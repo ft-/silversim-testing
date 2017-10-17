@@ -35,17 +35,34 @@ namespace SilverSim.Database.Memory.SimulationData
 
         private string GenParcelAccessListKey(UUID regionID, UUID parcelID) => regionID.ToString() + ":" + parcelID.ToString();
 
+        bool IParcelAccessList.TryGetValue(UUID regionID, UUID parcelID, UUI accessor, out ParcelAccessEntry e)
+        {
+            RwLockedDictionary<UUI, ParcelAccessEntry> list;
+            if (m_Data.TryGetValue(GenParcelAccessListKey(regionID, parcelID), out list))
+            {
+                IEnumerable<ParcelAccessEntry> en = from entry in list.Values where entry.Accessor.EqualsGrid(accessor) select entry;
+                IEnumerator<ParcelAccessEntry> enumerator = en.GetEnumerator();
+                if(enumerator.MoveNext())
+                {
+                    e = new ParcelAccessEntry(enumerator.Current);
+                    if (e.ExpiresAt != null && e.ExpiresAt.AsULong <= Date.Now.AsULong && list.RemoveIf(e.Accessor, (entry) => entry.ExpiresAt.AsULong <= Date.Now.AsULong))
+                    {
+                        e = null;
+                        return false;
+                    }
+                    return true;
+                }
+            }
+            e = null;
+            return false;
+        }
+
         bool IParcelAccessList.this[UUID regionID, UUID parcelID, UUI accessor]
         {
             get
             {
-                RwLockedDictionary<UUI, ParcelAccessEntry> list;
-                if(m_Data.TryGetValue(GenParcelAccessListKey(regionID, parcelID), out list))
-                {
-                    IEnumerable<ParcelAccessEntry> en = from entry in list.Values where entry.Accessor.EqualsGrid(accessor) select entry;
-                    return en.GetEnumerator().MoveNext();
-                }
-                return false;
+                ParcelAccessEntry pae;
+                return ((IParcelAccessList)this).TryGetValue(regionID, parcelID, accessor, out pae);
             }
         }
 
@@ -55,7 +72,7 @@ namespace SilverSim.Database.Memory.SimulationData
             {
                 RwLockedDictionary<UUI, ParcelAccessEntry> list;
                 return (m_Data.TryGetValue(GenParcelAccessListKey(regionID, parcelID), out list)) ?
-                    new List<ParcelAccessEntry>(from entry in list.Values where true select new ParcelAccessEntry(entry)) :
+                    new List<ParcelAccessEntry>(from entry in list.Values where entry.ExpiresAt != null && entry.ExpiresAt.AsULong > Date.Now.AsULong select new ParcelAccessEntry(entry)) :
                     new List<ParcelAccessEntry>();
             }
         }

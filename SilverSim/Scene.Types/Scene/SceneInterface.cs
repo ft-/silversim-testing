@@ -87,6 +87,7 @@ namespace SilverSim.Scene.Types.Scene
     {
         bool this[UUID regionID, UUID parcelID, UUI accessor] { get; }
         List<ParcelAccessEntry> this[UUID regionID, UUID parcelID] { get; }
+        bool TryGetValue(UUID regionID, UUID parcelID, UUI accessor, out ParcelAccessEntry e);
         void Store(ParcelAccessEntry entry);
         bool Remove(UUID regionID, UUID parcelID);
         bool Remove(UUID regionID, UUID parcelID, UUI accessor);
