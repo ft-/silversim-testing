@@ -72,7 +72,7 @@ namespace SilverSim.Database.Memory.SimulationData
             {
                 RwLockedDictionary<UUI, ParcelAccessEntry> list;
                 return (m_Data.TryGetValue(GenParcelAccessListKey(regionID, parcelID), out list)) ?
-                    new List<ParcelAccessEntry>(from entry in list.Values where entry.ExpiresAt != null && entry.ExpiresAt.AsULong > Date.Now.AsULong select new ParcelAccessEntry(entry)) :
+                    new List<ParcelAccessEntry>(from entry in list.Values where entry.ExpiresAt == null || entry.ExpiresAt.AsULong > Date.Now.AsULong select new ParcelAccessEntry(entry)) :
                     new List<ParcelAccessEntry>();
             }
         }

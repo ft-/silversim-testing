@@ -142,6 +142,26 @@ namespace SilverSim.Types
         }
         #endregion Serialization
 
+        public static Date operator +(Date d, TimeSpan t) =>
+            new Date(d.m_Value + t);
+        public static TimeSpan operator -(Date d1, Date d2) =>
+            d1.m_Value - d2.m_Value;
+
+        public static DateTime operator -(Date d, TimeSpan t) =>
+            new Date(d.m_Value - t);
+        public static bool operator ==(Date d1, Date d2) =>
+            d1.m_Value == d2.m_Value;
+        public static bool operator !=(Date d1, Date d2) =>
+            d1.m_Value != d2.m_Value;
+        public static bool operator <(Date t1, Date t2) =>
+            t1.m_Value < t2.m_Value;
+        public static bool operator >(Date t1, Date t2) =>
+            t1.m_Value > t2.m_Value;
+        public static bool operator <=(Date t1, Date t2) =>
+            t1.m_Value <= t2.m_Value;
+        public static bool operator >=(Date t1, Date t2) =>
+            t1.m_Value >= t2.m_Value;
+
         #region Helpers
         public ABoolean AsBoolean => new ABoolean(true);
         public Integer AsInteger => new Integer((int)DateTimeToUnixTime());
