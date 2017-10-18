@@ -155,7 +155,7 @@ namespace SilverSim.Types.Inventory
         {
             AssetID = new UUID(item.AssetID);
             AssetType = item.AssetType;
-            CreationDate = item.CreationDate;
+            CreationDate = new Date(item.CreationDate);
             Creator = new UUI(item.Creator);
             Description = item.Description;
             Flags = item.Flags;
@@ -175,7 +175,7 @@ namespace SilverSim.Types.Inventory
         {
             AssetID = new UUID(item.AssetID);
             AssetType = item.AssetType;
-            CreationDate = item.CreationDate;
+            CreationDate = new Date(item.CreationDate);
             Creator = new UUI(item.Creator);
             Description = item.Description;
             Flags = item.Flags;
