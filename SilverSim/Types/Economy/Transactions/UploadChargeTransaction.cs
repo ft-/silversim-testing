@@ -21,9 +21,7 @@
 
 namespace SilverSim.Types.Economy.Transactions
 {
-    public sealed class GroupJoinTransaction : ITransaction
+    public sealed class UploadChargeTransaction : ITransaction
     {
-        public UGI Group = UGI.Unknown;
-        public UUI Joiner = UUI.Unknown;
     }
 }

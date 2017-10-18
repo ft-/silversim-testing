@@ -21,9 +21,11 @@
 
 namespace SilverSim.Types.Economy.Transactions
 {
-    public sealed class GroupJoinTransaction : ITransaction
+    public sealed class LandSaleTransaction : ITransaction
     {
-        public UGI Group = UGI.Unknown;
-        public UUI Joiner = UUI.Unknown;
+        public UUID RegionID;
+        public string SimName;
+        public UUID ParcelID;
+        public string ParcelName;
     }
 }

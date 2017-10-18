@@ -29,7 +29,9 @@ namespace SilverSim.ServiceInterfaces.Economy
     {
         public interface IActiveTransaction
         {
+            /** <summary>Function to finalize transaction</summary> */
             void Commit();
+            /** <summary>Function to rollback a transaction</summary> */
             void Rollback(Exception exception);
         }
 
@@ -46,7 +48,13 @@ namespace SilverSim.ServiceInterfaces.Economy
 
         public abstract IMoneyBalanceAccessor MoneyBalance { get; }
 
+        /** <summary> Start a transaction for paying a grid service</summary>
+         * <exception cref="InsufficientFundsException">this exception is thrown when not enough funds are available</exception>
+         */
         public abstract IActiveTransaction BeginChargeTransaction(UUI agentID, ITransaction transactionData, int amount);
+        /** <summary> Start a transaction for paying another user</summary>
+         * <exception cref="InsufficientFundsException">this exception is thrown when not enough funds are available</exception>
+         */
         public abstract IActiveTransaction BeginTransferTransaction(UUI sourceID, UUI destinationID, ITransaction transactionData, int amount);
 
         public void ChargeAmount(UUI agentID, ITransaction transactionData, int amount, Action processOperation)

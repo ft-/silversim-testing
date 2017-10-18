@@ -21,9 +21,8 @@
 
 namespace SilverSim.Types.Economy.Transactions
 {
-    public sealed class GroupJoinTransaction : ITransaction
+    public sealed class User2UserMoneyTransferTransaction : ITransaction
     {
-        public UGI Group = UGI.Unknown;
-        public UUI Joiner = UUI.Unknown;
+        /* simple transaction type as it is a between user money transaction */
     }
 }

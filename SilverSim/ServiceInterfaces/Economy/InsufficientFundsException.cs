@@ -19,11 +19,29 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-namespace SilverSim.Types.Economy.Transactions
+using System;
+using System.Runtime.Serialization;
+
+namespace SilverSim.ServiceInterfaces.Economy
 {
-    public sealed class GroupJoinTransaction : ITransaction
+    public class InsufficientFundsException : Exception
     {
-        public UGI Group = UGI.Unknown;
-        public UUI Joiner = UUI.Unknown;
+        public InsufficientFundsException()
+        {
+        }
+
+        public InsufficientFundsException(string message) : base(message)
+        {
+        }
+
+        public InsufficientFundsException(string message, Exception innerException)
+            : base(message, innerException)
+        {
+        }
+
+        protected InsufficientFundsException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+        }
     }
 }

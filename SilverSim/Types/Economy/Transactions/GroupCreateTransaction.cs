@@ -21,7 +21,7 @@
 
 namespace SilverSim.Types.Economy.Transactions
 {
-    public class GroupCreateTransaction : ITransaction
+    public sealed class GroupCreateTransaction : ITransaction
     {
         public UGI Group = UGI.Unknown;
         public UUI Founder = UUI.Unknown;
