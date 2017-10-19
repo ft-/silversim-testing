@@ -213,6 +213,108 @@ namespace SilverSim.Types.Parcel
             }
         }
 
+        public bool TryFindNearestPointOnParcel(Vector3 originPosition, out Vector3 targetPosition)
+        {
+            targetPosition = Vector3.Zero;
+            double minxdist = Math.Abs(AABBMin.X - originPosition.X);
+            double minydist = Math.Abs(AABBMin.Y - originPosition.Y);
+            double maxxdist = Math.Abs(AABBMax.X - originPosition.X);
+            double maxydist = Math.Abs(AABBMax.Y - originPosition.Y);
+
+            int startx;
+            int starty;
+            int endx;
+            int endy;
+            if(maxxdist > minxdist)
+            {
+                startx = (int)AABBMin.X;
+                endx = (int)AABBMax.X;
+            }
+            else
+            {
+                startx = (int)AABBMax.X;
+                endx = (int)AABBMin.X;
+            }
+            if(maxydist > minydist)
+            {
+                starty = (int)AABBMin.Y;
+                endy = (int)AABBMax.Y;
+            }
+            else
+            {
+                starty = (int)AABBMax.Y;
+                endy = (int)AABBMin.Y;
+            }
+
+            int dirx = Math.Sign(endx - startx);
+            int diry = Math.Sign(endy - starty);
+            double distance = -1;
+
+            if (targetPosition.X < AABBMin.X || targetPosition.X > AABBMax.X)
+            {
+                /* point is to the left or right, so better go for vertical scan */
+                int xlinecnt = Math.Abs(endx - startx) + 1;
+                for (int x = startx; (endx - x) * dirx >= 0; x += dirx)
+                {
+                    int xcount = 0;
+                    for (int y = starty; (endy - y) * diry >= 0; y += diry)
+                    {
+                        if (LandBitmap[x, y])
+                        {
+                            double dist = (new Vector3(x - originPosition.X, y - originPosition.Y, 0)).LengthSquared;
+                            if (distance < 0 || distance > dist)
+                            {
+                                distance = dist;
+                                targetPosition = new Vector3(x, y, originPosition.Z);
+                            }
+                            else
+                            {
+                                ++xcount;
+                            }
+                        }
+                        if (xcount == xlinecnt)
+                        {
+                            /* limit parcel follow if all points exceed there is simply no need to continue */
+                            endx = x;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                /* point is to the top or bottom, so better go for horizontal scan */
+                int ylinecnt = Math.Abs(endy - starty) + 1;
+                for (int y = starty; (endy - y) * diry >= 0; y += diry)
+                {
+                    int ycount = 0;
+                    for (int x = startx; (endx - x) * dirx >= 0; x += dirx)
+                    {
+                        if (LandBitmap[x, y])
+                        {
+                            double dist = (new Vector3(x - originPosition.X, y - originPosition.Y, 0)).LengthSquared;
+                            if (distance < 0 || distance > dist)
+                            {
+                                distance = dist;
+                                targetPosition = new Vector3(x, y, originPosition.Z);
+                            }
+                            else
+                            {
+                                ++ycount;
+                            }
+                        }
+                        if (ycount == ylinecnt)
+                        {
+                            /* limit parcel follow if all points exceed there is simply no need to continue */
+                            endy = y;
+                        }
+                    }
+                }
+            }
+
+            return distance >= 0;
+        }
+
+
         public class ParcelDataLandBitmap
         {
             private readonly byte[,] m_LandBitmap;

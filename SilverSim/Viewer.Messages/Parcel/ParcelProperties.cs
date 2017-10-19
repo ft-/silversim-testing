@@ -36,6 +36,12 @@ namespace SilverSim.Viewer.Messages.Parcel
             Multiple = 1
         }
 
+        public const int SEQID_HOVERED_OVER_PARCEL = -50000;
+        public const int SEQID_NOT_ON_ACCESS_LIST = -40000;
+        public const int SEQID_BANNED = -30000;
+        public const int SEQID_NOT_IN_GROUP = -20000;
+        public const int SEQID_PARCEL_SELECTED = -10000;
+
         public RequestResultType RequestResult;
         public Int32 SequenceID;
         public bool SnapSelection;

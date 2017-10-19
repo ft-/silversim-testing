@@ -137,7 +137,7 @@ namespace SilverSim.Scene.Types.Scene
 
             for(offset = 0; offset < c.Length; offset += 1024, ++sequenceID)
             {
-                m = new ParcelOverlay()
+                m = new ParcelOverlay
                 {
                     SequenceID = sequenceID,
                     Data = (c.Length - offset >= 1024) ?
@@ -156,15 +156,15 @@ namespace SilverSim.Scene.Types.Scene
                 m_ParcelLayerRwLock.AcquireReaderLock(() =>
                 {
                     int sequenceID = 0;
-                    int totalLen = (int)(SizeX / PARCEL_BLOCK_SIZE * SizeY / PARCEL_BLOCK_SIZE);
-                    int xwidth = (int)(SizeX / PARCEL_BLOCK_SIZE);
+                    var totalLen = (int)(SizeX / PARCEL_BLOCK_SIZE * SizeY / PARCEL_BLOCK_SIZE);
+                    var xwidth = (int)(SizeX / PARCEL_BLOCK_SIZE);
                     for (int offset = 0; offset < totalLen; offset += 1024, ++sequenceID)
                     {
                         if (m_ParcelLayerDirty[offset / 1024])
                         {
                             foreach (IAgent a in Agents)
                             {
-                                ParcelOverlay m = new ParcelOverlay()
+                                var m = new ParcelOverlay
                                 {
                                     Data = (totalLen - offset >= 1024) ?
                                     new byte[1024] :
@@ -186,8 +186,90 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
+        private Dictionary<UUID, ParcelInfo> GetParcelsNearPoint(Vector3 position)
+        {
+            var results = new Dictionary<UUID, ParcelInfo>();
+            var start_x = (int)(position.X - 4);
+            var start_y = (int)(position.Y - 4);
+            var end_x = (int)(position.X + 4);
+            var end_y = (int)(position.Y + 4);
+            if (start_x < 0)
+            {
+                start_x = 0;
+            }
+            if (start_y < 0)
+            {
+                start_y = 0;
+            }
+            if (end_x >= SizeX)
+            {
+                end_x = (int)SizeX - 1;
+            }
+            if (end_y >= SizeY)
+            {
+                end_y = (int)SizeY - 1;
+            }
+
+            for (int x = start_x; x <= end_x; ++x)
+            {
+                for (int y = start_y; y <= end_y; ++y)
+                {
+                    ParcelInfo pinfo;
+                    try
+                    {
+                        pinfo = Parcels[new Vector3(x, y, 0)];
+                    }
+                    catch
+                    {
+                        continue;
+                    }
+
+                    if (!results.ContainsKey(pinfo.ID))
+                    {
+                        results.Add(pinfo.ID, pinfo);
+                    }
+                }
+            }
+            return results;
+        }
+
+        public bool TryGetNearestAccessibleParcel(IAgent accessor, Vector3 curPosition, out ParcelInfo pinfo, out Vector3 newPosition)
+        {
+            newPosition = curPosition;
+            pinfo = null;
+
+            var parcels = new List<ParcelInfo>();
+
+            foreach(ParcelInfo parcel in m_Parcels.ValuesByKey1)
+            {
+                if(!CheckParcelAccessRights(accessor, parcel))
+                {
+                    /* remove all inaccessible */
+                    continue;
+                }
+                parcels.Add(parcel);
+            }
+
+            double distance = -1;
+            foreach(ParcelInfo parcel in parcels)
+            {
+                Vector3 targetPosition;
+                if(parcel.TryFindNearestPointOnParcel(curPosition, out targetPosition))
+                {
+                    double newdistance = (targetPosition - curPosition).LengthSquared;
+                    if(distance < 0 || distance > newdistance)
+                    {
+                        distance = newdistance;
+                        newPosition = targetPosition;
+                    }
+                }
+            }
+
+            return distance >= 0;
+        }
+
         public ParcelProperties ParcelInfo2ParcelProperties(UUID agentID, ParcelInfo pinfo, int sequenceId, ParcelProperties.RequestResultType requestResult) =>
-            new ParcelProperties()
+            new ParcelProperties
         {
             RequestResult = requestResult,
             SequenceID = sequenceId,
