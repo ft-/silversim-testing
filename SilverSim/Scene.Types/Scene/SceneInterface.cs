@@ -296,7 +296,7 @@ namespace SilverSim.Scene.Types.Scene
             {
                 if(upd == null)
                 {
-                    upd = new CoarseLocationUpdate()
+                    upd = new CoarseLocationUpdate
                     {
                         Prey = -1,
                         You = -1
@@ -377,7 +377,7 @@ namespace SilverSim.Scene.Types.Scene
         protected ExternalHostNameServiceInterface m_ExternalHostNameService;
         public string ExternalHostName => m_ExternalHostNameService.ExternalHostName;
 
-        public RegionInfo GetRegionInfo() => new RegionInfo()
+        public RegionInfo GetRegionInfo() => new RegionInfo
         {
             Access = Access,
             Flags = RegionFlags.RegionOnline,

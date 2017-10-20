@@ -807,7 +807,7 @@ namespace SilverSim.Scene.Types.Scene
                 return false;
             }
 
-            ParcelInfo newParcel = new ParcelInfo(pInfo, true);
+            var newParcel = new ParcelInfo(pInfo, true);
             newParcel.ID = UUID.Random;
             Parcels.Add(newParcel);
             ParcelInfo.ParcelDataLandBitmap newBmap = newParcel.LandBitmap;
