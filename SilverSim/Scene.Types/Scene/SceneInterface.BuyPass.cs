@@ -77,7 +77,8 @@ namespace SilverSim.Scene.Types.Scene
                 RegionID = ID,
                 SimName = Name,
                 ParcelID = parcelInfo.ID,
-                ParcelName = parcelInfo.Name
+                ParcelName = parcelInfo.Name,
+                PassHours = passHours
             }, passPrice, () => Parcels.LandpassList.ExtendExpiry(ID, parcelInfo.ID, agent.Owner, extendSeconds));
         }
     }

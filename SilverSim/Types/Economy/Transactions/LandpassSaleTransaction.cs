@@ -27,5 +27,6 @@ namespace SilverSim.Types.Economy.Transactions
         public string SimName;
         public UUID ParcelID;
         public string ParcelName;
+        public double PassHours;
     }
 }
