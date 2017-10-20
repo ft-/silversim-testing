@@ -83,12 +83,36 @@ namespace SilverSim.Scene.Types.Scene
         int Count { get; }
     }
 
+
+    public class ExtendExpiryFailedException : Exception
+    {
+        public ExtendExpiryFailedException()
+        {
+        }
+
+        public ExtendExpiryFailedException(string message) 
+            : base(message)
+        {
+        }
+
+        public ExtendExpiryFailedException(string message, Exception innerException) 
+            : base(message, innerException)
+        {
+        }
+
+        protected ExtendExpiryFailedException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) 
+            : base(info, context)
+        {
+        }
+    }
+
     public interface IParcelAccessList
     {
         bool this[UUID regionID, UUID parcelID, UUI accessor] { get; }
         List<ParcelAccessEntry> this[UUID regionID, UUID parcelID] { get; }
         bool TryGetValue(UUID regionID, UUID parcelID, UUI accessor, out ParcelAccessEntry e);
         void Store(ParcelAccessEntry entry);
+        void ExtendExpiry(UUID regionID, UUID parcelID, UUI accessor, ulong extendseconds);
         bool Remove(UUID regionID, UUID parcelID);
         bool Remove(UUID regionID, UUID parcelID, UUI accessor);
     }

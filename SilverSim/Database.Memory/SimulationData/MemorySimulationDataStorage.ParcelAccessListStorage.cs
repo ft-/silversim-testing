@@ -24,6 +24,7 @@ using SilverSim.Scene.Types.Scene;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Parcel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -81,6 +82,33 @@ namespace SilverSim.Database.Memory.SimulationData
         {
             string key = GenParcelAccessListKey(entry.RegionID, entry.ParcelID);
             m_Data[key][entry.Accessor] = new ParcelAccessEntry(entry);
+        }
+
+        private readonly object m_ExpiryExtendLock = new object();
+        void IParcelAccessList.ExtendExpiry(UUID regionID, UUID parcelID, UUI accessor, ulong extendseconds)
+        {
+            lock (m_ExpiryExtendLock)
+            {
+                ParcelAccessEntry entry;
+                if (((IParcelAccessList)this).TryGetValue(regionID, parcelID, accessor, out entry))
+                {
+                    if (entry.ExpiresAt != null)
+                    {
+                        entry.ExpiresAt = new Date((DateTime)entry.ExpiresAt + TimeSpan.FromSeconds(extendseconds));
+                        ((IParcelAccessList)this).Store(entry);
+                    }
+                }
+                else
+                {
+                    ((IParcelAccessList)this).Store(new ParcelAccessEntry
+                    {
+                        RegionID = regionID,
+                        ParcelID = parcelID,
+                        Accessor = accessor,
+                        ExpiresAt = new Date((DateTime)Date.Now + TimeSpan.FromSeconds(extendseconds))
+                    });
+                }
+            }
         }
 
         bool ISimulationDataParcelAccessListStorageInterface.RemoveAllFromRegion(UUID regionID)
