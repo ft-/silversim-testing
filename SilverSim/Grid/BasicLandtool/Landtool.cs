@@ -27,9 +27,8 @@ using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.Types;
 using SilverSim.Types.Presence;
 using SilverSim.Types.StructuredData.XmlRpc;
-using System.ComponentModel;
-using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace SilverSim.Grid.BasicLandtool
 {
