@@ -24,29 +24,32 @@ using SilverSim.Types;
 using SilverSim.Types.StructuredData.Json;
 using SilverSim.Types.StructuredData.XmlRpc;
 using System.IO;
+using System.Security.Cryptography.X509Certificates;
 
 namespace SilverSim.Main.Common.Rpc
 {
     public static class RPC
     {
-        public static IValue DoJson20RpcRequest(string url, string method, string jsonId, IValue param, int timeoutms)
+        public static IValue DoJson20RpcRequest(string url, string method, string jsonId, IValue param, int timeoutms, X509CertificateCollection clientCertificates = null)
         {
             string jsonReq = Json20Rpc.SerializeRequest(method, jsonId, param);
             using (Stream res = new HttpClient.Post(url, "application/json-rpc", jsonReq)
             {
-                TimeoutMs = timeoutms
+                TimeoutMs = timeoutms,
+                ClientCertificates = clientCertificates
             }.ExecuteStreamRequest())
             {
                 return Json20Rpc.DeserializeResponse(res);
             }
         }
 
-        public static XmlRpc.XmlRpcResponse DoXmlRpcRequest(string url, XmlRpc.XmlRpcRequest req, int timeoutms)
+        public static XmlRpc.XmlRpcResponse DoXmlRpcRequest(string url, XmlRpc.XmlRpcRequest req, int timeoutms, X509Certificate2Collection clientCertificates = null)
         {
             byte[] rpcdata = req.Serialize();
             using (Stream res = new HttpClient.Post(url, "text/xml", rpcdata.Length, (Stream s) => s.Write(rpcdata, 0, rpcdata.Length))
             {
-                TimeoutMs = timeoutms
+                TimeoutMs = timeoutms,
+                ClientCertificates = clientCertificates
             }.ExecuteStreamRequest())
             {
                 return XmlRpc.DeserializeResponse(res);
