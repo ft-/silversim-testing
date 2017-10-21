@@ -38,7 +38,7 @@ namespace SilverSim.ServiceInterfaces.Economy
 
         public interface IMoneyBalanceAccessor
         {
-            Int32 this[UUI agentID] { get; set; }
+            Int32 this[UUI agentID] { get; }
 
             bool TryGetValue(UUI agentID, out Int32 balance);
         }
@@ -54,13 +54,13 @@ namespace SilverSim.ServiceInterfaces.Economy
         /** <summary> Start a transaction for paying a grid service</summary>
          * <exception cref="InsufficientFundsException">this exception is thrown when not enough funds are available</exception>
          */
-        public abstract IActiveTransaction BeginChargeTransaction(UUI agentID, ITransaction transactionData, int amount);
+        public abstract IActiveTransaction BeginChargeTransaction(UUI agentID, BaseTransaction transactionData, int amount);
         /** <summary> Start a transaction for paying another user</summary>
          * <exception cref="InsufficientFundsException">this exception is thrown when not enough funds are available</exception>
          */
-        public abstract IActiveTransaction BeginTransferTransaction(UUI sourceID, UUI destinationID, ITransaction transactionData, int amount);
+        public abstract IActiveTransaction BeginTransferTransaction(UUI sourceID, UUI destinationID, BaseTransaction transactionData, int amount);
 
-        public void ChargeAmount(UUI agentID, ITransaction transactionData, int amount, Action processOperation)
+        public void ChargeAmount(UUI agentID, BaseTransaction transactionData, int amount, Action processOperation)
         {
             IActiveTransaction transaction = BeginChargeTransaction(agentID, transactionData, amount);
             try
@@ -75,7 +75,7 @@ namespace SilverSim.ServiceInterfaces.Economy
             transaction.Commit();
         }
 
-        public void TransferMoney(UUI sourceID, UUI destinationID, ITransaction transactionData, int amount, Action processOperation)
+        public void TransferMoney(UUI sourceID, UUI destinationID, BaseTransaction transactionData, int amount, Action processOperation)
         {
             IActiveTransaction transaction = BeginTransferTransaction(sourceID, destinationID, transactionData, amount);
             try

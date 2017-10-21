@@ -21,9 +21,14 @@
 
 namespace SilverSim.Types.Economy.Transactions
 {
-    public class ObjectPaysTransaction : ITransaction
+    public class ObjectPaysTransaction : BaseTransaction
     {
         public string ObjectName = string.Empty;
         public UUID ObjectID = UUID.Zero;
+
+        public ObjectPaysTransaction(GridVector regionHandle, UUID regionID, string regionName)
+            : base(regionHandle, regionID, regionName)
+        {
+        }
     }
 }

@@ -21,11 +21,14 @@
 
 namespace SilverSim.Types.Economy.Transactions
 {
-    public sealed class LandSaleTransaction : ITransaction
+    public sealed class LandSaleTransaction : BaseTransaction
     {
-        public UUID RegionID;
-        public string SimName;
         public UUID ParcelID;
         public string ParcelName;
+
+        public LandSaleTransaction(GridVector regionHandle, UUID regionID, string regionName)
+            : base(regionHandle, regionID, regionName)
+        {
+        }
     }
 }

@@ -21,8 +21,13 @@
 
 namespace SilverSim.Types.Economy.Transactions
 {
-    public sealed class User2UserMoneyTransferTransaction : ITransaction
+    public sealed class User2UserMoneyTransferTransaction : BaseTransaction
     {
         /* simple transaction type as it is a between user money transaction */
+
+        public User2UserMoneyTransferTransaction(GridVector regionHandle, UUID regionID, string regionName)
+            : base(regionHandle, regionID, regionName)
+        {
+        }
     }
 }

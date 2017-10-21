@@ -21,14 +21,17 @@
 
 namespace SilverSim.Types.Economy.Transactions
 {
-    public sealed class ObjectInventorySaleTransaction : BaseTransaction
+    public abstract class BaseTransaction
     {
-        public string ObjectName = string.Empty;
-        public UUID ObjectID = UUID.Zero;
+        public UUID RegionID { get; }
+        public string RegionName { get; }
+        public GridVector RegionHandle { get; }
 
-        public ObjectInventorySaleTransaction(GridVector regionHandle, UUID regionID, string regionName)
-            : base(regionHandle, regionID, regionName)
+        protected BaseTransaction(GridVector regionHandle, UUID regionID, string regionName)
         {
+            RegionID = regionID;
+            RegionHandle = regionHandle;
+            RegionName = regionName;
         }
     }
 }

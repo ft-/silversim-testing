@@ -69,10 +69,11 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             var extendSeconds = (ulong)TimeSpan.FromHours(passHours).Seconds;
-            economyService.TransferMoney(agent.Owner, parcelInfo.Owner, new LandpassSaleTransaction
+            economyService.TransferMoney(agent.Owner, parcelInfo.Owner, new LandpassSaleTransaction(
+                GridPosition,
+                ID,
+                Name)
             {
-                RegionID = ID,
-                SimName = Name,
                 ParcelID = parcelInfo.ID,
                 ParcelName = parcelInfo.Name,
                 PassHours = passHours

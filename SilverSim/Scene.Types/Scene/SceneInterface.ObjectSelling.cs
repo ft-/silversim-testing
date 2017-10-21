@@ -390,17 +390,19 @@ namespace SilverSim.Scene.Types.Scene
                             {
                                 transaction = agent.EconomyService.BeginTransferTransaction(agent.Owner, part.Owner,
                                     grp.SaleType == InventoryItem.SaleInfoData.SaleType.Content ?
-                                    (ITransaction)new ObjectInventorySaleTransaction
+                                    (BaseTransaction)new ObjectInventorySaleTransaction(
+                                        GridPosition,
+                                        ID,
+                                        Name)
                                     {
-                                        RegionID = ID,
-                                        RegionName = Name,
                                         ObjectID = grp.ID,
                                         ObjectName = grp.Name
                                     } :
-                                    new ObjectSaleTransaction
+                                    new ObjectSaleTransaction(
+                                        GridPosition,
+                                        ID,
+                                        Name)
                                     {
-                                        RegionID = ID,
-                                        RegionName = Name,
                                         ObjectID = grp.ID,
                                         ObjectName = grp.Name
                                     },

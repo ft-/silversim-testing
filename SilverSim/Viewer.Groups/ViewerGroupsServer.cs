@@ -486,7 +486,10 @@ namespace SilverSim.Viewer.Groups
             {
                 if (economyService != null && scene.EconomyData.PriceGroupCreate > 0)
                 {
-                    economyService.ChargeAmount(agent.Owner, new GroupCreateTransaction
+                    economyService.ChargeAmount(agent.Owner, new GroupCreateTransaction(
+                        scene.GridPosition,
+                        scene.ID,
+                        scene.Name)
                     {
                         Group = groupinfo.ID,
                         Founder = groupinfo.Founder
@@ -601,6 +604,31 @@ namespace SilverSim.Viewer.Groups
             {
                 agent.SendMessageAlways(reply, scene.ID);
                 return;
+            }
+            else if(ginfo.MembershipFee != 0)
+            {
+                EconomyServiceInterface economyService = agent.EconomyService;
+                if (economyService != null)
+                {
+                    try
+                    {
+                        economyService.TransferMoney(agent.Owner, ginfo.Founder, new GroupJoinTransaction(
+                            scene.GridPosition,
+                            scene.ID,
+                            scene.Name)
+                        {
+                            Group = ginfo.ID,
+                            Joiner = agent.Owner
+                        }, ginfo.MembershipFee, () =>
+                            groupsService.Members.Add(agent.Owner, new UGI(req.GroupID), agent.Owner, UUID.Zero, ""));
+                        reply.Success = true;
+                    }
+                    catch (Exception e)
+                    {
+                        m_Log.Info("JoinGroupRequest", e);
+                    }
+                }
+                agent.SendMessageAlways(reply, scene.ID);
             }
             else
             {

@@ -21,7 +21,11 @@
 
 namespace SilverSim.Types.Economy.Transactions
 {
-    public sealed class UploadChargeTransaction : ITransaction
+    public sealed class UploadChargeTransaction : BaseTransaction
     {
+        public UploadChargeTransaction(GridVector regionHandle, UUID regionID, string regionName) 
+            : base(regionHandle, regionID, regionName)
+        {
+        }
     }
 }
