@@ -20,7 +20,6 @@
 // exception statement from your version.
 
 using SilverSim.Types;
-using SilverSim.Types.Account;
 using SilverSim.Types.Economy.Transactions;
 using System;
 using System.Runtime.Serialization;
