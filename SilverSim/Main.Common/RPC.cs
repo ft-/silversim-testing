@@ -43,7 +43,7 @@ namespace SilverSim.Main.Common.Rpc
             }
         }
 
-        public static XmlRpc.XmlRpcResponse DoXmlRpcRequest(string url, XmlRpc.XmlRpcRequest req, int timeoutms, X509Certificate2Collection clientCertificates = null)
+        public static XmlRpc.XmlRpcResponse DoXmlRpcRequest(string url, XmlRpc.XmlRpcRequest req, int timeoutms, X509CertificateCollection clientCertificates = null)
         {
             byte[] rpcdata = req.Serialize();
             using (Stream res = new HttpClient.Post(url, "text/xml", rpcdata.Length, (Stream s) => s.Write(rpcdata, 0, rpcdata.Length))
