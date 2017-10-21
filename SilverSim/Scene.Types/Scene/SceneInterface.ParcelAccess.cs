@@ -21,16 +21,12 @@
 
 using SilverSim.Scene.Types.Agent;
 using SilverSim.ServiceInterfaces.Economy;
+using SilverSim.Types;
 using SilverSim.Types.Economy.Transactions;
 using SilverSim.Types.Parcel;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Parcel;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static SilverSim.ServiceInterfaces.Economy.EconomyServiceInterface;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -80,6 +76,11 @@ namespace SilverSim.Scene.Types.Scene
                 ParcelName = parcelInfo.Name,
                 PassHours = passHours
             }, passPrice, () => Parcels.LandpassList.ExtendExpiry(ID, parcelInfo.ID, agent.Owner, extendSeconds));
+        }
+
+        public void EjectFromParcel(UUID agentID, UUID parcelID)
+        {
+
         }
     }
 }

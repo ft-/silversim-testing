@@ -160,7 +160,7 @@ namespace SilverSim.Scene.Types.Scene
 
         protected abstract void TriggerSpawnpointUpdate();
 
-        private bool CheckParcelAccessRights(IAgent agent, ParcelInfo parcel, out string reason)
+        public bool CheckParcelAccessRights(IAgent agent, ParcelInfo parcel, out string reason)
         {
             reason = string.Empty;
             /* EO,EM,RO,PO must be able to enter parcel */

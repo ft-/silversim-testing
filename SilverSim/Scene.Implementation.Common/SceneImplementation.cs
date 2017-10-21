@@ -57,7 +57,7 @@ using System.Timers;
 
 namespace SilverSim.Scene.Implementation.Common
 {
-    public abstract class SceneImplementation : SceneInterface
+    public abstract partial class SceneImplementation : SceneInterface
     {
         private static readonly ILog m_Log = LogManager.GetLogger("SCENE");
 
@@ -73,6 +73,7 @@ namespace SilverSim.Scene.Implementation.Common
         protected readonly SimulationDataStorageInterface m_SimulationDataStorage;
         protected readonly NeighborServiceInterface m_NeighborService;
         protected readonly BaseHttpServer m_HttpServer;
+        protected ParcelAccessManager m_ParcelAccessManager;
 
         protected override object GetService(Type service)
         {
@@ -237,6 +238,7 @@ namespace SilverSim.Scene.Implementation.Common
             }
             Environment.Start();
             Environment.OnEnvironmentControllerChangeParams += StoreEnvironmentControllerData;
+            m_ParcelAccessManager.Start();
         }
 
         private void StoreEnvironmentControllerData(byte[] serializedData)
@@ -267,6 +269,7 @@ namespace SilverSim.Scene.Implementation.Common
         protected void RemoveScene(SceneInterface s)
         {
             ScriptThreadPool.Shutdown();
+            m_ParcelAccessManager.Stop();
             Environment.OnEnvironmentControllerChangeParams -= StoreEnvironmentControllerData;
             Environment.Stop();
             PathfindingService?.Stop();

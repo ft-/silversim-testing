@@ -125,17 +125,19 @@ namespace SilverSim.Scene.Implementation.Basic
         {
             private readonly BasicScene m_Scene;
             private readonly object m_SceneUpdateLock = new object();
+            internal readonly ParcelAccessManager m_ParcelAccessManager;
 
             internal BasicSceneParcelsCollection(BasicScene scene)
             {
                 m_Scene = scene;
+                m_ParcelAccessManager = new ParcelAccessManager(scene, scene.m_SimulationDataStorage);
             }
 
-            public IParcelAccessList WhiteList => m_Scene.m_SimulationDataStorage.Parcels.WhiteList;
+            public IParcelAccessList WhiteList => m_ParcelAccessManager.WhiteList;
 
-            public IParcelAccessList BlackList => m_Scene.m_SimulationDataStorage.Parcels.BlackList;
+            public IParcelAccessList BlackList => m_ParcelAccessManager.BlackList;
 
-            public IParcelAccessList LandpassList => m_Scene.m_SimulationDataStorage.Parcels.LandpassList;
+            public IParcelAccessList LandpassList => m_ParcelAccessManager.LandpassList;
 
             public IParcelExperienceList Experiences => m_Scene.m_SimulationDataStorage.Parcels.Experiences;
 
@@ -340,6 +342,7 @@ namespace SilverSim.Scene.Implementation.Basic
             m_SceneAgents = new BasicSceneAgentsCollection(this);
             m_SceneRootAgents = new BasicSceneRootAgentsCollection(this);
             m_SceneParcels = new BasicSceneParcelsCollection(this);
+            m_ParcelAccessManager = m_SceneParcels.m_ParcelAccessManager;
 
             StartScene(sceneParams);
         }
