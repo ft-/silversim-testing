@@ -220,6 +220,7 @@ namespace SilverSim.Scene.Types.Scene
         public string GatekeeperURI { get; protected set; }
         public IScriptWorkerThreadPool ScriptThreadPool { get; protected set; }
         public Date m_StartTime = new Date();
+        public readonly Map SimulatorFeaturesExtrasMap = new Map();
 
         protected List<IUserAgentServicePlugin> UserAgentServicePlugins = new List<IUserAgentServicePlugin>();
         protected List<IAssetServicePlugin> AssetServicePlugins = new List<IAssetServicePlugin>();

@@ -25,6 +25,7 @@ using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Economy;
 using SilverSim.Types;
 using SilverSim.Types.StructuredData.Llsd;
+using System.Collections.Generic;
 using System.Net;
 
 namespace SilverSim.Viewer.Core.Capabilities
@@ -71,9 +72,13 @@ namespace SilverSim.Viewer.Core.Capabilities
             extrasMap.Add("SimulatorFPSFactor", 1.0);
             extrasMap.Add("ExportSupported", true);
             EconomyServiceInterface economyService = agent.EconomyService;
-            if(economyService != null)
+            foreach(KeyValuePair<string, IValue> kvp in scene.SimulatorFeaturesExtrasMap)
             {
-                extrasMap.Add("currency", economyService.CurrencySymbol);
+                extrasMap[kvp.Key] = kvp.Value;
+            }
+            if (economyService != null)
+            {
+                extrasMap["currency"] = new AString(economyService.CurrencySymbol);
             }
             if (extrasMap.Count > 0)
             {
