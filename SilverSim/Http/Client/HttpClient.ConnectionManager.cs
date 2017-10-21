@@ -167,13 +167,6 @@ namespace SilverSim.Http.Client
         #endregion
 
         #region Stream pipeling handling
-        private static AbstractHttpStream OpenStream(string scheme, string host, int port, ConnectionModeEnum reuseMode) =>
-            OpenStream(scheme, host, port,
-                null,
-                SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12,
-                false,
-                reuseMode);
-
         private static AbstractHttpStream OpenStream(
             string scheme, string host, int port,
             X509CertificateCollection clientCertificates,
@@ -284,12 +277,6 @@ namespace SilverSim.Http.Client
         #endregion
 
         #region HTTP/2 stream handling
-        private static Http2Connection.Http2Stream OpenHttp2Stream(string scheme, string host, int port) =>
-            OpenHttp2Stream(scheme, host, port,
-                null,
-                SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12,
-                false);
-
         private static Http2Connection.Http2Stream TryReuseStream(string scheme, string host, int port)
         {
             string key = scheme + "://" + host + ":" + port.ToString();

@@ -26,6 +26,8 @@ using System.IO;
 using System.IO.Compression;
 using System.Net.Sockets;
 using System.Runtime.Serialization;
+using System.Security.Authentication;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Web;
 
@@ -92,6 +94,10 @@ namespace SilverSim.Http.Client
             public bool Expect100Continue;
             public bool UseChunkedEncoding;
             public int Expect100ContinueMinSize = 8192;
+
+            public X509CertificateCollection ClientCertificates;
+            public SslProtocols EnabledSslProtocols = SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12;
+            public bool CheckCertificateRevocation = true;
 
             public Request(string url)
             {
@@ -429,7 +435,7 @@ namespace SilverSim.Http.Client
 
             int retrycnt = 1;
             retry:
-            AbstractHttpStream s = OpenStream(uri.Scheme, uri.Host, uri.Port, request.ConnectionMode);
+            AbstractHttpStream s = OpenStream(uri.Scheme, uri.Host, uri.Port, request.ClientCertificates, request.EnabledSslProtocols, request.CheckCertificateRevocation, request.ConnectionMode);
             string finalreqdata = reqdata;
             if (!s.IsReusable)
             {
@@ -787,7 +793,7 @@ namespace SilverSim.Http.Client
 
             int retrycnt = 1;
             retry:
-            Http2Connection.Http2Stream s = reuseStream ?? OpenHttp2Stream(uri.Scheme, uri.Host, uri.Port);
+            Http2Connection.Http2Stream s = reuseStream ?? OpenHttp2Stream(uri.Scheme, uri.Host, uri.Port, request.ClientCertificates, request.EnabledSslProtocols, request.CheckCertificateRevocation);
             headers.Clear();
             try
             {
