@@ -46,7 +46,15 @@ namespace SilverSim.Viewer.Economy
         {
             m_Scenes = loader.Scenes;
             m_Scenes.OnRegionAdd += OnSceneAdded;
-            m_HttpServer = loader.HttpServer;
+            /* prefer HTTPS over HTTP */
+            try
+            {
+                m_HttpServer = loader.HttpsServer;
+            }
+            catch
+            {
+                m_HttpServer = loader.HttpServer;
+            }
             loader.XmlRpcServer.XmlRpcMethods.Add("getCurrencyQuote", HandleGetCurrencyQuote);
             loader.XmlRpcServer.XmlRpcMethods.Add("buyCurrency", HandleBuyCurrency);
         }
