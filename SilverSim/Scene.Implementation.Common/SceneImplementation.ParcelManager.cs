@@ -31,6 +31,9 @@ namespace SilverSim.Scene.Implementation.Common
                 m_BlackListStorage = simulationDataStorage.Parcels.BlackList;
                 m_LandpassListStorage = simulationDataStorage.Parcels.LandpassList;
                 m_StorageList = new IParcelAccessList[] { m_WhiteListStorage, m_BlackListStorage, m_LandpassListStorage };
+                WhiteList = new StatusUpdateListener(this, m_WhiteListStorage);
+                BlackList = new StatusUpdateListener(this, m_BlackListStorage);
+                LandpassList = new StatusUpdateListener(this, m_LandpassListStorage);
             }
 
             ~ParcelAccessManager()
