@@ -56,7 +56,7 @@ namespace SilverSim.Scene.Types.Scene
 
             double passHours = parcelInfo.PassHours;
             int passPrice = parcelInfo.PassPrice;
-            if((parcelInfo.Flags & ParcelFlags.UsePassList) == 0 || passPrice <= 0 || passHours <= 0)
+            if((parcelInfo.Flags & ParcelFlags.UsePassList) == 0 || passPrice < 0 || passHours <= 0)
             {
                 return;
             }
@@ -64,6 +64,7 @@ namespace SilverSim.Scene.Types.Scene
             EconomyServiceInterface economyService = agent.EconomyService;
             if (economyService == null)
             {
+                agent.SendAlertMessage(this.GetLanguageString(agent.CurrentCulture, "UnableToBuyNoEconomyConfigured", "Unable to buy. No economy configured."), ID);
                 return;
             }
 

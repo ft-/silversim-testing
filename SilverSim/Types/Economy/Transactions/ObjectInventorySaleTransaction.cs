@@ -21,9 +21,11 @@
 
 namespace SilverSim.Types.Economy.Transactions
 {
-    public class ObjectPaysTransaction : ITransaction
+    public sealed class ObjectInventorySaleTransaction : ITransaction
     {
         public string ObjectName = string.Empty;
         public UUID ObjectID = UUID.Zero;
+        public string RegionName = string.Empty;
+        public UUID RegionID = UUID.Zero;
     }
 }

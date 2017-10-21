@@ -32,3 +32,5 @@ ExpectingAKeyParameterFor0Got1=Es wird ein key-Parameter für {0} erwartet: vorg
 ExpectingAFloatParameterFor0Got1=Es wird ein float-Parameter für {0} erwartet: vorgefunden {1}
 ExpectingARotationParameterFor0Got1=Es wird ein rotation-Parameter für {0} erwartet: vorgefunden {1}
 ExpectingAVectorParameterFor0Got1=Es wird ein vector-Parameter für {0} erwartet: vorgefunden {1}
+UnableToBuyInsufficientFunds=Kaufen nicht möglich. Vorhandenes Geld reicht nicht aus.
+UnableToBuyNoEconomyConfigured=Kaufen nicht möglich. Keine Währung konfiguriert.

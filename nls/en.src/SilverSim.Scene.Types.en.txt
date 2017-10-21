@@ -32,3 +32,5 @@ ExpectingAKeyParameterFor0Got1=Expecting a key parameter for {0}: got {1}
 ExpectingAFloatParameterFor0Got1=Expecting a float parameter for {0}: got {1}
 ExpectingARotationParameterFor0Got1=Expecting a rotation parameter for {0}: got {1}
 ExpectingAVectorParameterFor0Got1=Expecting a vector parameter for {0}: got {1}
+UnableToBuyInsufficientFunds=Unable to buy. Insufficient funds.
+UnableToBuyNoEconomyConfigured=Unable to buy. No economy configured.

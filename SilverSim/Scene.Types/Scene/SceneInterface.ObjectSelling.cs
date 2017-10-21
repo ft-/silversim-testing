@@ -24,9 +24,11 @@ using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Scene.Types.Transfer;
+using SilverSim.ServiceInterfaces.Economy;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
+using SilverSim.Types.Economy.Transactions;
 using SilverSim.Types.Inventory;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Object;
@@ -381,6 +383,54 @@ namespace SilverSim.Scene.Types.Scene
                                 grp.SaleType == InventoryItem.SaleInfoData.SaleType.Content ? part.Name : string.Empty,
                                 part.ID).QueueWorkItem();
                         }
+                        else if(agent.EconomyService != null)
+                        {
+                            EconomyServiceInterface.IActiveTransaction transaction;
+                            try
+                            {
+                                transaction = agent.EconomyService.BeginTransferTransaction(agent.Owner, part.Owner,
+                                    grp.SaleType == InventoryItem.SaleInfoData.SaleType.Content ?
+                                    (ITransaction)new ObjectInventorySaleTransaction
+                                    {
+                                        RegionID = ID,
+                                        RegionName = Name,
+                                        ObjectID = grp.ID,
+                                        ObjectName = grp.Name
+                                    } :
+                                    new ObjectSaleTransaction
+                                    {
+                                        RegionID = ID,
+                                        RegionName = Name,
+                                        ObjectID = grp.ID,
+                                        ObjectName = grp.Name
+                                    },
+                                    grp.SalePrice);
+                            }
+                            catch(InsufficientFundsException)
+                            {
+                                agent.SendAlertMessage(this.GetLanguageString(agent.CurrentCulture, "UnableToBuyInsufficientFunds", "Unable to buy. Insufficient funds."), ID);
+                                continue;
+                            }
+                            catch (Exception e)
+                            {
+                                m_Log.Error("Exception at object selling", e);
+                                agent.SendAlertMessage(e.Message, ID);
+                                continue;
+                            }
+
+                            new ObjectBuyTransferItem(
+                                agent,
+                                this,
+                                assetids,
+                                items,
+                                grp.SaleType == InventoryItem.SaleInfoData.SaleType.Content ? part.Name : string.Empty,
+                                part.ID,
+                                transaction).QueueWorkItem();
+                        }
+                        else
+                        {
+                            agent.SendAlertMessage(this.GetLanguageString(agent.CurrentCulture, "UnableToBuyNoEconomyConfigured", "Unable to buy. No economy configured."), ID);
+                        }
                     }
                 }
             }
@@ -389,6 +439,7 @@ namespace SilverSim.Scene.Types.Scene
         public class ObjectBuyTransferItem : ObjectTransferItem
         {
             private readonly UUID m_SellingPrimitiveID;
+            private readonly EconomyServiceInterface.IActiveTransaction m_Transaction;
 
             public ObjectBuyTransferItem(
                 IAgent agent,
@@ -396,15 +447,18 @@ namespace SilverSim.Scene.Types.Scene
                 List<UUID> assetids,
                 List<InventoryItem> items,
                 string destinationFolder,
-                UUID sellingPrimitiveID)
+                UUID sellingPrimitiveID,
+                EconomyServiceInterface.IActiveTransaction transaction = null)
                 : base(agent, scene, assetids, items, destinationFolder)
             {
                 m_SellingPrimitiveID = sellingPrimitiveID;
+                m_Transaction = transaction;
             }
 
             public override void AssetTransferComplete()
             {
                 base.AssetTransferComplete();
+                m_Transaction?.Commit();
 
                 ObjectPart part;
                 SceneInterface scene;
@@ -431,6 +485,12 @@ namespace SilverSim.Scene.Types.Scene
                         }
                     }
                 }
+            }
+
+            public override void AssetTransferFailed(Exception e)
+            {
+                base.AssetTransferFailed(e);
+                m_Transaction?.Rollback(e);
             }
         }
 
