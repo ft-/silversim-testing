@@ -256,23 +256,23 @@ namespace SilverSim.Types.Parcel
                 int xlinecnt = Math.Abs(endx - startx) + 1;
                 for (int x = startx; (endx - x) * dirx >= 0; x += dirx)
                 {
-                    int xcount = 0;
+                    bool onepointnearer = false;
                     for (int y = starty; (endy - y) * diry >= 0; y += diry)
                     {
+                        double dist = (new Vector3(x - originPosition.X, y - originPosition.Y, 0)).LengthSquared;
+                        if (distance < 0 || dist < distance)
+                        {
+                            onepointnearer = true;
+                        }
                         if (LandBitmap[x, y])
                         {
-                            double dist = (new Vector3(x - originPosition.X, y - originPosition.Y, 0)).LengthSquared;
                             if (distance < 0 || distance > dist)
                             {
                                 distance = dist;
                                 targetPosition = new Vector3(x, y, originPosition.Z);
                             }
-                            else
-                            {
-                                ++xcount;
-                            }
                         }
-                        if (xcount == xlinecnt)
+                        if (!onepointnearer)
                         {
                             /* limit parcel follow if all points exceed there is simply no need to continue */
                             endx = x;
@@ -286,23 +286,23 @@ namespace SilverSim.Types.Parcel
                 int ylinecnt = Math.Abs(endy - starty) + 1;
                 for (int y = starty; (endy - y) * diry >= 0; y += diry)
                 {
-                    int ycount = 0;
+                    bool onepointnearer = false;
                     for (int x = startx; (endx - x) * dirx >= 0; x += dirx)
                     {
+                        double dist = (new Vector3(x - originPosition.X, y - originPosition.Y, 0)).LengthSquared;
+                        if (distance < 0 || dist < distance)
+                        {
+                            onepointnearer = true;
+                        }
                         if (LandBitmap[x, y])
                         {
-                            double dist = (new Vector3(x - originPosition.X, y - originPosition.Y, 0)).LengthSquared;
                             if (distance < 0 || distance > dist)
                             {
                                 distance = dist;
                                 targetPosition = new Vector3(x, y, originPosition.Z);
                             }
-                            else
-                            {
-                                ++ycount;
-                            }
                         }
-                        if (ycount == ylinecnt)
+                        if (!onepointnearer)
                         {
                             /* limit parcel follow if all points exceed there is simply no need to continue */
                             endy = y;
