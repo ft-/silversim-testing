@@ -29,6 +29,7 @@ using SilverSim.Types;
 using SilverSim.Types.StructuredData.XmlRpc;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 
 namespace SilverSim.Viewer.Economy
 {
@@ -57,14 +58,28 @@ namespace SilverSim.Viewer.Economy
             dict["economy"] = m_HttpServer.ServerURI;
         }
 
+        private static CultureInfo GetLanguageCulture(string language)
+        {
+            try
+            {
+                return new CultureInfo(language);
+            }
+            catch
+            {
+                return new CultureInfo("en");
+            }
+        }
+
         private XmlRpc.XmlRpcResponse HandlePreFlightBuyLandPrep(XmlRpc.XmlRpcRequest req)
         {
             Map structParam;
             UUID agentId;
             UUID secureSessionId;
+            IValue language;
             if (!req.Params.TryGetValue(0, out structParam) ||
                 !structParam.TryGetValue("agentId", out agentId) ||
-                !structParam.TryGetValue("secureSessionId", out secureSessionId))
+                !structParam.TryGetValue("secureSessionId", out secureSessionId) ||
+                !structParam.TryGetValue("language", out language))
             {
                 throw new XmlRpc.XmlRpcFaultException(4, "Missing parameters");
             }
@@ -84,7 +99,7 @@ namespace SilverSim.Viewer.Economy
             if (!validated)
             {
                 resdata.Add("success", false);
-                resdata.Add("errorMessage", "\n\nUnable to Authenticate\n\nClick URL for more info.");
+                resdata.Add("errorMessage", this.GetLanguageString(GetLanguageCulture(language.ToString()), "UnableToAuthenticate", "Unable to authenticate."));
                 resdata.Add("errorURI", m_HttpServer.ServerURI);
             }
             else

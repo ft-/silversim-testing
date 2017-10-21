@@ -31,6 +31,7 @@ using SilverSim.Types.StructuredData.XmlRpc;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 
 namespace SilverSim.Viewer.Economy
 {
@@ -58,6 +59,18 @@ namespace SilverSim.Viewer.Economy
         public void GetGridInfo(Dictionary<string, string> dict)
         {
             dict["economy"] = m_HttpServer.ServerURI;
+        }
+
+        private static CultureInfo GetLanguageCulture(string language)
+        {
+            try
+            {
+                return new CultureInfo(language);
+            }
+            catch
+            {
+                return new CultureInfo("en");
+            }
         }
 
         private XmlRpc.XmlRpcResponse HandleGetCurrencyQuote(XmlRpc.XmlRpcRequest req)
@@ -91,7 +104,7 @@ namespace SilverSim.Viewer.Economy
             if (!validated)
             {
                 resdata.Add("success", false);
-                resdata.Add("errorMessage", "\n\nUnable to Authenticate\n\nClick URL for more info.");
+                resdata.Add("errorMessage", this.GetLanguageString(GetLanguageCulture(language.ToString()), "UnableToAuthenticate", "Unable to authenticate."));
                 resdata.Add("errorURI", m_HttpServer.ServerURI);
                 return new XmlRpc.XmlRpcResponse { ReturnValue = resdata };
             }
@@ -101,7 +114,7 @@ namespace SilverSim.Viewer.Economy
             if (economyService == null)
             {
                 resdata.Add("success", false);
-                resdata.Add("errorMessage", "\n\nUnable to Authenticate\n\nClick URL for more info.");
+                resdata.Add("errorMessage", this.GetLanguageString(agent.CurrentCulture, "NoEconomyConfigured", "No economy configured."));
                 resdata.Add("errorURI", m_HttpServer.ServerURI);
                 return new XmlRpc.XmlRpcResponse { ReturnValue = resdata };
             }
@@ -182,7 +195,7 @@ namespace SilverSim.Viewer.Economy
             if (!validated)
             {
                 resdata.Add("success", false);
-                resdata.Add("errorMessage", "\n\nUnable to Authenticate\n\nClick URL for more info.");
+                resdata.Add("errorMessage", this.GetLanguageString(GetLanguageCulture(language.ToString()), "UnableToAuthenticate", "Unable to authenticate."));
                 resdata.Add("errorURI", m_HttpServer.ServerURI);
                 return new XmlRpc.XmlRpcResponse { ReturnValue = resdata };
             }
@@ -192,7 +205,7 @@ namespace SilverSim.Viewer.Economy
             if (economyService == null)
             {
                 resdata.Add("success", false);
-                resdata.Add("errorMessage", "\n\nUnable to Authenticate\n\nClick URL for more info.");
+                resdata.Add("errorMessage", this.GetLanguageString(agent.CurrentCulture, "NoEconomyConfigured", "No economy configured."));
                 resdata.Add("errorURI", m_HttpServer.ServerURI);
                 return new XmlRpc.XmlRpcResponse { ReturnValue = resdata };
             }

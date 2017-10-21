@@ -1,0 +1,2 @@
+UnableToAuthenticate=Unable to authenticate.
+NoEconomyConfigured=No economy configured.
