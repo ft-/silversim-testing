@@ -212,7 +212,6 @@ namespace SilverSim.Scene.Types.Scene
         public readonly RwLockedList<ISceneListener> SceneListeners = new RwLockedList<ISceneListener>();
         public readonly RwLockedList<IAgentListener> AgentListeners = new RwLockedList<IAgentListener>();
         public GridServiceInterface GridService { get; protected set; }
-        public EconomyServiceInterface EconomyService { get; protected set; }
         public EstateServiceInterface EstateService { get; protected set; }
         public ExperienceServiceInterface ExperienceService { get; protected set; }
         public EconomyInfo EconomyData { get; protected set; }
@@ -456,10 +455,6 @@ namespace SilverSim.Scene.Types.Scene
             else if (service.IsAssignableFrom(typeof(NotecardCache)))
             {
                 return m_NotecardCache;
-            }
-            else if (service.IsAssignableFrom(typeof(EconomyServiceInterface)))
-            {
-                return EconomyService;
             }
             else if (service.IsAssignableFrom(typeof(GroupsServiceInterface)))
             {

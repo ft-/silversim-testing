@@ -481,7 +481,7 @@ namespace SilverSim.Viewer.Groups
             {
                 AgentID = req.AgentID
             };
-            var economyService = scene.EconomyService;
+            var economyService = agent.EconomyService;
             try
             {
                 if (economyService != null && scene.EconomyData.PriceGroupCreate > 0)

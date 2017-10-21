@@ -165,7 +165,7 @@ namespace SilverSim.Viewer.Economy
                 };
                 try
                 {
-                    var economyService = circuit.Scene.EconomyService;
+                    var economyService = agent.EconomyService;
                     mbrep.MoneyBalance= (economyService != null) ?
                         economyService.MoneyBalance[agent.Owner] :
                         0;

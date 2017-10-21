@@ -231,7 +231,7 @@ namespace SilverSim.Scene.Types.Scene
                     {
                         agent.SendAlertMessage(this.GetLanguageString(agent.CurrentCulture, "BuyingCurrentlyNotPossibleDueInvalidRequest", "Buying currently not possible since the viewer request is invalid. You might have to relog."), ID);
                     }
-                    else if(grp.SalePrice != 0 && EconomyService == null)
+                    else if(grp.SalePrice != 0 && agent.EconomyService == null)
                     {
                         agent.SendAlertMessage(this.GetLanguageString(agent.CurrentCulture, "BuyingForAnyOtherPriceThanZeroIsNotPossible", "Buying for any other price than zero is not possible without economy system."), ID);
                     }
