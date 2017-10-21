@@ -20,8 +20,10 @@
 // exception statement from your version.
 
 using SilverSim.Types;
+using SilverSim.Types.Account;
 using SilverSim.Types.Economy.Transactions;
 using System;
+using System.Runtime.Serialization;
 
 namespace SilverSim.ServiceInterfaces.Economy
 {
@@ -87,6 +89,68 @@ namespace SilverSim.ServiceInterfaces.Economy
                 throw;
             }
             transaction.Commit();
+        }
+
+        public enum ConfirmTypeEnum
+        {
+            None = 0,
+            Click = 1,
+            Password = 2
+        }
+
+        public struct CurrencyQuote
+        {
+            public int EstimatedUsCents;
+            public string EstimatedLocalCost;
+            public string LocalCurrency;
+            public int CurrencyToBuy;
+            public ConfirmTypeEnum ConfirmType;
+        }
+
+        public struct CurrencyBuy
+        {
+            public int EstimatedUsCents;
+            public string EstimatedLocalCost;
+            public int CurrencyToBuy;
+            public ConfirmTypeEnum ConfirmType;
+            public string Password;
+        }
+
+        public abstract CurrencyQuote GetCurrencyQuote(UUI sourceID, string language, int currencyToBuy);
+
+        public abstract void BuyCurrency(UUI sourceID, string language, CurrencyBuy quote);
+
+        public class UrlAttachedErrorException : Exception
+        {
+            public readonly string Uri = string.Empty;
+
+            public UrlAttachedErrorException(string message, string uri) : base(message)
+            {
+                Uri = uri;
+            }
+
+            public UrlAttachedErrorException()
+            {
+            }
+
+            public UrlAttachedErrorException(string message) : base(message)
+            {
+            }
+
+            public UrlAttachedErrorException(string message, Exception innerException) : base(message, innerException)
+            {
+            }
+
+            protected UrlAttachedErrorException(SerializationInfo info, StreamingContext context) : base(info, context)
+            {
+                Uri = info.GetString("Uri");
+            }
+
+            public override void GetObjectData(SerializationInfo info, StreamingContext context)
+            {
+                base.GetObjectData(info, context);
+                info.AddValue("Uri", Uri);
+            }
         }
     }
 }
