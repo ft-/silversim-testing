@@ -212,7 +212,6 @@ namespace SilverSim.Scene.Implementation.Common
             m_IMRouter.SceneIM.Add(IMSend);
             OnRemove += RemoveScene;
             m_UDPServer.Start();
-            SceneCapabilities.Add("SimulatorFeatures", new SimulatorFeatures(string.Empty, string.Empty, string.Empty, true));
 
             ScriptThreadPool = new ScriptWorkerThreadPool(50, 150, ID);
         }

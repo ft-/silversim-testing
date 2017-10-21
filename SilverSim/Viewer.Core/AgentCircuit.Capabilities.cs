@@ -341,6 +341,7 @@ namespace SilverSim.Viewer.Core
                 /* no action needed here */
             }
 
+            AddDefCapabilityFactory("SimulatorFeatures", regionSeedID, (ViewerAgent agent) => new SimulatorFeatures(agent, Server.Scene, RemoteIP), capConfig);
             AddDefCapability("UpdateAgentLanguage", regionSeedID, Cap_UpdateAgentLanguage, capConfig);
             AddDefCapability("EnvironmentSettings", regionSeedID, Cap_EnvironmentSettings, capConfig);
             AddDefCapability("RenderMaterials", regionSeedID, Cap_RenderMaterials, capConfig);

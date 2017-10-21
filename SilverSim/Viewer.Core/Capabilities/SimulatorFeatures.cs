@@ -20,9 +20,11 @@
 // exception statement from your version.
 
 using SilverSim.Main.Common.HttpServer;
+using SilverSim.Scene.Types.Pathfinding;
+using SilverSim.Scene.Types.Scene;
+using SilverSim.ServiceInterfaces.Economy;
 using SilverSim.Types;
 using SilverSim.Types.StructuredData.Llsd;
-using System.IO;
 using System.Net;
 
 namespace SilverSim.Viewer.Core.Capabilities
@@ -30,18 +32,25 @@ namespace SilverSim.Viewer.Core.Capabilities
     public class SimulatorFeatures : ICapabilityInterface
     {
         public readonly Map Features = new Map();
+        private readonly ViewerAgent m_Agent;
+        private readonly SceneInterface m_Scene;
+        private readonly string m_RemoteIP;
 
         public string CapabilityName => "SimulatorFeatures";
 
-        public SimulatorFeatures(string searchUrl, string gridName, string gridURL, bool exportSupported)
+        public SimulatorFeatures(ViewerAgent agent, SceneInterface scene, string remoteip)
         {
+            m_Agent = agent;
+            m_Scene = scene;
+            m_RemoteIP = remoteip;
+
             Features.Add("MeshRezEnabled", true);
             Features.Add("MeshUploadEnabled", true);
             Features.Add("MeshXferEnabled", true);
             Features.Add("PhysicsMaterialsEnabled", true);
             Features.Add("RenderMaterialsCapability", 1.0);
             Features.Add("MaxMaterialsPerTransaction", 50);
-            Features.Add("DynamicPathfindingEnabled", false);
+            Features.Add("DynamicPathfindingEnabled", scene.PathfindingService?.IsDynamicEnabled ?? false);
             Features.Add("AvatarHoverHeightEnabled", true);
             var typesMap = new Map
             {
@@ -51,27 +60,20 @@ namespace SilverSim.Viewer.Core.Capabilities
             };
             Features.Add("PhysicsShapeTypes", typesMap);
             var extrasMap = new Map();
-            if (!string.IsNullOrEmpty(gridURL))
+            if (!string.IsNullOrEmpty(scene.GatekeeperURI))
             {
-                extrasMap.Add("GridURL", gridURL);
-            }
-            if (!string.IsNullOrEmpty(gridName))
-            {
-                extrasMap.Add("GridName", gridName);
+                extrasMap.Add("GridURL", scene.GatekeeperURI);
             }
 
             extrasMap.Add("SimulatorFPS", 30.0);
             extrasMap.Add("SimulatorFPSWarnPercent", 66.6);
             extrasMap.Add("SimulatorFPSCritPercent", 33.3);
             extrasMap.Add("SimulatorFPSFactor", 1.0);
-
-            if(!string.IsNullOrEmpty(searchUrl))
+            extrasMap.Add("ExportSupported", true);
+            EconomyServiceInterface economyService = agent.EconomyService;
+            if(economyService != null)
             {
-                extrasMap.Add("search-server-url", searchUrl);
-            }
-            if(exportSupported)
-            {
-                extrasMap.Add("ExportSupported", true);
+                extrasMap.Add("currency", economyService.CurrencySymbol);
             }
             if (extrasMap.Count > 0)
             {
@@ -95,6 +97,8 @@ namespace SilverSim.Viewer.Core.Capabilities
              * avatar-picker-url:string
              * camera-only-mode:bool
              * special-ui:map(toolbar:string,floaters:map)
+             * currency
+             * currency-base-uri
              * 
              * known root features:
              * god_names:map(last_names:array(string),full_names:array(string))
@@ -112,7 +116,11 @@ namespace SilverSim.Viewer.Core.Capabilities
 
         public void HttpRequestHandler(HttpRequest httpreq)
         {
-            if(httpreq.Method != "GET")
+            if (httpreq.CallerIP != m_RemoteIP)
+            {
+                httpreq.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
+            }
+            else if (httpreq.Method != "GET")
             {
                 httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
             }
