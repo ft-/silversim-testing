@@ -46,6 +46,7 @@ namespace SilverSim.Viewer.Economy
             m_Scenes.OnRegionAdd += OnSceneAdded;
             m_HttpServer = loader.HttpServer;
             loader.XmlRpcServer.XmlRpcMethods.Add("preflightBuyLandPrep", HandlePreFlightBuyLandPrep);
+            loader.XmlRpcServer.XmlRpcMethods.Add("buyLandPrep", HandleBuyLandPrep);
         }
 
         private void OnSceneAdded(SceneInterface scene)
@@ -76,19 +77,21 @@ namespace SilverSim.Viewer.Economy
             UUID agentId;
             UUID secureSessionId;
             IValue language;
+            IValue currencyBuy;
             if (!req.Params.TryGetValue(0, out structParam) ||
                 !structParam.TryGetValue("agentId", out agentId) ||
                 !structParam.TryGetValue("secureSessionId", out secureSessionId) ||
-                !structParam.TryGetValue("language", out language))
+                !structParam.TryGetValue("language", out language) ||
+                !structParam.TryGetValue("currencyBuy", out currencyBuy))
             {
                 throw new XmlRpc.XmlRpcFaultException(4, "Missing parameters");
             }
 
             bool validated = false;
             IAgent agent;
-            foreach(SceneInterface scene in m_Scenes.ValuesByKey1)
+            foreach (SceneInterface scene in m_Scenes.ValuesByKey1)
             {
-                if(scene.Agents.TryGetValue(agentId, out agent) && agent.Session.SecureSessionID == secureSessionId)
+                if (scene.Agents.TryGetValue(agentId, out agent) && agent.Session.SecureSessionID == secureSessionId)
                 {
                     validated = true;
                     break;
@@ -120,7 +123,7 @@ namespace SilverSim.Viewer.Economy
                 };
                 var currency = new Map
                 {
-                    { "estimatedCost", "200.00" }
+                    { "estimatedCost", currencyBuy }
                 };
                 var membership = new Map
                 {
@@ -132,7 +135,58 @@ namespace SilverSim.Viewer.Economy
                 resdata.Add("membership", membership);
                 resdata.Add("landUse", landUse);
                 resdata.Add("currency", currency);
-                resdata.Add("confirm", string.Empty);
+                if (currency.AsInt != 0)
+                {
+                    resdata.Add("confirm", "click");
+                }
+                else
+                {
+                    resdata.Add("confirm", string.Empty);
+                }
+            }
+
+            return new XmlRpc.XmlRpcResponse { ReturnValue = resdata };
+        }
+
+        private XmlRpc.XmlRpcResponse HandleBuyLandPrep(XmlRpc.XmlRpcRequest req)
+        {
+            Map structParam;
+            UUID agentId;
+            UUID secureSessionId;
+            IValue language;
+            IValue currencyBuy;
+            IValue confirm;
+            if (!req.Params.TryGetValue(0, out structParam) ||
+                !structParam.TryGetValue("agentId", out agentId) ||
+                !structParam.TryGetValue("secureSessionId", out secureSessionId) ||
+                !structParam.TryGetValue("language", out language) ||
+                !structParam.TryGetValue("currencyBuy", out currencyBuy) ||
+                !structParam.TryGetValue("confirm", out confirm))
+            {
+                throw new XmlRpc.XmlRpcFaultException(4, "Missing parameters");
+            }
+
+            bool validated = false;
+            IAgent agent;
+            foreach (SceneInterface scene in m_Scenes.ValuesByKey1)
+            {
+                if (scene.Agents.TryGetValue(agentId, out agent) && agent.Session.SecureSessionID == secureSessionId)
+                {
+                    validated = true;
+                    break;
+                }
+            }
+
+            var resdata = new Map();
+            if (!validated)
+            {
+                resdata.Add("success", false);
+                resdata.Add("errorMessage", this.GetLanguageString(GetLanguageCulture(language.ToString()), "UnableToAuthenticate", "Unable to authenticate."));
+                resdata.Add("errorURI", m_HttpServer.ServerURI);
+            }
+            else
+            {
+                resdata.Add("success", true);
             }
 
             return new XmlRpc.XmlRpcResponse { ReturnValue = resdata };

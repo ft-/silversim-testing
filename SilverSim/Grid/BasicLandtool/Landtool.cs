@@ -29,6 +29,7 @@ using SilverSim.Types.Presence;
 using SilverSim.Types.StructuredData.XmlRpc;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 
 namespace SilverSim.Grid.BasicLandtool
 {
@@ -57,14 +58,28 @@ namespace SilverSim.Grid.BasicLandtool
             loader.XmlRpcServer.XmlRpcMethods.Add("preflightBuyLandPrep", HandlePreFlightBuyLandPrep);
         }
 
+        private static CultureInfo GetLanguageCulture(string language)
+        {
+            try
+            {
+                return new CultureInfo(language);
+            }
+            catch
+            {
+                return new CultureInfo("en");
+            }
+        }
+
         private XmlRpc.XmlRpcResponse HandlePreFlightBuyLandPrep(XmlRpc.XmlRpcRequest req)
         {
             Map structParam;
             UUID agentId;
             UUID secureSessionId;
+            IValue language;
             if(!req.Params.TryGetValue(0, out structParam) ||
                 !structParam.TryGetValue("agentId", out agentId) ||
-                !structParam.TryGetValue("secureSessionId", out secureSessionId))
+                !structParam.TryGetValue("secureSessionId", out secureSessionId) ||
+                !structParam.TryGetValue("language", out language))
             {
                 throw new XmlRpc.XmlRpcFaultException(4, "Missing parameters");
             }
@@ -83,7 +98,7 @@ namespace SilverSim.Grid.BasicLandtool
             if(!validated)
             {
                 resdata.Add("success", false);
-                resdata.Add("errorMessage", "\n\nUnable to Authenticate\n\nClick URL for more info.");
+                resdata.Add("errorMessage", this.GetLanguageString(GetLanguageCulture(language.ToString()), "UnableToAuthenticate", "Unable to authenticate."));
                 resdata.Add("errorURI", m_HttpServer.ServerURI);
             }
             else
@@ -117,6 +132,49 @@ namespace SilverSim.Grid.BasicLandtool
                 resdata.Add("landUse", landUse);
                 resdata.Add("currency", currency);
                 resdata.Add("confirm", string.Empty);
+            }
+
+            return new XmlRpc.XmlRpcResponse { ReturnValue = resdata };
+        }
+
+
+        private XmlRpc.XmlRpcResponse HandleBuyLandPrep(XmlRpc.XmlRpcRequest req)
+        {
+            Map structParam;
+            UUID agentId;
+            UUID secureSessionId;
+            IValue language;
+            IValue currencyBuy;
+            IValue confirm;
+            if (!req.Params.TryGetValue(0, out structParam) ||
+                !structParam.TryGetValue("agentId", out agentId) ||
+                !structParam.TryGetValue("secureSessionId", out secureSessionId) ||
+                !structParam.TryGetValue("language", out language) ||
+                !structParam.TryGetValue("currencyBuy", out currencyBuy) ||
+                !structParam.TryGetValue("confirm", out confirm))
+            {
+                throw new XmlRpc.XmlRpcFaultException(4, "Missing parameters");
+            }
+            bool validated = false;
+            foreach (PresenceInfo pinfo in m_PresenceService[agentId])
+            {
+                if (pinfo.SecureSessionID == secureSessionId)
+                {
+                    validated = true;
+                    break;
+                }
+            }
+
+            var resdata = new Map();
+            if (!validated)
+            {
+                resdata.Add("success", false);
+                resdata.Add("errorMessage", this.GetLanguageString(GetLanguageCulture(language.ToString()), "UnableToAuthenticate", "Unable to authenticate."));
+                resdata.Add("errorURI", m_HttpServer.ServerURI);
+            }
+            else
+            {
+                resdata.Add("success", true);
             }
 
             return new XmlRpc.XmlRpcResponse { ReturnValue = resdata };
