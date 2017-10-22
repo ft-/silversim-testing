@@ -30,6 +30,7 @@ namespace SilverSim.Database.Memory.SimulationData
     public partial class MemorySimulationDataStorage : ISimulationDataTerrainStorageInterface
     {
         internal readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, byte[]>> m_TerrainData = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, byte[]>>(() => new RwLockedDictionary<uint, byte[]>());
+        internal readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, byte[]>> m_DefaultTerrainData = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, byte[]>>(() => new RwLockedDictionary<uint, byte[]>());
 
         List<LayerPatch> ISimulationDataTerrainStorageInterface.this[UUID regionID]
         {
@@ -41,7 +42,7 @@ namespace SilverSim.Database.Memory.SimulationData
                 {
                     foreach(var kvp in patchesData)
                     {
-                        var patch = new LayerPatch()
+                        var patch = new LayerPatch
                         {
                             ExtendedPatchID = kvp.Key,
                             Serialization = kvp.Value
@@ -51,6 +52,38 @@ namespace SilverSim.Database.Memory.SimulationData
                 }
                 return patches;
             }
+        }
+
+        public void SaveAsDefault(UUID regionID)
+        {
+            RwLockedDictionary<uint, byte[]> patchesData;
+            if (m_TerrainData.TryGetValue(regionID, out patchesData))
+            {
+                foreach (var kvp in patchesData)
+                {
+                    m_DefaultTerrainData[regionID][kvp.Key] = kvp.Value;
+                }
+            }
+        }
+
+        public bool TryGetDefault(UUID regionID, List<LayerPatch> list)
+        {
+            RwLockedDictionary<uint, byte[]> patchesData;
+            var patches = new List<LayerPatch>();
+            if (m_DefaultTerrainData.TryGetValue(regionID, out patchesData))
+            {
+                foreach (var kvp in patchesData)
+                {
+                    var patch = new LayerPatch
+                    {
+                        ExtendedPatchID = kvp.Key,
+                        Serialization = kvp.Value
+                    };
+                    list.Add(patch);
+                }
+                return true;
+            }
+            return false;
         }
 
         private void RemoveTerrain(UUID regionID)
