@@ -930,6 +930,7 @@ namespace SilverSim.Scene.Implementation.Common
             if(m_SimulationDataStorage.Terrains.TryGetDefault(ID, terrainData))
             {
                 Terrain.AllPatches = terrainData;
+                Terrain.Flush();
                 agent.SendAlertMessage(typeof(SceneImplementation).GetLanguageString(agent.CurrentCulture, "RevertedTerrainToDefault", "Reverted terrain to default."), ID);
             }
             else
@@ -945,6 +946,7 @@ namespace SilverSim.Scene.Implementation.Common
             {
                 m_SimulationDataStorage.Terrains.SaveAsDefault(ID);
                 Terrain.AllPatches = terrainData;
+                Terrain.Flush();
                 agent.SendAlertMessage(typeof(SceneImplementation).GetLanguageString(agent.CurrentCulture, "SwappedTerrainWithDefault", "Swapped terrain with default."), ID);
             }
             else

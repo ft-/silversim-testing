@@ -1,4 +1,4 @@
-DefaultTerrainSaved=Standard-Terrain gespeichert.
-RevertedTerrainToDefault=Terrain auf Standard-Terrain zur�ckgesetzt.
+﻿DefaultTerrainSaved=Standard-Terrain gespeichert.
+RevertedTerrainToDefault=Terrain auf Standard-Terrain zurückgesetzt.
 SwappedTerrainWithDefault=Terrain mit Standard-Terrain getauscht.
 NoDefaultTerrainStored=Kein Standard-Terrain gespeichert.
