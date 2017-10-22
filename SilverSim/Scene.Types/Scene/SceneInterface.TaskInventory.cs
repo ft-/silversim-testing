@@ -200,7 +200,7 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             InventoryItem agentItem;
-            if(agent.InventoryService.Item.TryGetValue(req.ItemID, out agentItem) &&
+            if(agent.InventoryService.Item.TryGetValue(agent.Owner.ID, req.ItemID, out agentItem) &&
                 agentItem.AssetType == req.AssetType &&
                 agentItem.InventoryType == req.InvType)
             {

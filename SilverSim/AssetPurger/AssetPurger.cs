@@ -60,9 +60,9 @@ namespace SilverSim.AssetPurger
         }
 
         private System.Timers.Timer m_Timer = new System.Timers.Timer(3600000);
-        private bool m_IsRunning = false;
-        private bool m_StopProcess = false;
-        private uint m_Processed = 0;
+        private bool m_IsRunning;
+        private bool m_StopProcess;
+        private uint m_Processed;
 
         private readonly bool m_Enabled;
 
@@ -137,7 +137,7 @@ namespace SilverSim.AssetPurger
                     }
                 }
 
-                List<UUID> referencedAssets = new List<UUID>();
+                var referencedAssets = new List<UUID>();
                 foreach (IAssetReferenceInfoServiceInterface assetrefs in m_ReferenceServices)
                 {
                     assetrefs.EnumerateUsedAssets((assetid) =>

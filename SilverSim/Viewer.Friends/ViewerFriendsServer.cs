@@ -205,7 +205,7 @@ namespace SilverSim.Viewer.Friends
             {
                 return;
             }
-            var fi = new FriendInfo()
+            var fi = new FriendInfo
             {
                 User = thisAgent,
                 Friend = otherAgent,
@@ -279,7 +279,7 @@ namespace SilverSim.Viewer.Friends
             {
                 return;
             }
-            var fi = new FriendInfo()
+            var fi = new FriendInfo
             {
                 User = thisAgent,
                 Friend = otherAgent,
@@ -295,7 +295,7 @@ namespace SilverSim.Viewer.Friends
             }
             agent.FriendsService.Delete(fi);
 
-            var gim = new GridInstantMessage()
+            var gim = new GridInstantMessage
             {
                 FromAgent = thisAgent,
                 ToAgent = otherAgent,
@@ -374,7 +374,7 @@ namespace SilverSim.Viewer.Friends
             }
             agent.FriendsService.Delete(fi);
 
-            var gim = new GridInstantMessage()
+            var gim = new GridInstantMessage
             {
                 FromAgent = thisAgent,
                 ToAgent = otherAgent,
@@ -437,7 +437,7 @@ namespace SilverSim.Viewer.Friends
             {
                 return;
             }
-            var fi = new FriendInfo()
+            var fi = new FriendInfo
             {
                 User = thisAgent,
                 Friend = otherAgent,
@@ -513,7 +513,7 @@ namespace SilverSim.Viewer.Friends
             {
                 return;
             }
-            var fi = new FriendInfo()
+            var fi = new FriendInfo
             {
                 User = thisAgent,
                 Friend = otherAgent,

@@ -44,13 +44,12 @@ namespace SilverSim.AssetPurger
 
         public void EnumerateUsedAssets(Action<UUID> action)
         {
-            List<UUID> refs = new List<UUID>();
+            var refs = new List<UUID>();
             foreach(SceneInterface scene in m_Scenes.Values)
             {
                 foreach(IAgent agent in scene.Agents)
                 {
-                    UUID[] avatartextures = agent.Appearance.AvatarTextures.All;
-                    foreach(UUID id in avatartextures)
+                    foreach(UUID id in agent.Appearance.AvatarTextures.All)
                     {
                         if(id != UUID.Zero && !refs.Contains(id))
                         {

@@ -114,7 +114,7 @@ namespace SilverSim.Backend.Common.OfflineIM
             {
                 try
                 {
-                    var response_im = new GridInstantMessage()
+                    var response_im = new GridInstantMessage
                     {
                         FromAgent = im.ToAgent,
                         ToAgent = im.FromAgent,

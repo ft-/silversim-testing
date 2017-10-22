@@ -19,6 +19,8 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+#pragma warning disable CS0618
+
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Threading;
 using SilverSim.Types;
