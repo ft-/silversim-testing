@@ -19,41 +19,17 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.Types;
 using System;
 
 namespace SilverSim.Viewer.Messages.Land
 {
-    [UDPMessage(MessageType.LandStatRequest)]
-    [Reliable]
-    [NotTrusted]
-    public class LandStatRequest : Message
+    [Flags]
+    public enum LandStatFilterFlags : uint
     {
-        public UUID AgentID;
-        public UUID SessionID;
-        public LandStatReportEnum ReportType;
-        public LandStatFilterFlags RequestFlags;
-        public string Filter;
-        public Int32 ParcelLocalID;
-
-        public static Message Decode(UDPPacket p) => new LandStatRequest
-        {
-            AgentID = p.ReadUUID(),
-            SessionID = p.ReadUUID(),
-            ReportType = (LandStatReportEnum)p.ReadUInt32(),
-            RequestFlags = (LandStatFilterFlags)p.ReadUInt32(),
-            Filter = p.ReadStringLen8(),
-            ParcelLocalID = p.ReadInt32()
-        };
-
-        public override void Serialize(UDPPacket p)
-        {
-            p.WriteUUID(AgentID);
-            p.WriteUUID(SessionID);
-            p.WriteUInt32((uint)ReportType);
-            p.WriteUInt32((uint)RequestFlags);
-            p.WriteStringLen8(Filter);
-            p.WriteInt32(ParcelLocalID);
-        }
+        None = 0,
+        FilterByParcel = 0x00000001,
+        FilterByOwner = 0x00000002,
+        FilterByObject = 0x00000004,
+        FilterByParcelName = 0x00000008
     }
 }

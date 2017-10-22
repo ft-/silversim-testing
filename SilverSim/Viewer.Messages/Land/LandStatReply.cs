@@ -48,16 +48,16 @@ namespace SilverSim.Viewer.Messages.Land
             }
         }
 
-        public UInt32 ReportType;
-        public UInt32 RequestFlags;
+        public LandStatReportEnum ReportType;
+        public LandStatFilterFlags RequestFlags;
         public UInt32 TotalObjectCount;
 
         public List<ReportDataEntry> ReportData = new List<ReportDataEntry>();
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteUInt32(ReportType);
-            p.WriteUInt32(RequestFlags);
+            p.WriteUInt32((uint)ReportType);
+            p.WriteUInt32((uint)RequestFlags);
             p.WriteUInt32(TotalObjectCount);
 
             p.WriteUInt8((byte)ReportData.Count);
@@ -76,8 +76,8 @@ namespace SilverSim.Viewer.Messages.Land
         {
             var m = new LandStatReply
             {
-                ReportType = p.ReadUInt32(),
-                RequestFlags = p.ReadUInt32(),
+                ReportType = (LandStatReportEnum)p.ReadUInt32(),
+                RequestFlags = (LandStatFilterFlags)p.ReadUInt32(),
                 TotalObjectCount = p.ReadUInt32()
             };
             uint n = p.ReadUInt8();
