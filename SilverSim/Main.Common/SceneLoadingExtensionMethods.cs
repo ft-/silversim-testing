@@ -344,7 +344,7 @@ namespace SilverSim.Main.Common
                             if (valid[px, py] == 0)
                             {
                                 LayerPatch p = loadparams.Scene.Terrain.Patch[px, py];
-                                loadparams.Scene.Terrain.Patch.Update(p);
+                                loadparams.Scene.Terrain.Patch.MarkDirty(px, py);
                                 ++count;
                             }
                         }
@@ -352,10 +352,12 @@ namespace SilverSim.Main.Common
                     if (count == 1)
                     {
                         m_Log.InfoFormat("Stored {0} missing terrain segment for {1} ({2})", count, loadparams.Scene.Name, loadparams.Scene.ID);
+                        loadparams.Scene.Terrain.Flush();
                     }
                     else if (count > 0)
                     {
                         m_Log.InfoFormat("Stored {0} missing terrain segments for {1} ({2})", count, loadparams.Scene.Name, loadparams.Scene.ID);
+                        loadparams.Scene.Terrain.Flush();
                     }
                 }
 

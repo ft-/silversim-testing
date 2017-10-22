@@ -133,6 +133,7 @@ namespace SilverSim.Viewer.Messages.LayerData
                 {
                     m_Serial = 1;
                 }
+                Dirty = true;
             }
         }
 
@@ -157,6 +158,7 @@ namespace SilverSim.Viewer.Messages.LayerData
                 {
                     m_Serial = 1;
                 }
+                Dirty = true;
             }
         }
 

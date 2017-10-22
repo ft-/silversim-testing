@@ -487,6 +487,15 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                 }
             }
 
+            public void MarkDirty(uint x, uint y)
+            {
+                if (x >= m_NumXPatches || y >= m_NumYPatches)
+                {
+                    throw new KeyNotFoundException();
+                }
+                m_TerrainPatches[y, x].Dirty = true;
+            }
+
             public void Update(LayerPatch p)
             {
                 if (p.X >= m_NumXPatches || p.Y >= m_NumYPatches)
