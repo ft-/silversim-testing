@@ -23,10 +23,9 @@ using SilverSim.Main.Common.CmdIO;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Types;
 using SilverSim.Types.StructuredData.Llsd;
-using System;
-using System.IO;
-using System.Net;
 using SilverSim.Viewer.Messages.Console;
+using System;
+using System.Net;
 
 namespace SilverSim.Viewer.Core
 {
