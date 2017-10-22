@@ -19,10 +19,13 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.SceneEnvironment;
 using SilverSim.Scene.Types.WindLight;
 using SilverSim.Types;
 using SilverSim.Types.Estate;
+using SilverSim.Viewer.Messages;
+using SilverSim.Viewer.Messages.Generic;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -84,6 +87,12 @@ namespace SilverSim.Scene.Types.Scene
 
         public abstract void TriggerStoreOfEnvironmentSettings();
 
+        public abstract void StoreTerrainAsDefault(IAgent agent);
+
+        public abstract void RevertTerrainToDefault(IAgent agent);
+
+        public abstract void SwapTerrainWithDefault(IAgent agent);
+
         private EnvironmentSettings m_EnvironmentSettings;
 
         public EnvironmentSettings EnvironmentSettings
@@ -102,6 +111,43 @@ namespace SilverSim.Scene.Types.Scene
                 m_EnvironmentSettings = (value != null) ?
                     new EnvironmentSettings(value) :
                     null;
+            }
+        }
+
+        [GodlikeMessageHandler("terrain")]
+        public void HandleGodlikeTerrain(Message m)
+        {
+            var req = (GodlikeMessage)m;
+            if (req.ParamList.Count < 1)
+            {
+                return;
+            }
+
+            IAgent agent;
+            if(!Agents.TryGetValue(req.AgentID, out agent) || !IsPossibleGod(agent.Owner) || !agent.IsActiveGod)
+            {
+                return;
+            }
+
+            switch (req.ParamList[0].FromUTF8Bytes())
+            {
+                case "bake":
+                    StoreTerrainAsDefault(agent);
+                    break;
+
+                case "revert":
+                    RevertTerrainToDefault(agent);
+                    break;
+
+                case "swap":
+                    SwapTerrainWithDefault(agent);
+                    break;
+
+                default:
+#if DEBUG
+                    m_Log.DebugFormat("Unknown god terrain command {0} received", req.ParamList[0].FromUTF8Bytes());
+#endif
+                    break;
             }
         }
     }

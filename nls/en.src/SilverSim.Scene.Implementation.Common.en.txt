@@ -1,0 +1,4 @@
+DefaultTerrainSaved=Default terrain saved.
+RevertedTerrainToDefault=Reverted terrain to default.
+SwappedTerrainWithDefault=Swapped terrain with default.
+NoDefaultTerrainStored=No default terrain stored.

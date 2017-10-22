@@ -342,7 +342,6 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                     listener.TerrainUpdate(new LayerPatch(lp));
                 }
             }
-
         }
 
         public LayerPatch AdjustTerrain(uint x, uint y, double change)

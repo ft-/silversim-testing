@@ -38,7 +38,7 @@ namespace SilverSim.Types
             this object o,
             CultureInfo selectedCulture)
         {
-            var type = o.GetType();
+            var type = (o is Type) ? (Type)o : o.GetType();
             var assembly = type.Assembly;
             var assemblyName = assembly.GetName().Name;
             ResourceSet res = null;

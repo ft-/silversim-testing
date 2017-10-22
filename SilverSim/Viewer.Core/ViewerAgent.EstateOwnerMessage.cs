@@ -1043,10 +1043,6 @@ namespace SilverSim.Viewer.Core
             }
             switch (req.ParamList[0].FromUTF8Bytes())
             {
-                case "bake":
-                    scene.Terrain.Flush();
-                    break;
-
                 case "download filename":
                     if(req.ParamList.Count > 1)
                     {

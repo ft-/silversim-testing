@@ -29,7 +29,6 @@ using SilverSim.Scene.Types.Script;
 using SilverSim.ServiceInterfaces;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.AvatarName;
-using SilverSim.ServiceInterfaces.Economy;
 using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.ServiceInterfaces.Experience;
 using SilverSim.ServiceInterfaces.Grid;

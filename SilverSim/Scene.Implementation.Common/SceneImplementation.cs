@@ -49,6 +49,7 @@ using SilverSim.Types.Parcel;
 using SilverSim.Viewer.Core;
 using SilverSim.Viewer.Core.Capabilities;
 using SilverSim.Viewer.Messages;
+using SilverSim.Viewer.Messages.LayerData;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -916,5 +917,40 @@ namespace SilverSim.Scene.Implementation.Common
         }
 
         #endregion
+
+        public override void StoreTerrainAsDefault(IAgent agent)
+        {
+            m_SimulationDataStorage.Terrains.SaveAsDefault(ID);
+            agent.SendAlertMessage(typeof(SceneImplementation).GetLanguageString(agent.CurrentCulture, "DefaultTerrainSaved", "Default terrain saved."), ID);
+        }
+
+        public override void RevertTerrainToDefault(IAgent agent)
+        {
+            var terrainData = new List<LayerPatch>();
+            if(m_SimulationDataStorage.Terrains.TryGetDefault(ID, terrainData))
+            {
+                Terrain.AllPatches = terrainData;
+                agent.SendAlertMessage(typeof(SceneImplementation).GetLanguageString(agent.CurrentCulture, "RevertedTerrainToDefault", "Reverted terrain to default."), ID);
+            }
+            else
+            {
+                agent.SendAlertMessage(typeof(SceneImplementation).GetLanguageString(agent.CurrentCulture, "NoDefaultTerrainStored", "No default terrain stored."), ID);
+            }
+        }
+
+        public override void SwapTerrainWithDefault(IAgent agent)
+        {
+            var terrainData = new List<LayerPatch>();
+            if (m_SimulationDataStorage.Terrains.TryGetDefault(ID, terrainData))
+            {
+                m_SimulationDataStorage.Terrains.SaveAsDefault(ID);
+                Terrain.AllPatches = terrainData;
+                agent.SendAlertMessage(typeof(SceneImplementation).GetLanguageString(agent.CurrentCulture, "SwappedTerrainWithDefault", "Swapped terrain with default."), ID);
+            }
+            else
+            {
+                agent.SendAlertMessage(typeof(SceneImplementation).GetLanguageString(agent.CurrentCulture, "NoDefaultTerrainStored", "No default terrain stored."), ID);
+            }
+        }
     }
 }
