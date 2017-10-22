@@ -23,7 +23,9 @@ using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
+using SilverSim.Types.Agent;
 using SilverSim.Types.StructuredData.Llsd;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 
@@ -34,6 +36,65 @@ namespace SilverSim.Viewer.Core.Capabilities
         private readonly SceneInterface m_Scene;
         private readonly ViewerAgent m_Agent;
         private readonly string m_RemoteIP;
+
+        private static readonly Dictionary<AttachmentPoint, string> LocationStrings = new Dictionary<AttachmentPoint, string>
+        {
+            [AttachmentPoint.Chest] = "Chest",
+            [AttachmentPoint.Head] = "Head",
+            [AttachmentPoint.LeftShoulder] = "Left Shoulder",
+            [AttachmentPoint.RightShoulder] = "Right Shoulder",
+            [AttachmentPoint.LeftHand] = "Left Hand",
+            [AttachmentPoint.RightHand] = "Right Hand",
+            [AttachmentPoint.LeftFoot] = "Left Foot",
+            [AttachmentPoint.RightFoot] = "Right Foot",
+            [AttachmentPoint.Back] = "Back",
+            [AttachmentPoint.Pelvis] = "Pelvis",
+            [AttachmentPoint.Mouth] = "Mouth",
+            [AttachmentPoint.Chin] = "Chin",
+            [AttachmentPoint.LeftEar] = "Left Ear",
+            [AttachmentPoint.RightEar] = "Right Ear",
+            [AttachmentPoint.LeftEye] = "Left Eye",
+            [AttachmentPoint.RightEye] = "Right Eye",
+            [AttachmentPoint.Nose] = "Nose",
+            [AttachmentPoint.RightUpperArm] = "R Upper Arm",
+            [AttachmentPoint.RightLowerArm] = "R Lower Arm",
+            [AttachmentPoint.LeftUpperArm] = "L Upper Arm",
+            [AttachmentPoint.LeftLowerArm] = "L Lower Arm",
+            [AttachmentPoint.RightHip] = "Right Hip",
+            [AttachmentPoint.RightUpperLeg] = "R Upper Leg",
+            [AttachmentPoint.RightLowerLeg] = "R Lower Leg",
+            [AttachmentPoint.LeftHip] = "Left Hip",
+            [AttachmentPoint.LeftUpperLeg] = "L Upper Leg",
+            [AttachmentPoint.LeftLowerLeg] = "L Lower Leg",
+            [AttachmentPoint.Belly] = "Belly",
+            [AttachmentPoint.RightPec] = "Right Pec",
+            [AttachmentPoint.LeftPec] = "Left Pec",
+            [AttachmentPoint.HudCenter2] = "Center 2",
+            [AttachmentPoint.HudTopRight] = "Top Right",
+            [AttachmentPoint.HudTopCenter] = "Top",
+            [AttachmentPoint.HudTopLeft] = "Top Left",
+            [AttachmentPoint.HudCenter1] = "Center",
+            [AttachmentPoint.HudBottomLeft] = "Bottom Left",
+            [AttachmentPoint.HudBottom] = "Bottom",
+            [AttachmentPoint.HudBottomRight] = "Bottom Right",
+            [AttachmentPoint.Neck] = "Neck",
+            [AttachmentPoint.AvatarCenter] = "Avatar Center",
+            [AttachmentPoint.LeftHandRing1] = "Left Ring Finger",
+            [AttachmentPoint.RightHandRing1] = "Right Ring Finger",
+            [AttachmentPoint.TailBase] = "Tail Base",
+            [AttachmentPoint.TailTip] = "Tail Tip",
+            [AttachmentPoint.LeftWing] = "Left Wing",
+            [AttachmentPoint.RightWing] = "Right Wing",
+            [AttachmentPoint.FaceJaw] = "Jaw",
+            [AttachmentPoint.FaceLeftEar] = "Alt Left Ear",
+            [AttachmentPoint.FaceRightEar] = "Alt Right Ear",
+            [AttachmentPoint.FaceLeftEye] = "Alt Left Eye",
+            [AttachmentPoint.FaceRightEye] = "Alt Right Eye",
+            [AttachmentPoint.FaceTongue] = "Tongue",
+            [AttachmentPoint.Groin] = "Groin",
+            [AttachmentPoint.HindLeftFoot] = "Left Hind Foot",
+            [AttachmentPoint.HindRightFoot] = "Right Hind Foot"
+        };
 
         public string CapabilityName => "LandResources";
 
@@ -65,9 +126,11 @@ namespace SilverSim.Viewer.Core.Capabilities
             foreach (ObjectGroup grp in m_Agent.Attachments.All)
             {
                 var objects = new AnArray();
+                string locationString;
+                LocationStrings.TryGetValue(grp.AttachPoint, out locationString);
                 attachments.Add(new Map
                 {
-                    { "location", grp.AttachPoint.ToString() },
+                    { "location", locationString },
                     { "objects", objects }
                 });
                 foreach(ObjectPart part in grp.ValuesByKey1)
