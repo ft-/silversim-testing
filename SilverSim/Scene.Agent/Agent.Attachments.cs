@@ -39,8 +39,6 @@ namespace SilverSim.Scene.Agent
 {
     public partial class Agent
     {
-        protected readonly RwLockedDoubleDictionary<UUID /* ItemID */, UInt32 /* LocalID */, KeyValuePair<UUID /* SceneID */, UUID /* ObjectID */>> m_AttachmentsList = new RwLockedDoubleDictionary<UUID, UInt32, KeyValuePair<UUID, UUID>>();
-
         protected struct DetachEntry
         {
             public UUID ItemID;
@@ -189,7 +187,7 @@ namespace SilverSim.Scene.Agent
                 grp.IsAttached = true;
                 grp.Position = grp.AttachedPos;
 
-                m_AttachmentsList.Add(newitem.ID, grp.LocalID, new KeyValuePair<UUID, UUID>(scene.ID, grp.ID));
+                Attachments.Add(grp.AttachPoint, grp);
                 grp.PostEvent(new AttachEvent { ObjectID = Owner.ID });
 
             }
@@ -199,9 +197,9 @@ namespace SilverSim.Scene.Agent
         public void DetachAllAttachments()
         {
             var detachList = new List<DetachEntry>();
-            foreach (KeyValuePair<UUID, KeyValuePair<UUID, UUID>> kvp in m_AttachmentsList.Key1ValuePairs)
+            foreach (ObjectGroup grp in Attachments.All)
             {
-                detachList.Add(new DetachEntry(kvp.Key, kvp.Value.Key, kvp.Value.Value));
+                detachList.Add(new DetachEntry(grp.FromItemID, grp.Scene.ID, grp.ID));
             }
             foreach (var entry in detachList)
             {
@@ -211,28 +209,28 @@ namespace SilverSim.Scene.Agent
 
         public void DetachAttachment(UUID fromInventoryID)
         {
-            KeyValuePair<UUID, UUID> kvp;
-            if(m_AttachmentsList.TryGetValue(fromInventoryID, out kvp))
+            ObjectGroup grp;
+            if(Attachments.TryGetValueByInventoryID(fromInventoryID, out grp))
             {
-                DetachAttachment(new DetachEntry(fromInventoryID, kvp.Key, kvp.Value));
+                DetachAttachment(new DetachEntry(fromInventoryID, grp.Scene.ID, grp.ID));
             }
         }
 
         public void DropAttachment(UUID itemID, bool override_canrez = false)
         {
-            KeyValuePair<UUID, UUID> kvp;
-            if (m_AttachmentsList.TryGetValue(itemID, out kvp))
+            ObjectGroup grp;
+            if (Attachments.TryGetValueByInventoryID(itemID, out grp))
             {
-                DropAttachment(Attachments[kvp.Value], override_canrez);
+                DropAttachment(grp, override_canrez);
             }
         }
 
         public void DropAttachment(UUID itemID, Vector3 position, Quaternion rotation, bool override_canrez = false)
         {
-            KeyValuePair<UUID, UUID> kvp;
-            if (m_AttachmentsList.TryGetValue(itemID, out kvp))
+            ObjectGroup grp;
+            if (Attachments.TryGetValueByInventoryID(itemID, out grp))
             {
-                DropAttachment(Attachments[kvp.Value], position, rotation, override_canrez);
+                DropAttachment(grp, position, rotation, override_canrez);
             }
         }
 
@@ -245,10 +243,6 @@ namespace SilverSim.Scene.Agent
         {
             if (override_canrez || grp.Scene.CanRez(Owner, position))
             {
-                if (grp.FromItemID != UUID.Zero)
-                {
-                    m_AttachmentsList.Remove(grp.FromItemID);
-                }
                 if (Attachments.Remove(grp.ID))
                 {
                     grp.IsAttached = false;
@@ -267,7 +261,7 @@ namespace SilverSim.Scene.Agent
             private readonly UUID m_ItemID;
             private readonly UUI m_RezzingAgent;
             private readonly AttachmentPoint m_AttachPoint;
-            private readonly RwLockedDoubleDictionary<UUID /* ItemID */, UInt32 /* LocalID */, KeyValuePair<UUID /* SceneID */, UUID /* ObjectID */>> m_AttachmentsList = new RwLockedDoubleDictionary<UUID, UInt32, KeyValuePair<UUID, UUID>>();
+            private readonly AgentAttachments m_AttachmentsList;
 
             public RezAttachmentHandler(
                 SceneInterface scene,
@@ -276,7 +270,7 @@ namespace SilverSim.Scene.Agent
                 AssetServiceInterface source,
                 UUI rezzingagent,
                 AttachmentPoint attachPoint,
-                RwLockedDoubleDictionary<UUID /* ItemID */, UInt32 /* LocalID */, KeyValuePair<UUID /* SceneID */, UUID /* ObjectID */>> attachmentsList)
+                AgentAttachments attachmentsList)
                 : base(scene.AssetService, source, assetid, ReferenceSource.Destination)
             {
                 m_Scene = scene;
@@ -381,7 +375,7 @@ namespace SilverSim.Scene.Agent
                 try
                 {
                     m_Scene.Add(grp);
-                    m_AttachmentsList.Add(m_ItemID, grp.LocalID, new KeyValuePair<UUID, UUID>(m_Scene.ID, grp.ID));
+                    m_AttachmentsList.Add(grp.AttachPoint, grp);
                 }
                 catch
                 {

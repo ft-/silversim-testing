@@ -104,10 +104,10 @@ namespace SilverSim.Viewer.Core
 
                 foreach (var localid in req.ObjectList)
                 {
-                    KeyValuePair<UUID, KeyValuePair<UUID,UUID>> kvp;
-                    if(m_AttachmentsList.TryGetValue(localid, out kvp))
+                    ObjectGroup grp;
+                    if(Attachments.TryGetValueByLocalID(localid, out grp))
                     {
-                        detachList.Add(new DetachEntry(kvp.Key, kvp.Value.Key, kvp.Value.Value));
+                        detachList.Add(new DetachEntry(grp.FromItemID, req.CircuitSceneID, grp.ID));
                     }
                 }
             }
@@ -126,10 +126,10 @@ namespace SilverSim.Viewer.Core
                 m_Log.DebugFormat("Detach attachment {1} into inventory of {0}", Owner.FullName, req.ItemID);
 #endif
 
-                KeyValuePair<UInt32, KeyValuePair<UUID,UUID>> kvp;
-                if(m_AttachmentsList.TryGetValue(req.ItemID, out kvp))
+                ObjectGroup grp;
+                if(Attachments.TryGetValueByInventoryID(req.ItemID, out grp))
                 {
-                    detachList.Add(new DetachEntry(req.ItemID, kvp.Value.Key, kvp.Value.Value));
+                    detachList.Add(new DetachEntry(req.ItemID, m.CircuitSceneID.AsUUID, grp.ID));
                 }
             }
 
@@ -187,7 +187,7 @@ namespace SilverSim.Viewer.Core
                 AssetService,
                 Owner,
                 attachpointFlagged,
-                m_AttachmentsList).QueueWorkItem();
+                Attachments).QueueWorkItem();
         }
 
         protected override void DetachAttachment(DetachEntry entry)
@@ -199,10 +199,9 @@ namespace SilverSim.Viewer.Core
             }
             catch
             {
-                m_AttachmentsList.Remove(entry.ItemID);
                 return;
             }
-            m_AttachmentsList.Remove(entry.ItemID);
+            Attachments.Remove(grp.ID);
 
             /* only serialize changed and/or scripted attachments */
             var isChanged = false;

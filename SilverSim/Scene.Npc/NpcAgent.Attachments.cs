@@ -45,10 +45,9 @@ namespace SilverSim.Scene.Npc
             }
             catch
             {
-                m_AttachmentsList.Remove(entry.ItemID);
                 return;
             }
-            m_AttachmentsList.Remove(entry.ItemID);
+            Attachments.Remove(grp.ID);
 
             /* only serialize changed and/or scripted attachments */
             bool isChanged = false;
@@ -301,7 +300,7 @@ namespace SilverSim.Scene.Npc
             try
             {
                 scene.Add(grp);
-                m_AttachmentsList.Add(itemID, grp.LocalID, new KeyValuePair<UUID, UUID>(scene.ID, grp.ID));
+                Attachments.Add(grp.AttachPoint, grp);
             }
             catch
             {

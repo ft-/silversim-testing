@@ -47,6 +47,49 @@ namespace SilverSim.Scene.Types.Agent
             return new List<ObjectGroup>();
         });
 
+        public bool TryGetValueByInventoryID(UUID itemID, out ObjectGroup grp)
+        {
+            grp = m_AttachmentsRwLock.AcquireReaderLock(() =>
+            {
+                foreach(ObjectGroup igrp in m_AllAttachments.Values)
+                {
+                    if(igrp.FromItemID == itemID)
+                    {
+                        return igrp;
+                    }
+                }
+                return null;
+            });
+            return grp != null;
+        }
+
+        public bool TryGetValueByLocalID(uint localid, out ObjectGroup grp)
+        {
+            grp = m_AttachmentsRwLock.AcquireReaderLock(() =>
+            {
+                foreach (ObjectGroup igrp in m_AllAttachments.Values)
+                {
+                    if (igrp.LocalID == localid)
+                    {
+                        return igrp;
+                    }
+                }
+                return null;
+            });
+            return grp != null;
+        }
+
+        public bool TryGetValue(UUID sogid, out ObjectGroup grp)
+        {
+            grp = m_AttachmentsRwLock.AcquireReaderLock(() =>
+            {
+                ObjectGroup igrp;
+                bool res = m_AllAttachments.TryGetValue(sogid, out igrp);
+                return res ? igrp : null;
+            });
+            return grp != null;
+        }
+
         public void Add(AttachmentPoint ap, ObjectGroup sog) => m_AttachmentsRwLock.AcquireWriterLock(() =>
         {
             m_AllAttachments.Add(sog.ID, sog);

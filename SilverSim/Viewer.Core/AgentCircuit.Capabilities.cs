@@ -341,7 +341,7 @@ namespace SilverSim.Viewer.Core
                 /* no action needed here */
             }
 
-            AddDefCapabilityFactory("SimulatorFeatures", regionSeedID, (ViewerAgent agent) => new SimulatorFeatures(agent, Server.Scene, RemoteIP), capConfig);
+            AddDefCapabilityFactory("SimulatorFeatures", regionSeedID, (agent) => new SimulatorFeatures(agent, Server.Scene, RemoteIP), capConfig);
             AddDefCapability("UpdateAgentLanguage", regionSeedID, Cap_UpdateAgentLanguage, capConfig);
             AddDefCapability("EnvironmentSettings", regionSeedID, Cap_EnvironmentSettings, capConfig);
             AddDefCapability("RenderMaterials", regionSeedID, Cap_RenderMaterials, capConfig);
@@ -360,12 +360,12 @@ namespace SilverSim.Viewer.Core
             AddDefCapability("GetPhysicsObjectData", regionSeedID, Cap_GetObjectsPhysicsData, capConfig);
             AddDefCapability("ChatSessionRequest", regionSeedID, ChatSessionRequestCapability.HttpRequestHandler, capConfig);
             string localHostName = string.Format("{0}://{1}:{2}", m_CapsRedirector.Scheme, m_CapsRedirector.ExternalHostName, m_CapsRedirector.Port);
-            AddDefCapabilityFactory("DispatchRegionInfo", regionSeedID, (ViewerAgent agent) => new DispatchRegionInfo(agent, Server.Scene, RemoteIP), capConfig);
-            AddDefCapabilityFactory("CopyInventoryFromNotecard", regionSeedID, (ViewerAgent agent) => new CopyInventoryFromNotecard(agent, Server.Scene, RemoteIP), capConfig);
-            AddDefCapabilityFactory("ParcelPropertiesUpdate", regionSeedID, (ViewerAgent agent) => new ParcelPropertiesUpdate(agent, Server.Scene, RemoteIP), capConfig);
-            AddDefCapabilityFactory("AgentPreferences", regionSeedID, (ViewerAgent agent) => new AgentPreferences(agent, RemoteIP), capConfig);
-            AddDefCapabilityFactory("ObjectAdd", regionSeedID, (ViewerAgent agent) => new ObjectAdd(Server.Scene, agent.Owner, RemoteIP), capConfig);
-            AddDefCapabilityFactory("UploadBakedTexture", regionSeedID, (ViewerAgent agent) =>
+            AddDefCapabilityFactory("DispatchRegionInfo", regionSeedID, (agent) => new DispatchRegionInfo(agent, Server.Scene, RemoteIP), capConfig);
+            AddDefCapabilityFactory("CopyInventoryFromNotecard", regionSeedID, (agent) => new CopyInventoryFromNotecard(agent, Server.Scene, RemoteIP), capConfig);
+            AddDefCapabilityFactory("ParcelPropertiesUpdate", regionSeedID, (agent) => new ParcelPropertiesUpdate(agent, Server.Scene, RemoteIP), capConfig);
+            AddDefCapabilityFactory("AgentPreferences", regionSeedID, (agent) => new AgentPreferences(agent, RemoteIP), capConfig);
+            AddDefCapabilityFactory("ObjectAdd", regionSeedID, (agent) => new ObjectAdd(Server.Scene, agent.Owner, RemoteIP), capConfig);
+            AddDefCapabilityFactory("UploadBakedTexture", regionSeedID, (agent) =>
             {
                 UploadAssetAbstractCapability capability = new UploadBakedTexture(
                     agent.Owner,
@@ -375,7 +375,7 @@ namespace SilverSim.Viewer.Core
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);
-            AddDefCapabilityFactory("NewFileAgentInventory", regionSeedID, (ViewerAgent agent) =>
+            AddDefCapabilityFactory("NewFileAgentInventory", regionSeedID, (agent) =>
             {
                 UploadAssetAbstractCapability capability = new NewFileAgentInventory(
                     agent,
@@ -384,7 +384,7 @@ namespace SilverSim.Viewer.Core
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);
-            AddDefCapabilityFactory("NewFileAgentInventoryVariablePrice", regionSeedID, (ViewerAgent agent) =>
+            AddDefCapabilityFactory("NewFileAgentInventoryVariablePrice", regionSeedID, (agent) =>
             {
                 UploadAssetAbstractCapability capability = new NewFileAgentInventoryVariablePrice(
                     agent,
@@ -393,7 +393,7 @@ namespace SilverSim.Viewer.Core
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);
-            AddDefCapabilityFactory("UpdateGestureAgentInventory", regionSeedID, (ViewerAgent agent) =>
+            AddDefCapabilityFactory("UpdateGestureAgentInventory", regionSeedID, (agent) =>
             {
                 UploadAssetAbstractCapability capability = new UpdateGestureAgentInventory(
                     agent,
@@ -404,7 +404,7 @@ namespace SilverSim.Viewer.Core
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);
-            AddDefCapabilityFactory("UpdateNotecardAgentInventory", regionSeedID, (ViewerAgent agent) =>
+            AddDefCapabilityFactory("UpdateNotecardAgentInventory", regionSeedID, (agent) =>
             {
                 UploadAssetAbstractCapability capability = new UpdateNotecardAgentInventory(
                     agent,
@@ -415,7 +415,7 @@ namespace SilverSim.Viewer.Core
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);
-            AddDefCapabilityFactory("UpdateScriptAgent", regionSeedID, (ViewerAgent agent) =>
+            AddDefCapabilityFactory("UpdateScriptAgent", regionSeedID, (agent) =>
             {
                 UploadAssetAbstractCapability capability = new UpdateScriptAgent(
                     agent,
@@ -426,7 +426,7 @@ namespace SilverSim.Viewer.Core
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);
-            AddDefCapabilityFactory("UpdateScriptTask", regionSeedID, (ViewerAgent agent) =>
+            AddDefCapabilityFactory("UpdateScriptTask", regionSeedID, (agent) =>
             {
                 UploadAssetAbstractCapability capability = new UpdateScriptTask(
                     agent,
@@ -436,7 +436,7 @@ namespace SilverSim.Viewer.Core
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);
-            AddDefCapabilityFactory("UpdateGestureTaskInventory", regionSeedID, (ViewerAgent agent) =>
+            AddDefCapabilityFactory("UpdateGestureTaskInventory", regionSeedID, (agent) =>
             {
                 UploadAssetAbstractCapability capability = new UpdateGestureTaskInventory(
                     agent,
@@ -446,7 +446,7 @@ namespace SilverSim.Viewer.Core
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);
-            AddDefCapabilityFactory("UpdateNotecardTaskInventory", regionSeedID, (ViewerAgent agent) =>
+            AddDefCapabilityFactory("UpdateNotecardTaskInventory", regionSeedID, (agent) =>
             {
                 UploadAssetAbstractCapability capability = new UpdateNotecardTaskInventory(
                     agent,
@@ -456,10 +456,12 @@ namespace SilverSim.Viewer.Core
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);
-            AddDefCapabilityFactory("ParcelNavigateMedia", regionSeedID, (ViewerAgent agent) => new ParcelNavigateMedia(agent.Owner, Server.Scene, RemoteIP), capConfig);
-            AddDefCapabilityFactory("ObjectMedia", regionSeedID, (ViewerAgent agent) => new ObjectMedia(agent.Owner, Server.Scene, RemoteIP), capConfig);
-            AddDefCapabilityFactory("ObjectMediaNavigate", regionSeedID, (ViewerAgent agent) => new ObjectMediaNavigate(agent.Owner, Server.Scene, RemoteIP), capConfig);
-            AddDefCapabilityFactory("UpdateAvatarAppearance", regionSeedID, (ViewerAgent agent) => new UpdateAvatarAppearance(agent, Server.Scene, RemoteIP), capConfig);
+            AddDefCapabilityFactory("ParcelNavigateMedia", regionSeedID, (agent) => new ParcelNavigateMedia(agent.Owner, Server.Scene, RemoteIP), capConfig);
+            AddDefCapabilityFactory("ObjectMedia", regionSeedID, (agent) => new ObjectMedia(agent.Owner, Server.Scene, RemoteIP), capConfig);
+            AddDefCapabilityFactory("ObjectMediaNavigate", regionSeedID, (agent) => new ObjectMediaNavigate(agent.Owner, Server.Scene, RemoteIP), capConfig);
+            AddDefCapabilityFactory("UpdateAvatarAppearance", regionSeedID, (agent) => new UpdateAvatarAppearance(agent, Server.Scene, RemoteIP), capConfig);
+            AddDefCapabilityFactory("LandResources", regionSeedID, (agent) => new LandResources(agent, Server.Scene, localHostName, RemoteIP), capConfig);
+            AddDefCapabilityFactory("AttachmentResources", regionSeedID, (agent) => new AttachmentResources(agent, Server.Scene, RemoteIP), capConfig);
         }
         #endregion
     }
