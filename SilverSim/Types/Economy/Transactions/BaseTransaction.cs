@@ -26,6 +26,7 @@ namespace SilverSim.Types.Economy.Transactions
         public UUID RegionID { get; }
         public string RegionName { get; }
         public GridVector RegionHandle { get; }
+        public abstract int TransactionType { get; }
 
         protected BaseTransaction(GridVector regionHandle, UUID regionID, string regionName)
         {

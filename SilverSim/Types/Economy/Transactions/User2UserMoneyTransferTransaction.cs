@@ -29,5 +29,7 @@ namespace SilverSim.Types.Economy.Transactions
             : base(regionHandle, regionID, regionName)
         {
         }
+
+        public override int TransactionType => 5011;
     }
 }
