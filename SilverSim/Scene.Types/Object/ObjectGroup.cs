@@ -1334,6 +1334,35 @@ namespace SilverSim.Scene.Types.Object
             get { throw new NotImplementedException(); }
         }
 
+        #region Resource costs
+        public double PhysicsCost => 0;
+        public double StreamingCost
+        {
+            get
+            {
+                double cost = 0;
+                foreach(ObjectPart part in ValuesByKey1)
+                {
+                    cost += part.StreamingCost;
+                }
+                return cost;
+            }
+        }
+
+        public double SimulationCost
+        {
+            get
+            {
+                double cost = 0;
+                foreach(ObjectPart part in ValuesByKey1)
+                {
+                    cost += part.SimulationCost;
+                }
+                return cost;
+            }
+        }
+        #endregion
+
         #region XML Serialization
         public void ToXml(XmlTextWriter writer, XmlSerializationOptions options = XmlSerializationOptions.None)
         {

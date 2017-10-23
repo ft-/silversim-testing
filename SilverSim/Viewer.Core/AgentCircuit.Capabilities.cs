@@ -462,6 +462,7 @@ namespace SilverSim.Viewer.Core
             AddDefCapabilityFactory("UpdateAvatarAppearance", regionSeedID, (agent) => new UpdateAvatarAppearance(agent, Server.Scene, RemoteIP), capConfig);
             AddDefCapabilityFactory("LandResources", regionSeedID, (agent) => new LandResources(agent, Server.Scene, localHostName, RemoteIP), capConfig);
             AddDefCapabilityFactory("AttachmentResources", regionSeedID, (agent) => new AttachmentResources(agent, Server.Scene, RemoteIP), capConfig);
+            AddDefCapabilityFactory("ResourceCostSelected", regionSeedID, (agent) => new ResourceCostSelected(agent, Server.Scene, RemoteIP), capConfig);
         }
         #endregion
     }

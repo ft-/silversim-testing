@@ -369,6 +369,12 @@ namespace SilverSim.Scene.Types.Object
         }
         #endregion
 
+        #region Resource costs
+        public double PhysicsCost => 1;
+        public double StreamingCost => 1;
+        public double SimulationCost => 1;
+        #endregion
+
         #region Update Script Flags
         private void CheckInventoryScripts(ref bool hasTouchEvent, ref bool hasMoneyEvent)
         {
