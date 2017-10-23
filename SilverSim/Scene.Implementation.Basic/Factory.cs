@@ -100,7 +100,7 @@ namespace SilverSim.Scene.Implementation.Basic
             {
                 if(key.StartsWith("Cap_") && key != "Cap_")
                 {
-                    m_CapabilitiesConfig[key.Substring(4)] = ownConfig.GetString(key);
+                    m_CapabilitiesConfig[key.Substring(4)] = ownConfig.GetString(key).Trim();
                 }
             }
         }

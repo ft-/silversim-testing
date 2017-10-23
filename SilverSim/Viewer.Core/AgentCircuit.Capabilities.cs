@@ -90,6 +90,7 @@ namespace SilverSim.Viewer.Core
             {
                 if (0 == capsUriStr.Length)
                 {
+                    uri = string.Empty;
                     return true;
                 }
                 else
@@ -206,7 +207,10 @@ namespace SilverSim.Viewer.Core
                 }
                 else if(GetCustomCapsUri(v.ToString(), out capsUriStr))
                 {
-                    capsUri[v.ToString()] = capsUriStr;
+                    if (capsUriStr.Length != 0)
+                    {
+                        capsUri[v.ToString()] = capsUriStr;
+                    }
                 }
                 else if (m_RegisteredCapabilities.TryGetValue(v.ToString(), out capsID))
                 {
