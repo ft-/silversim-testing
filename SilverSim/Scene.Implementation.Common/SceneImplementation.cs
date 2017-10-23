@@ -111,7 +111,7 @@ namespace SilverSim.Scene.Implementation.Common
             RegionInfo ri)
             : base(ri.Size.X, ri.Size.Y)
         {
-            //SceneCapabilities.Add("ProductInfoRequest", new ProductInfoRequestCapability(this));
+            SceneCapabilities.Add("ProductInfoRequest", new ProductInfoRequestCapability(this));
             m_Scenes = sceneParams.Scenes;
             m_HttpServer = sceneParams.HttpServer;
             if (sceneParams.AssetService == null)

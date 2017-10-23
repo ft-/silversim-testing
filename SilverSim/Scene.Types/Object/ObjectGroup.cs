@@ -1335,7 +1335,19 @@ namespace SilverSim.Scene.Types.Object
         }
 
         #region Resource costs
-        public double PhysicsCost => 0;
+        public double PhysicsCost
+        {
+            get
+            {
+                double cost = 0;
+                foreach(ObjectPart part in ValuesByKey1)
+                {
+                    cost += part.PhysicsCost;
+                }
+                return cost;
+            }
+        }
+
         public double StreamingCost
         {
             get
