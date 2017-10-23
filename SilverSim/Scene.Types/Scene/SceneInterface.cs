@@ -517,8 +517,6 @@ namespace SilverSim.Scene.Types.Scene
             m_NotecardCache = new NotecardCache(this);
             LoginControl.OnLoginsEnabled += LoginsEnabledHandler;
 
-            /* basic capabilities */
-
             InitializeParcelLayer();
         }
 

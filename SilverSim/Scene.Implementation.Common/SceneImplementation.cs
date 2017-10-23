@@ -46,12 +46,14 @@ using SilverSim.Types.Estate;
 using SilverSim.Types.Grid;
 using SilverSim.Types.IM;
 using SilverSim.Types.Parcel;
+using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Viewer.Core;
 using SilverSim.Viewer.Core.Capabilities;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.LayerData;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Timers;
@@ -109,6 +111,7 @@ namespace SilverSim.Scene.Implementation.Common
             RegionInfo ri)
             : base(ri.Size.X, ri.Size.Y)
         {
+            //SceneCapabilities.Add("ProductInfoRequest", new ProductInfoRequestCapability(this));
             m_Scenes = sceneParams.Scenes;
             m_HttpServer = sceneParams.HttpServer;
             if (sceneParams.AssetService == null)
@@ -952,6 +955,45 @@ namespace SilverSim.Scene.Implementation.Common
             else
             {
                 agent.SendAlertMessage(typeof(SceneImplementation).GetLanguageString(agent.CurrentCulture, "NoDefaultTerrainStored", "No default terrain stored."), ID);
+            }
+        }
+
+
+        private sealed class ProductInfoRequestCapability : ICapabilityInterface
+        {
+            public string CapabilityName => "ProductInfoRequest";
+
+            public readonly SceneInterface m_Scene;
+
+            public ProductInfoRequestCapability(SceneInterface scene)
+            {
+                m_Scene = scene;
+            }
+
+            public void HttpRequestHandler(HttpRequest httpreq)
+            {
+                if(httpreq.Method != "GET")
+                {
+                    httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
+                    return;
+                }
+                RegionInfo info = m_Scene.GetRegionInfo();
+
+                var resdata = new AnArray
+                {
+                    new Map
+                    {
+                        { "description", VersionInfo.ProductName },
+                        { "name", info.ProductName },
+                        { "sku", VersionInfo.SimulatorVersion }
+                    }
+                };
+
+                using (HttpResponse res = httpreq.BeginResponse("application/llsd+xml"))
+                using (Stream s = res.GetOutputStream())
+                {
+                    LlsdXml.Serialize(resdata, s);
+                }
             }
         }
     }
