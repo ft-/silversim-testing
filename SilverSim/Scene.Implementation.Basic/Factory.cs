@@ -21,17 +21,12 @@
 
 using Nini.Config;
 using SilverSim.Main.Common;
-using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Implementation.Common;
-using SilverSim.Scene.Management.IM;
-using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.ServiceInterfaces.Chat;
-using SilverSim.Scene.ServiceInterfaces.Scene;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Pathfinding;
 using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Scene;
-using SilverSim.ServiceInterfaces;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Estate;
