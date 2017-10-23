@@ -113,7 +113,7 @@ namespace SilverSim.Viewer.Economy
             {
                 resdata.Add("success", false);
                 resdata.Add("errorMessage", this.GetLanguageString(GetLanguageCulture(language.ToString()), "UnableToAuthenticate", "Unable to authenticate."));
-                resdata.Add("errorURI", m_HttpServer.ServerURI);
+                resdata.Add("errorURI", string.Empty);
                 return new XmlRpc.XmlRpcResponse { ReturnValue = resdata };
             }
 
@@ -123,7 +123,7 @@ namespace SilverSim.Viewer.Economy
             {
                 resdata.Add("success", false);
                 resdata.Add("errorMessage", this.GetLanguageString(agent.CurrentCulture, "NoEconomyConfigured", "No economy configured."));
-                resdata.Add("errorURI", m_HttpServer.ServerURI);
+                resdata.Add("errorURI", string.Empty);
                 return new XmlRpc.XmlRpcResponse { ReturnValue = resdata };
             }
 
@@ -144,7 +144,7 @@ namespace SilverSim.Viewer.Economy
             {
                 resdata.Add("success", false);
                 resdata.Add("errorMessage", "\n\n" + e.Message);
-                resdata.Add("errorURI", m_HttpServer.ServerURI);
+                resdata.Add("errorURI", string.Empty);
                 return new XmlRpc.XmlRpcResponse { ReturnValue = resdata };
             }
 
@@ -204,7 +204,7 @@ namespace SilverSim.Viewer.Economy
             {
                 resdata.Add("success", false);
                 resdata.Add("errorMessage", this.GetLanguageString(GetLanguageCulture(language.ToString()), "UnableToAuthenticate", "Unable to authenticate."));
-                resdata.Add("errorURI", m_HttpServer.ServerURI);
+                resdata.Add("errorURI", string.Empty);
                 return new XmlRpc.XmlRpcResponse { ReturnValue = resdata };
             }
 
@@ -214,7 +214,7 @@ namespace SilverSim.Viewer.Economy
             {
                 resdata.Add("success", false);
                 resdata.Add("errorMessage", this.GetLanguageString(agent.CurrentCulture, "NoEconomyConfigured", "No economy configured."));
-                resdata.Add("errorURI", m_HttpServer.ServerURI);
+                resdata.Add("errorURI", string.Empty);
                 return new XmlRpc.XmlRpcResponse { ReturnValue = resdata };
             }
 
@@ -267,7 +267,7 @@ namespace SilverSim.Viewer.Economy
             {
                 resdata.Add("success", false);
                 resdata.Add("errorMessage", "\n\n" + e.Message);
-                resdata.Add("errorURI", m_HttpServer.ServerURI);
+                resdata.Add("errorURI", string.Empty);
                 return new XmlRpc.XmlRpcResponse { ReturnValue = resdata };
             }
 

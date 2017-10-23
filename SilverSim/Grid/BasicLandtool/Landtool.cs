@@ -99,7 +99,7 @@ namespace SilverSim.Grid.BasicLandtool
             {
                 resdata.Add("success", false);
                 resdata.Add("errorMessage", this.GetLanguageString(GetLanguageCulture(language.ToString()), "UnableToAuthenticate", "Unable to authenticate."));
-                resdata.Add("errorURI", m_HttpServer.ServerURI);
+                resdata.Add("errorURI", string.Empty);
             }
             else
             {
@@ -170,7 +170,7 @@ namespace SilverSim.Grid.BasicLandtool
             {
                 resdata.Add("success", false);
                 resdata.Add("errorMessage", this.GetLanguageString(GetLanguageCulture(language.ToString()), "UnableToAuthenticate", "Unable to authenticate."));
-                resdata.Add("errorURI", m_HttpServer.ServerURI);
+                resdata.Add("errorURI", string.Empty);
             }
             else
             {
