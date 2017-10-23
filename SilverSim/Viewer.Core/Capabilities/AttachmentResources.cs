@@ -96,7 +96,7 @@ namespace SilverSim.Viewer.Core.Capabilities
             [AttachmentPoint.HindRightFoot] = "Right Hind Foot"
         };
 
-        public string CapabilityName => "LandResources";
+        public string CapabilityName => "AttachmentResources";
 
         public AttachmentResources(ViewerAgent agent, SceneInterface scene, string remoteip)
         {
