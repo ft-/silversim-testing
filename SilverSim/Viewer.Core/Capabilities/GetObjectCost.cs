@@ -83,15 +83,13 @@ namespace SilverSim.Viewer.Core.Capabilities
                     ObjectPart part;
                     if(m_Scene.Primitives.TryGetValue(id, out part))
                     {
-                        var detailmap = new Map();
-                        detailmap = new Map
+                        resdata.Add(id.ToString(), new Map
                         {
                             { "linked_set_resource_cost", part.ObjectGroup.LinkCost },
                             { "linked_set_physics_cost", part.ObjectGroup.PhysicsCost },
                             { "resource_cost", part.LinkCost },
                             { "physics_cost", part.PhysicsCost }
-                        };
-                        resdata.Add(id.ToString(), detailmap);
+                        });
                     }
                 }
             }
