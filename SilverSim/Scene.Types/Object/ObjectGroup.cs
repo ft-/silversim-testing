@@ -1348,6 +1348,19 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        public double LinkCost
+        {
+            get
+            {
+                double cost = 0;
+                foreach (ObjectPart part in ValuesByKey1)
+                {
+                    cost += part.LinkCost;
+                }
+                return cost;
+            }
+        }
+
         public double StreamingCost
         {
             get

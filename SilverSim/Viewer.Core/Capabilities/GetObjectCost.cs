@@ -20,29 +20,29 @@
 // exception statement from your version.
 
 using SilverSim.Main.Common.HttpServer;
+using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
-using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.StructuredData.Llsd;
-using System.Collections.Generic;
+using System.IO;
 using System.Net;
 
 namespace SilverSim.Viewer.Core.Capabilities
 {
-    public sealed class ViewerMetrics : ICapabilityInterface
+    public sealed class GetObjectCost : ICapabilityInterface
     {
         private readonly ViewerAgent m_Agent;
         private readonly SceneInterface m_Scene;
         private readonly string m_RemoteIP;
 
-        public ViewerMetrics(ViewerAgent agent, SceneInterface scene, string remoteip)
+        public GetObjectCost(ViewerAgent agent, SceneInterface scene, string remoteip)
         {
             m_Agent = agent;
             m_Scene = scene;
             m_RemoteIP = remoteip;
         }
 
-        public string CapabilityName => "ViewerMetrics";
+        public string CapabilityName => "GetObjectCost";
 
         public void HttpRequestHandler(HttpRequest httpreq)
         {
@@ -73,39 +73,34 @@ namespace SilverSim.Viewer.Core.Capabilities
                 return;
             }
 
-            IValue iv;
-
-            if(reqmap.TryGetValue("message", out iv) && iv.ToString() == "ViewerAppearanceChangeMetrics")
+            AnArray objectlist;
+            var resdata = new Map();
+            if(reqmap.TryGetValue("object_ids", out objectlist))
             {
-                if(reqmap.TryGetValue("rez_status", out iv))
+                foreach(IValue iv in objectlist)
                 {
-                    OwnRezStatus = iv.ToString();
-                }
-
-                Map nearby;
-                var removeList = new List<string>(OtherRezStatus.Keys);
-                if(reqmap.TryGetValue("nearby", out nearby))
-                {
-                    foreach(KeyValuePair<string, IValue> kvp in nearby)
+                    UUID id = iv.AsUUID;
+                    ObjectPart part;
+                    if(m_Scene.Primitives.TryGetValue(id, out part))
                     {
-                        removeList.Remove(kvp.Key);
-                        OtherRezStatus[kvp.Key] = kvp.Value.ToString();
+                        var detailmap = new Map();
+                        detailmap = new Map
+                        {
+                            { "linked_set_resource_cost", part.ObjectGroup.LinkCost },
+                            { "linked_set_physics_cost", part.ObjectGroup.PhysicsCost },
+                            { "resource_cost", part.LinkCost },
+                            { "physics_cost", part.PhysicsCost }
+                        };
+                        resdata.Add(id.ToString(), detailmap);
                     }
                 }
-                foreach(string name in removeList)
-                {
-                    OtherRezStatus.Remove(name);
-                }
             }
-            
-            HaveValidData = true;
-            httpreq.EmptyResponse();
+
+            using (HttpResponse res = httpreq.BeginResponse("application/llsd+xml"))
+            using (Stream s = res.GetOutputStream())
+            {
+                LlsdXml.Serialize(resdata, s);
+            }
         }
-
-        public bool HaveValidData { get; private set; }
-
-        public string OwnRezStatus { get; private set; }
-
-        public readonly RwLockedDictionary<string, string> OtherRezStatus = new RwLockedDictionary<string, string>();
     }
 }

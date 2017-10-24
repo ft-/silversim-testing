@@ -373,6 +373,8 @@ namespace SilverSim.Scene.Types.Object
         public double PhysicsCost => 1;
         public double StreamingCost => 1;
         public double SimulationCost => 1;
+        public double LinkCost => 1;
+        public double ObjectCost => 1;
         #endregion
 
         #region Update Script Flags
