@@ -21,10 +21,8 @@
 
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Types.Scene;
-using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.StructuredData.Llsd;
-using System.Collections.Generic;
 using System.Net;
 
 namespace SilverSim.Viewer.Core.Capabilities
@@ -75,29 +73,12 @@ namespace SilverSim.Viewer.Core.Capabilities
 
             IValue iv;
 
-            if(reqmap.TryGetValue("message", out iv) && iv.ToString() == "ViewerAppearanceChangeMetrics")
+            if (reqmap.TryGetValue("message", out iv) && iv.ToString() == "ViewerAppearanceChangeMetrics" &&
+                reqmap.TryGetValue("rez_status", out iv))
             {
-                if(reqmap.TryGetValue("rez_status", out iv))
-                {
-                    OwnRezStatus = iv.ToString();
-                }
-
-                Map nearby;
-                var removeList = new List<string>(OtherRezStatus.Keys);
-                if(reqmap.TryGetValue("nearby", out nearby))
-                {
-                    foreach(KeyValuePair<string, IValue> kvp in nearby)
-                    {
-                        removeList.Remove(kvp.Key);
-                        OtherRezStatus[kvp.Key] = kvp.Value.ToString();
-                    }
-                }
-                foreach(string name in removeList)
-                {
-                    OtherRezStatus.Remove(name);
-                }
+                OwnRezStatus = iv.ToString();
             }
-            
+
             HaveValidData = true;
             httpreq.EmptyResponse();
         }
@@ -105,7 +86,5 @@ namespace SilverSim.Viewer.Core.Capabilities
         public bool HaveValidData { get; private set; }
 
         public string OwnRezStatus { get; private set; }
-
-        public readonly RwLockedDictionary<string, string> OtherRezStatus = new RwLockedDictionary<string, string>();
     }
 }
