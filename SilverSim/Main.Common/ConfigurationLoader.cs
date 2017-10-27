@@ -774,7 +774,7 @@ namespace SilverSim.Main.Common
                         DumpIniToFile(dumpResultingIniName);
                     }
 
-                    throw new ConfigurationErrorException(string.Format("Parameter value {0} for {1} in section {2}",
+                    throw new ConfigurationErrorException(string.Format("Unsupported parameter value {0} for {1} in section {2}",
                         sourceParam, useparam[1], useparam[0]));
                 }
             }
