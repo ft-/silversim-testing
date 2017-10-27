@@ -370,34 +370,36 @@ namespace SilverSim.Main.Common
                 return assembly;
             }
 
+            string platformFolderName;
+            string machineWidthName = Environment.Is64BitProcess ? "64/" : "32/";
+            string assemblyBaseName = aName.Name + ".dll";
+
             switch (Environment.OSVersion.Platform)
             {
                 case PlatformID.Win32NT:
                 case PlatformID.Win32S:
                 case PlatformID.Win32Windows:
                 case PlatformID.WinCE:
-                    assemblyFileName = Environment.Is64BitProcess ?
-                        "platform-libs/windows/64/" + aName.Name + ".dll" :
-                        "platform-libs/windows/32/" + aName.Name + ".dll";
+                    platformFolderName = "platform-libs/windows/";
                     break;
 
                 case PlatformID.MacOSX:
-                    assemblyFileName = Environment.Is64BitProcess ?
-                        "platform-libs/macosx/64/" + aName.Name + ".dll" :
-                        "platform-libs/macosx/32/" + aName.Name + ".dll";
+                    platformFolderName = "platform-libs/macosx/";
                     break;
 
                 case PlatformID.Unix:
-                    assemblyFileName = Environment.Is64BitProcess ?
-                        "platform-libs/linux/64/" + aName.Name + ".dll" :
-                        "platform-libs/linux/32/" + aName.Name + ".dll";
+                    platformFolderName = "platform-libs/linux/";
                     break;
 
                 default:
                     return null;
             }
 
-            assemblyFileName = Path.Combine(InstallationBinPath, assemblyFileName);
+            assemblyFileName = Path.Combine(InstallationBinPath, platformFolderName + machineWidthName + assemblyBaseName);
+            if(!File.Exists(assemblyFileName))
+            {
+                assemblyFileName = Path.Combine(InstallationBinPath, platformFolderName + assemblyBaseName);
+            }
 
             if (!File.Exists(assemblyFileName))
             {
