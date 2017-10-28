@@ -147,8 +147,7 @@ namespace SilverSim.Viewer.MuteList
                 Flags = req.MuteFlags,
                 MuteID = req.MuteID,
                 MuteName = req.MuteName,
-                Type = req.MuteType,
-                Timestamp = Date.Now
+                Type = req.MuteType
             });
         }
 

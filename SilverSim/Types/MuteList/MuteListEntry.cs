@@ -27,11 +27,9 @@ namespace SilverSim.Types.MuteList
         public UUID MuteID = UUID.Zero;
         public MuteType Type;
         public MuteFlags Flags;
-        public Date Timestamp;
 
         public MuteListEntry()
         {
-
         }
 
         public MuteListEntry(MuteListEntry src)
@@ -40,7 +38,6 @@ namespace SilverSim.Types.MuteList
             MuteID = src.MuteID;
             Type = src.Type;
             Flags = src.Flags;
-            Timestamp = new Date(src.Timestamp);
         }
     }
 }
