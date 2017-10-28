@@ -33,17 +33,19 @@ namespace SilverSim.Http.Client.Authorization
             m_BearerToken = bearertoken;
         }
 
-        public void GetRequestHeaders(IDictionary<string, string> headers)
+        public void GetRequestHeaders(IDictionary<string, string> headers, string method, string requestUri)
         {
             string o = Convert.ToBase64String(m_BearerToken);
             headers["Authorization"] = $"Bearer {o}";
         }
 
-        public bool HandledUnauthorized(IDictionary<string, string> headers)
-        {
-            return false;
-        }
+        public bool HandledUnauthorized(IDictionary<string, string> headers) => false;
 
         public bool IsSchemeAllowed(string scheme) => scheme == Uri.UriSchemeHttps;
+
+        public void ProcessResponseHeaders(IDictionary<string, string> headers)
+        {
+            /* nothing to do */
+        }
     }
 }

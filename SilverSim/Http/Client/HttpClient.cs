@@ -321,63 +321,80 @@ namespace SilverSim.Http.Client
                         throw new BadHttpResponseException();
                     }
                     lastHeader = splits[0].Trim().ToLowerInvariant();
-                    headers[lastHeader] = splits[1].Trim();
+                    if (headers.ContainsKey(lastHeader))
+                    {
+                        headers[lastHeader] += "\0" + splits[1].Trim();
+                    }
+                    else
+                    {
+                        headers[lastHeader] = splits[1].Trim();
+                    }
                 }
             }
         }
-        #endregion
 
-        #region Main HTTP Client Functionality
         public static Dictionary<string, string> ParseWWWAuthenticate(string value, out string authtype)
         {
             int index = value.IndexOf(' ');
             authtype = default(string);
-            if(index < 0)
+            if (index < 0)
             {
                 return null;
             }
 
             authtype = value.Substring(0, index);
-            string para = value.Substring(index + 1);
+            Dictionary<string, string> paradata = ParseAuthParams(value.Substring(index + 1));
+            if(paradata == null)
+            {
+                authtype = default(string);
+            }
+            return paradata;
+        }
+
+        public static Dictionary<string, string> ParseAuthParams(string para)
+        {
             int pos = 0;
             var paradata = new Dictionary<string, string>();
-            while(pos < para.Length)
+            while (pos < para.Length)
             {
-                if(char.IsWhiteSpace(para[pos]))
+                if (char.IsWhiteSpace(para[pos]))
                 {
                     ++pos;
                     continue;
                 }
 
                 string paraname = string.Empty;
-                while(pos < para.Length && char.IsLetterOrDigit(para[pos]))
+                while (pos < para.Length && char.IsLetterOrDigit(para[pos]))
                 {
                     paraname += para[pos++];
                 }
 
-                if(pos == para.Length || para[pos] != '=')
+                if (pos == para.Length || para[pos] != '=')
                 {
-                    authtype = default(string);
                     return null;
                 }
 
-                while(pos < para.Length && char.IsWhiteSpace(para[pos]))
+                while (pos < para.Length && char.IsWhiteSpace(para[pos]))
                 {
                     ++pos;
                 }
 
                 string paravalue = string.Empty;
-                if(para[pos] == '\"')
+                if (para[pos] == '\"')
                 {
                     ++pos;
-                    while(pos < para.Length && para[pos] != '\"')
+                    while (pos < para.Length && para[pos] != '\"')
                     {
+                        /* escaped pieces */
+                        if (para[pos] == '\\' && ++pos == para.Length)
+                        {
+                            return null;
+                        }
                         paravalue += para[pos++];
                     }
 
-                    if(pos == para.Length || para[pos] != '\"')
+                    if (pos == para.Length || para[pos] != '\"')
                     {
-                        authtype = default(string);
                         return null;
                     }
                 }
@@ -387,16 +404,17 @@ namespace SilverSim.Http.Client
                     ++pos;
                 }
 
-                if(pos < para.Length && para[pos] != ',')
+                if (pos < para.Length && para[pos] != ',')
                 {
-                    authtype = default(string);
                     return null;
                 }
                 paradata[paraname.ToLowerInvariant()] = paravalue;
             }
             return paradata;
         }
+        #endregion
 
+        #region Main HTTP Client Functionality
         public static string ExecuteRequest(
             this Request request)
         {
@@ -510,7 +528,7 @@ redoafter401:
                 }
                 if (request.Authorization.IsSchemeAllowed(uri.Scheme))
                 {
-                    request.Authorization.GetRequestHeaders(headers);
+                    request.Authorization.GetRequestHeaders(headers, request.Method, uri.PathAndQuery);
                 }
             }
 
@@ -811,6 +829,10 @@ redoafter401:
                         }
                     }
                 }
+                else
+                {
+                    request.Authorization?.ProcessResponseHeaders(headers);
+                }
 
                 if (statusCode == 404)
                 {
@@ -822,13 +844,11 @@ redoafter401:
                 }
             }
             
-            if(headers != null)
-            {
-                /* needs a little passthrough for not changing the API, this actually comes from HTTP/2 */
-                headers.Add(":status", splits[1]);
-            }
+            /* needs a little passthrough for not changing the API, this actually comes from HTTP/2 */
+            headers.Add(":status", splits[1]);
 
             ReadHeaderLines(s, headers);
+            request.Authorization?.ProcessResponseHeaders(headers);
 
             string value;
             string compressedresult = string.Empty;
@@ -991,7 +1011,7 @@ redoafter401:
 
             if(request.Authorization != null)
             {
-                request.Authorization.GetRequestHeaders(actheaders);
+                request.Authorization.GetRequestHeaders(actheaders, request.Method, uri.PathAndQuery);
             }
 
             if (actheaders.TryGetValue("transfer-encoding", out encval) && encval == "chunked")
@@ -1197,6 +1217,10 @@ redoafter401:
                         }
                     }
                 }
+                else
+                {
+                    request.Authorization?.ProcessResponseHeaders(rxheaders);
+                }
 
                 if (statusCode == 404)
                 {
@@ -1210,9 +1234,11 @@ redoafter401:
                 }
             }
 
+            request.Authorization?.ProcessResponseHeaders(rxheaders);
+
             string value;
             string compressedresult = string.Empty;
-            if (headers.TryGetValue("content-encoding", out value) || headers.TryGetValue("x-content-encoding", out value))
+            if (rxheaders.TryGetValue("content-encoding", out value) || rxheaders.TryGetValue("x-content-encoding", out value))
             {
                 /* Content-Encoding */
                 /* x-gzip is deprecated but better feel safe about having that */

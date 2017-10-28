@@ -34,7 +34,7 @@ namespace SilverSim.Http.Client.Authorization
             m_Auth = Convert.ToBase64String($"{username}:{password}".ToUTF8Bytes());
         }
 
-        public void GetRequestHeaders(IDictionary<string, string> headers)
+        public void GetRequestHeaders(IDictionary<string, string> headers, string method, string requestUri)
         {
             headers["Authorization"] = $"Basic {m_Auth}";
         }
@@ -45,5 +45,10 @@ namespace SilverSim.Http.Client.Authorization
         }
 
         public bool IsSchemeAllowed(string scheme) => true;
+
+        public void ProcessResponseHeaders(IDictionary<string, string> headers)
+        {
+            /* nothing to do */
+        }
     }
 }

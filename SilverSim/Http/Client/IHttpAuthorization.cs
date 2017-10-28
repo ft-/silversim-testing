@@ -25,7 +25,8 @@ namespace SilverSim.Http.Client
 {
     public interface IHttpAuthorization
     {
-        void GetRequestHeaders(IDictionary<string, string> headers);
+        void GetRequestHeaders(IDictionary<string, string> headers, string method, string requestUri);
+        void ProcessResponseHeaders(IDictionary<string, string> headers);
 
         bool IsSchemeAllowed(string scheme);
 

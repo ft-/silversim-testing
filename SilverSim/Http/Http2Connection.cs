@@ -1238,7 +1238,14 @@ namespace SilverSim.Http
                         {
                             entry = m_RxStaticTable[value];
                         }
-                        headers[entry.Key] = entry.Value;
+                        if (headers.ContainsKey(entry.Key))
+                        {
+                            headers[entry.Key] += "\0" + entry.Value;
+                        }
+                        else
+                        {
+                            headers[entry.Key] = entry.Value;
+                        }
                         m_HeaderRxBuf.RemoveRange(0, offset);
                     }
                     else if((cmd & 0xC0) == 0x40)
@@ -1263,7 +1270,14 @@ namespace SilverSim.Http
                         }
 
                         m_RxDynamicTable.Insert(0, new KeyValuePair<byte[], byte[]>(name, value));
-                        headers[UTF8NoBOM.GetString(name)] = UTF8NoBOM.GetString(value);
+                        if (headers.ContainsKey(UTF8NoBOM.GetString(name)))
+                        {
+                            headers[UTF8NoBOM.GetString(name)] += "\0" + UTF8NoBOM.GetString(value);
+                        }
+                        else
+                        {
+                            headers[UTF8NoBOM.GetString(name)] = UTF8NoBOM.GetString(value);
+                        }
                         m_HeaderRxBuf.RemoveRange(0, offset);
                     }
                     else if((cmd & 0xE0) == 0x00)
@@ -1289,7 +1303,14 @@ namespace SilverSim.Http
                             break;
                         }
 
-                        headers[UTF8NoBOM.GetString(name)] = UTF8NoBOM.GetString(value);
+                        if (headers.ContainsKey(UTF8NoBOM.GetString(name)))
+                        {
+                            headers[UTF8NoBOM.GetString(name)] += "\0" + UTF8NoBOM.GetString(value);
+                        }
+                        else
+                        {
+                            headers[UTF8NoBOM.GetString(name)] = UTF8NoBOM.GetString(value);
+                        }
                         m_HeaderRxBuf.RemoveRange(0, offset);
                     }
                     else if ((cmd & 0xE0) == 0x20)
