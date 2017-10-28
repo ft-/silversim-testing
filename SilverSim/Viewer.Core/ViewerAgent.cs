@@ -571,7 +571,6 @@ namespace SilverSim.Viewer.Core
             MuteListService = serviceList.Get<MuteListServiceInterface>();
             FirstName = firstName;
             LastName = lastName;
-            //EconomyService?.Login(Owner, SessionID, m_SecureSessionID);
             OnPositionChange += ChildUpdateOnPositionChange;
             OnAppearanceUpdate += HandleAppearanceUpdate;
         }
