@@ -408,6 +408,18 @@ namespace SilverSim.Main.Common
             return (T)module;
         }
 
+        public bool TryGetService<T>(string serviceName, out T service)
+        {
+            IPlugin module;
+            if (!PluginInstances.TryGetValue(serviceName, out module) || !typeof(T).IsAssignableFrom(module.GetType()))
+            {
+                service = default(T);
+                return false;
+            }
+            service = (T)module;
+            return true;
+        }
+
         public T GetPluginService<T>(string serviceName) =>
             GetService<T>("$" + serviceName);
 
@@ -422,6 +434,19 @@ namespace SilverSim.Main.Common
                 }
             }
             return list;
+        }
+
+        public Dictionary<string, T> GetServicesByKeyValue<T>()
+        {
+            var dict = new Dictionary<string, T>();
+            foreach(KeyValuePair<string, IPlugin> kvp in PluginInstances)
+            {
+                if(typeof(T).IsAssignableFrom(kvp.Value.GetType()))
+                {
+                    dict.Add(kvp.Key, (T)kvp.Value);
+                }
+            }
+            return dict;
         }
 
         public BaseHttpServer HttpServer => GetService<BaseHttpServer>("HttpServer");
