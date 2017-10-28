@@ -682,6 +682,8 @@ redoafter401:
                         if (splits[1] != "100")
                         {
                             int statusCode;
+                            headers.Clear();
+                            ReadHeaderLines(s, headers);
                             if (!int.TryParse(splits[1], out statusCode))
                             {
                                 statusCode = 500;

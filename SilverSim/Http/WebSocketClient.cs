@@ -61,21 +61,23 @@ namespace SilverSim.Http
         {
         }
 
-        public static WebSocketClient Connect(string url, string[] protocols = null)
+        public static WebSocketClient Connect(string url, string[] protocols = null, IHttpAuthorization authorization = null)
         {
             string selectedProtocol;
-            Stream s = ConnectStream(url, protocols, out selectedProtocol);
+            Stream s = ConnectStream(url, protocols, out selectedProtocol, authorization);
             return new WebSocketClient(s) { SelectedProtocol = selectedProtocol };
         }
 
-        private static Stream ConnectStream(string url, string[] protocols, out string selectedProtocol)
+        private static Stream ConnectStream(string url, string[] protocols, out string selectedProtocol, IHttpAuthorization authorization)
         {
             Stream stream;
             var uri = new Uri(url, UriKind.Absolute);
             string host = uri.Host;
             int port = uri.Port;
 
-            switch(uri.Scheme)
+            redoafter401:
+
+            switch (uri.Scheme)
             {
                 case "ws":
                 case "http":
@@ -106,6 +108,17 @@ namespace SilverSim.Http
             {
                 webSocketRequest += "Sec-WebSocket-Protocol: " + string.Join(",", protocols) + "\r\n";
             }
+
+            if(authorization != null)
+            {
+                var txheaders = new Dictionary<string, string>();
+                authorization.GetRequestHeaders(txheaders, "GET", uri.PathAndQuery);
+                foreach(KeyValuePair<string, string> kvp in txheaders)
+                {
+                    webSocketRequest += $"{kvp.Key}: {kvp.Value}\r\n";
+                }
+            }
+
             webSocketRequest += "\r\n";
 
             string websocketkeyuuid = webSocketKey + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
@@ -133,6 +146,7 @@ namespace SilverSim.Http
                 throw new HttpClient.BadHttpResponseException();
             }
 
+            var headers = new Dictionary<string, string>();
             if (splits[1] != "101")
             {
                 int statusCode;
@@ -140,6 +154,37 @@ namespace SilverSim.Http
                 {
                     statusCode = 500;
                 }
+
+                ReadHeaderLines(stream, headers);
+
+                if (statusCode == 401 && authorization != null && authorization.CanHandleUnauthorized(headers))
+                {
+                    goto redoafter401;
+                }
+
+                if (statusCode == 401)
+                {
+                    string data;
+                    if (headers.TryGetValue("www-authenticate", out data))
+                    {
+                        string authtype;
+                        Dictionary<string, string> authpara = HttpClient.ParseWWWAuthenticate(data, out authtype);
+                        if (authpara == null)
+                        {
+                            throw new HttpClient.BadHttpResponseException("Invalid WWW-Authenticate");
+                        }
+                        else
+                        {
+                            string realm;
+                            if (!authpara.TryGetValue("realm", out realm))
+                            {
+                                realm = string.Empty;
+                            }
+                            throw new HttpClient.HttpUnauthorizedException(authtype, realm, authpara);
+                        }
+                    }
+                }
+
                 if (statusCode == 404)
                 {
                     throw new HttpException(statusCode, splits[2] + " (" + url + ")");
@@ -157,32 +202,9 @@ namespace SilverSim.Http
             }
 
             /* parse Headers */
-            string lastHeader = string.Empty;
-            var headers = new Dictionary<string, string>();
-            string headerLine;
-            while ((headerLine = ReadHeaderLine(stream)).Length != 0)
-            {
-                if (headers.Count == 0)
-                {
-                    /* we have to trim first header line as per RFC7230 when it starts with whitespace */
-                    headerLine = headerLine.TrimStart(new char[] { ' ', '\t' });
-                }
-                /* a white space designates a continuation , RFC7230 deprecates is use for anything else than Content-Type but we stay more permissive here */
-                else if (char.IsWhiteSpace(headerLine[0]))
-                {
-                    headers[lastHeader] += headerLine.Trim().ToLowerInvariant();
-                    continue;
-                }
+            ReadHeaderLines(stream, headers);
 
-                string[] headerData = headerLine.Split(new char[] { ':' }, 2);
-                if (headerData.Length != 2 || headerData[0].Trim() != headerData[0])
-                {
-                    stream.Close();
-                    throw new HttpClient.BadHttpResponseException();
-                }
-                lastHeader = headerData[0];
-                headers[lastHeader] = headerData[1].Trim();
-            }
+            string headerLine;
 
             if(!headers.TryGetValue("connection", out headerLine) || headerLine.Trim() != "upgrade")
             {
@@ -204,6 +226,35 @@ namespace SilverSim.Http
                 headerLine : string.Empty;
 
             return stream;
+        }
+
+        private static void ReadHeaderLines(Stream stream, Dictionary<string, string> headers)
+        {
+            string lastHeader = string.Empty;
+            string headerLine;
+            while ((headerLine = ReadHeaderLine(stream)).Length != 0)
+            {
+                if (headers.Count == 0)
+                {
+                    /* we have to trim first header line as per RFC7230 when it starts with whitespace */
+                    headerLine = headerLine.TrimStart(new char[] { ' ', '\t' });
+                }
+                /* a white space designates a continuation , RFC7230 deprecates is use for anything else than Content-Type but we stay more permissive here */
+                else if (char.IsWhiteSpace(headerLine[0]))
+                {
+                    headers[lastHeader] += headerLine.Trim().ToLowerInvariant();
+                    continue;
+                }
+
+                string[] headerData = headerLine.Split(new char[] { ':' }, 2);
+                if (headerData.Length != 2 || headerData[0].Trim() != headerData[0])
+                {
+                    stream.Close();
+                    throw new HttpClient.BadHttpResponseException();
+                }
+                lastHeader = headerData[0].ToLowerInvariant();
+                headers[lastHeader] = headerData[1].Trim();
+            }
         }
 
         private static string ReadHeaderLine(Stream stream)
