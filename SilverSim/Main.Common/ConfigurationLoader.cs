@@ -453,6 +453,8 @@ namespace SilverSim.Main.Common
 
         public BaseHttpServer HttpsServer => GetService<BaseHttpServer>("HttpsServer");
 
+        public bool TryGetHttpsServer(out BaseHttpServer server) => TryGetService("HttpsServer", out server);
+
         public HttpXmlRpcHandler XmlRpcServer => GetService<HttpXmlRpcHandler>("XmlRpcServer");
 
         public HttpJson20RpcHandler Json20RpcServer => GetService<HttpJson20RpcHandler>("JSON2.0RpcServer");
