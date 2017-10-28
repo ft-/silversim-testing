@@ -57,7 +57,7 @@ namespace SilverSim.Http.Client.Authorization
                 {
                     hashFunction = GetMD5;
                 }
-                else if (m_Algorithm == "SHA-256")
+                else if (m_Algorithm == "SHA2-256")
                 {
                     hashFunction = GetSHA256;
                 }
@@ -74,7 +74,7 @@ namespace SilverSim.Http.Client.Authorization
 
                 if (m_UserHash)
                 {
-                    string userhash = QuotedString(hashFunction($"{m_Username}:${m_Realm}"));
+                    string userhash = QuoteString(hashFunction($"{m_Username}:${m_Realm}"));
                     auth += $"username=\"{userhash}\", ";
                 }
                 else
@@ -88,21 +88,21 @@ namespace SilverSim.Http.Client.Authorization
                 string clientnonce = randomdata.ToHexString();
 
                 string ncstr = string.Format("{0:8x}", nc);
-                auth += $"qop=\"auth\", realm={QuotedString(m_Realm)}, ";
-                auth += $"uri={QuotedString(requestUri)}, algorithm={m_Algorithm}, nonce={QuotedString(m_Nonce)}, ";
-                auth += $"nc={ncstr}, cnonce={QuotedString(clientnonce)}";
+                auth += $"qop=\"auth\", realm={QuoteString(m_Realm)}, ";
+                auth += $"uri={QuoteString(requestUri)}, algorithm={m_Algorithm}, nonce={QuoteString(m_Nonce)}, ";
+                auth += $"nc={ncstr}, cnonce={QuoteString(clientnonce)}";
 
                 string a1 = hashFunction($"{m_Username}:{m_Realm}:{m_Password}");
                 string a2 = hashFunction($"{method}:{requestUri}");
                 string response = hashFunction($"{a1}:{m_Nonce}:{ncstr}:{clientnonce}:auth:{a2}");
 
-                auth += $", response={QuotedString(response)}";
+                auth += $", response={QuoteString(response)}";
 
                 headers["Authorization"] = auth;
             }
         }
 
-        private static string QuotedString(string input)
+        private static string QuoteString(string input)
         {
             var sb = new StringBuilder();
             foreach(char c in input)
