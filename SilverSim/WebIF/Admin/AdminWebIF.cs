@@ -313,18 +313,13 @@ namespace SilverSim.WebIF.Admin
             m_ServerParams = loader.GetServerParamStorage();
             m_HttpServer = loader.HttpServer;
             m_HttpServer.StartsWithUriHandlers.Add("/admin", HandleUnsecureHttp);
-            try
-            {
-                m_HttpsServer = loader.HttpsServer;
-            }
-            catch(ConfigurationLoader.ServiceNotFoundException)
-            {
-                m_HttpsServer = null;
-            }
-
-            if(m_HttpsServer != null)
+            if(loader.TryGetHttpsServer(out m_HttpsServer))
             {
                 m_HttpsServer.StartsWithUriHandlers.Add("/admin", HandleHttp);
+            }
+            else
+            {
+                m_HttpsServer = null;
             }
             loader.CommandRegistry.Commands.Add("admin-webif", AdminWebIFCmd);
 

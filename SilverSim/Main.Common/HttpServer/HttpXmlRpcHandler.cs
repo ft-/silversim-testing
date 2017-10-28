@@ -102,15 +102,10 @@ namespace SilverSim.Main.Common.HttpServer
             BaseHttpServer server = loader.HttpServer;
             server.RootUriContentTypeHandlers["text/xml"] = RequestHandler;
             server.RootUriContentTypeHandlers["application/xml"] = RequestHandler;
-            try
+            if(loader.TryGetHttpsServer(out server))
             {
-                server = loader.HttpsServer;
                 server.RootUriContentTypeHandlers["text/xml"] = RequestHandler;
                 server.RootUriContentTypeHandlers["application/xml"] = RequestHandler;
-            }
-            catch
-            {
-                /* intentionally left empty */
             }
         }
 

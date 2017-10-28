@@ -154,19 +154,11 @@ namespace SilverSim.Grid.Login
 
             m_ConfigurationIssues = loader.KnownConfigurationIssues;
             m_HttpServer = loader.HttpServer;
-            try
-            {
-                m_HttpsServer = loader.HttpsServer;
-            }
-            catch
-            {
-                m_HttpsServer = null;
-            }
-
             m_HttpServer.UriHandlers.Add("/login", HandleLogin);
             m_HttpServer.UriHandlers.Add("/get_grid_info", HandleGetGridInfo);
             m_HttpServer.UriHandlers.Add("/json_grid_info", HandleJsonGridInfo);
-            if (m_HttpsServer != null)
+
+            if(loader.TryGetHttpsServer(out m_HttpsServer))
             {
                 m_HttpsServer.UriHandlers.Add("/login", HandleLogin);
                 m_HttpsServer.UriHandlers.Add("/get_grid_info", HandleGetGridInfo);

@@ -163,14 +163,9 @@ namespace SilverSim.Main.Common.HttpServer
             m_Log.Info("Initializing JSON2.0RPC Handler");
             BaseHttpServer server = loader.HttpServer;
             server.RootUriContentTypeHandlers["application/json-rpc"] = RequestHandler;
-            try
+            if(loader.TryGetHttpsServer(out server))
             {
-                server = loader.HttpsServer;
                 server.RootUriContentTypeHandlers["application/json-rpc"] = RequestHandler;
-            }
-            catch
-            {
-                /* intentionally left empty */
             }
         }
 

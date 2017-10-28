@@ -48,13 +48,10 @@ namespace SilverSim.Main.Common
                 {
                     [(int)HttpServer.Port] = "HTTP Server"
                 };
-                try
+                BaseHttpServer httpsServer;
+                if(TryGetHttpsServer(out httpsServer))
                 {
-                    tcpPorts.Add((int)HttpsServer.Port, "HTTPS Server");
-                }
-                catch
-                {
-                    /* no HTTPS Server */
+                    tcpPorts.Add((int)httpsServer.Port, "HTTPS Server");
                 }
                 return tcpPorts;
             }
@@ -67,15 +64,7 @@ namespace SilverSim.Main.Common
             var sb = new StringBuilder("HTTP Handlers: (" + http.ServerURI + ")\n----------------------------------------------\n");
             ListHttpHandlers(sb, http);
             BaseHttpServer https;
-            try
-            {
-                https = HttpsServer;
-            }
-            catch
-            {
-                https = null;
-            }
-            if (https != null)
+            if(TryGetHttpsServer(out https))
             {
                 sb.AppendFormat("\nHTTPS Handlers: ({0})\n----------------------------------------------\n", https.ServerURI);
                 ListHttpHandlers(sb, https);

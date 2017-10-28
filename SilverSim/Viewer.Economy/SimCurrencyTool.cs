@@ -47,11 +47,7 @@ namespace SilverSim.Viewer.Economy
             m_Scenes = loader.Scenes;
             m_Scenes.OnRegionAdd += OnSceneAdded;
             /* prefer HTTPS over HTTP */
-            try
-            {
-                m_HttpServer = loader.HttpsServer;
-            }
-            catch
+            if(!loader.TryGetHttpsServer(out m_HttpServer))
             {
                 m_HttpServer = loader.HttpServer;
             }

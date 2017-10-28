@@ -55,15 +55,7 @@ namespace SilverSim.Grid.Mapserver
             m_MaptileService = loader.GetService<MaptileServiceInterface>(m_MaptileServiceName);
             m_HttpServer = loader.HttpServer;
             m_HttpServer.StartsWithUriHandlers.Add("/map-", HandleMap);
-            try
-            {
-                m_HttpsServer = loader.HttpsServer;
-            }
-            catch
-            {
-                m_HttpsServer = null;
-            }
-            if(m_HttpsServer != null)
+            if(loader.TryGetHttpsServer(out m_HttpsServer))
             {
                 m_HttpsServer.StartsWithUriHandlers.Add("/map-", HandleMap);
             }
