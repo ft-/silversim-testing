@@ -69,7 +69,7 @@ namespace SilverSim.Viewer.OfflineIM
                     continue;
                 }
 
-                RetrieveInstantMessages imreq = (RetrieveInstantMessages)m;
+                var imreq = (RetrieveInstantMessages)m;
                 if(imreq.SessionID != imreq.CircuitSessionID ||
                     imreq.AgentID != imreq.CircuitAgentID)
                 {
