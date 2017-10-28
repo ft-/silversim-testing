@@ -132,7 +132,7 @@ namespace SilverSim.Http.Client.Authorization
             }
         }
 
-        public bool HandledUnauthorized(IDictionary<string, string> headers)
+        public bool CanHandleUnauthorized(IDictionary<string, string> headers)
         {
             string auth;
             string authtype;

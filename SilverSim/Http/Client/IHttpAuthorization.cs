@@ -31,6 +31,6 @@ namespace SilverSim.Http.Client
         bool IsSchemeAllowed(string scheme);
 
         /** <summary>returns true when 401 is handled</summary> */
-        bool HandledUnauthorized(IDictionary<string, string> headers);
+        bool CanHandleUnauthorized(IDictionary<string, string> headers);
     }
 }

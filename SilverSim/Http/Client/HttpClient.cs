@@ -686,7 +686,7 @@ redoafter401:
                             {
                                 statusCode = 500;
                             }
-                            if (statusCode == 401 && request.Authorization != null && request.Authorization.HandledUnauthorized(headers))
+                            if (statusCode == 401 && request.Authorization != null && request.Authorization.CanHandleUnauthorized(headers))
                             {
                                 goto redoafter401;
                             }
@@ -803,7 +803,7 @@ redoafter401:
                     statusCode = 500;
                 }
 
-                if (statusCode == 401 && request.Authorization != null && request.Authorization.HandledUnauthorized(headers))
+                if (statusCode == 401 && request.Authorization != null && request.Authorization.CanHandleUnauthorized(headers))
                 {
                     goto redoafter401;
                 }
@@ -1117,7 +1117,7 @@ redoafter401:
                             statusCode = 500;
                         }
 
-                        if (statusCode == 401 && request.Authorization != null && request.Authorization.HandledUnauthorized(rxheaders))
+                        if (statusCode == 401 && request.Authorization != null && request.Authorization.CanHandleUnauthorized(rxheaders))
                         {
                             throw new RedoAfter401Exception();
                         }
@@ -1190,7 +1190,7 @@ redoafter401:
                     statusCode = 500;
                 }
 
-                if (statusCode == 401 && request.Authorization != null && request.Authorization.HandledUnauthorized(rxheaders))
+                if (statusCode == 401 && request.Authorization != null && request.Authorization.CanHandleUnauthorized(rxheaders))
                 {
                     throw new RedoAfter401Exception();
                 }

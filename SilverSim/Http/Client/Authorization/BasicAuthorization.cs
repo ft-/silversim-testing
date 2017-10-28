@@ -39,7 +39,7 @@ namespace SilverSim.Http.Client.Authorization
             headers["Authorization"] = $"Basic {m_Auth}";
         }
 
-        public bool HandledUnauthorized(IDictionary<string, string> headers)
+        public bool CanHandleUnauthorized(IDictionary<string, string> headers)
         {
             return false;
         }

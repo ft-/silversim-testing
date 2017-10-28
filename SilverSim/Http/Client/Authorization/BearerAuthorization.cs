@@ -39,7 +39,7 @@ namespace SilverSim.Http.Client.Authorization
             headers["Authorization"] = $"Bearer {o}";
         }
 
-        public bool HandledUnauthorized(IDictionary<string, string> headers) => false;
+        public bool CanHandleUnauthorized(IDictionary<string, string> headers) => false;
 
         public bool IsSchemeAllowed(string scheme) => scheme == Uri.UriSchemeHttps;
 
