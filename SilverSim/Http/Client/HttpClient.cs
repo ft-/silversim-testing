@@ -78,6 +78,68 @@ namespace SilverSim.Http.Client
             }
         }
 
+        [Serializable]
+        public class HttpUnauthorizedException : HttpException
+        {
+            public string AuthenticationRealm { get; }
+            public string AuthenticationType { get; }
+            public Dictionary<string, string> AuthenticationParameters { get; }
+
+            public HttpUnauthorizedException(string type, string realm, Dictionary<string, string> authparams) : base(401, "Not authorized")
+            {
+                AuthenticationType = type;
+                AuthenticationRealm = realm;
+                AuthenticationParameters = authparams;
+            }
+
+            public HttpUnauthorizedException()
+            {
+            }
+
+            public HttpUnauthorizedException(string message) : base(message)
+            {
+            }
+
+            public HttpUnauthorizedException(string message, int hr) : base(message, hr)
+            {
+            }
+
+            public HttpUnauthorizedException(string message, Exception innerException) : base(message, innerException)
+            {
+            }
+
+            public HttpUnauthorizedException(int httpCode, string message, Exception innerException) : base(httpCode, message, innerException)
+            {
+            }
+
+            public HttpUnauthorizedException(int httpCode, string message) : base(httpCode, message)
+            {
+            }
+
+            public HttpUnauthorizedException(int httpCode, string message, int hr) : base(httpCode, message, hr)
+            {
+            }
+
+            protected HttpUnauthorizedException(SerializationInfo info, StreamingContext context) : base(info, context)
+            {
+                if(info == null)
+                {
+                    throw new ArgumentNullException(nameof(info));
+                }
+                AuthenticationRealm = info.GetString("AuthenticationRealm");
+                AuthenticationType = info.GetString("AuthenticationType");
+                AuthenticationParameters = (Dictionary<string, string>)info.GetValue("AuthenticationParameters", typeof(Dictionary<string, string>));
+            }
+
+            public override void GetObjectData(SerializationInfo info, StreamingContext context)
+            {
+                base.GetObjectData(info, context);
+                info.AddValue("AuthenticationRealm", AuthenticationRealm);
+                info.AddValue("AuthenticationType", AuthenticationType);
+                info.AddValue("AuthenticationParameters", AuthenticationParameters);
+            }
+        }
+
         public class Request
         {
             public string Method = "GET";
@@ -98,6 +160,7 @@ namespace SilverSim.Http.Client
             public X509CertificateCollection ClientCertificates;
             public SslProtocols EnabledSslProtocols = SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12;
             public bool CheckCertificateRevocation = true;
+            public IHttpAuthorization Authorization;
 
             public Request(string url)
             {
@@ -265,6 +328,75 @@ namespace SilverSim.Http.Client
         #endregion
 
         #region Main HTTP Client Functionality
+        public static Dictionary<string, string> ParseWWWAuthenticate(string value, out string authtype)
+        {
+            int index = value.IndexOf(' ');
+            authtype = default(string);
+            if(index < 0)
+            {
+                return null;
+            }
+
+            authtype = value.Substring(0, index);
+            string para = value.Substring(index + 1);
+            int pos = 0;
+            var paradata = new Dictionary<string, string>();
+            while(pos < para.Length)
+            {
+                if(char.IsWhiteSpace(para[pos]))
+                {
+                    ++pos;
+                    continue;
+                }
+
+                string paraname = string.Empty;
+                while(pos < para.Length && char.IsLetterOrDigit(para[pos]))
+                {
+                    paraname += para[pos++];
+                }
+
+                if(pos == para.Length || para[pos] != '=')
+                {
+                    authtype = default(string);
+                    return null;
+                }
+
+                while(pos < para.Length && char.IsWhiteSpace(para[pos]))
+                {
+                    ++pos;
+                }
+
+                string paravalue = string.Empty;
+                if(para[pos] == '\"')
+                {
+                    ++pos;
+                    while(pos < para.Length && para[pos] != '\"')
+                    {
+                        paravalue += para[pos++];
+                    }
+
+                    if(pos == para.Length || para[pos] != '\"')
+                    {
+                        authtype = default(string);
+                        return null;
+                    }
+                }
+
+                while (pos < para.Length && char.IsWhiteSpace(para[pos]))
+                {
+                    ++pos;
+                }
+
+                if(pos < para.Length && para[pos] != ',')
+                {
+                    authtype = default(string);
+                    return null;
+                }
+                paradata[paraname.ToLowerInvariant()] = paravalue;
+            }
+            return paradata;
+        }
+
         public static string ExecuteRequest(
             this Request request)
         {
@@ -331,6 +463,7 @@ namespace SilverSim.Http.Client
 
             string method = request.Method;
 
+redoafter401:        
             string reqdata = uri.IsDefaultPort ?
                     $"{method} {uri.PathAndQuery} HTTP/1.1\r\nHost: {uri.Host}\r\n":
                     $"{method} {uri.PathAndQuery} HTTP/1.1\r\nHost: {uri.Host}:{uri.Port}\r\n";
@@ -342,12 +475,12 @@ namespace SilverSim.Http.Client
 
             IDictionary<string, string> headers = request.Headers;
             bool haveAccept = false;
-            if(headers != null)
+            if (headers != null)
             {
                 var removal = new List<string>();
-                foreach(string k in headers.Keys)
+                foreach (string k in headers.Keys)
                 {
-                    if(string.Compare(k, "content-length", true) == 0 ||
+                    if (string.Compare(k, "content-length", true) == 0 ||
                         string.Compare(k, "content-type", true) == 0 ||
                         string.Compare(k, "connection", true) == 0 ||
                         string.Compare(k, "expect", true) == 0 ||
@@ -355,7 +488,7 @@ namespace SilverSim.Http.Client
                     {
                         removal.Add(k);
                     }
-                    if(string.Compare(k, "accept", true) == 0)
+                    if (string.Compare(k, "accept", true) == 0)
                     {
                         haveAccept = true;
                     }
@@ -367,14 +500,31 @@ namespace SilverSim.Http.Client
                         headers.Remove(k);
                     }
                 }
+            }
+
+            if(request.Authorization != null)
+            {
+                if(headers == null)
+                {
+                    headers = new Dictionary<string, string>();
+                }
+                if (request.Authorization.IsSchemeAllowed(uri.Scheme))
+                {
+                    request.Authorization.GetRequestHeaders(headers);
+                }
+            }
+
+            if (headers != null)
+            {
                 foreach (KeyValuePair<string, string> kvp in headers)
                 {
                     reqdata += $"{kvp.Key}: {kvp.Value}\r\n";
                 }
-                if(request.UseChunkedEncoding)
-                {
-                    reqdata += "Transfer-Encoding: chunked\r\n";
-                }
+            }
+
+            if(request.UseChunkedEncoding)
+            {
+                reqdata += "Transfer-Encoding: chunked\r\n";
             }
 
             string content_type = request.RequestContentType;
@@ -518,6 +668,33 @@ namespace SilverSim.Http.Client
                             {
                                 statusCode = 500;
                             }
+                            if (statusCode == 401 && request.Authorization != null && request.Authorization.HandledUnauthorized(headers))
+                            {
+                                goto redoafter401;
+                            }
+                            if(statusCode == 401)
+                            {
+                                string data;
+                                if(headers.TryGetValue("www-authenticate", out data))
+                                {
+                                    string authtype;
+                                    Dictionary<string, string> authpara = ParseWWWAuthenticate(data, out authtype);
+                                    if(authpara == null)
+                                    {
+                                        throw new BadHttpResponseException("Invalid WWW-Authenticate");
+                                    }
+                                    else
+                                    {
+                                        string realm;
+                                        if(!authpara.TryGetValue("realm", out realm))
+                                        {
+                                            realm = string.Empty;
+                                        }
+                                        throw new HttpUnauthorizedException(authtype, realm, authpara);
+                                    }
+                                }
+                            }
+
                             if (statusCode == 404)
                             {
                                 throw new HttpException(statusCode, splits[2] + " (" + url + ")");
@@ -607,6 +784,34 @@ namespace SilverSim.Http.Client
                 {
                     statusCode = 500;
                 }
+
+                if (statusCode == 401 && request.Authorization != null && request.Authorization.HandledUnauthorized(headers))
+                {
+                    goto redoafter401;
+                }
+                if (statusCode == 401)
+                {
+                    string data;
+                    if (headers.TryGetValue("www-authenticate", out data))
+                    {
+                        string authtype;
+                        Dictionary<string, string> authpara = ParseWWWAuthenticate(data, out authtype);
+                        if (authpara == null)
+                        {
+                            throw new BadHttpResponseException("Invalid WWW-Authenticate");
+                        }
+                        else
+                        {
+                            string realm;
+                            if (!authpara.TryGetValue("realm", out realm))
+                            {
+                                realm = string.Empty;
+                            }
+                            throw new HttpUnauthorizedException(authtype, realm, authpara);
+                        }
+                    }
+                }
+
                 if (statusCode == 404)
                 {
                     throw new HttpException(statusCode, splits[2] + " (" + url + ")");
@@ -719,6 +924,26 @@ namespace SilverSim.Http.Client
             }
         }
 
+        [Serializable]
+        private sealed class RedoAfter401Exception : Exception
+        {
+            public RedoAfter401Exception()
+            {
+            }
+
+            public RedoAfter401Exception(string message) : base(message)
+            {
+            }
+
+            public RedoAfter401Exception(string message, Exception innerException) : base(message, innerException)
+            {
+            }
+
+            private RedoAfter401Exception(SerializationInfo info, StreamingContext context) : base(info, context)
+            {
+            }
+        }
+
         private static Stream DoStreamRequestHttp2(
             Request request,
             Uri uri,
@@ -727,6 +952,7 @@ namespace SilverSim.Http.Client
             bool doPost = false;
             string encval;
 
+redoafter401:
             var actheaders = new Dictionary<string, string>();
             actheaders.Add(":method", request.Method);
             actheaders.Add(":scheme", uri.Scheme);
@@ -761,6 +987,11 @@ namespace SilverSim.Http.Client
                     }
                     actheaders.Add(kn, k.Value);
                 }
+            }
+
+            if(request.Authorization != null)
+            {
+                request.Authorization.GetRequestHeaders(actheaders);
             }
 
             if (actheaders.TryGetValue("transfer-encoding", out encval) && encval == "chunked")
@@ -825,11 +1056,18 @@ namespace SilverSim.Http.Client
             }
             s.ReadTimeout = 10000;
 
-            return DoStreamRequestHttp2Response(
-                s,
-                request,
-                uri,
-                doPost);
+            try
+            {
+                return DoStreamRequestHttp2Response(
+                    s,
+                    request,
+                    uri,
+                    doPost);
+            }
+            catch(RedoAfter401Exception)
+            {
+                goto redoafter401;
+            }
         }
 
         private static Stream DoStreamRequestHttp2Response(
@@ -858,6 +1096,35 @@ namespace SilverSim.Http.Client
                         {
                             statusCode = 500;
                         }
+
+                        if (statusCode == 401 && request.Authorization != null && request.Authorization.HandledUnauthorized(rxheaders))
+                        {
+                            throw new RedoAfter401Exception();
+                        }
+
+                        if (statusCode == 401)
+                        {
+                            string data;
+                            if (rxheaders.TryGetValue("www-authenticate", out data))
+                            {
+                                string authtype;
+                                Dictionary<string, string> authpara = ParseWWWAuthenticate(data, out authtype);
+                                if (authpara == null)
+                                {
+                                    throw new BadHttpResponseException("Invalid WWW-Authenticate");
+                                }
+                                else
+                                {
+                                    string realm;
+                                    if (!authpara.TryGetValue("realm", out realm))
+                                    {
+                                        realm = string.Empty;
+                                    }
+                                    throw new HttpUnauthorizedException(authtype, realm, authpara);
+                                }
+                            }
+                        }
+
                         if (statusCode == 404)
                         {
                             s.SendRstStream(Http2Connection.Http2ErrorCode.StreamClosed);
@@ -902,6 +1169,35 @@ namespace SilverSim.Http.Client
                 {
                     statusCode = 500;
                 }
+
+                if (statusCode == 401 && request.Authorization != null && request.Authorization.HandledUnauthorized(rxheaders))
+                {
+                    throw new RedoAfter401Exception();
+                }
+
+                if (statusCode == 401)
+                {
+                    string data;
+                    if (rxheaders.TryGetValue("www-authenticate", out data))
+                    {
+                        string authtype;
+                        Dictionary<string, string> authpara = ParseWWWAuthenticate(data, out authtype);
+                        if (authpara == null)
+                        {
+                            throw new BadHttpResponseException("Invalid WWW-Authenticate");
+                        }
+                        else
+                        {
+                            string realm;
+                            if (!authpara.TryGetValue("realm", out realm))
+                            {
+                                realm = string.Empty;
+                            }
+                            throw new HttpUnauthorizedException(authtype, realm, authpara);
+                        }
+                    }
+                }
+
                 if (statusCode == 404)
                 {
                     s.SendRstStream(Http2Connection.Http2ErrorCode.StreamClosed);
