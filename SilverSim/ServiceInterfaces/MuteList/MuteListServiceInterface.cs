@@ -21,39 +21,14 @@
 
 using SilverSim.Types;
 using SilverSim.Types.MuteList;
+using System.Collections.Generic;
 
-namespace SilverSim.Viewer.Messages.MuteList
+namespace SilverSim.ServiceInterfaces.MuteList
 {
-    [UDPMessage(MessageType.UpdateMuteListEntry)]
-    [Reliable]
-    [NotTrusted]
-    public class UpdateMuteListEntry : Message
+    public abstract class MuteListServiceInterface
     {
-        public UUID AgentID;
-        public UUID SessionID;
-        public UUID MuteID;
-        public string MuteName;
-        public MuteType MuteType;
-        public MuteFlags MuteFlags;
-
-        public static UpdateMuteListEntry Decode(UDPPacket p) => new UpdateMuteListEntry
-        {
-            AgentID = p.ReadUUID(),
-            SessionID = p.ReadUUID(),
-            MuteID = p.ReadUUID(),
-            MuteName = p.ReadStringLen8(),
-            MuteType = (MuteType)p.ReadInt32(),
-            MuteFlags = (MuteFlags)p.ReadUInt32()
-        };
-
-        public override void Serialize(UDPPacket p)
-        {
-            p.WriteUUID(AgentID);
-            p.WriteUUID(SessionID);
-            p.WriteUUID(MuteID);
-            p.WriteStringLen8(MuteName);
-            p.WriteInt32((int)MuteType);
-            p.WriteUInt32((uint)MuteFlags);
-        }
+        public abstract List<MuteListEntry> GetList(UUID muteListOwnerID);
+        public abstract void Store(UUID muteListOwnerID, MuteListEntry mute);
+        public abstract bool Remove(UUID muteListOwnerID, UUID muteID, string muteName);
     }
 }

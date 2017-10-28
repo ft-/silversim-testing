@@ -31,6 +31,7 @@ using SilverSim.ServiceInterfaces.GridUser;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.IM;
 using SilverSim.ServiceInterfaces.Inventory;
+using SilverSim.ServiceInterfaces.MuteList;
 using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.ServiceInterfaces.UserAgents;
@@ -183,6 +184,8 @@ namespace SilverSim.Scene.Types.Agent
         EconomyServiceInterface EconomyService { get; }
 
         OfflineIMServiceInterface OfflineIMService { get; }
+
+        MuteListServiceInterface MuteListService { get; }
 
         void SendMessageIfRootAgent(Message m, UUID fromSceneID);
         void SendMessageAlways(Message m, UUID fromSceneID);

@@ -19,41 +19,14 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.Types;
-using SilverSim.Types.MuteList;
-
-namespace SilverSim.Viewer.Messages.MuteList
+namespace SilverSim.Types.MuteList
 {
-    [UDPMessage(MessageType.UpdateMuteListEntry)]
-    [Reliable]
-    [NotTrusted]
-    public class UpdateMuteListEntry : Message
+    public enum MuteType
     {
-        public UUID AgentID;
-        public UUID SessionID;
-        public UUID MuteID;
-        public string MuteName;
-        public MuteType MuteType;
-        public MuteFlags MuteFlags;
-
-        public static UpdateMuteListEntry Decode(UDPPacket p) => new UpdateMuteListEntry
-        {
-            AgentID = p.ReadUUID(),
-            SessionID = p.ReadUUID(),
-            MuteID = p.ReadUUID(),
-            MuteName = p.ReadStringLen8(),
-            MuteType = (MuteType)p.ReadInt32(),
-            MuteFlags = (MuteFlags)p.ReadUInt32()
-        };
-
-        public override void Serialize(UDPPacket p)
-        {
-            p.WriteUUID(AgentID);
-            p.WriteUUID(SessionID);
-            p.WriteUUID(MuteID);
-            p.WriteStringLen8(MuteName);
-            p.WriteInt32((int)MuteType);
-            p.WriteUInt32((uint)MuteFlags);
-        }
+        ByName = 0,
+        ByAgent = 1,
+        ByObject = 2,
+        ByGroup = 3,
+        External = 4
     }
 }

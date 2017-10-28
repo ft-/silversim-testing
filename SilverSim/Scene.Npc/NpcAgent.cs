@@ -36,6 +36,7 @@ using SilverSim.ServiceInterfaces.GridUser;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.IM;
 using SilverSim.ServiceInterfaces.Inventory;
+using SilverSim.ServiceInterfaces.MuteList;
 using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.ServiceInterfaces.UserAgents;
@@ -268,7 +269,12 @@ namespace SilverSim.Scene.Npc
 
         public override OfflineIMServiceInterface OfflineIMService
         {
-            get { throw new NotImplementedException(); }
+            get { throw new NotSupportedException(); }
+        }
+
+        public override MuteListServiceInterface MuteListService
+        {
+            get { throw new NotSupportedException(); }
         }
 
         #region Physics Linkage

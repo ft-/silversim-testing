@@ -27,7 +27,6 @@ using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.IM;
-using System;
 using System.Collections.Generic;
 
 namespace SilverSim.Scene.Npc

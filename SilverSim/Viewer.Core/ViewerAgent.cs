@@ -65,6 +65,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Threading;
+using SilverSim.ServiceInterfaces.MuteList;
 
 namespace SilverSim.Viewer.Core
 {
@@ -339,6 +340,8 @@ namespace SilverSim.Viewer.Core
 
         public override OfflineIMServiceInterface OfflineIMService { get; }
 
+        public override MuteListServiceInterface MuteListService { get; }
+
         public override GroupsServiceInterface GroupsService => m_GroupsService;
 
         public override ProfileServiceInterface ProfileService => m_ProfileService;
@@ -565,6 +568,7 @@ namespace SilverSim.Viewer.Core
             m_GridUserService = serviceList.Get<GridUserServiceInterface>();
             EconomyService = serviceList.Get<EconomyServiceInterface>();
             OfflineIMService = serviceList.Get<OfflineIMServiceInterface>();
+            MuteListService = serviceList.Get<MuteListServiceInterface>();
             FirstName = firstName;
             LastName = lastName;
             EconomyService?.Login(Owner, SessionID, m_SecureSessionID);

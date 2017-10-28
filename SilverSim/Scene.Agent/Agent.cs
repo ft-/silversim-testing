@@ -35,6 +35,7 @@ using SilverSim.ServiceInterfaces.GridUser;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.IM;
 using SilverSim.ServiceInterfaces.Inventory;
+using SilverSim.ServiceInterfaces.MuteList;
 using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.ServiceInterfaces.UserAgents;
@@ -1023,6 +1024,7 @@ namespace SilverSim.Scene.Agent
         public abstract PresenceServiceInterface PresenceService { get; }
         public abstract GridUserServiceInterface GridUserService { get; }
         public abstract EconomyServiceInterface EconomyService { get; }
+        public abstract MuteListServiceInterface MuteListService { get; }
         public abstract OfflineIMServiceInterface OfflineIMService { get; }
         public abstract bool IsActiveGod { get; }
         public abstract bool IsNpc { get; }
