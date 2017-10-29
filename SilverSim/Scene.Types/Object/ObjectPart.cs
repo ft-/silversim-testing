@@ -2296,7 +2296,7 @@ namespace SilverSim.Scene.Types.Object
                     writer.WriteNamedValue("WalkableCoefficientB", WalkableCoefficientB);
                     writer.WriteNamedValue("WalkableCoefficientC", WalkableCoefficientC);
                     writer.WriteNamedValue("WalkableCoefficientD", WalkableCoefficientD);
-                    if(VehicleType != Physics.Vehicle.VehicleType.None || VehicleFlags != Physics.Vehicle.VehicleFlags.None)
+                    if(VehicleType != Physics.Vehicle.VehicleType.None)
                     {
                         writer.WriteStartElement("Vehicle");
                         {
