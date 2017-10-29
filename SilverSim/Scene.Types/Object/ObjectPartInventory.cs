@@ -357,7 +357,7 @@ namespace SilverSim.Scene.Types.Object
         private ObjectPartInventoryItem FromXML(XmlTextReader reader, UUI currentOwner, XmlDeserializationOptions options, out UUID origid)
         {
             origid = UUID.Zero;
-            var item = new ObjectPartInventoryItem()
+            var item = new ObjectPartInventoryItem
             {
                 Owner = currentOwner
             };
