@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using log4net;
+using SilverSim.Scene.Types.Physics.Vehicle;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Scene.Types.Script.Events;
@@ -2295,6 +2296,74 @@ namespace SilverSim.Scene.Types.Object
                     writer.WriteNamedValue("WalkableCoefficientB", WalkableCoefficientB);
                     writer.WriteNamedValue("WalkableCoefficientC", WalkableCoefficientC);
                     writer.WriteNamedValue("WalkableCoefficientD", WalkableCoefficientD);
+                    if(VehicleType != Physics.Vehicle.VehicleType.None || VehicleFlags != Physics.Vehicle.VehicleFlags.None)
+                    {
+                        writer.WriteStartElement("Vehicle");
+                        {
+                            writer.WriteNamedValue("TYPE", (int)VehicleType);
+                            writer.WriteNamedValue("FLAGS", (int)VehicleFlags);
+
+                            /* linear */
+                            writer.WriteNamedValue("LMDIR", VehicleParams[VehicleVectorParamId.LinearMotorDirection]);
+                            writer.WriteNamedValue("LMFTIME", VehicleParams[VehicleVectorParamId.LinearFrictionTimescale]);
+                            writer.WriteNamedValue("LMDTIME", VehicleParams[VehicleVectorParamId.LinearMotorDecayTimescale].Length);
+                            writer.WriteNamedValue("LMTIME", VehicleParams[VehicleVectorParamId.LinearMotorTimescale].Length);
+                            writer.WriteNamedValue("LMOFF", VehicleParams[VehicleVectorParamId.LinearMotorOffset]);
+
+                            /* linear extension (must be written after float value due to loading concept) */
+                            writer.WriteNamedValue("LinearMotorDecayTimescaleVector", VehicleParams[VehicleVectorParamId.LinearMotorDecayTimescale]);
+                            writer.WriteNamedValue("LinearMotorTimescaleVector", VehicleParams[VehicleVectorParamId.LinearMotorTimescale]);
+
+                            /* angular */
+                            writer.WriteNamedValue("AMDIR", VehicleParams[VehicleVectorParamId.AngularMotorDirection]);
+                            writer.WriteNamedValue("AMTIME", VehicleParams[VehicleVectorParamId.AngularMotorTimescale].Length);
+                            writer.WriteNamedValue("AMDTIME", VehicleParams[VehicleVectorParamId.AngularMotorDecayTimescale].Length);
+                            writer.WriteNamedValue("AMFTIME", VehicleParams[VehicleVectorParamId.AngularFrictionTimescale]);
+
+                            /* angular extension (must be written after float value due to loading concept) */
+                            writer.WriteNamedValue("AngularMotorTimescaleVector", VehicleParams[VehicleVectorParamId.AngularMotorTimescale]);
+                            writer.WriteNamedValue("AngularMotorDecayTimescaleVector", VehicleParams[VehicleVectorParamId.AngularMotorDecayTimescale]);
+
+                            /* deflection */
+                            writer.WriteNamedValue("ADEFF", VehicleParams[VehicleFloatParamId.AngularDeflectionEfficiency]);
+                            writer.WriteNamedValue("ADTIME", VehicleParams[VehicleFloatParamId.AngularDeflectionTimescale]);
+                            writer.WriteNamedValue("LDEFF", VehicleParams[VehicleFloatParamId.LinearDeflectionEfficiency]);
+                            writer.WriteNamedValue("LDTIME", VehicleParams[VehicleFloatParamId.LinearDeflectionTimescale]);
+
+                            /* banking */
+                            writer.WriteNamedValue("BEFF", VehicleParams[VehicleFloatParamId.BankingEfficiency]);
+                            writer.WriteNamedValue("BMIX", VehicleParams[VehicleFloatParamId.BankingMix]);
+                            writer.WriteNamedValue("BTIME", VehicleParams[VehicleFloatParamId.BankingTimescale]);
+                            writer.WriteNamedValue("BankingAzimuth", VehicleParams[VehicleFloatParamId.BankingAzimuth]);
+                            writer.WriteNamedValue("InvertedBankingModifier", VehicleParams[VehicleFloatParamId.InvertedBankingModifier]);
+
+                            /* hover and buoyancy */
+                            writer.WriteNamedValue("HHEI", VehicleParams[VehicleFloatParamId.HoverHeight]);
+                            writer.WriteNamedValue("HEFF", VehicleParams[VehicleFloatParamId.HoverEfficiency]);
+                            writer.WriteNamedValue("HTIME", VehicleParams[VehicleFloatParamId.HoverTimescale]);
+                            writer.WriteNamedValue("VBUO", VehicleParams[VehicleFloatParamId.Buoyancy]);
+
+                            /* attractor */
+                            writer.WriteNamedValue("VAEFF", VehicleParams[VehicleFloatParamId.VerticalAttractionEfficiency]);
+                            writer.WriteNamedValue("VATIME", VehicleParams[VehicleFloatParamId.VerticalAttractionTimescale]);
+
+                            /* reference */
+                            writer.WriteNamedValue("REF_FRAME", VehicleParams[VehicleRotationParamId.ReferenceFrame]);
+
+                            /* wind */
+                            writer.WriteNamedValue("LinearWindEfficiency", VehicleParams[VehicleVectorParamId.LinearWindEfficiency]);
+                            writer.WriteNamedValue("AngularWindEfficiency", VehicleParams[VehicleVectorParamId.AngularWindEfficiency]);
+
+                            /* mouselook */
+                            writer.WriteNamedValue("MouselookAzimuth", VehicleParams[VehicleFloatParamId.MouselookAzimuth]);
+                            writer.WriteNamedValue("MouselookAltitude", VehicleParams[VehicleFloatParamId.MouselookAltitude]);
+
+                            /* disable motors */
+                            writer.WriteNamedValue("DisableMotorsAbove", VehicleParams[VehicleFloatParamId.DisableMotorsAbove]);
+                            writer.WriteNamedValue("DisableMotorsAfter", VehicleParams[VehicleFloatParamId.DisableMotorsAfter]);
+                        }
+                        writer.WriteEndElement();
+                    }
                 }
                 writer.WriteEndElement();
             }
@@ -2818,9 +2887,192 @@ namespace SilverSim.Scene.Types.Object
             return flags;
         }
 
+        public static void LoadVehicleParams(XmlTextReader reader, ObjectPart part)
+        {
+            if (reader.IsEmptyElement)
+            {
+                return;
+            }
+
+            for (; ; )
+            {
+                if (!reader.Read())
+                {
+                    throw new InvalidObjectXmlException();
+                }
+
+                switch (reader.NodeType)
+                {
+                    case XmlNodeType.Element:
+                        switch(reader.Name)
+                        {
+                            case "TYPE":
+                                part.VehicleType = (VehicleType)reader.ReadElementValueAsInt();
+                                break;
+
+                            case "FLAGS":
+                                part.VehicleFlags = (VehicleFlags)reader.ReadElementValueAsInt();
+                                break;
+
+                            case "LMDIR":
+                                part.VehicleParams[VehicleVectorParamId.LinearMotorDirection] = reader.ReadElementChildsAsVector3();
+                                break;
+
+                            case "LMFTIME":
+                                part.VehicleParams[VehicleVectorParamId.LinearFrictionTimescale] = reader.ReadElementChildsAsVector3();
+                                break;
+
+                            case "LMDTIME":
+                                part.VehicleParams[VehicleVectorParamId.LinearMotorDecayTimescale] = new Vector3(reader.ReadElementValueAsDouble());
+                                break;
+
+                            case "LMTIME":
+                                part.VehicleParams[VehicleVectorParamId.LinearMotorTimescale] = new Vector3(reader.ReadElementValueAsDouble());
+                                break;
+
+                            case "LMOFF":
+                                part.VehicleParams[VehicleVectorParamId.LinearMotorOffset] = reader.ReadElementChildsAsVector3();
+                                break;
+
+                            case "LinearMotorDecayTimescaleVector":
+                                part.VehicleParams[VehicleVectorParamId.LinearMotorDecayTimescale] = reader.ReadElementChildsAsVector3();
+                                break;
+
+                            case "LinearMotorTimescaleVector":
+                                part.VehicleParams[VehicleVectorParamId.LinearMotorTimescale] = reader.ReadElementChildsAsVector3();
+                                break;
+
+                            case "AMDIR":
+                                part.VehicleParams[VehicleVectorParamId.AngularMotorDirection] = reader.ReadElementChildsAsVector3();
+                                break;
+
+                            case "AMTIME":
+                                part.VehicleParams[VehicleVectorParamId.AngularMotorTimescale] = new Vector3(reader.ReadElementValueAsDouble());
+                                break;
+
+                            case "AMDTIME":
+                                part.VehicleParams[VehicleVectorParamId.AngularMotorDecayTimescale] = new Vector3(reader.ReadElementValueAsDouble());
+                                break;
+
+                            case "AMFTIME":
+                                part.VehicleParams[VehicleVectorParamId.AngularFrictionTimescale] = reader.ReadElementChildsAsVector3();
+                                break;
+
+                            case "AngularMotorTimescaleVector":
+                                part.VehicleParams[VehicleVectorParamId.AngularMotorTimescale] = reader.ReadElementChildsAsVector3();
+                                break;
+
+                            case "AngularMotorDecayTimescaleVector":
+                                part.VehicleParams[VehicleVectorParamId.AngularMotorDecayTimescale] = reader.ReadElementChildsAsVector3();
+                                break;
+
+                            case "ADEFF":
+                                part.VehicleParams[VehicleFloatParamId.AngularDeflectionEfficiency] = reader.ReadElementValueAsDouble();
+                                break;
+
+                            case "ADTIME":
+                                part.VehicleParams[VehicleFloatParamId.AngularDeflectionTimescale] = reader.ReadElementValueAsDouble();
+                                break;
+
+                            case "LDEFF":
+                                part.VehicleParams[VehicleFloatParamId.LinearDeflectionEfficiency] = reader.ReadElementValueAsDouble();
+                                break;
+
+                            case "LDTIME":
+                                part.VehicleParams[VehicleFloatParamId.LinearDeflectionTimescale] = reader.ReadElementValueAsDouble();
+                                break;
+
+                            case "BEFF":
+                                part.VehicleParams[VehicleFloatParamId.BankingEfficiency] = reader.ReadElementValueAsDouble();
+                                break;
+
+                            case "BMIX":
+                                part.VehicleParams[VehicleFloatParamId.BankingMix] = reader.ReadElementValueAsDouble();
+                                break;
+
+                            case "BTIME":
+                                part.VehicleParams[VehicleFloatParamId.BankingTimescale] = reader.ReadElementValueAsDouble();
+                                break;
+
+                            case "BankingAzimuth":
+                                part.VehicleParams[VehicleFloatParamId.BankingAzimuth] = reader.ReadElementValueAsDouble();
+                                break;
+
+                            case "InvertedBankingModifier":
+                                part.VehicleParams[VehicleFloatParamId.InvertedBankingModifier] = reader.ReadElementValueAsDouble();
+                                break;
+
+                            case "HHEI":
+                                part.VehicleParams[VehicleFloatParamId.HoverHeight] = reader.ReadElementValueAsDouble();
+                                break;
+
+                            case "HEFF":
+                                part.VehicleParams[VehicleFloatParamId.HoverEfficiency] = reader.ReadElementValueAsDouble();
+                                break;
+
+                            case "HTIME":
+                                part.VehicleParams[VehicleFloatParamId.HoverTimescale] = reader.ReadElementValueAsDouble();
+                                break;
+
+                            case "VBUO":
+                                part.VehicleParams[VehicleFloatParamId.Buoyancy] = reader.ReadElementValueAsDouble();
+                                break;
+
+                            case "VAEFF":
+                                part.VehicleParams[VehicleFloatParamId.VerticalAttractionEfficiency] = reader.ReadElementValueAsDouble();
+                                break;
+
+                            case "VATIME":
+                                part.VehicleParams[VehicleFloatParamId.VerticalAttractionTimescale] = reader.ReadElementValueAsDouble();
+                                break;
+
+                            case "REF_FRAME":
+                                part.VehicleParams[VehicleRotationParamId.ReferenceFrame] = reader.ReadElementChildsAsQuaternion();
+                                break;
+
+                            case "LinearWindEfficiency":
+                                part.VehicleParams[VehicleVectorParamId.LinearWindEfficiency] = reader.ReadElementChildsAsVector3();
+                                break;
+
+                            case "AngularWindEfficiency":
+                                part.VehicleParams[VehicleVectorParamId.AngularWindEfficiency] = reader.ReadElementChildsAsVector3();
+                                break;
+
+                            case "MouselookAzimuth":
+                                part.VehicleParams[VehicleFloatParamId.MouselookAzimuth] = reader.ReadElementValueAsDouble();
+                                break;
+
+                            case "MouselookAltitude":
+                                part.VehicleParams[VehicleFloatParamId.MouselookAltitude] = reader.ReadElementValueAsDouble();
+                                break;
+
+                            case "DisableMotorsAbove":
+                                part.VehicleParams[VehicleFloatParamId.DisableMotorsAbove] = reader.ReadElementValueAsDouble();
+                                break;
+
+                            case "DisableMotorsAfter":
+                                part.VehicleParams[VehicleFloatParamId.DisableMotorsAfter] = reader.ReadElementValueAsDouble();
+                                break;
+
+                            default:
+                                reader.ReadToEndElement();
+                                break;
+                        }
+                        break;
+
+                    case XmlNodeType.EndElement:
+                        if (reader.Name != "Vehicle")
+                        {
+                            throw new InvalidObjectXmlException();
+                        }
+                        return;
+                }
+            }
+        }
+
         public static ObjectPart FromXml(XmlTextReader reader, ObjectGroup rootGroup, UUI currentOwner, XmlDeserializationOptions options)
         {
-            var part = new ObjectPart()
+            var part = new ObjectPart
             {
                 Owner = currentOwner
             };
@@ -2871,6 +3123,10 @@ namespace SilverSim.Scene.Types.Object
 
                             case "ForceMouselook": /* boolean field */
                                 part.ForceMouselook = reader.ReadElementValueAsBoolean();
+                                break;
+
+                            case "Vehicle":
+                                LoadVehicleParams(reader, part);
                                 break;
 
                             case "RezzerID":
