@@ -398,7 +398,14 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "CreatorData":
-                                item.Creator.CreatorData = reader.ReadElementValueAsString();
+                                try
+                                {
+                                    item.Creator.CreatorData = reader.ReadElementValueAsString();
+                                }
+                                catch(UriFormatException)
+                                {
+                                    /* ignore this if it fails */
+                                }
                                 break;
 
                             case "Description":
