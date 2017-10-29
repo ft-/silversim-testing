@@ -739,7 +739,7 @@ namespace SilverSim.Main.Common
                     }
                     foreach(string key in source.GetKeys())
                     {
-                        dest.Set($"{sourcesection}.{key}", source.GetString(key));
+                        dest.Set($"{kvpouter.Key}.{key}", source.GetString(key));
                         processParaMap = true;
                     }
                 }
@@ -887,7 +887,8 @@ namespace SilverSim.Main.Common
                 ProcessParameterMap();
             }
             ProcessUseTemplates();
-            if(ProcessParameterMapTemplates())
+            bool res = ProcessParameterMapTemplates();
+            if (res && processParameterMap)
             {
                 ProcessParameterMap();
             }
