@@ -708,7 +708,7 @@ namespace SilverSim.Main.Common
             {
                 foreach(string key in cfg.GetKeys())
                 {
-                    if(!key.StartsWith("UseParameterTemplate"))
+                    if(!key.StartsWith("UseParameterMapTemplate"))
                     {
                         continue;
                     }
