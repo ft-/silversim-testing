@@ -733,15 +733,11 @@ namespace SilverSim.Main.Common
                 foreach(string sourcesection in kvpouter.Value)
                 {
                     IConfig source = Config.Configs[sourcesection];
-                    IConfig dest = Config.Configs["ParameterMap"];
-                    if(dest == null)
-                    {
-                        dest = Config.AddConfig("ParameterMap");
-                    }
-                    if(source == null)
+                    if (source == null)
                     {
                         continue;
                     }
+                    IConfig dest = Config.Configs["ParameterMap"] ?? Config.AddConfig("ParameterMap");
                     foreach(string key in source.GetKeys())
                     {
                         if(key == "IsTemplate")
