@@ -699,6 +699,55 @@ namespace SilverSim.Main.Common
         }
         #endregion
 
+        #region Process "ParameterMapTemplates" section
+        private bool ProcessParameterMapTemplates()
+        {
+            bool processParaMap = false;
+            var mapParamTemplates = new Dictionary<string, List<string>>();
+            foreach(IConfig cfg in Config.Configs)
+            {
+                foreach(string key in cfg.GetKeys())
+                {
+                    if(!key.StartsWith("UseParameterTemplate"))
+                    {
+                        continue;
+                    }
+                    List<string> mapList;
+                    if(!mapParamTemplates.TryGetValue(cfg.Name, out mapList))
+                    {
+                        mapList = new List<string>();
+                        mapParamTemplates[cfg.Name] = mapList;
+                    }
+
+                    mapList.Add(cfg.GetString(key));
+                }
+            }
+
+            foreach(KeyValuePair<string, List<string>> kvpouter in mapParamTemplates)
+            {
+                foreach(string sourcesection in kvpouter.Value)
+                {
+                    IConfig source = Config.Configs[sourcesection];
+                    IConfig dest = Config.Configs["ParameterMap"];
+                    if(dest == null)
+                    {
+                        dest = Config.AddConfig("ParameterMap");
+                    }
+                    if(source == null)
+                    {
+                        continue;
+                    }
+                    foreach(string key in source.GetKeys())
+                    {
+                        dest.Set($"{sourcesection}.{key}", source.GetString(key));
+                        processParaMap = true;
+                    }
+                }
+            }
+            return processParaMap;
+        }
+        #endregion
+
         #region Process UseSourceParameter lines
         private void ProcessUseSourceParameter()
         {
@@ -838,6 +887,10 @@ namespace SilverSim.Main.Common
                 ProcessParameterMap();
             }
             ProcessUseTemplates();
+            if(ProcessParameterMapTemplates())
+            {
+                ProcessParameterMap();
+            }
         }
 
         private void ShowModeHelp()
