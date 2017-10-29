@@ -706,7 +706,12 @@ namespace SilverSim.Main.Common
             var mapParamTemplates = new Dictionary<string, List<string>>();
             foreach(IConfig cfg in Config.Configs)
             {
-                foreach(string key in cfg.GetKeys())
+                if (cfg.Contains("IsTemplate"))
+                {
+                    continue;
+                }
+
+                foreach (string key in cfg.GetKeys())
                 {
                     if(!key.StartsWith("UseParameterMapTemplate"))
                     {
@@ -739,6 +744,10 @@ namespace SilverSim.Main.Common
                     }
                     foreach(string key in source.GetKeys())
                     {
+                        if(key == "IsTemplate")
+                        {
+                            continue;
+                        }
                         dest.Set($"{kvpouter.Key}.{key}", source.GetString(key));
                         processParaMap = true;
                     }
