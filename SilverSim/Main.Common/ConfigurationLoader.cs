@@ -709,7 +709,14 @@ namespace SilverSim.Main.Common
                     break;
 
                 default:
-                    platformlibsLibraryPath = Path.Combine(InstallationBinPath, "platform-libs/unknown");
+                    if (Environment.Is64BitProcess)
+                    {
+                        platformlibsLibraryPath = Path.Combine(InstallationBinPath, "platform-libs/unknown/64");
+                    }
+                    else
+                    {
+                        platformlibsLibraryPath = Path.Combine(InstallationBinPath, "platform-libs/unknown/32");
+                    }
                     break;
             }
 
