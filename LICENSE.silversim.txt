@@ -24,7 +24,7 @@ exception statement from your version.
 
 
 This license does not affect files that are distributed alongside the
-ArribaSim project allowing to fulfill its purpose.
+SilverSim project allowing to fulfill its purpose.
 
 
 
