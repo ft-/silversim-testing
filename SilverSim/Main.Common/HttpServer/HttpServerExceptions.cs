@@ -65,7 +65,7 @@ namespace SilverSim.Main.Common.HttpServer
     }
 
     [Serializable]
-    public class NotAWebSocketRequestException : Exception
+    public sealed class NotAWebSocketRequestException : Exception
     {
         public NotAWebSocketRequestException()
         {
@@ -79,7 +79,7 @@ namespace SilverSim.Main.Common.HttpServer
         {
         }
 
-        protected NotAWebSocketRequestException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) : base(info, context)
+        private NotAWebSocketRequestException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) : base(info, context)
         {
         }
     }

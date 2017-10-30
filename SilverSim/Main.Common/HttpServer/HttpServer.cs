@@ -319,9 +319,7 @@ namespace SilverSim.Main.Common.HttpServer
                     string remoteAddr = AddressToString(ep.Address);
                     Thread.CurrentThread.Name = Scheme.ToUpper() + " Server for " + remoteAddr + " at " + Port.ToString();
 
-                    Stream httpstream = new HttpStream(socket);
-
-                    AcceptedConnection_Internal(httpstream, remoteAddr, false);
+                    AcceptedConnection_Internal(new HttpStream(socket), remoteAddr, false);
                 }
                 catch (HttpResponse.DisconnectFromThreadException)
                 {

@@ -119,7 +119,7 @@ namespace SilverSim.Main.Common.HttpServer
         {
             using (HttpResponse response = req.BeginResponse("text/xml"))
             {
-                var res = new XmlRpc.XmlRpcFaultResponse()
+                var res = new XmlRpc.XmlRpcFaultResponse
                 {
                     FaultCode = statusCode,
                     FaultString = statusMessage

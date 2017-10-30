@@ -143,7 +143,7 @@ namespace SilverSim.Main.Common.HttpServer
         public HttpResponse BeginResponse(string contentType)
         {
             HttpResponse res = BeginResponse();
-            res.ContentType = ContentType;
+            res.ContentType = contentType;
             return res;
         }
 
