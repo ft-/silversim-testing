@@ -196,8 +196,8 @@ namespace SilverSim.Scene.Types.Physics
 
         private void GetTerrainMatches(RayData ray, RayTestHitFlags flags, List<RayResult> results)
         {
-            List<ulong> pos = new List<ulong>();
-            Vector3 regionExtents = new Vector3(m_Scene.SizeX, m_Scene.SizeY, 0);
+            var pos = new List<ulong>();
+            var regionExtents = new Vector3(m_Scene.SizeX, m_Scene.SizeY, 0);
 
             double d;
             for(d = 0; d < ray.RayLength; d += 0.5)
@@ -222,10 +222,10 @@ namespace SilverSim.Scene.Types.Physics
                     continue;
                 }
 
-                Vector3 t0 = new Vector3(bbox.CenterOffset.X - 0.5, bbox.CenterOffset.Y - 0.5, 0);
-                Vector3 t1 = new Vector3(bbox.CenterOffset.X + 0.5, bbox.CenterOffset.Y - 0.5, 0);
-                Vector3 t2 = new Vector3(bbox.CenterOffset.X - 0.5, bbox.CenterOffset.Y + 0.5, 0);
-                Vector3 t3 = new Vector3(bbox.CenterOffset.X + 0.5, bbox.CenterOffset.Y + 0.5, 0);
+                var t0 = new Vector3(bbox.CenterOffset.X - 0.5, bbox.CenterOffset.Y - 0.5, 0);
+                var t1 = new Vector3(bbox.CenterOffset.X + 0.5, bbox.CenterOffset.Y - 0.5, 0);
+                var t2 = new Vector3(bbox.CenterOffset.X - 0.5, bbox.CenterOffset.Y + 0.5, 0);
+                var t3 = new Vector3(bbox.CenterOffset.X + 0.5, bbox.CenterOffset.Y + 0.5, 0);
                 t0.Z = m_Scene.Terrain[t0];
                 t1.Z = m_Scene.Terrain[t1];
                 t2.Z = m_Scene.Terrain[t2];
@@ -255,13 +255,14 @@ namespace SilverSim.Scene.Types.Physics
                     continue;
                 }
 
-                RayResult res = new RayResult();
-                res.HitNormalWorld = normal;
-                res.HitPointWorld = ray.Origin + ray.Direction * dist;
-                res.IsTerrain = true;
-                res.ObjectId = UUID.Zero;
-                res.PartId = UUID.Zero;
-                results.Add(res);
+                results.Add(new RayResult
+                {
+                    HitNormalWorld = normal,
+                    HitPointWorld = ray.Origin + ray.Direction * dist,
+                    IsTerrain = true,
+                    ObjectId = UUID.Zero,
+                    PartId = UUID.Zero
+                });
             }
         }
 
@@ -279,12 +280,13 @@ namespace SilverSim.Scene.Types.Physics
                 {
                     continue;
                 }
-                RayResult res = new RayResult();
-                res.IsTerrain = false;
-                res.ObjectId = agent.ID;
-                res.PartId = agent.ID;
-                res.HitPointWorld = ray.Origin + ray.Direction * dist;
-                results.Add(res);
+                results.Add(new RayResult
+                {
+                    IsTerrain = false,
+                    ObjectId = agent.ID,
+                    PartId = agent.ID,
+                    HitPointWorld = ray.Origin + ray.Direction * dist
+                });
             }
         }
 
@@ -399,9 +401,11 @@ namespace SilverSim.Scene.Types.Physics
                         continue;
                     }
 
-                    RayResult res = new RayResult();
-                    res.ObjectId = grp.ID;
-                    res.PartId = part.ID;
+                    var res = new RayResult
+                    {
+                        ObjectId = grp.ID,
+                        PartId = part.ID
+                    };
 
                     /* calculate actual HitPoint and HitNormal */
                     ObjectPart.PrimitiveShape shape = part.Shape;

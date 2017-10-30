@@ -85,7 +85,7 @@ namespace SilverSim.Scene.Types.Scene
             }
             instance = item.ScriptInstance;
 
-            var reply = new ScriptRunningReply()
+            var reply = new ScriptRunningReply
             {
                 ItemID = req.ItemID,
                 ObjectID = req.ObjectID,
@@ -122,7 +122,7 @@ namespace SilverSim.Scene.Types.Scene
                 instance.IsRunning = req.IsRunning;
             }
 
-            var reply = new ScriptRunningReply()
+            var reply = new ScriptRunningReply
             {
                 ItemID = req.ItemID,
                 ObjectID = req.ObjectID,
@@ -201,7 +201,7 @@ namespace SilverSim.Scene.Types.Scene
                 }
             }
 
-            var e = new RuntimePermissionsEvent()
+            var e = new RuntimePermissionsEvent
             {
                 PermissionsKey = req.CircuitAgentOwner,
                 Permissions = req.Questions

@@ -122,7 +122,7 @@ namespace SilverSim.Scene.Types.Agent
 
         public void SendAnimations()
         {
-            var m = new AvatarAnimation()
+            var m = new AvatarAnimation
             {
                 Sender = m_AgentID
             };
@@ -210,7 +210,7 @@ namespace SilverSim.Scene.Types.Agent
 
         public string GetAnimationOverride(string anim_state)
         {
-            if (m_AnimStates.Contains<string>(anim_state))
+            if (m_AnimStates.Contains(anim_state))
             {
                 lock (m_Lock)
                 {

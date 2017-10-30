@@ -26,7 +26,7 @@ using System.Runtime.Serialization;
 namespace SilverSim.Scene.Types.Script
 {
     [Serializable]
-    public class ScriptAbortException : Exception
+    public sealed class ScriptAbortException : Exception
     {
         public ScriptAbortException()
         {
@@ -37,7 +37,7 @@ namespace SilverSim.Scene.Types.Script
         {
         }
 
-        protected ScriptAbortException(SerializationInfo info, StreamingContext context)
+        private ScriptAbortException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
         }
@@ -48,7 +48,7 @@ namespace SilverSim.Scene.Types.Script
         }
     }
 
-    public class ScriptReportData
+    public sealed class ScriptReportData
     {
         private double m_Score;
         private readonly object m_ScoreLock = new object();

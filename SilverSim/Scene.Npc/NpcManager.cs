@@ -248,7 +248,7 @@ namespace SilverSim.Scene.Npc
                 m_NonpersistentProfileService?.Remove(UUID.Zero, kvp.Key);
                 NpcAgent npc = kvp.Value;
                 IObject obj = npc.SittingOnObject;
-                var presenceInfo = new NpcPresenceInfo()
+                var presenceInfo = new NpcPresenceInfo
                 {
                     Npc = npc.Owner,
                     Owner = npc.NpcOwner,
@@ -286,7 +286,7 @@ namespace SilverSim.Scene.Npc
             NpcPresenceServiceInterface presenceService = agentServiceList.Get<NpcPresenceServiceInterface>();
             InventoryServiceInterface inventoryService = agentServiceList.Get<InventoryServiceInterface>();
 
-            var npcId = new UUI()
+            var npcId = new UUI
             {
                 ID = UUID.Random,
                 FirstName = firstName,

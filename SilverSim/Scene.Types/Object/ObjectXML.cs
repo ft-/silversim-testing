@@ -80,7 +80,7 @@ namespace SilverSim.Scene.Types.Object
                     writer.Flush();
                 }
 
-                return new AssetData()
+                return new AssetData
                 {
                     ID = UUID.Random,
                     Type = AssetType.Object,

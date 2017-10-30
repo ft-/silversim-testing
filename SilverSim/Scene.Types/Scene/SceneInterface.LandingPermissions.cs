@@ -320,8 +320,7 @@ namespace SilverSim.Scene.Types.Scene
                 !EstateService.EstateAccess[estateID, agentOwner])
             {
                 List<UGI> estateGroups = EstateService.EstateGroup.All[estateID];
-                List<GroupMembership> groups = GroupsService.Memberships[agentOwner, agentOwner];
-                foreach (GroupMembership group in groups)
+                foreach (GroupMembership group in GroupsService.Memberships[agentOwner, agentOwner])
                 {
                     if (estateGroups.Contains(group.Group))
                     {

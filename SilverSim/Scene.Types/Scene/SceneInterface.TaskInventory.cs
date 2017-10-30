@@ -535,7 +535,7 @@ namespace SilverSim.Scene.Types.Scene
                     string fname = "inventory_" + UUID.Random.ToString() + ".tmp";
                     agent.AddNewFile(fname, ms.ToArray());
 
-                    var res = new ReplyTaskInventory()
+                    var res = new ReplyTaskInventory
                     {
                         Serial = (short)part.Inventory.InventorySerial,
                         Filename = fname,

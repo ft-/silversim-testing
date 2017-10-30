@@ -56,10 +56,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             }
             set
             {
-                m_TerrainRwLock.AcquireWriterLock(() =>
-                {
-                    m_LowerLimit = value;
-                });
+                m_TerrainRwLock.AcquireWriterLock(() => m_LowerLimit = value);
             }
         }
 
@@ -71,10 +68,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             }
             set
             {
-                m_TerrainRwLock.AcquireWriterLock(() =>
-                {
-                    m_RaiseLimit = value;
-                });
+                m_TerrainRwLock.AcquireWriterLock(() => m_RaiseLimit = value);
             }
         }
 

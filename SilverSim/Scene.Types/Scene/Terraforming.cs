@@ -531,7 +531,7 @@ namespace SilverSim.Scene.Types.Scene
         [FloodEffect(StandardTerrainEffect.Lower)]
         public static void LowerArea(UUI agentOwner, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
-            List<LayerPatch> changed = new List<LayerPatch>();
+            var changed = new List<LayerPatch>();
             for (int x = (int)data.West; x < (int)data.East; x++)
             {
                 for (int y = (int)data.South; y < (int)data.North; y++)
@@ -612,7 +612,7 @@ namespace SilverSim.Scene.Types.Scene
         [FloodEffect(StandardTerrainEffect.Smooth)]
         public static void SmoothArea(UUI agentOwner, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
-            List<LayerPatch> changed = new List<LayerPatch>();
+            var changed = new List<LayerPatch>();
 
             double area = modify.Size;
             double step = area / 4;
@@ -660,7 +660,7 @@ namespace SilverSim.Scene.Types.Scene
         [FloodEffect(StandardTerrainEffect.Noise)]
         public static void NoiseArea(UUI agentOwner, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
-            List<LayerPatch> changed = new List<LayerPatch>();
+            var changed = new List<LayerPatch>();
 
             for (int x = (int)data.West; x < (int)data.East; x++)
             {
@@ -707,8 +707,8 @@ namespace SilverSim.Scene.Types.Scene
 
         private static double GetBilinearInterpolate(double x, double y, SceneInterface scene)
         {
-            int w = (int)scene.SizeX;
-            int h = (int)scene.SizeY;
+            var w = (int)scene.SizeX;
+            var h = (int)scene.SizeY;
 
             if (x > w - 2)
             {

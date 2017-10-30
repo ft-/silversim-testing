@@ -173,7 +173,7 @@ namespace SilverSim.Scene.Types.Scene
             ObjectPartInventoryItem item = instance.Item;
             if(part != null && item != null)
             {
-                var listen = new ObjectBuyListen()
+                var listen = new ObjectBuyListen
                 {
                     PrimitiveID = part.ID,
                     ItemID = item.ID
@@ -478,12 +478,12 @@ namespace SilverSim.Scene.Types.Scene
                             part.Owner.EqualsGrid(sellOwner))
                         {
                             ScriptInstance script = item.ScriptInstance;
-                            script?.PostEvent(new ItemSoldEvent()
-                                {
-                                    Agent = m_DestinationAgent,
-                                    ObjectID = m_SellingPrimitiveID,
-                                    ObjectName = part.Name
-                                });
+                            script?.PostEvent(new ItemSoldEvent
+                            {
+                                Agent = m_DestinationAgent,
+                                ObjectID = m_SellingPrimitiveID,
+                                ObjectName = part.Name
+                            });
                         }
                     }
                 }

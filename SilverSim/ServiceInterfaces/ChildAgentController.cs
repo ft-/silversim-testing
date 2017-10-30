@@ -55,7 +55,7 @@ namespace SilverSim.ServiceInterfaces
 
                 if(!childList.ContainsKey(ri.Location.RegionHandle))
                 {
-                    var childConn = new ChildConnection()
+                    var childConn = new ChildConnection
                     {
                         State = ChildConnectionState.Establish,
                         RegionInfo = ri,

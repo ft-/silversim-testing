@@ -172,7 +172,7 @@ namespace SilverSim.Scene.Types.KeyframedMotion
 
             for(int i = 0; i < durations.Count; ++i)
             {
-                var frame = new Keyframe()
+                var frame = new Keyframe
                 {
                     Duration = durations[i].AsReal
                 };

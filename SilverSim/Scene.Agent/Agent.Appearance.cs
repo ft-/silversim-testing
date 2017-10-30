@@ -120,13 +120,13 @@ namespace SilverSim.Scene.Agent
 
         public AvatarAppearance GetAvatarAppearanceMsg()
         {
-            var appearance = new AvatarAppearance()
+            var appearance = new AvatarAppearance
             {
                 Sender = ID,
                 TextureEntry = TextureEntry,
                 VisualParams = VisualParams
             };
-            var e = new AvatarAppearance.AppearanceDataEntry()
+            var e = new AvatarAppearance.AppearanceDataEntry
             {
                 AppearanceVersion = 1,
                 CofVersion = Appearance.Serial
@@ -221,7 +221,7 @@ namespace SilverSim.Scene.Agent
         {
             get
             {
-                var ai = new AppearanceInfo()
+                var ai = new AppearanceInfo
                 {
                     Wearables = Wearables,
                     VisualParams = VisualParams,

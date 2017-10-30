@@ -35,7 +35,7 @@ namespace SilverSim.Scene.Types.Scene
             RegionInfo ri;
             if(GridService.TryGetValue(ScopeID, out ri))
             {
-                res = new Viewer.Messages.Region.RegionIDAndHandleReply()
+                res = new Viewer.Messages.Region.RegionIDAndHandleReply
                 {
                     RegionPosition = ri.Location,
                     RegionID = req.RegionID

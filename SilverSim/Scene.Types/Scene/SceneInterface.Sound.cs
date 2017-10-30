@@ -33,7 +33,7 @@ namespace SilverSim.Scene.Types.Scene
     {
         public void SendPreloadSound(ObjectPart objpart, UUID sound)
         {
-            var req = new PreloadSound()
+            var req = new PreloadSound
             {
                 OwnerID = objpart.ObjectGroup.Owner.ID,
                 SoundID = sound,
@@ -47,7 +47,7 @@ namespace SilverSim.Scene.Types.Scene
 
         public void SendAttachedSound(ObjectPart objpart, UUID sound, double gain, double soundradius, PrimitiveSoundFlags flags)
         {
-            var req = new AttachedSound()
+            var req = new AttachedSound
             {
                 OwnerID = objpart.ObjectGroup.Owner.ID,
                 SoundID = sound,
@@ -88,7 +88,7 @@ namespace SilverSim.Scene.Types.Scene
 
         public void SendAttachedSoundGainChange(ObjectPart objpart, double gain, double soundradius)
         {
-            var req = new AttachedSoundGainChange()
+            var req = new AttachedSoundGainChange
             {
                 ObjectID = objpart.ID,
                 Gain = gain.Clamp(0, 1)
@@ -116,7 +116,7 @@ namespace SilverSim.Scene.Types.Scene
 
         public void SendTriggerSound(ObjectPart objpart, UUID sound, double gain, double soundradius)
         {
-            var req = new SoundTrigger()
+            var req = new SoundTrigger
             {
                 OwnerID = objpart.ObjectGroup.Owner.ID,
                 SoundID = sound,
@@ -152,7 +152,7 @@ namespace SilverSim.Scene.Types.Scene
 
         public void SendTriggerSound(ObjectPart objpart, UUID sound, double gain, double soundradius, Vector3 top_north_east, Vector3 bottom_south_west)
         {
-            var req = new SoundTrigger()
+            var req = new SoundTrigger
             {
                 OwnerID = objpart.ObjectGroup.Owner.ID,
                 SoundID = sound,

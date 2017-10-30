@@ -164,7 +164,7 @@ namespace SilverSim.Scene.Types.Scene
 
                     try
                     {
-                        Material mat = new Material(mmap["ID"].AsUUID, (Map)mmap["Material"]);
+                        var mat = new Material(mmap["ID"].AsUUID, (Map)mmap["Material"]);
                         mats.Add(mat);
                         StoreMaterial(mat);
                     }

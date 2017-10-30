@@ -100,7 +100,7 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            var e = new TouchEvent()
+            var e = new TouchEvent
             {
                 Detected = new List<DetectInfo>(),
                 Type = TouchEvent.TouchType.Continuous
@@ -186,7 +186,7 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            var e = new TouchEvent()
+            var e = new TouchEvent
             {
                 Detected = new List<DetectInfo>(),
                 Type = TouchEvent.TouchType.End

@@ -185,7 +185,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     /* p2 and p3 are on next row */
                     int z2 = z + verticeRowCount;
                     int l2 = (l + 1) % verticeRowCount; /* loop closure */
-                    var tri = new Triangle()
+                    var tri = new Triangle
                     {
                         Vertex1 = z + l,
                         Vertex2 = z2 + l2,
@@ -193,7 +193,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     };
                     mesh.Triangles.Add(tri);
 
-                    tri = new Triangle()
+                    tri = new Triangle
                     {
                         Vertex1 = z + l,
                         Vertex2 = z2 + l,
@@ -214,7 +214,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 {
                     int l2 = verticeRowCount - l - 1;
 
-                    var tri = new Triangle()
+                    var tri = new Triangle
                     {
                         Vertex1 = l,
                         Vertex2 = l2,
@@ -222,7 +222,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     };
                     mesh.Triangles.Add(tri);
 
-                    tri = new Triangle()
+                    tri = new Triangle
                     {
                         Vertex1 = l + 1,
                         Vertex2 = l2,
@@ -230,7 +230,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     };
                     mesh.Triangles.Add(tri);
 
-                    tri = new Triangle()
+                    tri = new Triangle
                     {
                         Vertex1 = l + bottomIndex,
                         Vertex2 = l2 + bottomIndex,
@@ -238,7 +238,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     };
                     mesh.Triangles.Add(tri);
 
-                    tri = new Triangle()
+                    tri = new Triangle
                     {
                         Vertex1 = l + 1 + bottomIndex,
                         Vertex2 = l2 + bottomIndex,
@@ -259,7 +259,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 {
                     int l2 = (l + 1) % verticeRowCount;
 
-                    var tri = new Triangle()
+                    var tri = new Triangle
                     {
                         Vertex1 = l,
                         Vertex2 = l2,
@@ -267,7 +267,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     };
                     mesh.Triangles.Add(tri);
 
-                    tri = new Triangle()
+                    tri = new Triangle
                     {
                         Vertex1 = l + bottomIndex,
                         Vertex2 = l2 + bottomIndex,

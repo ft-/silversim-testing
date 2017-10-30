@@ -92,7 +92,7 @@ namespace SilverSim.Scene.Types.Scene
             public ResourceAssetService()
             {
                 m_ResourceAssets = new ResourceAssetAccessor();
-                m_ReferencesService = new SilverSim.ServiceInterfaces.Asset.DefaultAssetReferencesService(this);
+                m_ReferencesService = new ServiceInterfaces.Asset.DefaultAssetReferencesService(this);
             }
 
             public List<UUID> GetKnownAssets() => m_ResourceAssets.GetKnownAssets();

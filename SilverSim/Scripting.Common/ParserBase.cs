@@ -29,7 +29,7 @@ namespace SilverSim.Scripting.Common
     public abstract class ParserBase
     {
         [Serializable]
-        public class StackEmptyException : Exception
+        public sealed class StackEmptyException : Exception
         {
             public StackEmptyException()
             {
@@ -45,14 +45,14 @@ namespace SilverSim.Scripting.Common
             {
             }
 
-            protected StackEmptyException(SerializationInfo info, StreamingContext context)
+            private StackEmptyException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
             {
             }
         }
 
         [Serializable]
-        public class EndOfStringException : Exception
+        public sealed class EndOfStringException : Exception
         {
             public EndOfStringException()
             {
@@ -68,14 +68,14 @@ namespace SilverSim.Scripting.Common
             {
             }
 
-            protected EndOfStringException(SerializationInfo info, StreamingContext context)
+            private EndOfStringException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
             {
             }
         }
 
         [Serializable]
-        public class EndOfFileException : Exception
+        public sealed class EndOfFileException : Exception
         {
             public EndOfFileException()
             {
@@ -91,14 +91,14 @@ namespace SilverSim.Scripting.Common
             {
             }
 
-            protected EndOfFileException(SerializationInfo info, StreamingContext context)
+            private EndOfFileException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
             {
             }
         }
 
         [Serializable]
-        public class PreprocessorLineErrorException : Exception
+        public sealed class PreprocessorLineErrorException : Exception
         {
             public PreprocessorLineErrorException()
             {
@@ -114,14 +114,14 @@ namespace SilverSim.Scripting.Common
             {
             }
 
-            protected PreprocessorLineErrorException(SerializationInfo info, StreamingContext context)
+            private PreprocessorLineErrorException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
             {
             }
         }
 
         [Serializable]
-        public class ParenthesisMismatchErrorException : Exception
+        public sealed class ParenthesisMismatchErrorException : Exception
         {
             public ParenthesisMismatchErrorException()
                 : base("')' has no matching '('")
@@ -138,14 +138,14 @@ namespace SilverSim.Scripting.Common
             {
             }
 
-            protected ParenthesisMismatchErrorException(SerializationInfo info, StreamingContext context)
+            private ParenthesisMismatchErrorException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
             {
             }
         }
 
         [Serializable]
-        public class FileIoErrorException : Exception
+        public sealed class FileIoErrorException : Exception
         {
             public FileIoErrorException()
             {
@@ -161,14 +161,14 @@ namespace SilverSim.Scripting.Common
             {
             }
 
-            protected FileIoErrorException(SerializationInfo info, StreamingContext context)
+            private FileIoErrorException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
             {
             }
         }
 
         [Serializable]
-        public class CircularIncludeException : Exception
+        public sealed class CircularIncludeException : Exception
         {
             public CircularIncludeException(string msg)
                 : base(msg)
@@ -184,7 +184,7 @@ namespace SilverSim.Scripting.Common
             {
             }
 
-            protected CircularIncludeException(SerializationInfo info, StreamingContext context)
+            private CircularIncludeException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
             {
             }

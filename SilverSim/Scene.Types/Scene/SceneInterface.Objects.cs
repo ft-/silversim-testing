@@ -348,7 +348,7 @@ namespace SilverSim.Scene.Types.Scene
 
                 if ((d.Flags & MultipleObjectUpdate.UpdateFlags.UpdateScale) != 0)
                 {
-                    Vector3 pos = new Vector3();
+                    var pos = new Vector3();
                     pos.FromBytes(d.Data, datapos);
                     if(CanEdit(agent, prim.ObjectGroup, prim.ObjectGroup.GlobalPosition))
                     {
@@ -689,7 +689,7 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            List<UUID> primids = new List<UUID>();
+            var primids = new List<UUID>();
             foreach (uint id in req.ObjectList)
             {
                 ObjectPart part;
@@ -706,7 +706,7 @@ namespace SilverSim.Scene.Types.Scene
         [PacketHandler(MessageType.ObjectDelink)]
         public void HandleObjectDelink(Message m)
         {
-            ObjectDelink req = (ObjectDelink)m;
+            var req = (ObjectDelink)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {

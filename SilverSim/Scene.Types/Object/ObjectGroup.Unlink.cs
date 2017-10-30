@@ -140,7 +140,7 @@ namespace SilverSim.Scene.Types.Object
                     ObjectPart part;
                     if(Remove(id, out part))
                     {
-                        ObjectGroup newGrp = new ObjectGroup(this);
+                        var newGrp = new ObjectGroup(this);
                         newGrp.Add(LINK_ROOT, part.ID, part);
                         part.ObjectGroup = newGrp;
                         part.LocalPosition = newChildPos[id];

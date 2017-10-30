@@ -387,11 +387,10 @@ namespace SilverSim.Scene.Types.Object
                     {
                         if(m_KeyframedMotion == null)
                         {
-                            var controller = new KeyframedMotionController(this)
+                            m_KeyframedMotion = new KeyframedMotionController(this)
                             {
                                 Program = value
                             };
-                            m_KeyframedMotion = controller;
                         }
                         else
                         {

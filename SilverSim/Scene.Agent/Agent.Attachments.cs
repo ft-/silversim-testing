@@ -147,7 +147,7 @@ namespace SilverSim.Scene.Agent
                     }
                 }
 
-                var newitem = new InventoryItem()
+                var newitem = new InventoryItem
                 {
                     AssetID = assetID,
                     AssetType = AssetType.Object,

@@ -36,7 +36,7 @@ namespace SilverSim.Scene.Npc
         public void DoSay(int channel, string text)
         {
             ChatServiceInterface chatService = CurrentScene.GetService<ChatServiceInterface>();
-            chatService.Send(new ListenEvent()
+            chatService.Send(new ListenEvent
             {
                 ID = ID,
                 Type = ListenEvent.ChatType.Say,
@@ -63,7 +63,7 @@ namespace SilverSim.Scene.Npc
         public void DoShout(int channel, string text)
         {
             var chatService = CurrentScene.GetService<ChatServiceInterface>();
-            chatService.Send(new ListenEvent()
+            chatService.Send(new ListenEvent
             {
                 ID = ID,
                 Type = ListenEvent.ChatType.Shout,
@@ -85,7 +85,7 @@ namespace SilverSim.Scene.Npc
         public void DoWhisper(int channel, string text)
         {
             ChatServiceInterface chatService = CurrentScene.GetService<ChatServiceInterface>();
-            chatService.Send(new ListenEvent()
+            chatService.Send(new ListenEvent
             {
                 ID = ID,
                 Type = ListenEvent.ChatType.Whisper,
@@ -116,7 +116,7 @@ namespace SilverSim.Scene.Npc
             {
                 return;
             }
-            var dInfo = new DetectInfo()
+            var dInfo = new DetectInfo
             {
                 LinkNumber = linkNum,
                 TouchFace = -1,
@@ -133,21 +133,21 @@ namespace SilverSim.Scene.Npc
                 TouchST = new Vector3(-1f, -1f, 0),
                 TouchUV = new Vector3(-1f, -1f, 0)
             };
-            var te = new TouchEvent()
+            var te = new TouchEvent
             {
                 Type = TouchEvent.TouchType.Start
             };
             te.Detected.Add(dInfo);
             part.PostTouchEvent(te);
 
-            te = new TouchEvent()
+            te = new TouchEvent
             {
                 Type = TouchEvent.TouchType.Continuous
             };
             te.Detected.Add(dInfo);
             part.PostTouchEvent(te);
 
-            te = new TouchEvent()
+            te = new TouchEvent
             {
                 Type = TouchEvent.TouchType.End
             };
@@ -201,7 +201,7 @@ namespace SilverSim.Scene.Npc
                                 ScriptInstance instance = item.ScriptInstance;
 
                                 /* Translate IM event to mapped channel */
-                                instance?.PostEvent(new ListenEvent()
+                                instance?.PostEvent(new ListenEvent
                                 {
                                     ButtonIndex = -1,
                                     Channel = kvpinner.Value,
@@ -266,7 +266,7 @@ namespace SilverSim.Scene.Npc
                             ScriptInstance instance = item.ScriptInstance;
 
                             /* Translate listen event to mapped channel */
-                            instance?.PostEvent(new ListenEvent()
+                            instance?.PostEvent(new ListenEvent
                             {
                                 ButtonIndex = ev.ButtonIndex,
                                 Channel = kvpinner.Value,

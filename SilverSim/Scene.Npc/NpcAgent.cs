@@ -198,7 +198,7 @@ namespace SilverSim.Scene.Npc
             set { throw new NotImplementedException(); }
         }
 
-        public override ClientInfo Client => new ClientInfo()
+        public override ClientInfo Client => new ClientInfo
         {
             Channel = VersionInfo.ProductName,
             ClientIP = string.Empty,
@@ -323,7 +323,7 @@ namespace SilverSim.Scene.Npc
             }
         }
 
-        public override SessionInfo Session => new SessionInfo()
+        public override SessionInfo Session => new SessionInfo
         {
             SessionID = UUID.Zero,
             SecureSessionID = UUID.Zero,
@@ -333,7 +333,7 @@ namespace SilverSim.Scene.Npc
         public override List<GridType> SupportedGridTypes => new List<GridType>();
         public override RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>> TransmittedTerrainSerials { get; } = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>>(() => new RwLockedDictionary<uint, uint>());
 
-        public override UserAccount UntrustedAccountInfo => new UserAccount()
+        public override UserAccount UntrustedAccountInfo => new UserAccount
         {
             Principal = Owner,
             IsLocalToGrid = true,

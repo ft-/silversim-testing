@@ -303,7 +303,7 @@ namespace SilverSim.Scene.Types.Scene
         {
             get
             {
-                using (MemoryStream ms = new MemoryStream())
+                using (var ms = new MemoryStream())
                 {
                     WriteCoeffs(ms, -1, WalkableCoefficientsUnderwater);
                     WriteCoeffs(ms, 0, WalkableCoefficientsTerrain0);
@@ -317,7 +317,7 @@ namespace SilverSim.Scene.Types.Scene
 
             set
             {
-                using (MemoryStream ms = new MemoryStream(value))
+                using (var ms = new MemoryStream(value))
                 {
                     WalkingCoefficients coeffs;
                     while (ms.Length > ms.Position)

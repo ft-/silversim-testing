@@ -145,7 +145,7 @@ namespace SilverSim.Scene.Types.Object
                     return new FlexibleParam();
                 }
 
-                return new FlexibleParam()
+                return new FlexibleParam
                 {
                     Softness = ((value[0] & 0x80) >> 6) | ((value[1] & 0x80) >> 7),
                     Tension = (value[0] & 0x7F) / 10.0f,
@@ -232,7 +232,7 @@ namespace SilverSim.Scene.Types.Object
                     return new PointLightParam();
                 }
 
-                return new PointLightParam()
+                return new PointLightParam
                 {
                     IsLight = true,
                     LightColor = new Color { R_AsByte = value[0], G_AsByte = value[1], B_AsByte = value[2] },
@@ -315,7 +315,7 @@ namespace SilverSim.Scene.Types.Object
                 {
                     return new ProjectionParam();
                 }
-                return new ProjectionParam()
+                return new ProjectionParam
                 {
                     IsProjecting = true,
                     ProjectionTextureID = new UUID(value, 0),
@@ -398,10 +398,10 @@ namespace SilverSim.Scene.Types.Object
                 {
                     return new ExtendedMeshParams();
                 }
-                ExtendedMeshParams p = new ExtendedMeshParams();
+                var p = new ExtendedMeshParams();
                 if(!BitConverter.IsLittleEndian)
                 {
-                    byte[] b = new byte[4];
+                    var b = new byte[4];
                     Buffer.BlockCopy(value, 0, b, 0, 4);
                     Array.Reverse(b);
                     p.Flags = (MeshFlags)BitConverter.ToUInt32(b, 0);

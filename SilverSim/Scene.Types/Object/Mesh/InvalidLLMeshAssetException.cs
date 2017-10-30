@@ -25,7 +25,7 @@ using System.Runtime.Serialization;
 namespace SilverSim.Scene.Types.Object.Mesh
 {
     [Serializable]
-    public class InvalidLLMeshAssetException : Exception
+    public sealed class InvalidLLMeshAssetException : Exception
     {
         public InvalidLLMeshAssetException()
         {
@@ -36,7 +36,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
         {
         }
 
-        protected InvalidLLMeshAssetException(SerializationInfo info, StreamingContext context)
+        private InvalidLLMeshAssetException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
         }

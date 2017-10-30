@@ -48,7 +48,7 @@ namespace SilverSim.Scene.Types.Object
     }
 
     [Serializable]
-    public class HitSandboxLimitException : Exception
+    public sealed class HitSandboxLimitException : Exception
     {
         public HitSandboxLimitException()
         {
@@ -59,7 +59,7 @@ namespace SilverSim.Scene.Types.Object
         {
         }
 
-        protected HitSandboxLimitException(SerializationInfo info, StreamingContext context)
+        private HitSandboxLimitException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
         }

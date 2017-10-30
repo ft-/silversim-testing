@@ -499,7 +499,7 @@ namespace SilverSim.Scene.Types.Object
 
         public void FillFromXml(XmlTextReader reader, UUI currentOwner, XmlDeserializationOptions options)
         {
-            var part = new ObjectPart()
+            var part = new ObjectPart
             {
                 Owner = currentOwner
             };

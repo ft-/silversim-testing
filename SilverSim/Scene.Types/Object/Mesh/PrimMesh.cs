@@ -37,7 +37,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
 
         static PrimMesh()
         {
-            START_VECTOR_BOX = new Vector3(-1, -1, 0).Normalize();
+            START_VECTOR_BOX = new Vector3(-1, -1, 0);
 
             /* the hole shape inside a sphere is a trapezoid but not a tri-angle.
              * So, it is called trapezoid here.

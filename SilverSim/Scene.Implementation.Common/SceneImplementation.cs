@@ -378,7 +378,7 @@ namespace SilverSim.Scene.Implementation.Common
             private readonly WeakReference m_WeakScene;
             private readonly SceneImplementationFactory m_SceneFactory;
             private readonly GridServiceInterface m_RegionStorage;
-            public readonly System.Timers.Timer RestartTimer = new System.Timers.Timer(1000);
+            public readonly Timer RestartTimer = new Timer(1000);
             private int m_SecondsToRestart;
             public bool FirstTrigger;
             private readonly SceneList m_Scenes;

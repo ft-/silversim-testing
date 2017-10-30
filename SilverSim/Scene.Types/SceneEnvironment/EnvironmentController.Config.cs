@@ -158,12 +158,10 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                     Interlocked.Increment(ref m_InDeserialization);
                     try
                     {
-                        using (MemoryStream ms = new MemoryStream(value))
+                        using (var ms = new MemoryStream(value))
+                        using (var reader = new XmlTextReader(ms))
                         {
-                            using (XmlTextReader reader = new XmlTextReader(ms))
-                            {
-                                DeserializeRoot(reader);
-                            }
+                            DeserializeRoot(reader);
                         }
                     }
                     finally

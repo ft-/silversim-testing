@@ -55,7 +55,7 @@ namespace SilverSim.Scene.Types.Object
 
         private ObjectAnimation GetMessage()
         {
-            var m = new ObjectAnimation()
+            var m = new ObjectAnimation
             {
                 Sender = m_Part.ID
             };

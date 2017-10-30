@@ -167,7 +167,7 @@ namespace SilverSim.Scene.Types.Scene
             else
             {
                 string[] god_agents_list = value.Split(new char[] { ',' });
-                List<UUI> new_gods = new List<UUI>();
+                var new_gods = new List<UUI>();
                 foreach (string god_agent in god_agents_list)
                 {
                     UUI uui;
@@ -790,7 +790,7 @@ namespace SilverSim.Scene.Types.Scene
                 return false;
             }
 
-            InventoryPermissionsMask checkMask = InventoryPermissionsMask.Copy;
+            var checkMask = InventoryPermissionsMask.Copy;
             if(!agentOwner.EqualsGrid(groupOwner))
             {
                 checkMask |= InventoryPermissionsMask.Transfer;

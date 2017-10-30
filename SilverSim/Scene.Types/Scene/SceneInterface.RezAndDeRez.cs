@@ -250,7 +250,7 @@ namespace SilverSim.Scene.Types.Scene
                     {
                         copyItems.Add(targetAgent, new List<InventoryItem>());
                     }
-                    var newitem = new InventoryItem()
+                    var newitem = new InventoryItem
                     {
                         AssetID = assetID,
                         AssetType = AssetType.Object,
@@ -353,9 +353,11 @@ namespace SilverSim.Scene.Types.Scene
                 var newgrp = new ObjectGroup(grp);
                 foreach (ObjectPart part in grp.ValuesByKey1)
                 {
-                    var newpart = new ObjectPart(UUID.Random, part);
-                    newpart.RezDate = Date.Now;
-                    newpart.ObjectGroup = newgrp;
+                    var newpart = new ObjectPart(UUID.Random, part)
+                    {
+                        RezDate = Date.Now,
+                        ObjectGroup = newgrp
+                    };
                     newgrp.Add(part.LinkNumber, newpart.ID, newpart);
                     newpart.UpdateData(ObjectPart.UpdateDataFlags.All);
 
@@ -622,7 +624,7 @@ namespace SilverSim.Scene.Types.Scene
                 {
                     copyItems.Add(targetAgent, new List<InventoryItem>());
                 }
-                var item = new InventoryItem()
+                var item = new InventoryItem
                 {
                     AssetID = assetID,
                     AssetType = AssetType.Object,
@@ -691,7 +693,7 @@ namespace SilverSim.Scene.Types.Scene
                 }
             }
 
-            ackres = new Viewer.Messages.Object.DeRezAck()
+            ackres = new Viewer.Messages.Object.DeRezAck
             {
                 TransactionID = req.TransactionID,
                 Success = true

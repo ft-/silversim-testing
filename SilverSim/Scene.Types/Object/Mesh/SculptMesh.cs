@@ -102,8 +102,8 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     {
                         reversed_t = sculptSizeT - t - 1;
                     }
-                    int x = (int)((double)reversed_t / (sculptSizeT - 1) * bitmap.Width);
-                    int y = (int)((double)s / (sculptSizeS - 1) * bitmap.Height);
+                    var x = (int)((double)reversed_t / (sculptSizeT - 1) * bitmap.Width);
+                    var y = (int)((double)s / (sculptSizeS - 1) * bitmap.Height);
 
                     if (y == 0)
                     {
@@ -144,7 +144,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     mesh.Vertices.Add(v);
                     if(generate_uv)
                     {
-                        var uv = new UVCoord()
+                        var uv = new UVCoord
                         {
                             U = (float)reversed_t / (sculptSizeS - t),
                             V = (float)s / (sculptSizeS - 1)
@@ -161,7 +161,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 int row2Index = rowIndex + sculptSizeT;
                 for(int col = 0; col < sculptSizeT - 1; ++col)
                 {
-                    var tri = new Triangle()
+                    var tri = new Triangle
                     {
                         Vertex1 = rowIndex + col,
                         Vertex2 = row2Index + col + 1,
@@ -169,7 +169,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     };
                     mesh.Triangles.Add(tri);
 
-                    tri = new Triangle()
+                    tri = new Triangle
                     {
                         Vertex1 = rowIndex + col,
                         Vertex2 = row2Index + col,

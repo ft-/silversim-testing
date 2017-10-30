@@ -34,7 +34,7 @@ namespace SilverSim.Scripting.Common
 {
     public static class CompilerRegistry
     {
-        public class RegistryImpl : IScriptCompilerRegistry
+        public sealed class RegistryImpl : IScriptCompilerRegistry
         {
             private readonly RwLockedDictionary<string, IScriptCompiler> m_ScriptCompilers = new RwLockedDictionary<string, IScriptCompiler>();
             public string DefaultCompilerName { get; set; }

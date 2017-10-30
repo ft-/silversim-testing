@@ -487,7 +487,7 @@ namespace SilverSim.Scene.Types.Object
 
         public void GetBoundingBox(out BoundingBox box)
         {
-            box = new BoundingBox()
+            box = new BoundingBox
             {
                 CenterOffset = Vector3.Zero,
                 Size = Size * Rotation
@@ -1453,7 +1453,7 @@ namespace SilverSim.Scene.Types.Object
             get
             {
                 Vector3 angvel = AngularVelocity;
-                return new OmegaParam()
+                return new OmegaParam
                 {
                     Axis = angvel.Normalize(),
                     Spinrate = angvel.Length,
@@ -2296,7 +2296,7 @@ namespace SilverSim.Scene.Types.Object
                     writer.WriteNamedValue("WalkableCoefficientB", WalkableCoefficientB);
                     writer.WriteNamedValue("WalkableCoefficientC", WalkableCoefficientC);
                     writer.WriteNamedValue("WalkableCoefficientD", WalkableCoefficientD);
-                    if(VehicleType != Physics.Vehicle.VehicleType.None)
+                    if(VehicleType != VehicleType.None)
                     {
                         writer.WriteStartElement("Vehicle");
                         {
@@ -2783,7 +2783,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        private static Map DynAttrsFromXml(XmlTextReader reader, ObjectGroup rootGroup, UUI currentOwner)
+        private static Map DynAttrsFromXml(XmlTextReader reader)
         {
             if(reader.IsEmptyElement)
             {
@@ -3579,7 +3579,7 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "DynAttrs":
-                                part.m_DynAttrMap = DynAttrsFromXml(reader, rootGroup, currentOwner);
+                                part.m_DynAttrMap = DynAttrsFromXml(reader);
                                 break;
 
                             case "Components":
