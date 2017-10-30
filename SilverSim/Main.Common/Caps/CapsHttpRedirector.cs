@@ -60,6 +60,7 @@ namespace SilverSim.Main.Common.Caps
                 else
                 {
                     del(httpreq);
+                    return;
                 }
             }
 

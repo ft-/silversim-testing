@@ -150,7 +150,7 @@ namespace SilverSim.Main.Cmd.UserServer
             }
             else if (m_UserAccountService.TryGetValue(UUID.Zero, args[3], args[4], out account))
             {
-                UserAuthInfo authInfo = new UserAuthInfo()
+                var authInfo = new UserAuthInfo
                 {
                     ID = account.Principal.ID,
                     Password = io.GetPass("New password")
@@ -237,7 +237,7 @@ namespace SilverSim.Main.Cmd.UserServer
             }
             else
             {
-                var account = new UserAccount()
+                var account = new UserAccount
                 {
                     IsLocalToGrid = true
                 };
@@ -246,7 +246,7 @@ namespace SilverSim.Main.Cmd.UserServer
                 account.Principal.LastName = args[3];
                 account.UserLevel = 0;
 
-                var authInfo = new UserAuthInfo()
+                var authInfo = new UserAuthInfo
                 {
                     ID = account.Principal.ID,
                     Password = io.GetPass("Password")

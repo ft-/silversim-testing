@@ -849,7 +849,7 @@ namespace SilverSim.Main.Cmd.Region
                 }
                 if (rInfo.Size.X % 256 != 0 || rInfo.Size.Y % 256 != 0)
                 {
-                    io.Write("Invalid region size " + rInfo.ToString());
+                    io.Write("Invalid region size " + rInfo.Size.ToString());
                     return;
                 }
 
@@ -1587,7 +1587,7 @@ namespace SilverSim.Main.Cmd.Region
             }
             else if (args[2] == "offline")
             {
-                List<UUID> onlineRegions = new List<UUID>();
+                var onlineRegions = new List<UUID>();
 
                 foreach (SceneInterface scene in m_Scenes.Values)
                 {
@@ -1899,7 +1899,7 @@ namespace SilverSim.Main.Cmd.Region
             }
             else
             {
-                StringBuilder output = new StringBuilder("Parcel List:\n--------------------------------------------------------------------------------");
+                var output = new StringBuilder("Parcel List:\n--------------------------------------------------------------------------------");
                 foreach (ParcelInfo parcel in scene.Parcels)
                 {
                     output.AppendFormat("\nParcel {0} ({1}):\n  Owner={2}\n",

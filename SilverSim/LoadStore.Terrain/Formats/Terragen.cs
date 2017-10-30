@@ -85,14 +85,14 @@ namespace SilverSim.LoadStore.Terrain.Formats
                                     {
                                         for (uint x = 0; x < suggested_width; ++x)
                                         {
-                                            vals[liney, x] = baseHeight + (float)bs.ReadInt16() * heightScale;
+                                            vals[liney, x] = baseHeight + bs.ReadInt16() * heightScale;
                                         }
                                     }
 
                                     /* now build patches from those 16 lines */
                                     for (uint patchx = 0; patchx < suggested_width / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++patchx)
                                     {
-                                        var patch = new LayerPatch()
+                                        var patch = new LayerPatch
                                         {
                                             X = patchx,
                                             Y = patchy
@@ -140,7 +140,7 @@ namespace SilverSim.LoadStore.Terrain.Formats
             return retVal;
         }
 
-        public void SaveStream(System.IO.Stream output, List<LayerPatch> terrain)
+        public void SaveStream(Stream output, List<LayerPatch> terrain)
         {
             Encoding ascii = Encoding.ASCII;
             var outdata = new short[terrain.Count * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];

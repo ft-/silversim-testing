@@ -64,7 +64,7 @@ namespace SilverSim.LoadStore.Terrain.Formats
                     /* now build patches from those 16 lines */
                     for(uint patchx = 0; patchx < suggested_width / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++patchx)
                     {
-                        var patch = new LayerPatch()
+                        var patch = new LayerPatch
                         {
                             X = patchx,
                             Y = patchy

@@ -65,7 +65,7 @@ namespace SilverSim.LoadStore.Terrain.Formats
             {
                 for(uint x = 0; x < bitmap.Width / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++x)
                 {
-                    var patch = new LayerPatch()
+                    var patch = new LayerPatch
                     {
                         X = x,
                         Y = (uint)bitmap.Height / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES - 1 - y
