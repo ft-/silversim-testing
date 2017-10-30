@@ -647,6 +647,72 @@ namespace SilverSim.Main.Common
 
             CoreUpdater.Instance.LoadInstalledPackageDescriptions();
 
+            string platformlibsLibraryPath;
+            string envvar;
+            switch(Environment.OSVersion.Platform)
+            {
+                case PlatformID.Unix:
+                    if (Environment.Is64BitProcess)
+                    {
+                        platformlibsLibraryPath = Path.Combine(InstallationBinPath, "platform-libs/linux/64");
+                    }
+                    else
+                    {
+                        platformlibsLibraryPath = Path.Combine(InstallationBinPath, "platform-libs/linux/32");
+                    }
+
+                    envvar = Environment.GetEnvironmentVariable("LD_LIBRARY_PATH");
+                    if (envvar != null)
+                    {
+                        envvar = platformlibsLibraryPath + ":" + envvar;
+                    }
+                    else
+                    {
+                        envvar = platformlibsLibraryPath;
+                    }
+                    Environment.SetEnvironmentVariable("LD_LIBRARY_PATH", envvar);
+                    break;
+
+                case PlatformID.MacOSX:
+                    if (Environment.Is64BitProcess)
+                    {
+                        platformlibsLibraryPath = Path.Combine(InstallationBinPath, "platform-libs/macosx/64");
+                    }
+                    else
+                    {
+                        platformlibsLibraryPath = Path.Combine(InstallationBinPath, "platform-libs/macosx/32");
+                    }
+
+                    envvar = Environment.GetEnvironmentVariable("DYLD_LIBRARY_PATH");
+                    if(envvar != null)
+                    {
+                        envvar = platformlibsLibraryPath + ":" + envvar;
+                    }
+                    else
+                    {
+                        envvar = platformlibsLibraryPath;
+                    }
+                    Environment.SetEnvironmentVariable("DYLD_LIBRARY_PATH", envvar);
+                    break;
+
+                case PlatformID.Win32NT:
+                case PlatformID.Win32S:
+                    if (Environment.Is64BitProcess)
+                    {
+                        platformlibsLibraryPath = Path.Combine(InstallationBinPath, "platform-libs/windows/64");
+                    }
+                    else
+                    {
+                        platformlibsLibraryPath = Path.Combine(InstallationBinPath, "platform-libs/windows/32");
+                    }
+                    Environment.SetEnvironmentVariable("PATH", platformlibsLibraryPath + ";" + Environment.GetEnvironmentVariable("PATH"));
+                    break;
+
+                default:
+                    platformlibsLibraryPath = Path.Combine(InstallationBinPath, "platform-libs/unknown");
+                    break;
+            }
+
             string DefaultDataPath = Path.GetFullPath(Path.Combine(InstallationBinPath, startup.GetString("defaultconfigdir", "../data")));
 
             string mainConfig = startup.GetString("config", defaultConfigName);
