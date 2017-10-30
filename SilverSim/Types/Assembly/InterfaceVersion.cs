@@ -26,11 +26,11 @@ namespace SilverSim.Types.Assembly
     [AttributeUsage(AttributeTargets.Assembly, Inherited = false)]
     public sealed class InterfaceVersionAttribute : Attribute
     {
+        public string Version { get; }
+
         public InterfaceVersionAttribute(string version)
         {
             Version = version;
         }
-
-        public string Version { get; }
     }
 }
