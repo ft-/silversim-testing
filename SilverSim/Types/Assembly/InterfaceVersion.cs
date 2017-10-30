@@ -19,16 +19,20 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+#pragma warning disable IDE0003 // Some parsers fail on Version and think it is a type
+
+using System;
+
 namespace SilverSim.Types.Assembly
 {
-    [System.AttributeUsage(System.AttributeTargets.Assembly, Inherited = false)]
-    public sealed class InterfaceVersionAttribute : System.Attribute
+    [AttributeUsage(AttributeTargets.Assembly, Inherited = false)]
+    public sealed class InterfaceVersionAttribute : Attribute
     {
         public string Version { get; }
 
         public InterfaceVersionAttribute(string version)
         {
-            Version = version;
+            this.Version = version;
         }
     }
 }
