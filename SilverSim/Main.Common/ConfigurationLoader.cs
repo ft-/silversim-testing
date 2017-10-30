@@ -958,9 +958,6 @@ namespace SilverSim.Main.Common
                 KnownConfigurationIssues.Add("Please run as 64-bit process on a 64-bit operating system");
             }
 
-            m_Log.Info("Loading platform modules");
-            LoadArchDlls();
-
             m_Log.Info("Loading specified modules");
             LoadModules();
 

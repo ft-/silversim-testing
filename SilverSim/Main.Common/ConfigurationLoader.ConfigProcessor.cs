@@ -572,35 +572,6 @@ namespace SilverSim.Main.Common
         }
         #endregion
 
-        #region Preload Arch Specific Libraries
-        [DllImport("kernel32.dll")]
-        private static extern IntPtr LoadLibrary(string dllToLoad);
-
-        private void LoadArchDlls()
-        {
-            string archModule = "UnmanagedModule-" + VersionInfo.ArchSpecificId;
-            foreach (IConfig config in Config.Configs)
-            {
-                if (config.Contains("IsTemplate"))
-                {
-                    continue;
-                }
-                foreach (string key in config.GetKeys())
-                {
-                    if (key.StartsWith(archModule))
-                    {
-                        string fName = config.GetString(key);
-                        if (Environment.OSVersion.Platform == PlatformID.Win32NT &&
-                            LoadLibrary(Path.Combine(InstallationBinPath, fName)) == IntPtr.Zero)
-                        {
-                            throw new ConfigurationErrorException("unmanaged module " + fName + " not found");
-                        }
-                    }
-                }
-            }
-        }
-        #endregion
-
         #region Process [ParameterMap] section
         private void ProcessParameterMap()
         {
