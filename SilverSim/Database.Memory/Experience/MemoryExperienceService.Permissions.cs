@@ -65,7 +65,7 @@ namespace SilverSim.Database.Memory.Experience
         {
             get
             {
-                Dictionary<UUID, bool> res = new Dictionary<UUID, bool>();
+                var res = new Dictionary<UUID, bool>();
                 foreach(KeyValuePair<UUID, RwLockedDictionary<UUI, bool>> kvp in m_Perms)
                 {
                     bool allowed;

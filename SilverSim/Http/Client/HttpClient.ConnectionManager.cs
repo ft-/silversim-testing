@@ -19,8 +19,6 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-//#define SUPPORT_REUSE
-
 using SilverSim.Threading;
 using System;
 using System.Collections.Generic;
@@ -44,11 +42,7 @@ namespace SilverSim.Http.Client
             UpgradeHttp2,
             Http2PriorKnowledge
         }
-#if SUPPORT_REUSE
         public static ConnectionModeEnum ConnectionReuse = ConnectionModeEnum.Keepalive;
-#else
-        public static ConnectionModeEnum ConnectionReuse /*= ConnectionModeEnum.SingleRequest */;
-#endif
 
         private struct StreamInfo
         {

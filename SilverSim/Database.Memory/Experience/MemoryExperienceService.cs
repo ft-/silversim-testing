@@ -64,7 +64,7 @@ namespace SilverSim.Database.Memory.Experience
 
         public override List<UUID> FindExperienceByName(string query)
         {
-            List<UUID> res = new List<UUID>();
+            var res = new List<UUID>();
             foreach (KeyValuePair<UUID, ExperienceInfo> kvp in m_Experiences)
             {
                 if (kvp.Value.Name.Contains(query))
@@ -77,7 +77,7 @@ namespace SilverSim.Database.Memory.Experience
 
         public override List<ExperienceInfo> FindExperienceInfoByName(string query)
         {
-            List<ExperienceInfo> res = new List<ExperienceInfo>();
+            var res = new List<ExperienceInfo>();
             foreach (KeyValuePair<UUID, ExperienceInfo> kvp in m_Experiences)
             {
                 if (kvp.Value.Name.Contains(query))
@@ -116,7 +116,7 @@ namespace SilverSim.Database.Memory.Experience
 
         public override List<UUID> GetGroupExperiences(UGI group)
         {
-            List<UUID> res = new List<UUID>();
+            var res = new List<UUID>();
             foreach(KeyValuePair<UUID, ExperienceInfo> kvp in m_Experiences)
             {
                 if(kvp.Value.Group.Equals(group))

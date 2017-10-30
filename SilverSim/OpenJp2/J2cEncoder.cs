@@ -41,7 +41,7 @@ namespace OpenJp2.Net
         [DllImport("openjp2", EntryPoint = "j2c_encoded_free")]
         private static extern void J2cEncodedFree(IntPtr dataref);
 
-        public class J2cEncodingFailedException : Exception
+        public sealed class J2cEncodingFailedException : Exception
         {
             public J2cEncodingFailedException()
             {
@@ -55,7 +55,7 @@ namespace OpenJp2.Net
             {
             }
 
-            protected J2cEncodingFailedException(SerializationInfo info, StreamingContext context) : base(info, context)
+            private J2cEncodingFailedException(SerializationInfo info, StreamingContext context) : base(info, context)
             {
             }
         }

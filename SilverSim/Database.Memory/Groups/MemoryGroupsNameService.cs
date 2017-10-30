@@ -23,6 +23,7 @@ using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.Threading;
 using SilverSim.Types;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -70,8 +71,8 @@ namespace SilverSim.Database.Memory.Groups
         {
             var groups = new List<UGI>();
             var res = from grp in m_Data.Values
-                                   where grp.GroupName.ToLower().Equals(groupName.ToLower())
-                                   select grp;
+                                   where grp.GroupName.Equals(groupName, StringComparison.OrdinalIgnoreCase)
+                      select grp;
             foreach(UGI ugi in res)
             {
                 if(groups.Count < limit)

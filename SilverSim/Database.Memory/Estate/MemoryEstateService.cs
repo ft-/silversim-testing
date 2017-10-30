@@ -23,10 +23,10 @@ using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.Threading;
 using SilverSim.Types.Estate;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System;
 
 namespace SilverSim.Database.Memory.Estate
 {
@@ -63,7 +63,7 @@ namespace SilverSim.Database.Memory.Estate
         {
             foreach(var intern in m_Data.Values)
             {
-                if(intern.Name.ToLower() == estateName.ToLower())
+                if(string.Equals(intern.Name, estateName, StringComparison.OrdinalIgnoreCase))
                 {
                     estateInfo = new EstateInfo(intern);
                     return true;
@@ -79,7 +79,7 @@ namespace SilverSim.Database.Memory.Estate
         {
             foreach (var intern in m_Data.Values)
             {
-                if (intern.Name.ToLower() == estateName.ToLower())
+                if (string.Equals(intern.Name, estateName, StringComparison.OrdinalIgnoreCase))
                 {
                     return true;
                 }

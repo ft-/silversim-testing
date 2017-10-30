@@ -26,7 +26,7 @@ using System.Text;
 
 namespace SilverSim.Http
 {
-    public class HttpsStream : AbstractHttpStream
+    public sealed class HttpsStream : AbstractHttpStream
     {
         private readonly SslStream m_Stream;
         private readonly byte[] m_Buffer;

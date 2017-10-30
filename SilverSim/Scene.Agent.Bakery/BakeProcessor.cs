@@ -96,7 +96,7 @@ namespace SilverSim.Scene.Agent.Bakery
                 Image img;
                 try
                 {
-                    img = J2cDecoder.DecodeWithDump(data.Data, out bump);
+                    img = J2cDecoder.DecodeWithBump(data.Data, out bump);
                 }
                 catch
                 {

@@ -20,7 +20,6 @@
 // exception statement from your version.
 
 using System;
-using System.Collections;
 using System.IO;
 using System.Net.Sockets;
 using System.Runtime.Serialization;
@@ -28,7 +27,7 @@ using System.Text;
 
 namespace SilverSim.Http
 {
-    public class HttpStream : AbstractHttpStream
+    public sealed class HttpStream : AbstractHttpStream
     {
         private readonly Socket m_Socket;
         private readonly byte[] m_Buffer;

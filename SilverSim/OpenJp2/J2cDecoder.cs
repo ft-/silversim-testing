@@ -29,7 +29,7 @@ namespace OpenJp2.Net
 {
     public static class J2cDecoder
     {
-        public class J2cDecodingFailedException : Exception
+        public sealed class J2cDecodingFailedException : Exception
         {
             public J2cDecodingFailedException()
             {
@@ -43,7 +43,7 @@ namespace OpenJp2.Net
             {
             }
 
-            protected J2cDecodingFailedException(SerializationInfo info, StreamingContext context) : base(info, context)
+            private J2cDecodingFailedException(SerializationInfo info, StreamingContext context) : base(info, context)
             {
             }
         }
@@ -70,10 +70,10 @@ namespace OpenJp2.Net
         public static Image Decode(byte[] buffer)
         {
             byte[] dummy;
-            return DecodeWithDump(buffer, out dummy, false);
+            return DecodeWithBump(buffer, out dummy, false);
         }
 
-        public static Image DecodeWithDump(byte[] buffer, out byte[] bump, bool decodebump = true)
+        public static Image DecodeWithBump(byte[] buffer, out byte[] bump, bool decodebump = true)
         {
             if (!J2cInit.m_Inited)
             {
@@ -145,10 +145,10 @@ namespace OpenJp2.Net
                             goto case 3;
                     }
 
-                    if (channels > 4)
+                    if (channels > 4 && decodebump)
                     {
                         bump = new byte[channelwidth];
-                        int[] ibump = new int[channelwidth];
+                        var ibump = new int[channelwidth];
                         Marshal.Copy(J2cDecodedGetScan0(ptr, 4), ibump, 0, channelwidth);
                         for(int i = 0; i < channelwidth; ++i)
                         {
@@ -192,7 +192,7 @@ namespace OpenJp2.Net
             }
 
             /* no using here, we are returning it */
-            Bitmap bmp = new Bitmap(width, height, destformat);
+            var bmp = new Bitmap(width, height, destformat);
 
             /* put the decoded image into it */
             BitmapData lockBits = bmp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadWrite, destformat);

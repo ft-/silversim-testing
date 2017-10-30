@@ -80,7 +80,7 @@ namespace SilverSim.Database.Memory.UserAccounts
         public override bool ContainsKey(UUID scopeID, string email)
         {
             var result = from account in m_Data.Values
-                                              where account.Email.ToLower().Equals(email.ToLower()) &&
+                                              where account.Email.Equals(email, StringComparison.OrdinalIgnoreCase) &&
                        (scopeID == UUID.Zero || account.ScopeID == scopeID)
                                               select true;
             foreach(bool acc in result)
@@ -94,7 +94,7 @@ namespace SilverSim.Database.Memory.UserAccounts
         public override bool TryGetValue(UUID scopeID, string email, out UserAccount account)
         {
             var result = from accountdata in m_Data.Values
-                                       where accountdata.Email.ToLower().Equals(email.ToLower()) &&
+                                       where accountdata.Email.Equals(email, StringComparison.OrdinalIgnoreCase) &&
                 (scopeID == UUID.Zero || accountdata.ScopeID == scopeID)
                                        select accountdata;
             foreach(UserAccount acc in result)
@@ -123,8 +123,8 @@ namespace SilverSim.Database.Memory.UserAccounts
         public override bool ContainsKey(UUID scopeID, string firstName, string lastName)
         {
             var result = from account in m_Data.Values
-                                       where account.Principal.FirstName.ToLower().Equals(firstName.ToLower()) &&
-                                       account.Principal.LastName.ToLower().Equals(lastName.ToLower()) &&
+                                       where account.Principal.FirstName.Equals(firstName, StringComparison.OrdinalIgnoreCase) &&
+                                       account.Principal.LastName.Equals(lastName, StringComparison.OrdinalIgnoreCase) &&
                 (scopeID == UUID.Zero || account.ScopeID == scopeID)
                                        select true;
             foreach (bool acc in result)
@@ -138,8 +138,8 @@ namespace SilverSim.Database.Memory.UserAccounts
         public override bool TryGetValue(UUID scopeID, string firstName, string lastName, out UserAccount account)
         {
             var result = from accountdata in m_Data.Values
-                                       where accountdata.Principal.FirstName.ToLower().Equals(firstName.ToLower()) &&
-                                       accountdata.Principal.LastName.ToLower().Equals(lastName.ToLower()) &&
+                                       where accountdata.Principal.FirstName.Equals(firstName, StringComparison.OrdinalIgnoreCase) &&
+                                       accountdata.Principal.LastName.Equals(lastName, StringComparison.OrdinalIgnoreCase) &&
                 (scopeID == UUID.Zero || accountdata.ScopeID == scopeID)
                                        select accountdata;
             foreach (UserAccount acc in result)
@@ -178,8 +178,8 @@ namespace SilverSim.Database.Memory.UserAccounts
             else
             {
                 res = (words.Length == 1) ?
-                    from data in m_Data.Values where data.Principal.FirstName.ToLower().Equals(words[0].ToLower()) || data.Principal.LastName.ToLower().Equals(words[0].ToLower()) select new UserAccount(data) :
-                    from data in m_Data.Values where data.Principal.FirstName.ToLower().Equals(words[0].ToLower()) && data.Principal.LastName.ToLower().Equals(words[1].ToLower()) select new UserAccount(data);
+                    from data in m_Data.Values where data.Principal.FirstName.Equals(words[0], StringComparison.OrdinalIgnoreCase) || data.Principal.LastName.Equals(words[0], StringComparison.OrdinalIgnoreCase) select new UserAccount(data) :
+                    from data in m_Data.Values where data.Principal.FirstName.Equals(words[0], StringComparison.OrdinalIgnoreCase) && data.Principal.LastName.Equals(words[1], StringComparison.OrdinalIgnoreCase) select new UserAccount(data);
             }
             foreach(var acc in res)
             {

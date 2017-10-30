@@ -50,12 +50,10 @@ namespace SilverSim.Database.Memory.ServerParam
             }
         }
 
-        #region Constructor
         public void Startup(ConfigurationLoader loader)
         {
             /* nothing to do */
         }
-        #endregion
 
         public override List<string> this[UUID regionID]
         {

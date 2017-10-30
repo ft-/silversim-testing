@@ -19,17 +19,11 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-
 namespace SilverSim.Http.Client
 {
     public static partial class HttpClient
     {
-        public class BodyResponseChunkedStream : HttpReadChunkedBodyStream
+        public sealed class BodyResponseChunkedStream : HttpReadChunkedBodyStream
         {
             private readonly string m_Scheme;
             private readonly string m_Host;

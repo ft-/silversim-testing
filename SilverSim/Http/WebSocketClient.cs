@@ -52,7 +52,7 @@ namespace SilverSim.Http
         }
     }
 
-    public class WebSocketClient : HttpWebSocket
+    public sealed class WebSocketClient : HttpWebSocket
     {
         public string SelectedProtocol { get; private set; }
 

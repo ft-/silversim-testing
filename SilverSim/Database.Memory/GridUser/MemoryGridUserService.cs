@@ -86,7 +86,7 @@ namespace SilverSim.Database.Memory.GridUser
             }
             else
             {
-                info = new GridUserInfo()
+                info = new GridUserInfo
                 {
                     User = userID,
                     LastLogin = Date.Now,

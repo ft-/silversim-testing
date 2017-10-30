@@ -38,12 +38,10 @@ namespace SilverSim.Database.Memory.Presence
     {
         private readonly RwLockedDictionary<UUID, PresenceInfo> m_Data = new RwLockedDictionary<UUID, PresenceInfo>();
 
-        #region Constructor
         public void Startup(ConfigurationLoader loader)
         {
             /* nothing to do */
         }
-        #endregion
 
         #region PresenceServiceInterface
         public override List<PresenceInfo> GetPresencesInRegion(UUID regionId) =>

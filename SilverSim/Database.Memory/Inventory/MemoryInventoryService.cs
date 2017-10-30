@@ -38,14 +38,12 @@ namespace SilverSim.Database.Memory.Inventory
     {
         readonly DefaultInventoryFolderContentService m_ContentService;
 
-        internal readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, InventoryFolder>> m_Folders;
-        internal readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, InventoryItem>> m_Items;
+        internal readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, InventoryFolder>> m_Folders = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, InventoryFolder>>(() => new RwLockedDictionary<UUID, InventoryFolder>());
+        internal readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, InventoryItem>> m_Items = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, InventoryItem>>(() => new RwLockedDictionary<UUID, InventoryItem>());
 
         public MemoryInventoryService()
         {
             m_ContentService = new DefaultInventoryFolderContentService(this);
-            m_Folders = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, InventoryFolder>>(delegate () { return new RwLockedDictionary<UUID, InventoryFolder>(); });
-            m_Items = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, InventoryItem>>(delegate () { return new RwLockedDictionary<UUID, InventoryItem>(); });
         }
 
         IInventoryFolderContentServiceInterface IInventoryFolderServiceInterface.Content => m_ContentService;

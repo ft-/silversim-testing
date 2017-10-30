@@ -24,7 +24,6 @@ using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;

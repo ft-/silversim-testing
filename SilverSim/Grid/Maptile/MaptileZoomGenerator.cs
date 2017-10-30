@@ -111,7 +111,7 @@ namespace SilverSim.Grid.Maptile
             }
             else
             {
-                outmap = new MaptileData()
+                outmap = new MaptileData
                 {
                     Location = location,
                     ZoomLevel = zoomlevel,

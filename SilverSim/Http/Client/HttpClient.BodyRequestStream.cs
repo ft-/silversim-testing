@@ -26,7 +26,7 @@ namespace SilverSim.Http.Client
 {
     public static partial class HttpClient
     {
-        public class RequestBodyStream : Stream
+        public sealed class RequestBodyStream : Stream
         {
             private Stream m_Output;
             private long m_RemainingLength;

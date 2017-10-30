@@ -26,6 +26,7 @@ using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Grid;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -167,7 +168,7 @@ namespace SilverSim.Database.MySQL.Grid
         public override bool TryGetValue(UUID scopeID, string regionName, out RegionInfo rInfo)
         {
             var res = from region in m_Data.Values
-                                          where region.Name.ToLower().Equals(regionName.ToLower()) &&
+                                          where region.Name.Equals(regionName, StringComparison.OrdinalIgnoreCase) &&
              (scopeID == UUID.Zero || scopeID == region.ScopeID)
                                           select region;
             foreach (RegionInfo regionInfo in res)
@@ -183,7 +184,7 @@ namespace SilverSim.Database.MySQL.Grid
         public override bool ContainsKey(UUID scopeID, string regionName)
         {
             var res = from region in m_Data.Values
-                                          where region.Name.ToLower().Equals(regionName.ToLower()) &&
+                                          where region.Name.Equals(regionName, StringComparison.OrdinalIgnoreCase) &&
              (scopeID == UUID.Zero || scopeID == region.ScopeID)
                                           select true;
             foreach (bool f in res)
@@ -340,7 +341,7 @@ namespace SilverSim.Database.MySQL.Grid
             new List<RegionInfo>(from region in m_Data.Values where scopeID == UUID.Zero || region.ScopeID == scopeID select new RegionInfo(region));
 
         public override List<RegionInfo> SearchRegionsByName(UUID scopeID, string searchString) =>
-            new List<RegionInfo>(from region in m_Data.Values where (scopeID == UUID.Zero || region.ScopeID == scopeID) && region.Name.ToLower().StartsWith(searchString.ToLower()) select new RegionInfo(region));
+            new List<RegionInfo>(from region in m_Data.Values where (scopeID == UUID.Zero || region.ScopeID == scopeID) && region.Name.StartsWith(searchString, StringComparison.OrdinalIgnoreCase) select new RegionInfo(region));
 
         public override Dictionary<string, string> GetGridExtraFeatures() =>
             new Dictionary<string, string>();

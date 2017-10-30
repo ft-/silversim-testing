@@ -182,7 +182,7 @@ namespace SilverSim.Database.Memory.Friends
             fInfo = null;
             if(m_Friends.TryGetValue(user.ID, out friendList) && friendList.TryGetValue(friend.ID, out data))
             {
-                fInfo = new FriendInfo()
+                fInfo = new FriendInfo
                 {
                     Secret = data.Secret,
                     User = user,
