@@ -33,11 +33,8 @@ namespace SilverSim.Http.Client.Authorization
             m_BearerToken = bearertoken;
         }
 
-        public void GetRequestHeaders(IDictionary<string, string> headers, string method, string requestUri)
-        {
-            string o = Convert.ToBase64String(m_BearerToken);
-            headers["Authorization"] = $"Bearer {o}";
-        }
+        public void GetRequestHeaders(IDictionary<string, string> headers, string method, string requestUri) =>
+            headers["Authorization"] = $"Bearer {Convert.ToBase64String(m_BearerToken)}";
 
         public bool CanHandleUnauthorized(IDictionary<string, string> headers) => false;
 
