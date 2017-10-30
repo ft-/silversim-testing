@@ -1,7 +1,7 @@
 Except stated otherwise in ThirdPartyLicenses this license applies.
 
 
-ArribaSim is distributed under the terms of the
+SilverSim is distributed under the terms of the
 GNU Affero General Public License v3
 with the following clarification and special exception.
 
