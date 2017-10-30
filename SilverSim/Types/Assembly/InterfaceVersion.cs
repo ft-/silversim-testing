@@ -19,12 +19,10 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using System;
-
 namespace SilverSim.Types.Assembly
 {
-    [AttributeUsage(AttributeTargets.Assembly, Inherited = false)]
-    public sealed class InterfaceVersionAttribute : Attribute
+    [System.AttributeUsage(System.AttributeTargets.Assembly, Inherited = false)]
+    public sealed class InterfaceVersionAttribute : System.Attribute
     {
         public string Version { get; }
 
