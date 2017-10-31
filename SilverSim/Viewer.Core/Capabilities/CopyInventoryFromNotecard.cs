@@ -180,13 +180,13 @@ namespace SilverSim.Viewer.Core.Capabilities
 
         private void HandleAssetTransferWorkItem(object o)
         {
-            AssetTransferWorkItem wi = (AssetTransferWorkItem)o;
+            var wi = (AssetTransferWorkItem)o;
             wi.ProcessAssetTransfer();
         }
 
         private UUID CreateInventoryItemFromNotecard(InventoryFolder destinationFolder, NotecardInventoryItem ncitem, uint callbackID)
         {
-            var item = new InventoryItem()
+            var item = new InventoryItem
             {
                 InventoryType = ncitem.InventoryType,
                 AssetType = ncitem.AssetType,

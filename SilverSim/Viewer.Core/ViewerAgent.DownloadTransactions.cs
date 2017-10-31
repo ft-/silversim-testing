@@ -97,7 +97,7 @@ namespace SilverSim.Viewer.Core
                     return;
                 }
 
-                var res = new SendXferPacket()
+                var res = new SendXferPacket
                 {
                     Packet = ++tdata.Packet
                 };

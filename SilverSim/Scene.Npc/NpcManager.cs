@@ -302,7 +302,7 @@ namespace SilverSim.Scene.Npc
                 try
                 {
                     m_NpcAgents.Add(agent.ID, agent);
-                    var npcInfo = new NpcPresenceInfo()
+                    var npcInfo = new NpcPresenceInfo
                     {
                         RegionID = sceneid,
                         Npc = agent.Owner,

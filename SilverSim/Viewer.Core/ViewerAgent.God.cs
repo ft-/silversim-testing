@@ -65,7 +65,7 @@ namespace SilverSim.Viewer.Core
             }
             else if(!m.IsGodlike && m_IsActiveGod)
             {
-                var r = new GrantGodlikePowers()
+                var r = new GrantGodlikePowers
                 {
                     AgentID = m.AgentID,
                     SessionID = m.SessionID,

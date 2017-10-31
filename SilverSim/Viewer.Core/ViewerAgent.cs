@@ -421,7 +421,7 @@ namespace SilverSim.Viewer.Core
 
         public override void KickUser(string msg)
         {
-            var req = new KickUser()
+            var req = new KickUser
             {
                 AgentID = Owner.ID,
                 SessionID = SessionID,
@@ -433,7 +433,7 @@ namespace SilverSim.Viewer.Core
 
         public override void KickUser(string msg, Action<bool> callbackDelegate)
         {
-            var req = new KickUser()
+            var req = new KickUser
             {
                 AgentID = Owner.ID,
                 SessionID = SessionID,
@@ -656,7 +656,7 @@ namespace SilverSim.Viewer.Core
                     return ScriptPermissions.None;
                 }
             }
-            var m = new ScriptQuestion()
+            var m = new ScriptQuestion
             {
                 ExperienceID = experienceID,
                 ItemID = itemID,
@@ -962,21 +962,6 @@ namespace SilverSim.Viewer.Core
                 }
             }
             m_Log.InfoFormat("Agent {0} {1} ({0}) logout request processed", FirstName, LastName, ID);
-        }
-
-        [PacketHandler(MessageType.MuteListRequest)]
-        public void HandleMuteListRequest(Message m)
-        {
-            var req = (MuteListRequest)m;
-            if (req.AgentID != ID || req.SessionID != m.CircuitSessionID)
-            {
-                return;
-            }
-            var res = new UseCachedMuteList()
-            {
-                AgentID = req.AgentID
-            };
-            SendMessageAlways(res, m.CircuitSceneID);
         }
 
         [PacketHandler(MessageType.TrackAgent)]

@@ -23,7 +23,7 @@ using SilverSim.Types;
 
 namespace SilverSim.Scene.Types.Object
 {
-    public class ObjectUpdateInfo : IUpdateInfo
+    public sealed class ObjectUpdateInfo : IUpdateInfo
     {
         private bool m_Killed;
         public uint LocalID;

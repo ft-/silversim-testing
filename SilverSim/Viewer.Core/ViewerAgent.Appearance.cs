@@ -115,7 +115,7 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            var awu = new AgentWearablesUpdate()
+            var awu = new AgentWearablesUpdate
             {
                 AgentID = m.AgentID,
                 SessionID = m.SessionID,
@@ -125,7 +125,7 @@ namespace SilverSim.Viewer.Core
             {
                 foreach (var wi in kvp.Value)
                 {
-                    var d = new AgentWearablesUpdate.WearableDataEntry()
+                    var d = new AgentWearablesUpdate.WearableDataEntry
                     {
                         ItemID = wi.ItemID,
                         AssetID = wi.AssetID,
@@ -176,7 +176,7 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            var res = new AgentCachedTextureResponse()
+            var res = new AgentCachedTextureResponse
             {
                 AgentID = m.AgentID,
                 SessionID = m.SessionID,
