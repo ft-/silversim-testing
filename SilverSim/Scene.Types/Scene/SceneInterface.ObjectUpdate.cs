@@ -68,7 +68,7 @@ namespace SilverSim.Scene.Types.Scene
             {
                 m = new Viewer.Messages.Object.UnreliableObjectUpdate();
             }
-            var d = new Viewer.Messages.Object.UnreliableObjectUpdate.ObjData()
+            var d = new Viewer.Messages.Object.UnreliableObjectUpdate.ObjData
             {
                 Data = new byte[0],
                 ExtraParams = new byte[1],
