@@ -312,6 +312,7 @@ namespace SilverSim.Scene.Npc
                     inventoryService.CheckInventory(npcInfo.Npc.ID);
                     presenceService.Store(npcInfo);
                     agent.CurrentScene = scene;
+                    agent.GetUpdateInfo(scene.ID).SceneID = scene.ID;
                     agent.Position = position;
                     scene.Add(agent);
                 }

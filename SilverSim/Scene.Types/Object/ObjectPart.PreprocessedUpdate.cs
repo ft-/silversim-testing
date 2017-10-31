@@ -256,7 +256,6 @@ namespace SilverSim.Scene.Types.Object
                 }
 
                 var primUpdateFlags = (uint)m_PrimitiveFlags;
-                uint parentID = 0;
                 string name = string.Empty;
 
                 primUpdateFlags &= (uint)(~(
@@ -313,25 +312,6 @@ namespace SilverSim.Scene.Types.Object
                         primUpdateFlags |= (uint)PrimitiveFlags.TemporaryOnRez;
                     }
 
-                    if (objectGroup.RootPart != this)
-                    {
-                        parentID = ObjectGroup.RootPart.LocalID;
-                    }
-                    else if (objectGroup.IsAttached)
-                    {
-                        IAgent agent;
-                        SceneInterface scene = objectGroup.Scene;
-                        if(scene != null && scene.Agents.TryGetValue(Owner.ID, out agent))
-                        {
-                            parentID = agent.LocalID;
-                        }
-                        else
-                        {
-#if DEBUG
-                            m_Log.DebugFormat("Failed to find agent for attachment");
-#endif
-                        }
-                    }
                     if (objectGroup.IsAttached)
                     {
                         name = string.Format("AttachItemID STRING RW SV {0}", objectGroup.FromItemID);
@@ -370,11 +350,6 @@ namespace SilverSim.Scene.Types.Object
                     m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.UpdateFlags + 1] = (byte)((primUpdateFlags >> 8) & 0xFF);
                     m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.UpdateFlags + 2] = (byte)((primUpdateFlags >> 16) & 0xFF);
                     m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.UpdateFlags + 3] = (byte)((primUpdateFlags >> 24) & 0xFF);
-
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ParentID] = (byte)(parentID & 0xFF);
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ParentID + 1] = (byte)((parentID >> 8) & 0xFF);
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ParentID + 2] = (byte)((parentID >> 16) & 0xFF);
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ParentID + 3] = (byte)((parentID >> 24) & 0xFF);
 
                     if(objectGroup == null)
                     {
@@ -516,11 +491,8 @@ namespace SilverSim.Scene.Types.Object
                             compressedSize += textureanimbytes.Length + 4;
                         }
 
-                        if(parentID != 0)
-                        {
-                            compressedflags |= ObjectUpdateCompressed.CompressedFlags.HasParent;
-                            compressedSize += 4;
-                        }
+                        compressedflags |= ObjectUpdateCompressed.CompressedFlags.HasParent;
+                        compressedSize += 4;
 
                         if(!string.IsNullOrEmpty(name))
                         {
@@ -551,10 +523,10 @@ namespace SilverSim.Scene.Types.Object
 
                         var compressedData = new byte[compressedSize];
                         ID.ToBytes(compressedData, 0);
-                        compressedData[16] = (byte)(LocalID & 0xFF);
-                        compressedData[17] = (byte)((LocalID >> 8) & 0xFF);
-                        compressedData[18] = (byte)((LocalID >> 16) & 0xFF);
-                        compressedData[19] = (byte)((LocalID >> 24) & 0xFF);
+                        compressedData[16] = 0;//(byte)(LocalID & 0xFF);
+                        compressedData[17] = 0;//(byte)((LocalID >> 8) & 0xFF);
+                        compressedData[18] = 0;//(byte)((LocalID >> 16) & 0xFF);
+                        compressedData[19] = 0;// (byte)((LocalID >> 24) & 0xFF);
                         var shape = Shape;
                         compressedData[20] = (byte)shape.PCode;
                         compressedData[21] = shape.State;
@@ -584,14 +556,11 @@ namespace SilverSim.Scene.Types.Object
                         }
 
                         //Parent
-                        if(parentID != 0)
-                        {
-                            compressedData[offset] = (byte)(parentID & 0xFF);
-                            compressedData[offset + 1] = (byte)((parentID >> 8) & 0xFF);
-                            compressedData[offset + 2] = (byte)((parentID >> 16) & 0xFF);
-                            compressedData[offset + 3] = (byte)((parentID >> 24) & 0xFF);
-                            offset += 4;
-                        }
+                        compressedData[offset] = 0;// (byte)(parentID & 0xFF);
+                        compressedData[offset + 1] = 0;// (byte)((parentID >> 8) & 0xFF);
+                        compressedData[offset + 2] = 0;// (byte)((parentID >> 16) & 0xFF);
+                        compressedData[offset + 3] = 0;// (byte)((parentID >> 24) & 0xFF);
+                        offset += 4;
                         
                         //Hover text
                         if(textbytes != null)

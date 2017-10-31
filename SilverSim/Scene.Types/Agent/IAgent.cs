@@ -61,6 +61,10 @@ namespace SilverSim.Scene.Types.Agent
         string LastName { get; set; }
         UUID SceneID { get; set; }
 
+        AgentUpdateInfo GetUpdateInfo(UUID sceneID);
+
+        void SendKillObject(UUID sceneID);
+
         bool AllowUnsit { get; set; }
 
         ClientInfo Client { get; }
@@ -257,5 +261,7 @@ namespace SilverSim.Scene.Types.Agent
         void SetAssetUploadAsCompletionAction(UUID transactionID, UUID sceneID, Action<UUID> action);
 
         void DetachAllAttachments();
+
+        void ScheduleUpdate(AgentUpdateInfo info, UUID fromSceneID);
     }
 }

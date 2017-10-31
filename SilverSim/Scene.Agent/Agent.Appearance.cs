@@ -355,16 +355,7 @@ namespace SilverSim.Scene.Agent
                 Vector3 accel = Acceleration;
 
                 var data = new byte[60];
-                int pos = 0;
-                {
-                    byte[] b = BitConverter.GetBytes(LocalID);
-                    if (!BitConverter.IsLittleEndian)
-                    {
-                        Array.Reverse(b);
-                    }
-                    Buffer.BlockCopy(b, 0, data, pos, 4);
-                    pos += 4;
-                }
+                int pos = 4; /* LocalID is filled in later */
                 data[pos++] = 0; //State
                 data[pos++] = 1;
 

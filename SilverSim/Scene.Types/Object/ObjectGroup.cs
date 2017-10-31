@@ -64,11 +64,7 @@ namespace SilverSim.Scene.Types.Object
         public event Action<IObject> OnPositionChange;
         #endregion
 
-        public UInt32 LocalID
-        {
-            get { return RootPart.LocalID; }
-            set { RootPart.LocalID = value; }
-        }
+        public ILocalIDAccessor LocalID => RootPart.LocalID;
 
         public const int LINK_SET = -1;
         public const int LINK_ALL_OTHERS = -2;

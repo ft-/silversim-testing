@@ -19,22 +19,24 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Scene.Types.Agent;
+using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 
 namespace SilverSim.Scene.Types.Object
 {
-    public sealed class ObjectUpdateInfo : IUpdateInfo
+    public sealed class ObjectUpdateInfo : IObjUpdateInfo
     {
         private bool m_Killed;
-        public uint LocalID;
+        public uint LocalID { get; internal set; }
         public ObjectPart Part { get; }
         public UUID ID { get; internal set; }
+        public UUID SceneID { get; internal set; }
 
         public ObjectUpdateInfo(ObjectPart part)
         {
             Part = part;
             ID = part.ID;
-            LocalID = part.LocalID;
         }
 
         public void KillObject()
@@ -42,7 +44,15 @@ namespace SilverSim.Scene.Types.Object
             m_Killed = true;
         }
 
+        public UUI Owner => Part.ObjectGroup.Owner;
+
+        public bool IsAlwaysFull => false;
+
         public bool IsKilled => m_Killed;
+
+        public bool IsAttached => Part.ObjectGroup.IsAttached;
+
+        public bool IsAttachedToPrivate => Part.ObjectGroup.IsAttachedToPrivate;
 
         public bool IsPhysics
         {
@@ -53,6 +63,32 @@ namespace SilverSim.Scene.Types.Object
                     return Part.ObjectGroup.IsPhysics;
                 }
                 return false;
+            }
+        }
+
+        public uint ParentID
+        {
+            get
+            {
+                uint parentID = 0;
+                ObjectGroup objectGroup = Part.ObjectGroup;
+                ObjectPart rootPart = objectGroup.RootPart;
+
+                if (rootPart != Part)
+                {
+                    parentID = rootPart.LocalID[SceneID];
+                }
+                else if (objectGroup.IsAttached)
+                {
+                    IAgent agent;
+                    SceneInterface scene = objectGroup.Scene;
+                    if (scene != null && scene.Agents.TryGetValue(Owner.ID, out agent))
+                    {
+                        parentID = agent.LocalID[SceneID];
+                    }
+                }
+
+                return parentID;
             }
         }
 

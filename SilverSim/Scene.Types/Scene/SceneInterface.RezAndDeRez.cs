@@ -213,7 +213,7 @@ namespace SilverSim.Scene.Types.Scene
             group.RezzingObjectID = UUID.Zero;
             Add(group);
             RezScriptsForObject(group);
-            return group.LocalID;
+            return group.LocalID[ID];
         }
 
         public abstract void RezScriptsForObject(ObjectGroup group);

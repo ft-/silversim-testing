@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
 using SilverSim.Types.Estate;
@@ -29,6 +30,11 @@ namespace SilverSim.Scene.Npc
 {
     public partial class NpcAgent
     {
+        public override void ScheduleUpdate(AgentUpdateInfo info, UUID fromSceneID)
+        {
+            /* ignored */
+        }
+
         public override void ScheduleUpdate(ObjectUpdateInfo info, UUID fromSceneID)
         {
             /* ignored */

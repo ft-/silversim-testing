@@ -38,6 +38,7 @@ using SilverSim.ServiceInterfaces.GridUser;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.IM;
 using SilverSim.ServiceInterfaces.Inventory;
+using SilverSim.ServiceInterfaces.MuteList;
 using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.ServiceInterfaces.UserAgents;
@@ -56,7 +57,6 @@ using SilverSim.Viewer.Messages.Alert;
 using SilverSim.Viewer.Messages.Avatar;
 using SilverSim.Viewer.Messages.Circuit;
 using SilverSim.Viewer.Messages.God;
-using SilverSim.Viewer.Messages.MuteList;
 using SilverSim.Viewer.Messages.Parcel;
 using SilverSim.Viewer.Messages.Script;
 using SilverSim.Viewer.Messages.User;
@@ -65,11 +65,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Threading;
-using SilverSim.ServiceInterfaces.MuteList;
 
 namespace SilverSim.Viewer.Core
 {
-    public partial class ViewerAgent : SilverSim.Scene.Agent.Agent
+    public partial class ViewerAgent : SilverSim.Scene.Agent.Agent, ILocalIDAccessor
     {
         private static readonly ILog m_Log = LogManager.GetLogger("VIEWER AGENT");
         private readonly SceneList m_Scenes;
@@ -126,14 +125,49 @@ namespace SilverSim.Viewer.Core
 
         public override void RemoveActiveTeleportService(IAgentTeleportServiceInterface service)
         {
-            lock(m_DataLock)
+            lock (m_DataLock)
             {
-                if(m_ActiveTeleportService == service)
+                if (m_ActiveTeleportService == service)
                 {
                     m_ActiveTeleportService = null;
                 }
             }
         }
+
+        public override AgentUpdateInfo GetUpdateInfo(UUID sceneID)
+        {
+            AgentCircuit circuit;
+            return Circuits.TryGetValue(sceneID, out circuit) ? circuit.UpdateInfo : null;
+        }
+
+        public override void SendKillObject(UUID sceneID)
+        {
+            AgentCircuit circuit;
+            if (Circuits.TryGetValue(sceneID, out circuit))
+            {
+                circuit.SendKillObject();
+            }
+        }
+
+        public override ILocalIDAccessor LocalID => this;
+
+        uint ILocalIDAccessor.this[UUID sceneID]
+        {
+            get
+            {
+                AgentCircuit circuit;
+                return Circuits.TryGetValue(sceneID, out circuit) ? circuit.UpdateInfo.LocalID : 0;
+            }
+            set
+            {
+                AgentCircuit circuit;
+                if(Circuits.TryGetValue(sceneID, out circuit))
+                {
+                    circuit.UpdateInfo.LocalID = value;
+                }
+            }
+        }
+
 
         #region ViewerAgent Properties
         public UUID SessionID { get; }
@@ -983,14 +1017,14 @@ namespace SilverSim.Viewer.Core
         #region Enable Simulator call for Teleport handling
         public override void EnableSimulator(UUID originSceneID, uint circuitCode, string capsURI, DestinationInfo destinationInfo)
         {
-            var ensim = new EnableSimulator()
+            var ensim = new EnableSimulator
             {
                 RegionSize = destinationInfo.Size,
                 SimIP = ((IPEndPoint)destinationInfo.SimIP).Address,
                 SimPort = (ushort)destinationInfo.ServerPort,
                 GridPosition = destinationInfo.Location
             };
-            var estagent = new EstablishAgentCommunication()
+            var estagent = new EstablishAgentCommunication
             {
                 AgentID = ID,
                 GridPosition = destinationInfo.Location,
@@ -1015,6 +1049,15 @@ namespace SilverSim.Viewer.Core
         {
             AgentCircuit circuit;
             if(Circuits.TryGetValue(fromSceneID, out circuit))
+            {
+                circuit.ScheduleUpdate(info);
+            }
+        }
+
+        public override void ScheduleUpdate(AgentUpdateInfo info, UUID fromSceneID)
+        {
+            AgentCircuit circuit;
+            if (Circuits.TryGetValue(fromSceneID, out circuit))
             {
                 circuit.ScheduleUpdate(info);
             }

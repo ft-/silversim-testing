@@ -452,7 +452,7 @@ namespace SilverSim.Scene.Implementation.Basic
                     foreach (ObjectPart objpart in objgroup.Values)
                     {
                         AddNewLocalID(objpart);
-                        m_Primitives.Add(objpart.ID, objpart.LocalID, objpart);
+                        m_Primitives.Add(objpart.ID, objpart.LocalID[ID], objpart);
                         removeAgain.Add(objpart);
                     }
                     m_Objects.Add(objgroup.ID, objgroup);
@@ -586,14 +586,14 @@ namespace SilverSim.Scene.Implementation.Basic
                 {
                     Interlocked.Decrement(ref m_AgentCount);
                 }
-                SendKillObjectToAgents(agent.LocalID);
+                agent.SendKillObject(ID);
                 RemoveLocalID(agent);
                 Interlocked.Decrement(ref m_AgentCount);
             }
             else
             {
+                agent.SendKillObject(ID);
                 m_Objects.Remove(obj.ID);
-                SendKillObjectToAgents(obj.LocalID);
                 RemoveLocalID(obj);
             }
 

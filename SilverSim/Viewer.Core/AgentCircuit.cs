@@ -772,6 +772,14 @@ namespace SilverSim.Viewer.Core
         }
         #endregion
 
+        public AgentUpdateInfo UpdateInfo { get; }
+
+        public void SendKillObject()
+        {
+            UpdateInfo.KillObject();
+            Scene.ScheduleUpdate(UpdateInfo);
+        }
+
         public AgentCircuit(
             CommandRegistry commands,
             ViewerAgent agent,
@@ -794,6 +802,7 @@ namespace SilverSim.Viewer.Core
             GatekeeperURI = gatekeeperURI;
 
             Scene = server.Scene;
+            UpdateInfo = new AgentUpdateInfo(Agent, Scene.ID);
 
             m_MessageRouting.Add(MessageType.CopyInventoryItem, m_InventoryRequestQueue.Enqueue);
             m_MessageRouting.Add(MessageType.ChangeInventoryItemFlags, m_InventoryRequestQueue.Enqueue);

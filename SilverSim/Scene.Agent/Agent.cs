@@ -71,7 +71,7 @@ namespace SilverSim.Scene.Agent
 
         #region Properties
         public Uri HomeURI { get; }
-        public UInt32 LocalID { get; set; }
+        public abstract ILocalIDAccessor LocalID { get; }
         #endregion
 
         private UUID m_TracksAgentID;
@@ -143,6 +143,10 @@ namespace SilverSim.Scene.Agent
             get { return 0; }
             set { /* setting intentionally ignored */ }
         }
+
+        public abstract AgentUpdateInfo GetUpdateInfo(UUID sceneID);
+
+        public abstract void SendKillObject(UUID sceneID);
 
         protected Agent(UUID agentId, Uri homeURI)
         {
@@ -1096,6 +1100,7 @@ namespace SilverSim.Scene.Agent
         public abstract bool TeleportHome(SceneInterface sceneInterface);
         public abstract void KickUser(string msg);
         public abstract void KickUser(string msg, Action<bool> callbackDelegate);
+        public abstract void ScheduleUpdate(AgentUpdateInfo info, UUID fromSceneID);
         public abstract void ScheduleUpdate(ObjectUpdateInfo info, UUID fromSceneID);
         public void ScheduleUpdate(ObjectInventoryUpdateInfo info, UUID fromSceneID)
         {

@@ -40,7 +40,7 @@ using System.Xml;
 
 namespace SilverSim.Scene.Types.Object
 {
-    public partial class ObjectPart : IPhysicalObject
+    public partial class ObjectPart : IPhysicalObject, ILocalIDAccessor
     {
         private static readonly ILog m_Log = LogManager.GetLogger("OBJECT PART");
 
@@ -52,7 +52,7 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         private UInt32 m_LocalID;
-        public UInt32 LocalID
+        UInt32 ILocalIDAccessor.this[UUID sceneID]
         {
             get { return m_LocalID; }
 
@@ -72,6 +72,8 @@ namespace SilverSim.Scene.Types.Object
                 UpdateData(UpdateDataFlags.All, incSerial);
             }
         }
+
+        public ILocalIDAccessor LocalID => this;
 
         private UUID m_ID = UUID.Zero;
         private string m_Name = string.Empty;
@@ -1973,7 +1975,7 @@ namespace SilverSim.Scene.Types.Object
                 int pos = 0;
                 var data = new byte[44];
                 {
-                    byte[] b = BitConverter.GetBytes(LocalID);
+                    byte[] b = BitConverter.GetBytes(LocalID[ID]);
                     if (!BitConverter.IsLittleEndian)
                     {
                         Array.Reverse(b);
@@ -2057,7 +2059,7 @@ namespace SilverSim.Scene.Types.Object
                     Inventory.ToXml(writer, nextOwner, options);
 
                     writer.WriteUUID("UUID", ID);
-                    writer.WriteNamedValue("LocalId", LocalID);
+                    writer.WriteNamedValue("LocalId", 0);
                     writer.WriteNamedValue("Name", Name);
                     writer.WriteNamedValue("Material", (int)Material);
                     writer.WriteNamedValue("IsRotateXEnabled", ObjectGroup.IsRotateXEnabled);
@@ -3182,7 +3184,8 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "LocalId":
-                                part.LocalID = reader.ReadElementValueAsUInt();
+                                /* unnecessary to use the LocalId */
+                                reader.ReadToEndElement();
                                 break;
 
                             case "Name":

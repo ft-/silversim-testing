@@ -26,16 +26,27 @@ using System;
 
 namespace SilverSim.Scene.Types.Agent
 {
-    public sealed class AgentUpdateInfo : Object.IUpdateInfo
+    public sealed class AgentUpdateInfo : IObjUpdateInfo
     {
         private bool m_Killed;
-        public uint LocalID;
+        public uint LocalID { get; set; }
         public IAgent Agent { get; }
         public UUID ID { get; internal set; }
+        public UUID SceneID { get; set; }
+
+        public bool IsAlwaysFull => true;
+
+        public UUI Owner => Agent.Owner;
 
         private readonly byte[] m_UpdateDataBlock;
 
-        private enum FullFixedBlock1Offset
+        public bool IsAttached => false;
+
+        public bool IsAttachedToPrivate => false;
+
+        public int SerialNumber { get; }
+
+        public enum FullFixedBlock1Offset
         {
             LocalID = 0,
             State = LocalID + 4,
@@ -99,14 +110,16 @@ namespace SilverSim.Scene.Types.Agent
             BlockLength = JointAxisOrAnchor + 12
         }
 
-        public AgentUpdateInfo(IAgent agent)
+        public AgentUpdateInfo(IAgent agent, UUID sceneID)
         {
             Agent = agent;
+            SceneID = sceneID;
             ID = agent.ID;
-            LocalID = agent.LocalID;
 
             m_UpdateDataBlock = GeneratePreprocessedUpdateBlock(agent);
         }
+
+        public uint ParentID => Agent.SittingOnObject?.LocalID[SceneID] ?? 0;
 
         private static byte[] GeneratePreprocessedUpdateBlock(IAgent agent)
         {
@@ -167,6 +180,10 @@ namespace SilverSim.Scene.Types.Agent
             }
         }
 
+        public byte[] TerseUpdate => null;
+
+        public byte[] PropertiesUpdate => null;
+
         public byte[] FullUpdate
         {
             get
@@ -194,7 +211,7 @@ namespace SilverSim.Scene.Types.Agent
                     }
                     else
                     {
-                        parentID = sittingobj.LocalID;
+                        parentID = sittingobj.LocalID[SceneID];
                     }
                     newUpdateDataBlock[(int)FullFixedBlock1Offset.ParentID] = (byte)(parentID & 0xFF);
                     newUpdateDataBlock[(int)FullFixedBlock1Offset.ParentID + 1] = (byte)((parentID >> 8) & 0xFF);

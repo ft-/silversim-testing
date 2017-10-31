@@ -90,10 +90,15 @@ namespace SilverSim.Viewer.Core
         }
         #endregion
 
-        private readonly BlockingQueue<ObjectUpdateInfo> m_TxObjectQueue = new BlockingQueue<ObjectUpdateInfo>();
+        private readonly BlockingQueue<IObjUpdateInfo> m_TxObjectQueue = new BlockingQueue<IObjUpdateInfo>();
         private bool m_TriggerFirstUpdate;
 
         public void ScheduleUpdate(ObjectUpdateInfo info)
+        {
+            m_TxObjectQueue.Enqueue(info);
+        }
+
+        public void ScheduleUpdate(AgentUpdateInfo info)
         {
             m_TxObjectQueue.Enqueue(info);
         }
@@ -148,7 +153,7 @@ namespace SilverSim.Viewer.Core
             return null;
         }
 
-        private void SendFullUpdateMsg(UDPPacket full_packet, List<KeyValuePair<ObjectUpdateInfo, byte[]>> full_packet_data)
+        private void SendFullUpdateMsg(UDPPacket full_packet, List<KeyValuePair<IObjUpdateInfo, byte[]>> full_packet_data)
         {
             UInt64 regionHandle;
             try
@@ -169,95 +174,131 @@ namespace SilverSim.Viewer.Core
             {
                 int offset = full_packet.DataPos;
                 full_packet.WriteBytes(kvp.Value);
-                var b = new byte[4];
-                Buffer.BlockCopy(full_packet.Data, offset + (int)ObjectPart.FullFixedBlock1Offset.UpdateFlags, b, 0, 4);
-                if(!BitConverter.IsLittleEndian)
-                {
-                    Array.Reverse(b);
-                }
-                var flags = (PrimitiveFlags)BitConverter.ToUInt32(b, 0);
 
-                if(SelectedObjects.Contains(kvp.Key.Part.ID))
+                if(kvp.Key.GetType() == typeof(AgentUpdateInfo))
                 {
-                    flags |= PrimitiveFlags.CreateSelected;
-                }
-                if(kvp.Key.Part.ObjectGroup.IsGroupOwned)
-                {
-                    flags |= PrimitiveFlags.ObjectGroupOwned;
-                }
-                if(0 != (kvp.Key.Part.ObjectGroup.VehicleFlags & SilverSim.Scene.Types.Physics.Vehicle.VehicleFlags.CameraDecoupled))
-                {
-                    flags |= PrimitiveFlags.CameraDecoupled;
-                }
-                if (kvp.Key.Part.Owner.EqualsGrid(Agent.Owner) && !kvp.Key.Part.ObjectGroup.IsGroupOwned)
-                {
-                    flags |= PrimitiveFlags.ObjectYouOwner;
-                    if ((kvp.Key.Part.OwnerMask & InventoryPermissionsMask.Move) != 0)
-                    {
-                        flags |= PrimitiveFlags.ObjectMove;
-                    }
-                    if ((kvp.Key.Part.OwnerMask & InventoryPermissionsMask.Transfer) != 0)
-                    {
-                        flags |= PrimitiveFlags.ObjectTransfer;
-                    }
-                    if ((kvp.Key.Part.OwnerMask & InventoryPermissionsMask.Modify) != 0)
-                    {
-                        flags |= PrimitiveFlags.ObjectModify | Types.Primitive.PrimitiveFlags.ObjectOwnerModify;
-                    }
-                    if ((kvp.Key.Part.OwnerMask & InventoryPermissionsMask.Copy) != 0)
-                    {
-                        flags |= PrimitiveFlags.ObjectCopy;
-                    }
-                }
-                else
-                {
-                    flags &= ~PrimitiveFlags.ObjectYouOwner;
-                    if ((kvp.Key.Part.EveryoneMask & InventoryPermissionsMask.Move) != 0)
-                    {
-                        flags |= PrimitiveFlags.ObjectMove;
-                    }
-                    if ((kvp.Key.Part.EveryoneMask & InventoryPermissionsMask.Transfer) != 0)
-                    {
-                        flags |= PrimitiveFlags.ObjectTransfer;
-                    }
-                    if ((kvp.Key.Part.EveryoneMask & InventoryPermissionsMask.Modify) != 0)
-                    {
-                        flags |= PrimitiveFlags.ObjectModify;
-                    }
-                    if ((kvp.Key.Part.EveryoneMask & InventoryPermissionsMask.Copy) != 0)
-                    {
-                        flags |= PrimitiveFlags.ObjectCopy;
-                    }
+                    var aui = kvp.Key as AgentUpdateInfo;
+                    uint parentID = aui.ParentID;
+                    uint localID = aui.LocalID;
 
-                    if(Agent.Group.Equals(kvp.Key.Part.Group))
+                    full_packet.Data[offset + (int)AgentUpdateInfo.FullFixedBlock1Offset.LocalID] = (byte)(localID & 0xFF);
+                    full_packet.Data[offset + (int)AgentUpdateInfo.FullFixedBlock1Offset.LocalID + 1] = (byte)((localID >> 8) & 0xFF);
+                    full_packet.Data[offset + (int)AgentUpdateInfo.FullFixedBlock1Offset.LocalID + 2] = (byte)((localID >> 16) & 0xFF);
+                    full_packet.Data[offset + (int)AgentUpdateInfo.FullFixedBlock1Offset.LocalID + 3] = (byte)((localID >> 24) & 0xFF);
+
+                    full_packet.Data[offset + (int)AgentUpdateInfo.FullFixedBlock1Offset.ParentID] = (byte)(parentID & 0xFF);
+                    full_packet.Data[offset + (int)AgentUpdateInfo.FullFixedBlock1Offset.ParentID + 1] = (byte)((parentID >> 8) & 0xFF);
+                    full_packet.Data[offset + (int)AgentUpdateInfo.FullFixedBlock1Offset.ParentID + 2] = (byte)((parentID >> 16) & 0xFF);
+                    full_packet.Data[offset + (int)AgentUpdateInfo.FullFixedBlock1Offset.ParentID + 3] = (byte)((parentID >> 24) & 0xFF);
+                }
+                else if (kvp.Key.GetType() == typeof(ObjectUpdateInfo))
+                {
+                    var oui = kvp.Key as ObjectUpdateInfo;
+                    ObjectPart part = oui.Part;
+
+                    uint parentID = oui.ParentID;
+                    uint localID = oui.LocalID;
+
+                    full_packet.Data[offset + (int)ObjectPart.FullFixedBlock1Offset.LocalID] = (byte)(localID & 0xFF);
+                    full_packet.Data[offset + (int)ObjectPart.FullFixedBlock1Offset.LocalID + 1] = (byte)((localID >> 8) & 0xFF);
+                    full_packet.Data[offset + (int)ObjectPart.FullFixedBlock1Offset.LocalID + 2] = (byte)((localID >> 16) & 0xFF);
+                    full_packet.Data[offset + (int)ObjectPart.FullFixedBlock1Offset.LocalID + 3] = (byte)((localID >> 24) & 0xFF);
+
+                    full_packet.Data[offset + (int)ObjectPart.FullFixedBlock1Offset.ParentID] = (byte)(parentID & 0xFF);
+                    full_packet.Data[offset + (int)ObjectPart.FullFixedBlock1Offset.ParentID + 1] = (byte)((parentID >> 8) & 0xFF);
+                    full_packet.Data[offset + (int)ObjectPart.FullFixedBlock1Offset.ParentID + 2] = (byte)((parentID >> 16) & 0xFF);
+                    full_packet.Data[offset + (int)ObjectPart.FullFixedBlock1Offset.ParentID + 3] = (byte)((parentID >> 24) & 0xFF);
+
+                    var b = new byte[4];
+                    Buffer.BlockCopy(full_packet.Data, offset + (int)ObjectPart.FullFixedBlock1Offset.UpdateFlags, b, 0, 4);
+                    if (!BitConverter.IsLittleEndian)
                     {
-                        if ((kvp.Key.Part.GroupMask & InventoryPermissionsMask.Move) != 0)
+                        Array.Reverse(b);
+                    }
+                    var flags = (PrimitiveFlags)BitConverter.ToUInt32(b, 0);
+
+                    if (SelectedObjects.Contains(kvp.Key.ID))
+                    {
+                        flags |= PrimitiveFlags.CreateSelected;
+                    }
+                    if (part.ObjectGroup.IsGroupOwned)
+                    {
+                        flags |= PrimitiveFlags.ObjectGroupOwned;
+                    }
+                    if (0 != (part.ObjectGroup.VehicleFlags & SilverSim.Scene.Types.Physics.Vehicle.VehicleFlags.CameraDecoupled))
+                    {
+                        flags |= PrimitiveFlags.CameraDecoupled;
+                    }
+                    if (part.Owner.EqualsGrid(Agent.Owner) && !part.ObjectGroup.IsGroupOwned)
+                    {
+                        flags |= PrimitiveFlags.ObjectYouOwner;
+                        if ((part.OwnerMask & InventoryPermissionsMask.Move) != 0)
                         {
                             flags |= PrimitiveFlags.ObjectMove;
                         }
-                        if ((kvp.Key.Part.GroupMask & InventoryPermissionsMask.Transfer) != 0)
+                        if ((part.OwnerMask & InventoryPermissionsMask.Transfer) != 0)
                         {
                             flags |= PrimitiveFlags.ObjectTransfer;
                         }
-                        if ((kvp.Key.Part.GroupMask & InventoryPermissionsMask.Modify) != 0)
+                        if ((part.OwnerMask & InventoryPermissionsMask.Modify) != 0)
                         {
-                            flags |= PrimitiveFlags.ObjectModify;
+                            flags |= PrimitiveFlags.ObjectModify | PrimitiveFlags.ObjectOwnerModify;
                         }
-                        if ((kvp.Key.Part.GroupMask & InventoryPermissionsMask.Copy) != 0)
+                        if ((part.OwnerMask & InventoryPermissionsMask.Copy) != 0)
                         {
                             flags |= PrimitiveFlags.ObjectCopy;
                         }
                     }
-                }
-                flags |= PrimitiveFlags.ObjectAnyOwner;
+                    else
+                    {
+                        flags &= ~PrimitiveFlags.ObjectYouOwner;
+                        if ((part.EveryoneMask & InventoryPermissionsMask.Move) != 0)
+                        {
+                            flags |= PrimitiveFlags.ObjectMove;
+                        }
+                        if ((part.EveryoneMask & InventoryPermissionsMask.Transfer) != 0)
+                        {
+                            flags |= PrimitiveFlags.ObjectTransfer;
+                        }
+                        if ((part.EveryoneMask & InventoryPermissionsMask.Modify) != 0)
+                        {
+                            flags |= PrimitiveFlags.ObjectModify;
+                        }
+                        if ((part.EveryoneMask & InventoryPermissionsMask.Copy) != 0)
+                        {
+                            flags |= PrimitiveFlags.ObjectCopy;
+                        }
 
-                b = BitConverter.GetBytes((UInt32)flags);
-                if (!BitConverter.IsLittleEndian)
-                {
-                    Array.Reverse(b);
-                }
+                        if (Agent.Group.Equals(part.Group))
+                        {
+                            if ((part.GroupMask & InventoryPermissionsMask.Move) != 0)
+                            {
+                                flags |= PrimitiveFlags.ObjectMove;
+                            }
+                            if ((part.GroupMask & InventoryPermissionsMask.Transfer) != 0)
+                            {
+                                flags |= PrimitiveFlags.ObjectTransfer;
+                            }
+                            if ((part.GroupMask & InventoryPermissionsMask.Modify) != 0)
+                            {
+                                flags |= PrimitiveFlags.ObjectModify;
+                            }
+                            if ((part.GroupMask & InventoryPermissionsMask.Copy) != 0)
+                            {
+                                flags |= PrimitiveFlags.ObjectCopy;
+                            }
+                        }
+                    }
+                    flags |= PrimitiveFlags.ObjectAnyOwner;
 
-                Buffer.BlockCopy(b, 0, full_packet.Data, offset + (int)ObjectPart.FullFixedBlock1Offset.UpdateFlags, 4);
+                    b = BitConverter.GetBytes((UInt32)flags);
+                    if (!BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(b);
+                    }
+
+                    Buffer.BlockCopy(b, 0, full_packet.Data, offset + (int)ObjectPart.FullFixedBlock1Offset.UpdateFlags, 4);
+                }
             }
 
             SendObjectUpdateMsg(full_packet);
@@ -268,16 +309,17 @@ namespace SilverSim.Viewer.Core
             UInt64 regionHandle;
             var LastObjSerialNo = new C5.TreeDictionary<uint, int>();
             var SendSelectedObjects = new C5.TreeSet<UUID>();
-            var queues = new Queue<ObjectUpdateInfo>[2];
-            var physicalOutQueue = new Queue<ObjectUpdateInfo>();
-            var nonPhysicalOutQueue = new Queue<ObjectUpdateInfo>();
+            var queues = new Queue<IObjUpdateInfo>[2];
+            var physicalOutQueue = new Queue<IObjUpdateInfo>();
+            var nonPhysicalOutQueue = new Queue<IObjUpdateInfo>();
             queues[0] = physicalOutQueue;
             queues[1] = nonPhysicalOutQueue;
             regionHandle = Scene.GridPosition.RegionHandle;
-            ObjectUpdateInfo objinfo;
+            IObjUpdateInfo objinfo;
 
             while (m_ObjectUpdateThreadRunning)
             {
+                objinfo = null;
                 if (!((physicalOutQueue.Count != 0 || nonPhysicalOutQueue.Count != 0) && m_AckThrottlingCount[(int)Message.QueueOutType.Object] < 100))
                 {
                     try
@@ -288,18 +330,31 @@ namespace SilverSim.Viewer.Core
                     {
                         continue;
                     }
+                }
+                else if(m_TxObjectQueue.Count > 0)
+                {
+                    objinfo = m_TxObjectQueue.Dequeue(0);
+                }
 
-                    if(!m_EnableObjectUpdates)
+                int qcount = m_TxObjectQueue.Count;
+                while (objinfo != null)
+                {
+                    /* better use a compare here than the "is" */
+                    if(objinfo.GetType() == typeof(AgentUpdateInfo))
+                    {
+                        /* agents pass */
+                    }
+                    else if (!m_EnableObjectUpdates)
                     {
                         continue;
                     }
                     try
                     {
-                        if (objinfo.Part.ObjectGroup.IsAttachedToPrivate && objinfo.Part.ObjectGroup.Owner != Agent.Owner)
+                        if (objinfo.IsAttachedToPrivate && objinfo.Owner != Agent.Owner)
                         {
                             /* do not signal private attachments to anyone else than the owner */
                         }
-                        else if (objinfo.IsPhysics && !objinfo.IsKilled && !objinfo.Part.ObjectGroup.IsAttached)
+                        else if (objinfo.IsPhysics && !objinfo.IsKilled && !objinfo.IsAttached)
                         {
                             physicalOutQueue.Enqueue(objinfo);
                         }
@@ -312,31 +367,8 @@ namespace SilverSim.Viewer.Core
                     {
                         /* ensure that no exception kills this thread unexpectedly */
                     }
-                }
 
-                int qcount = m_TxObjectQueue.Count;
-                while(qcount-- > 0)
-                {
-                    objinfo = m_TxObjectQueue.Dequeue(0);
-                    try
-                    {
-                        if (objinfo.Part.ObjectGroup.IsAttachedToPrivate && objinfo.Part.ObjectGroup.Owner != Agent.Owner)
-                        {
-                            /* do not signal private attachments to anyone else than the owner */
-                        }
-                        else if (objinfo.IsPhysics && !objinfo.IsKilled && !objinfo.Part.ObjectGroup.IsAttached)
-                        {
-                            physicalOutQueue.Enqueue(objinfo);
-                        }
-                        else
-                        {
-                            nonPhysicalOutQueue.Enqueue(objinfo);
-                        }
-                    }
-                    catch
-                    {
-                        /* ensure that no exception kills this thread unexpectedly */
-                    }
+                    objinfo = (qcount-- > 0) ? m_TxObjectQueue.Dequeue(0) : null;
                 }
 
                 if(m_TriggerFirstUpdate)
@@ -359,12 +391,12 @@ namespace SilverSim.Viewer.Core
 
                 UDPPacket phys_terse_packet = null;
                 byte phys_terse_packet_count = 0;
-                List<KeyValuePair<ObjectUpdateInfo, byte[]>> phys_full_packet_data = null;
+                List<KeyValuePair<IObjUpdateInfo, byte[]>> phys_full_packet_data = null;
                 int phys_full_packet_data_length = 0;
 
                 UDPPacket nonphys_terse_packet = null;
                 byte nonphys_terse_packet_count = 0;
-                List<KeyValuePair<ObjectUpdateInfo, byte[]>> nonphys_full_packet_data = null;
+                List<KeyValuePair<IObjUpdateInfo, byte[]>> nonphys_full_packet_data = null;
                 int nonphys_full_packet_data_length = 0;
 
                 ObjectPropertiesTriggerMessage full_packet_objprop = null;
@@ -379,7 +411,7 @@ namespace SilverSim.Viewer.Core
                     for (queueidx = 0; queueidx < queues.Length; ++queueidx)
                     {
                         var q = queues[queueidx];
-                        ObjectUpdateInfo ui;
+                        IObjUpdateInfo ui;
                         if (q.Count == 0)
                         {
                             continue;
@@ -411,7 +443,7 @@ namespace SilverSim.Viewer.Core
                         else
                         {
                             var dofull = false;
-                            if(LastObjSerialNo.Contains(ui.LocalID))
+                            if(!ui.IsAlwaysFull && LastObjSerialNo.Contains(ui.LocalID))
                             {
                                 int serialno = LastObjSerialNo[ui.LocalID];
                                 dofull = serialno != ui.SerialNumber;
@@ -421,21 +453,28 @@ namespace SilverSim.Viewer.Core
                                 dofull = true;
                             }
 
-                            var isSelected = SelectedObjects.Contains(ui.Part.ID);
-                            var wasSelected = SendSelectedObjects.Contains(ui.Part.ID);
-                            dofull |= (wasSelected && !isSelected) || (isSelected && !wasSelected);
-                            if(wasSelected && !isSelected)
+                            if (ui.PropertiesUpdate != null)
                             {
-                                SendSelectedObjects.Remove(ui.Part.ID);
-                            }
-                            else if(isSelected && !wasSelected)
-                            {
-                                SendSelectedObjects.Add(ui.Part.ID);
-                                if(full_packet_objprop == null)
+                                var oui = ui as ObjectUpdateInfo;
+                                if (oui != null)
                                 {
-                                    full_packet_objprop = new ObjectPropertiesTriggerMessage(this);
+                                    var isSelected = SelectedObjects.Contains(ui.ID);
+                                    var wasSelected = SendSelectedObjects.Contains(ui.ID);
+                                    dofull |= (wasSelected && !isSelected) || (isSelected && !wasSelected);
+                                    if (wasSelected && !isSelected)
+                                    {
+                                        SendSelectedObjects.Remove(ui.ID);
+                                    }
+                                    else if (isSelected && !wasSelected)
+                                    {
+                                        SendSelectedObjects.Add(ui.ID);
+                                        if (full_packet_objprop == null)
+                                        {
+                                            full_packet_objprop = new ObjectPropertiesTriggerMessage(this);
+                                        }
+                                        full_packet_objprop.ObjectParts.Add(oui.Part);
+                                    }
                                 }
-                                full_packet_objprop.ObjectParts.Add(ui.Part);
                             }
 
                             if (dofull)
@@ -462,11 +501,11 @@ namespace SilverSim.Viewer.Core
 
                                         if (phys_full_packet_data == null)
                                         {
-                                            phys_full_packet_data = new List<KeyValuePair<ObjectUpdateInfo, byte[]>>();
+                                            phys_full_packet_data = new List<KeyValuePair<IObjUpdateInfo, byte[]>>();
                                             phys_full_packet_data_length = 0;
                                         }
 
-                                        phys_full_packet_data.Add(new KeyValuePair<ObjectUpdateInfo, byte[]>(ui, fullUpdate));
+                                        phys_full_packet_data.Add(new KeyValuePair<IObjUpdateInfo, byte[]>(ui, fullUpdate));
                                         phys_full_packet_data_length += fullUpdate.Length;
                                     }
                                     else
@@ -489,12 +528,12 @@ send_nonphys_packet:
 
                                         if (nonphys_full_packet_data == null)
                                         {
-                                            nonphys_full_packet_data = new List<KeyValuePair<ObjectUpdateInfo, byte[]>>();
+                                            nonphys_full_packet_data = new List<KeyValuePair<IObjUpdateInfo, byte[]>>();
                                             nonphys_full_packet_data_length = 0;
                                         }
                                         else
                                         {
-                                            foreach (KeyValuePair<ObjectUpdateInfo, byte[]> kvp in nonphys_full_packet_data)
+                                            foreach (KeyValuePair<IObjUpdateInfo, byte[]> kvp in nonphys_full_packet_data)
                                             {
                                                 if(kvp.Key.LocalID == ui.LocalID)
                                                 {
@@ -504,7 +543,7 @@ send_nonphys_packet:
                                             }
                                         }
 
-                                        nonphys_full_packet_data.Add(new KeyValuePair<ObjectUpdateInfo, byte[]>(ui, fullUpdate));
+                                        nonphys_full_packet_data.Add(new KeyValuePair<IObjUpdateInfo, byte[]>(ui, fullUpdate));
                                         nonphys_full_packet_data_length += fullUpdate.Length;
                                     }
                                 }
@@ -515,6 +554,12 @@ send_nonphys_packet:
 
                                 if (terseUpdate != null)
                                 {
+                                    uint localID = ui.LocalID;
+                                    terseUpdate[0] = (byte)(localID & 0xFF);
+                                    terseUpdate[1] = (byte)((localID >> 8) & 0xFF);
+                                    terseUpdate[2] = (byte)((localID >> 16) & 0xFF);
+                                    terseUpdate[3] = (byte)((localID >> 24) & 0xFF);
+
                                     if (ui.IsPhysics)
                                     {
                                         if (phys_terse_packet != null && terseUpdate.Length + phys_terse_packet.DataLength > 1400)
@@ -538,6 +583,7 @@ send_nonphys_packet:
                                             phys_terse_packet.WriteUInt16(65535); /* dilation */
                                             phys_terse_packet.WriteUInt8(0);
                                         }
+
                                         phys_terse_packet.WriteBytes(terseUpdate);
                                         ++phys_terse_packet_count;
                                     }

@@ -369,7 +369,7 @@ namespace SilverSim.Scripting.Common
                     {
                         try
                         {
-                            localId = tc.CurrentScriptInstance.Part.LocalID;
+                            localId = tc.CurrentScriptInstance.Part.LocalID[m_SceneID];
                             executionStart = Environment.TickCount - executionStart;
                             if (executionStart > 0)
                             {

@@ -63,13 +63,13 @@ namespace SilverSim.Scene.Types.Agent
             return grp != null;
         }
 
-        public bool TryGetValueByLocalID(uint localid, out ObjectGroup grp)
+        public bool TryGetValueByLocalID(UUID sceneID, uint localid, out ObjectGroup grp)
         {
             grp = m_AttachmentsRwLock.AcquireReaderLock(() =>
             {
                 foreach (ObjectGroup igrp in m_AllAttachments.Values)
                 {
-                    if (igrp.LocalID == localid)
+                    if (igrp.LocalID[sceneID] == localid)
                     {
                         return igrp;
                     }

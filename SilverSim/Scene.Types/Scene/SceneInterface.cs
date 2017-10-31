@@ -611,7 +611,7 @@ namespace SilverSim.Scene.Types.Scene
                 {
                     UInt32 localID = NextLocalID;
                     m_LocalIDs.Add(localID, v);
-                    v.LocalID = localID;
+                    v.LocalID[ID] = localID;
                     break;
                 }
                 catch
@@ -623,7 +623,7 @@ namespace SilverSim.Scene.Types.Scene
 
         protected void RemoveLocalID(IObject v)
         {
-            m_LocalIDs.Remove(v.LocalID);
+            m_LocalIDs.Remove(v.LocalID[ID]);
         }
 
         private Date m_ActiveStatsLastUpdated = Date.Now;

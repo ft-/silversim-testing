@@ -97,11 +97,16 @@ namespace SilverSim.Scene.Types.Object
         public Vector3 Size;
     }
 
+    public interface ILocalIDAccessor
+    {
+        UInt32 this[UUID sceneID] { get; set; }
+    }
+
     public interface IObject
     {
         event Action<IObject> OnPositionChange;
 
-        UInt32 LocalID { get; set; }
+        ILocalIDAccessor LocalID { get; }
 
         #region Properties
         UUID ID

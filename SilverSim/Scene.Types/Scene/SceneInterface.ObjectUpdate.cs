@@ -19,14 +19,12 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.Viewer.Messages.Avatar;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
 using SilverSim.Types.Primitive;
-using System;
-using System.Collections.Generic;
 using SilverSim.Viewer.Messages;
+using SilverSim.Viewer.Messages.Avatar;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -44,6 +42,14 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
+        public void ScheduleUpdate(AgentUpdateInfo agentinfo)
+        {
+            foreach(IAgent a in Agents)
+            {
+                a.ScheduleUpdate(agentinfo, ID);
+            }
+        }
+
         public void ScheduleUpdate(ObjectInventoryUpdateInfo objinfo)
         {
             foreach (IAgent a in Agents)
@@ -56,81 +62,25 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        private Message AgentToObjectUpdate(IAgent agent)
-        {
-            Viewer.Messages.Object.UnreliableObjectUpdate m;
-            var sittingOn = agent.SittingOnObject;
-            if (sittingOn != null)
-            {
-                m = new Viewer.Messages.Object.ObjectUpdate();
-            }
-            else
-            {
-                m = new Viewer.Messages.Object.UnreliableObjectUpdate();
-            }
-            var d = new Viewer.Messages.Object.UnreliableObjectUpdate.ObjData
-            {
-                Data = new byte[0],
-                ExtraParams = new byte[1],
-                FullID = agent.ID,
-                LocalID = agent.LocalID,
-                Material = PrimitiveMaterial.Flesh,
-                MediaURL = string.Empty,
-                NameValue = string.Format("FirstName STRING RW SV {0}\nLastName STRING RW SV {1}\nTitle STRING RW SV {2}", agent.FirstName, agent.LastName, string.Empty),
-                ObjectData = new byte[76],
-                PathCurve = 16,
-                PathScaleX = 100,
-                PathScaleY = 100,
-                PCode = PrimitiveCode.Avatar,
-                ProfileCurve = 1,
-                PSBlock = new byte[0],
-                Scale = new Vector3(0.45f, 0.6f, 1.9f),
-                Text = string.Empty,
-                TextColor = new ColorAlpha(0, 0, 0, 0),
-                TextureAnim = new byte[0],
-                TextureEntry = new byte[0],
-                UpdateFlags = PrimitiveFlags.Physics | PrimitiveFlags.ObjectModify | PrimitiveFlags.ObjectCopy | PrimitiveFlags.ObjectAnyOwner |
-                            PrimitiveFlags.ObjectYouOwner | PrimitiveFlags.ObjectMove | PrimitiveFlags.InventoryEmpty | PrimitiveFlags.ObjectTransfer |
-                            PrimitiveFlags.ObjectOwnerModify
-            };
-            agent.CollisionPlane.ToBytes(d.ObjectData, 0);
-            agent.Position.ToBytes(d.ObjectData, 16);
-            agent.Velocity.ToBytes(d.ObjectData, 28);
-            agent.Acceleration.ToBytes(d.ObjectData, 40);
-            Vector3.Zero.ToBytes(d.ObjectData, 64); /* set to zero as per SL ObjectUpdate definition for the 76 byte format */
-            Quaternion rot = agent.Rotation;
-            IObject sittingobj = agent.SittingOnObject;
-            if(sittingobj == null)
-            {
-                rot.X = 0;
-                rot.Y = 0;
-                rot.NormalizeSelf();
-                d.ParentID = 0;
-            }
-            else
-            {
-                d.ParentID = sittingobj.LocalID;
-            }
-            rot.ToBytes(d.ObjectData, 52);
-
-            m.ObjectData.Add(d);
-            m.GridPosition = GridPosition;
-            return m;
-        }
-
         public void SendAgentObjectToAgent(IAgent agent, IAgent targetAgent)
         {
-            var m = AgentToObjectUpdate(agent);
-            targetAgent.SendMessageAlways(m, ID);
-            targetAgent.SendMessageAlways(agent.GetAvatarAppearanceMsg(), ID);
+            AgentUpdateInfo aui = agent.GetUpdateInfo(ID);
+            if (aui != null)
+            {
+                targetAgent.ScheduleUpdate(aui, ID);
+                targetAgent.SendMessageAlways(agent.GetAvatarAppearanceMsg(), ID);
+            }
         }
 
         public void SendAgentObjectToAllAgents(IAgent agent)
         {
-            var m = AgentToObjectUpdate(agent);
-            foreach (IAgent a in Agents)
+            AgentUpdateInfo aui = agent.GetUpdateInfo(ID);
+            if (aui != null)
             {
-                a.SendMessageAlways(m, ID);
+                foreach (IAgent a in Agents)
+                {
+                    a.ScheduleUpdate(aui, ID);
+                }
             }
         }
 
@@ -158,6 +108,7 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
+        /*
         public void SendKillObjectToAgents(List<UInt32> localids)
         {
             var m = new Viewer.Messages.Object.KillObject();
@@ -179,5 +130,6 @@ namespace SilverSim.Scene.Types.Scene
                 a.SendMessageAlways(m, ID);
             }
         }
+        */
     }
 }

@@ -51,7 +51,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.Scene.Npc
 {
-    public partial class NpcAgent : Agent.Agent
+    public partial class NpcAgent : Agent.Agent, ILocalIDAccessor
     {
         private static readonly ILog m_Log = LogManager.GetLogger("NPC AGENT");
 
@@ -89,7 +89,7 @@ namespace SilverSim.Scene.Npc
 
         internal void DisableListen()
         {
-            if(m_ChatListener != null)
+            if (m_ChatListener != null)
             {
                 m_ChatListener.Remove();
                 m_ChatListener = null;
@@ -109,6 +109,7 @@ namespace SilverSim.Scene.Npc
             m_GridUserService = serviceList.Get<GridUserServiceInterface>();
             m_PresenceService = serviceList.Get<PresenceServiceInterface>();
             NpcPresenceService = serviceList.Get<NpcPresenceServiceInterface>();
+            m_UpdateInfo = new AgentUpdateInfo(this, UUID.Zero);
             OnAppearanceUpdate += HandleAppearanceUpdate;
         }
 
@@ -129,14 +130,14 @@ namespace SilverSim.Scene.Npc
         {
             get
             {
-                lock(m_DataLock)
+                lock (m_DataLock)
                 {
                     return new UUI(m_NpcOwner);
                 }
             }
             set
             {
-                lock(m_DataLock)
+                lock (m_DataLock)
                 {
                     m_NpcOwner = new UUI(value);
                 }
@@ -227,7 +228,7 @@ namespace SilverSim.Scene.Npc
         {
             get
             {
-                if(m_GridUserService == null)
+                if (m_GridUserService == null)
                 {
                     throw new NotSupportedException();
                 }
@@ -244,7 +245,7 @@ namespace SilverSim.Scene.Npc
         {
             get
             {
-                if(m_InventoryService == null)
+                if (m_InventoryService == null)
                 {
                     throw new NotSupportedException();
                 }
@@ -303,7 +304,7 @@ namespace SilverSim.Scene.Npc
         {
             get
             {
-                if(m_PresenceService == null)
+                if (m_PresenceService == null)
                 {
                     throw new NotSupportedException();
                 }
@@ -315,7 +316,7 @@ namespace SilverSim.Scene.Npc
         {
             get
             {
-                if(m_ProfileService == null)
+                if (m_ProfileService == null)
                 {
                     throw new NotSupportedException();
                 }
@@ -332,6 +333,36 @@ namespace SilverSim.Scene.Npc
 
         public override List<GridType> SupportedGridTypes => new List<GridType>();
         public override RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>> TransmittedTerrainSerials { get; } = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>>(() => new RwLockedDictionary<uint, uint>());
+
+        private readonly AgentUpdateInfo m_UpdateInfo;
+
+        uint ILocalIDAccessor.this[UUID sceneID]
+        {
+            get
+            {
+                return sceneID == SceneID ? m_UpdateInfo.LocalID : 0;
+            }
+            set
+            {
+                if(sceneID == SceneID)
+                {
+                    m_UpdateInfo.LocalID = value;
+                }
+            }
+        }
+
+        public override ILocalIDAccessor LocalID => this;
+
+        public override AgentUpdateInfo GetUpdateInfo(UUID sceneID)
+        {
+            return (sceneID == SceneID) ? m_UpdateInfo : null;
+        }
+
+        public override void SendKillObject(UUID sceneID)
+        {
+            m_UpdateInfo.KillObject();
+            CurrentScene?.ScheduleUpdate(m_UpdateInfo);
+        }
 
         public override UserAccount UntrustedAccountInfo => new UserAccount
         {

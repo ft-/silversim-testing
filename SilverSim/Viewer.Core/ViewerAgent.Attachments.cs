@@ -105,7 +105,7 @@ namespace SilverSim.Viewer.Core
                 foreach (var localid in req.ObjectList)
                 {
                     ObjectGroup grp;
-                    if(Attachments.TryGetValueByLocalID(localid, out grp))
+                    if(Attachments.TryGetValueByLocalID(req.CircuitSceneID, localid, out grp))
                     {
                         detachList.Add(new DetachEntry(grp.FromItemID, req.CircuitSceneID, grp.ID));
                     }

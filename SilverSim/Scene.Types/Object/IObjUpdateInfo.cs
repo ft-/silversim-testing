@@ -20,12 +20,35 @@
 // exception statement from your version.
 
 using SilverSim.Types;
-using SilverSim.Types.Primitive;
-using System;
 
 namespace SilverSim.Scene.Types.Object
 {
-    public interface IUpdateInfo
+    public interface IObjUpdateInfo : IUpdateInfo
     {
+        uint LocalID { get; }
+
+        uint ParentID { get; }
+
+        UUID ID { get; }
+
+        UUI Owner { get; }
+
+        bool IsAlwaysFull { get; }
+
+        bool IsKilled { get; }
+
+        bool IsAttached { get; }
+
+        bool IsAttachedToPrivate { get; }
+
+        bool IsPhysics { get; }
+
+        byte[] FullUpdate { get; }
+
+        byte[] TerseUpdate { get; }
+
+        byte[] PropertiesUpdate { get; }
+
+        int SerialNumber { get; }
     }
 }
