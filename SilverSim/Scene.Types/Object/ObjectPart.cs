@@ -111,7 +111,10 @@ namespace SilverSim.Scene.Types.Object
 
         public int ScriptAccessPin;
 
-        public int LoadedLinkNumber; /* not authoritative, just for loading from XML */
+        /** <summary>not authoritative, just for loading from XML</summary> */
+        public int LoadedLocalID;
+        /** <summary>not authoritative, just for loading from XML</summary> */
+        public int LoadedLinkNumber;
 
         private PathfindingType m_PathfindingType;
 
@@ -3185,7 +3188,7 @@ namespace SilverSim.Scene.Types.Object
 
                             case "LocalId":
                                 /* unnecessary to use the LocalId */
-                                reader.ReadToEndElement();
+                                part.LoadedLocalID = reader.ReadElementValueAsInt();
                                 break;
 
                             case "Name":
