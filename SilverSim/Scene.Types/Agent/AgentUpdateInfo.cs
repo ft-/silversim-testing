@@ -128,6 +128,7 @@ namespace SilverSim.Scene.Types.Agent
             byte[] nameblock = string.Format("FirstName STRING RW SV {0}\nLastName STRING RW SV {1}\nTitle STRING RW SV {2}\0", agent.FirstName, agent.LastName, string.Empty).ToUTF8Bytes();
             newupdateblock = new byte[nameblock.Length + (int)FullFixedBlock1Offset.BlockLength + (int)FullFixedBlock2Offset.BlockLength];
             Array.Clear(newupdateblock, 0, newupdateblock.Length);
+            newupdateblock[(int)FullFixedBlock1Offset.ObjectDataLength] = 76;
             newupdateblock[(int)FullFixedBlock1Offset.Material] = (byte)PrimitiveMaterial.Flesh;
             newupdateblock[(int)FullFixedBlock1Offset.PathCurve] = 16;
             newupdateblock[(int)FullFixedBlock1Offset.PathScaleX] = 100;
