@@ -2059,7 +2059,7 @@ namespace SilverSim.Scene.Types.Object
                     Inventory.ToXml(writer, nextOwner, options);
 
                     writer.WriteUUID("UUID", ID);
-                    writer.WriteNamedValue("LocalId", 0);
+                    writer.WriteNamedValue("LocalId", LocalID[ObjectGroup?.Scene?.ID ?? UUID.Zero]);
                     writer.WriteNamedValue("Name", Name);
                     writer.WriteNamedValue("Material", (int)Material);
                     writer.WriteNamedValue("IsRotateXEnabled", ObjectGroup.IsRotateXEnabled);
