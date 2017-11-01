@@ -161,9 +161,13 @@ namespace SilverSim.Viewer.Core
             set
             {
                 AgentCircuit circuit;
-                if(Circuits.TryGetValue(sceneID, out circuit))
+                if (Circuits.TryGetValue(sceneID, out circuit))
                 {
                     circuit.UpdateInfo.LocalID = value;
+                }
+                else
+                {
+                    m_Log.DebugFormat("Setting LocalID on agent {0} for region {1} has no circuit", ID, sceneID);
                 }
             }
         }
