@@ -126,8 +126,9 @@ namespace SilverSim.Scene.Types.Agent
             byte[] newupdateblock;
             /* last element is group title */
             byte[] nameblock = string.Format("FirstName STRING RW SV {0}\nLastName STRING RW SV {1}\nTitle STRING RW SV {2}\0", agent.FirstName, agent.LastName, string.Empty).ToUTF8Bytes();
-            newupdateblock = new byte[nameblock.Length + (int)FullFixedBlock1Offset.BlockLength + (int)FullFixedBlock2Offset.BlockLength];
+            newupdateblock = new byte[nameblock.Length + 2 + (int)FullFixedBlock1Offset.BlockLength + (int)FullFixedBlock2Offset.BlockLength];
             Array.Clear(newupdateblock, 0, newupdateblock.Length);
+            agent.ID.ToBytes(newupdateblock, (int)FullFixedBlock1Offset.FullID);
             newupdateblock[(int)FullFixedBlock1Offset.ObjectDataLength] = 76;
             newupdateblock[(int)FullFixedBlock1Offset.Material] = (byte)PrimitiveMaterial.Flesh;
             newupdateblock[(int)FullFixedBlock1Offset.PathCurve] = 16;
@@ -145,6 +146,11 @@ namespace SilverSim.Scene.Types.Agent
             newupdateblock[(int)FullFixedBlock1Offset.UpdateFlags + 3] = (byte)(((uint)primUpdateFlags >> 24) & 0xFF);
 
             var offset = (int)FullFixedBlock1Offset.BlockLength;
+
+            newupdateblock[offset] = (byte)(nameblock.Length & 0xFF);
+            ++offset;
+            newupdateblock[offset] = (byte)((nameblock.Length >> 8) & 0xFF);
+            ++offset;
 
             Buffer.BlockCopy(nameblock, 0, newupdateblock, offset, nameblock.Length);
             offset += nameblock.Length;
