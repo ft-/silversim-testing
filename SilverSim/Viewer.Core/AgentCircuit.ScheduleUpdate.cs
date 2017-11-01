@@ -164,7 +164,6 @@ namespace SilverSim.Viewer.Core
             {
                 return;
             }
-            full_packet.IsReliable = true;
             full_packet.WriteMessageNumber(MessageType.ObjectUpdate);
             full_packet.WriteUInt64(regionHandle);
             full_packet.WriteUInt16(65535); /* dilation */
@@ -485,7 +484,9 @@ namespace SilverSim.Viewer.Core
                                 {
                                     if (ui.IsPhysics)
                                     {
-                                        if (phys_full_packet_data != null && fullUpdate.Length + phys_full_packet_data_length > 1400)
+                                        bool foundobject = false;
+                                        send_phys_packet:
+                                        if (phys_full_packet_data != null && (fullUpdate.Length + phys_full_packet_data_length > 1400 || foundobject))
                                         {
                                             var full_packet = GetTxObjectPoolPacket();
                                             if (full_packet == null)
@@ -503,6 +504,17 @@ namespace SilverSim.Viewer.Core
                                         {
                                             phys_full_packet_data = new List<KeyValuePair<IObjUpdateInfo, byte[]>>();
                                             phys_full_packet_data_length = 0;
+                                        }
+                                        else
+                                        {
+                                            foreach (KeyValuePair<IObjUpdateInfo, byte[]> kvp in phys_full_packet_data)
+                                            {
+                                                if (kvp.Key.LocalID == ui.LocalID)
+                                                {
+                                                    foundobject = true;
+                                                    goto send_phys_packet;
+                                                }
+                                            }
                                         }
 
                                         phys_full_packet_data.Add(new KeyValuePair<IObjUpdateInfo, byte[]>(ui, fullUpdate));
@@ -625,7 +637,7 @@ send_nonphys_packet:
                         {
                             break;
                         }
-                        full_packet.IsReliable = true;
+                        full_packet.IsReliable = false;
                         full_packet.AckMessage = full_packet_objprop;
                         SendFullUpdateMsg(full_packet, phys_full_packet_data);
                     }
