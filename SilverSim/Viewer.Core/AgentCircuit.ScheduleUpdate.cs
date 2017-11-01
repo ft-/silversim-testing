@@ -122,7 +122,6 @@ namespace SilverSim.Viewer.Core
             if (p.IsReliable)
             {
                 Interlocked.Increment(ref m_AckThrottlingCount[(int)Message.QueueOutType.Object]);
-                p.IsResent = true;
                 lock (m_UnackedPacketsHash)
                 {
                     m_UnackedPacketsHash.Add(p.SequenceNumber, p);

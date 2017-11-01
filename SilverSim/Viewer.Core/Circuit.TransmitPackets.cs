@@ -325,7 +325,7 @@ namespace SilverSim.Viewer.Core
                             {
                                 try
                                 {
-                                    var p = new UDPPacket()
+                                    var p = new UDPPacket
                                     {
                                         OutQueue = m.OutQueue,
                                         IsZeroEncoded = m.ZeroFlag || m.ForceZeroFlag
