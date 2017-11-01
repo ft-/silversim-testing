@@ -107,6 +107,7 @@ namespace SilverSim.Viewer.MuteList
 
             if(muteListService == null)
             {
+                circuit.SendMessage(new UseCachedMuteList() { AgentID = agent.ID });
                 return;
             }
 
