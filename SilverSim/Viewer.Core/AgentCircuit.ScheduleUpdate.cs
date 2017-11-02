@@ -304,6 +304,7 @@ namespace SilverSim.Viewer.Core
 
         private void HandleObjectUpdates()
         {
+            Thread.CurrentThread.Name = $"Agent:ObjectUpdateHandler:Agent={AgentID}:Scene={m_Scene.ID}";
             UInt64 regionHandle;
             var LastObjSerialNo = new C5.TreeDictionary<uint, int>();
             var SendSelectedObjects = new C5.TreeSet<UUID>();
@@ -487,7 +488,7 @@ namespace SilverSim.Viewer.Core
                                         send_phys_packet:
                                         if (phys_full_packet_data != null && (fullUpdate.Length + phys_full_packet_data_length > 1400 || foundobject))
                                         {
-                                            var full_packet = GetTxObjectPoolPacket();
+                                            var full_packet = new UDPPacket();
                                             if (full_packet == null)
                                             {
                                                 break;
@@ -583,7 +584,7 @@ send_nonphys_packet:
 
                                         if (phys_terse_packet == null)
                                         {
-                                            phys_terse_packet = GetTxObjectPoolPacket();
+                                            phys_terse_packet = new UDPPacket();
                                             if (phys_terse_packet == null)
                                             {
                                                 break;
@@ -631,7 +632,7 @@ send_nonphys_packet:
 
                     if (phys_full_packet_data != null && physicalOutQueue.Count == 0)
                     {
-                        var full_packet = GetTxObjectPoolPacket();
+                        var full_packet = new UDPPacket();
                         if (full_packet == null)
                         {
                             break;
