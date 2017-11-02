@@ -112,7 +112,7 @@ namespace SilverSim.Scene.Types.Object
         public int ScriptAccessPin;
 
         /** <summary>not authoritative, just for loading from XML</summary> */
-        public int LoadedLocalID;
+        public uint LoadedLocalID;
         /** <summary>not authoritative, just for loading from XML</summary> */
         public int LoadedLinkNumber;
 
@@ -3188,7 +3188,7 @@ namespace SilverSim.Scene.Types.Object
 
                             case "LocalId":
                                 /* unnecessary to use the LocalId */
-                                part.LoadedLocalID = reader.ReadElementValueAsInt();
+                                part.LoadedLocalID = reader.ReadElementValueAsUInt();
                                 break;
 
                             case "Name":
