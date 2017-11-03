@@ -343,13 +343,13 @@ namespace SilverSim.Viewer.Groups
                 List<GroupMembership> gmems = groupsService.Memberships[agent.Owner, agent.Owner];
                 if (group == null || gmems.Count(gmem => gmem.Group.ID == group.ID) != 0)
                 { /* still a lot work with that check but we are at least gentle with the viewer here */
-                    var update = new AgentGroupDataUpdate()
+                    var update = new AgentGroupDataUpdate
                     {
                         AgentID = agent.Owner.ID
                     };
                     foreach (var gmem in gmems)
                     {
-                        update.GroupData.Add(new AgentGroupDataUpdate.GroupDataEntry()
+                        update.GroupData.Add(new AgentGroupDataUpdate.GroupDataEntry
                         {
                             ListInProfile = gmem.IsListInProfile,
                             GroupID = gmem.Group.ID,
@@ -390,7 +390,7 @@ namespace SilverSim.Viewer.Groups
             if(groupsService == null ||
                 (GetGroupPowers(agent.Owner, groupsService, new UGI(req.GroupID)) & GroupPowers.ReceiveNotices) == 0)
             {
-                var reply = new GroupNoticesListReply()
+                var reply = new GroupNoticesListReply
                 {
                     AgentID = req.AgentID,
                     GroupID = req.GroupID
@@ -414,7 +414,7 @@ namespace SilverSim.Viewer.Groups
 
                 foreach(var notice in notices)
                 {
-                    var d = new GroupNoticesListReply.GroupNoticeData()
+                    var d = new GroupNoticesListReply.GroupNoticeData
                     {
                         NoticeID = notice.ID,
                         Timestamp = notice.Timestamp,
@@ -431,7 +431,7 @@ namespace SilverSim.Viewer.Groups
 
                     if(reply == null)
                     {
-                        reply = new GroupNoticesListReply()
+                        reply = new GroupNoticesListReply
                         {
                             AgentID = req.AgentID,
                             GroupID = req.GroupID
@@ -581,7 +581,7 @@ namespace SilverSim.Viewer.Groups
                 return;
             }
 
-            var reply = new JoinGroupReply()
+            var reply = new JoinGroupReply
             {
                 AgentID = req.AgentID,
                 GroupID = req.GroupID,
@@ -660,12 +660,12 @@ namespace SilverSim.Viewer.Groups
                 return;
             }
 
-            var dropGroup = new AgentDropGroup()
+            var dropGroup = new AgentDropGroup
             {
                 AgentID = req.AgentID,
                 GroupID = req.GroupID
             };
-            var reply = new LeaveGroupReply()
+            var reply = new LeaveGroupReply
             {
                 AgentID = req.AgentID,
                 GroupID = req.GroupID,
@@ -736,14 +736,14 @@ namespace SilverSim.Viewer.Groups
                 {
                     m_Log.Info("GroupProfileRequest", e);
                 }
-                gr = new GroupRole()
+                gr = new GroupRole
                 {
                     Title = "",
                     Powers = GroupPowers.None
                 };
             }
 
-            var reply = new GroupProfileReply()
+            var reply = new GroupProfileReply
             {
                 AgentID = req.AgentID,
                 GroupID = req.GroupID,
@@ -812,7 +812,7 @@ namespace SilverSim.Viewer.Groups
 
                     try
                     {
-                        var grm = new GroupRolemember()
+                        var grm = new GroupRolemember
                         {
                             Group = new UGI(req.GroupID),
                             Principal = principalUUI,
@@ -879,7 +879,7 @@ namespace SilverSim.Viewer.Groups
             int messageFill = 0;
             foreach(var role in rolemembers)
             {
-                var d = new GroupRoleDataReply.RoleDataEntry()
+                var d = new GroupRoleDataReply.RoleDataEntry
                 {
                     Name = role.Name,
                     Powers = role.Powers,
@@ -895,7 +895,7 @@ namespace SilverSim.Viewer.Groups
                 }
                 if(reply == null)
                 {
-                    reply = new GroupRoleDataReply()
+                    reply = new GroupRoleDataReply
                     {
                         AgentID = req.AgentID,
                         RequestID = req.RequestID,
@@ -944,7 +944,7 @@ namespace SilverSim.Viewer.Groups
             int messageFill = 0;
             foreach (var role in rolemembers)
             {
-                var d = new GroupRoleMembersReply.MemberDataEntry()
+                var d = new GroupRoleMembersReply.MemberDataEntry
                 {
                     MemberID = role.Principal.ID,
                     RoleID = role.RoleID
@@ -956,7 +956,7 @@ namespace SilverSim.Viewer.Groups
                 }
                 if (reply == null)
                 {
-                    reply = new GroupRoleMembersReply()
+                    reply = new GroupRoleMembersReply
                     {
                         AgentID = req.AgentID,
                         RequestID = req.RequestID,
@@ -1000,7 +1000,7 @@ namespace SilverSim.Viewer.Groups
                     case GroupRoleUpdate.RoleUpdateType.Create:
                         if((powers & GroupPowers.CreateRole) != 0)
                         {
-                            var info = new GroupRole()
+                            var info = new GroupRole
                             {
                                 Group = new UGI(req.GroupID),
                                 ID = UUID.Random,
@@ -1126,7 +1126,7 @@ namespace SilverSim.Viewer.Groups
                 grms = groupsService.Rolemembers[agent.Owner, agent.Owner];
                 foreach(var grm in grms)
                 {
-                    var d = new GroupTitlesReply.GroupDataEntry()
+                    var d = new GroupTitlesReply.GroupDataEntry
                     {
                         RoleID = grm.RoleID,
                         Selected = grm.RoleID == gam.SelectedRoleID,
@@ -1139,7 +1139,7 @@ namespace SilverSim.Viewer.Groups
                     }
                     if(reply == null)
                     {
-                        reply = new GroupTitlesReply()
+                        reply = new GroupTitlesReply
                         {
                             AgentID = req.AgentID,
                             GroupID = req.GroupID,
@@ -1157,7 +1157,7 @@ namespace SilverSim.Viewer.Groups
                 m_Log.Info("GroupTitlesRequest", e);
                 if (reply == null)
                 {
-                    reply = new GroupTitlesReply()
+                    reply = new GroupTitlesReply
                     {
                         AgentID = req.AgentID,
                         GroupID = req.GroupID
@@ -1437,7 +1437,7 @@ namespace SilverSim.Viewer.Groups
 
             foreach (var gmem in gmems)
             {
-                var d = new GroupMembersReply.MemberDataEntry()
+                var d = new GroupMembersReply.MemberDataEntry
                 {
                     AgentID = gmem.Principal.ID,
                     AgentPowers = GroupPowers.None,
@@ -1473,7 +1473,7 @@ namespace SilverSim.Viewer.Groups
 
                 if(reply == null)
                 {
-                    reply = new GroupMembersReply()
+                    reply = new GroupMembersReply
                     {
                         AgentID = req.AgentID,
                         GroupID = req.GroupID,

@@ -157,7 +157,7 @@ namespace SilverSim.Viewer.Economy
                 {
                     return;
                 }
-                var mbrep = new MoneyBalanceReply()
+                var mbrep = new MoneyBalanceReply
                 {
                     ForceZeroFlag = true, /* lots of NUL at the end of the message */
                     AgentID = mbr.AgentID,

@@ -567,7 +567,7 @@ namespace SilverSim.Types.Asset.Format
             notecard.AppendFormat("Text length {0}\n", TextData.Length);
             var NotecardHeader = notecard.ToString().ToUTF8Bytes();
 
-            var asset = new AssetData()
+            var asset = new AssetData
             {
                 Data = new byte[TextData.Length + NotecardHeader.Length + 2]
             };

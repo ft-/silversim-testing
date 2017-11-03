@@ -460,7 +460,7 @@ namespace SilverSim.Scene.Types.Scene
             List<ObjectPartInventoryItem> items = part.Inventory.Values;
             if(items.Count == 0)
             {
-                var res = new ReplyTaskInventoryNone()
+                var res = new ReplyTaskInventoryNone
                 {
                     Serial = (short)part.Inventory.InventorySerial,
                     TaskID = part.ID

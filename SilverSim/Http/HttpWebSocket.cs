@@ -241,7 +241,7 @@ namespace SilverSim.Http
 
                 if (opcode == OpCode.Binary)
                 {
-                    return new Message()
+                    return new Message
                     {
                         Data = payload,
                         Type = MessageType.Binary,
@@ -250,7 +250,7 @@ namespace SilverSim.Http
                 }
                 else if (opcode == OpCode.Text)
                 {
-                    return new Message()
+                    return new Message
                     {
                         Data = payload,
                         Type = MessageType.Text,

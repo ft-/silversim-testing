@@ -60,7 +60,7 @@ namespace SilverSim.Viewer.Core
 
         public override void TakeControls(ScriptInstance instance, int controls, int accept, int pass_on)
         {
-            this[instance] = new ScriptControlData()
+            this[instance] = new ScriptControlData
             {
                 Taken = accept != 0 ? (ControlFlags)controls : ControlFlags.None,
                 Ignored = pass_on != 0 ? (ControlFlags)controls : ControlFlags.None
@@ -276,7 +276,7 @@ namespace SilverSim.Viewer.Core
 
                 foreach(var kvp in copy)
                 {
-                    var ce = new ControlEvent()
+                    var ce = new ControlEvent
                     {
                         Level = (int)(m_ActiveAgentControlFlags & kvp.Value.Taken),
                         Flags = (int)(edge & kvp.Value.Taken)

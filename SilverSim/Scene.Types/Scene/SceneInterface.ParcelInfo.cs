@@ -713,7 +713,7 @@ namespace SilverSim.Scene.Types.Scene
             ParcelInfo pInfo;
             if (Parcels.TryGetValue(req.LocalID, out pInfo))
             {
-                var reply = new ParcelDwellReply()
+                var reply = new ParcelDwellReply
                 {
                     AgentID = req.AgentID,
                     LocalID = req.LocalID,

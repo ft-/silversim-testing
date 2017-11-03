@@ -56,7 +56,7 @@ namespace SilverSim.Main.Common
             {
                 if (scene.m_LoaderThread == null && !scene.IsSceneEnabled)
                 {
-                    var loadparams = new SceneLoadingParams()
+                    var loadparams = new SceneLoadingParams
                     {
                         Scenes = scenes,
                         Scene = scene,
@@ -76,7 +76,7 @@ namespace SilverSim.Main.Common
             {
                 if (scene.m_LoaderThread == null && !scene.IsSceneEnabled)
                 {
-                    var loadparams = new SceneLoadingParams()
+                    var loadparams = new SceneLoadingParams
                     {
                         Scenes = scenes,
                         Scene = scene,

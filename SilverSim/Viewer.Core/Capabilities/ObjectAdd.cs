@@ -103,7 +103,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 return;
             }
 
-            var m = new Messages.Object.ObjectAdd()
+            var m = new Messages.Object.ObjectAdd
             {
                 AgentID = m_Creator.ID
             };

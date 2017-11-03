@@ -54,7 +54,7 @@ namespace SilverSim.SelfSignCert
 
             var rawCert = builder.Sign(rsaKey);
 
-            var p12 = new PKCS12()
+            var p12 = new PKCS12
             {
                 Password = string.Empty
             };

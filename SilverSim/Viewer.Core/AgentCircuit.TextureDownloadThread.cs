@@ -138,7 +138,7 @@ namespace SilverSim.Viewer.Core
                             {
                                 m_Log.DebugFormat("Failed to download image {0} (RequestImage): {1} or {2}\nA: {3}\nB: {4}", imageRequest.ImageID, e1.Message, e2.Message, e1.StackTrace, e2.StackTrace);
                             }
-                            var failres = new ImageNotInDatabase()
+                            var failres = new ImageNotInDatabase
                             {
                                 ID = imageRequest.ImageID
                             };
@@ -170,7 +170,7 @@ namespace SilverSim.Viewer.Core
                             break;
 
                         default:
-                            var failres = new ImageNotInDatabase()
+                            var failres = new ImageNotInDatabase
                             {
                                 ID = imageRequest.ImageID
                             };
@@ -183,7 +183,7 @@ namespace SilverSim.Viewer.Core
                             continue;
                     }
 
-                    var res = new ImageData()
+                    var res = new ImageData
                     {
                         Codec = codec,
                         ID = imageRequest.ImageID,
@@ -201,7 +201,7 @@ namespace SilverSim.Viewer.Core
                         ushort packetno = 1;
                         while(offset < asset.Data.Length)
                         {
-                            var ip = new ImagePacket()
+                            var ip = new ImagePacket
                             {
                                 ID = imageRequest.ImageID,
                                 Packet = packetno++,

@@ -358,7 +358,7 @@ namespace SilverSim.Viewer.Friends
             {
                 return;
             }
-            var fi = new FriendInfo()
+            var fi = new FriendInfo
             {
                 User = thisAgent,
                 Friend = otherAgent,

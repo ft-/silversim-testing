@@ -176,7 +176,7 @@ namespace SilverSim.Scene.Types.Scene
                         newPosition.X <= kvp.Value.RemoteRegionData.Size.X + le.Distance &&
                         newPosition.Y <= kvp.Value.RemoteRegionData.Size.Y + le.Distance)
                     {
-                        kvp.Value.RemoteCircuit.SendMessage(new ChatPass()
+                        kvp.Value.RemoteCircuit.SendMessage(new ChatPass
                         {
                             ChatType = (ChatType)(byte)le.Type,
                             Name = le.Name,
@@ -238,7 +238,7 @@ namespace SilverSim.Scene.Types.Scene
             {
                 if(!Neighbors.ContainsKey(rinfo.ID))
                 {
-                    Neighbors[rinfo.ID] = new NeighborEntry()
+                    Neighbors[rinfo.ID] = new NeighborEntry
                     {
                         RemoteOffset = rinfo.Location - GridPosition,
                         RemoteRegionData = rinfo
@@ -266,7 +266,7 @@ namespace SilverSim.Scene.Types.Scene
                 /* neighbor supports UDP Inter-Sim connects */
                 var randomID = UUID.Random;
                 uint circuitID;
-                Neighbors[rinfo.ID] = new NeighborEntry()
+                Neighbors[rinfo.ID] = new NeighborEntry
                 {
                     RemoteOffset = rinfo.Location - GridPosition,
                     RemoteRegionData = rinfo

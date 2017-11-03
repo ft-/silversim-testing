@@ -385,7 +385,7 @@ namespace SilverSim.Viewer.Profile
             }
             catch
             {
-                reply = new AvatarClassifiedReply()
+                reply = new AvatarClassifiedReply
                 {
                     AgentID = m.AgentID,
                     TargetID = targetuuid
@@ -403,7 +403,7 @@ namespace SilverSim.Viewer.Profile
                 }
                 if (reply == null)
                 {
-                    reply = new AvatarClassifiedReply()
+                    reply = new AvatarClassifiedReply
                     {
                         AgentID = m.AgentID,
                         TargetID = targetuuid
@@ -411,7 +411,7 @@ namespace SilverSim.Viewer.Profile
                     messageFill = 0;
                 }
 
-                var d = new AvatarClassifiedReply.ClassifiedData()
+                var d = new AvatarClassifiedReply.ClassifiedData
                 {
                     ClassifiedID = classified.Key,
                     Name = classified.Value
@@ -456,7 +456,7 @@ namespace SilverSim.Viewer.Profile
             try
             {
                 ProfileClassified cls = serviceData.ProfileService.Classifieds[kvp.Key, req.ClassifiedID];
-                var reply = new ClassifiedInfoReply()
+                var reply = new ClassifiedInfoReply
                 {
                     AgentID = req.AgentID,
 
@@ -585,7 +585,7 @@ namespace SilverSim.Viewer.Profile
                 targetuui = new UUI(targetuuid);
             }
 
-            var reply = new AvatarNotesReply()
+            var reply = new AvatarNotesReply
             {
                 AgentID = m.AgentID,
                 TargetID = targetuui.ID
@@ -667,7 +667,7 @@ namespace SilverSim.Viewer.Profile
             }
             catch
             {
-                reply = new AvatarPicksReply()
+                reply = new AvatarPicksReply
                 {
                     AgentID = m.AgentID,
                     TargetID = targetuuid
@@ -685,7 +685,7 @@ namespace SilverSim.Viewer.Profile
                 }
                 if(reply == null)
                 {
-                    reply = new AvatarPicksReply()
+                    reply = new AvatarPicksReply
                     {
                         AgentID = m.AgentID,
                         TargetID = targetuuid
@@ -693,7 +693,7 @@ namespace SilverSim.Viewer.Profile
                     messageFill = 0;
                 }
 
-                var d = new AvatarPicksReply.PickData()
+                var d = new AvatarPicksReply.PickData
                 {
                     PickID = pick.Key,
                     Name = pick.Value
@@ -748,7 +748,7 @@ namespace SilverSim.Viewer.Profile
             try
             {
                 var pick = serviceData.ProfileService.Picks[uui, pickid];
-                var reply = new PickInfoReply()
+                var reply = new PickInfoReply
                 {
                     AgentID = m.AgentID,
                     CreatorID = pick.Creator.ID,
@@ -858,7 +858,7 @@ namespace SilverSim.Viewer.Profile
             }
             catch /* yes, we are catching a NullReferenceException here too */
             {
-                prefs = new ProfilePreferences()
+                prefs = new ProfilePreferences
                 {
                     IMviaEmail = false,
                     Visible = false,
@@ -866,7 +866,7 @@ namespace SilverSim.Viewer.Profile
                 };
             }
 
-            var reply = new UserInfoReply()
+            var reply = new UserInfoReply
             {
                 AgentID = req.AgentID,
                 DirectoryVisibility = (prefs.Visible) ?
@@ -892,7 +892,7 @@ namespace SilverSim.Viewer.Profile
                 return;
             }
 
-            var prefs = new ProfilePreferences()
+            var prefs = new ProfilePreferences
             {
                 User = agent.Owner,
                 IMviaEmail = req.IMViaEmail,
@@ -945,7 +945,7 @@ namespace SilverSim.Viewer.Profile
 #if DEBUG
                 m_Log.Debug("Exception at userinfo request", e);
 #endif
-                userInfo = new UserAgentServiceInterface.UserInfo()
+                userInfo = new UserAgentServiceInterface.UserInfo
                 {
                     FirstName = uui.FirstName,
                     LastName = uui.LastName,
@@ -967,7 +967,7 @@ namespace SilverSim.Viewer.Profile
 #if DEBUG
                 m_Log.Debug("Exception at properties request", e);
 #endif
-                props = new ProfileProperties()
+                props = new ProfileProperties
                 {
                     ImageID = "5748decc-f629-461c-9a36-a35a221fe21f",
                     FirstLifeImageID = "5748decc-f629-461c-9a36-a35a221fe21f",
@@ -982,7 +982,7 @@ namespace SilverSim.Viewer.Profile
                 };
             }
 
-            var res = new AvatarPropertiesReply()
+            var res = new AvatarPropertiesReply
             {
                 AgentID = req.AgentID,
                 AvatarID = req.AvatarID,
@@ -999,14 +999,14 @@ namespace SilverSim.Viewer.Profile
             };
             agent.SendMessageAlways(res, scene.ID);
 
-            var res2 = new AvatarInterestsReply()
+            var res2 = new AvatarInterestsReply
             {
                 AgentID = req.AgentID,
                 AvatarID = req.AvatarID
             };
             agent.SendMessageAlways(res2, scene.ID);
 
-            var res3 = new AvatarGroupsReply()
+            var res3 = new AvatarGroupsReply
             {
                 AgentID = req.AgentID,
                 AvatarID = req.AvatarID
@@ -1018,7 +1018,7 @@ namespace SilverSim.Viewer.Profile
                 {
                     foreach(var gmem in scene.GroupsService.Memberships[uui, uui])
                     {
-                        res3.GroupData.Add(new AvatarGroupsReply.GroupDataEntry()
+                        res3.GroupData.Add(new AvatarGroupsReply.GroupDataEntry
                         {
                             GroupPowers = gmem.GroupPowers,
                             AcceptNotices = gmem.IsAcceptNotices,
@@ -1057,7 +1057,7 @@ namespace SilverSim.Viewer.Profile
                 return;
             }
 
-            var props = new ProfileProperties()
+            var props = new ProfileProperties
             {
                 ImageID = UUID.Zero,
                 FirstLifeImageID = UUID.Zero,
@@ -1099,7 +1099,7 @@ namespace SilverSim.Viewer.Profile
                 return;
             }
 
-            var props = new ProfileProperties()
+            var props = new ProfileProperties
             {
                 ImageID = UUID.Zero,
                 FirstLifeImageID = UUID.Zero,

@@ -98,7 +98,7 @@ namespace SilverSim.Viewer.Core
 
             public override void Write(string text)
             {
-                var res = new SimConsoleResponse()
+                var res = new SimConsoleResponse
                 {
                     Message = text
                 };

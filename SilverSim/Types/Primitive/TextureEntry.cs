@@ -154,7 +154,7 @@ namespace SilverSim.Types.Primitive
 
         private static float TEGlowFloat(byte[] bytes, int pos) => bytes[pos] / 255.0f;
 
-        private static ColorAlpha ColorFromBytes(byte[] data, int pos) => new ColorAlpha()
+        private static ColorAlpha ColorFromBytes(byte[] data, int pos) => new ColorAlpha
         {
             R = (255 - data[pos + 0]) / 255f,
             G = (255 - data[pos + 1]) / 255f,

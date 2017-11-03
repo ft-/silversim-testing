@@ -25,7 +25,7 @@ namespace SilverSim.Scene.Types.Object
 {
     public partial class ObjectPart
     {
-        public ObjectPropertiesFamily PropertiesFamily => new ObjectPropertiesFamily()
+        public ObjectPropertiesFamily PropertiesFamily => new ObjectPropertiesFamily
         {
             ObjectID = ID,
             OwnerID = Owner.ID,

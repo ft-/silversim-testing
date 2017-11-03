@@ -336,7 +336,7 @@ namespace SilverSim.Types
 
         #region Static Methods
 
-        public static Matrix4 operator +(Matrix4 matrix1, Matrix4 matrix2) => new Matrix4()
+        public static Matrix4 operator +(Matrix4 matrix1, Matrix4 matrix2) => new Matrix4
         {
             M11 = matrix1.M11 + matrix2.M11,
             M12 = matrix1.M12 + matrix2.M12,
@@ -751,7 +751,7 @@ namespace SilverSim.Types
             return matrix;
         }
 
-        public static Matrix4 Lerp(Matrix4 matrix1, Matrix4 matrix2, double amount) => new Matrix4()
+        public static Matrix4 Lerp(Matrix4 matrix1, Matrix4 matrix2, double amount) => new Matrix4
         {
             M11 = matrix1.M11 + ((matrix2.M11 - matrix1.M11) * amount),
             M12 = matrix1.M12 + ((matrix2.M12 - matrix1.M12) * amount),
@@ -796,7 +796,7 @@ namespace SilverSim.Types
                 matrix1.M41 * matrix2.M14 + matrix1.M42 * matrix2.M24 + matrix1.M43 * matrix2.M34 + matrix1.M44 * matrix2.M44
             );
 
-        public static Matrix4 operator *(Matrix4 matrix1, double scaleFactor) => new Matrix4()
+        public static Matrix4 operator *(Matrix4 matrix1, double scaleFactor) => new Matrix4
         {
             M11 = matrix1.M11 * scaleFactor,
             M12 = matrix1.M12 * scaleFactor,
@@ -819,7 +819,7 @@ namespace SilverSim.Types
             M44 = matrix1.M44 * scaleFactor
         };
 
-        public static Matrix4 operator -(Matrix4 matrix) => new Matrix4()
+        public static Matrix4 operator -(Matrix4 matrix) => new Matrix4
         {
             M11 = -matrix.M11,
             M12 = -matrix.M12,
@@ -842,7 +842,7 @@ namespace SilverSim.Types
             M44 = -matrix.M44
         };
 
-        public static Matrix4 operator -(Matrix4 matrix1, Matrix4 matrix2) => new Matrix4()
+        public static Matrix4 operator -(Matrix4 matrix1, Matrix4 matrix2) => new Matrix4
         {
             M11 = matrix1.M11 - matrix2.M11,
             M12 = matrix1.M12 - matrix2.M12,
@@ -906,7 +906,7 @@ namespace SilverSim.Types
             return matrix;
         }
 
-        public static Matrix4 Transpose(Matrix4 matrix) => new Matrix4()
+        public static Matrix4 Transpose(Matrix4 matrix) => new Matrix4
         {
             M11 = matrix.M11,
             M12 = matrix.M21,

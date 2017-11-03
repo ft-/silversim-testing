@@ -146,14 +146,14 @@ namespace SilverSim.Viewer.Search
             {
                 if(res == null)
                 {
-                    res = new DirPeopleReply()
+                    res = new DirPeopleReply
                     {
                         AgentID = req.AgentID,
                         QueryID = req.QueryID
                     };
                 }
 
-                var d = new DirPeopleReply.QueryReplyData()
+                var d = new DirPeopleReply.QueryReplyData
                 {
                     AgentID = uui.ID
                 };
@@ -189,7 +189,7 @@ namespace SilverSim.Viewer.Search
             var groupsService = scene.GroupsService;
             if(groupsService == null)
             {
-                res = new DirGroupsReply()
+                res = new DirGroupsReply
                 {
                     AgentID = req.AgentID,
                     QueryID = req.QueryID
@@ -201,7 +201,7 @@ namespace SilverSim.Viewer.Search
             var gis = groupsService.Groups.GetGroupsByName(agent.Owner, req.QueryText);
             if(gis.Count == 0)
             {
-                res = new DirGroupsReply()
+                res = new DirGroupsReply
                 {
                     AgentID = req.AgentID,
                     QueryID = req.QueryID
@@ -214,14 +214,14 @@ namespace SilverSim.Viewer.Search
             {
                 if (res == null)
                 {
-                    res = new DirGroupsReply()
+                    res = new DirGroupsReply
                     {
                         AgentID = req.AgentID,
                         QueryID = req.QueryID
                     };
                 }
 
-                var d = new DirGroupsReply.QueryReplyData()
+                var d = new DirGroupsReply.QueryReplyData
                 {
                     GroupID = gi.ID.ID,
                     GroupName = gi.ID.GroupName,
@@ -286,7 +286,7 @@ namespace SilverSim.Viewer.Search
             for(int offset = 0; offset < results.Count && offset < 100; ++offset)
             {
                 string[] sp = results[offset].FullName.Split(new char[] {' '}, 2);
-                var d = new AvatarPickerReply.DataEntry()
+                var d = new AvatarPickerReply.DataEntry
                 {
                     AvatarID = results[offset].ID,
                     FirstName = sp[0],

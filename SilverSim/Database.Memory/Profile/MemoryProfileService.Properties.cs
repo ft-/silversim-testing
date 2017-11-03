@@ -75,7 +75,7 @@ namespace SilverSim.Database.Memory.Profile
             ProfileProperties props;
             if (!m_Properties.TryGetValue(user.ID, out props))
             {
-                props = new ProfileProperties()
+                props = new ProfileProperties
                 {
                     User = user,
                     Partner = UUI.Unknown,

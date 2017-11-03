@@ -173,7 +173,7 @@ namespace SilverSim.Scene.Agent
         public abstract List<GridType> SupportedGridTypes { get; }
         public abstract IAgentTeleportServiceInterface ActiveTeleportService { get; set; }
 
-        public void GetBoundingBox(out BoundingBox box) => box = new BoundingBox()
+        public void GetBoundingBox(out BoundingBox box) => box = new BoundingBox
         {
             CenterOffset = Vector3.Zero,
             Size = Size * Rotation
@@ -271,7 +271,7 @@ namespace SilverSim.Scene.Agent
         {
             get
             {
-                return new UUI()
+                return new UUI
                 {
                     FirstName = FirstName,
                     LastName = LastName,

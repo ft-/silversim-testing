@@ -113,7 +113,7 @@ namespace SilverSim.Viewer.Core
                         rep.Flags = listType;
                         rep.SequenceID = sequenceno++;
                     }
-                    var pad = new ParcelAccessListReply.Data()
+                    var pad = new ParcelAccessListReply.Data
                     {
                         Flags = listType,
                         ID = pae
@@ -202,7 +202,7 @@ namespace SilverSim.Viewer.Core
                 UUI uui;
                 if (Scene.AvatarNameService.TryGetValue(upd.ID, out uui))
                 {
-                    var pae = new ParcelAccessEntry()
+                    var pae = new ParcelAccessEntry
                     {
                         RegionID = Scene.ID,
                         Accessor = uui,
@@ -228,7 +228,7 @@ namespace SilverSim.Viewer.Core
                 ExperienceInfo expInfo;
                 if (Scene.ExperienceService.TryGetValue(upd.ID, out expInfo))
                 {
-                    var pae = new ParcelExperienceEntry()
+                    var pae = new ParcelExperienceEntry
                     {
                         RegionID = Scene.ID,
                         ExperienceID = upd.ID,

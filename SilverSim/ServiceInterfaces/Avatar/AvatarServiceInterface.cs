@@ -174,7 +174,7 @@ namespace SilverSim.ServiceInterfaces.Avatar
                     int pos = int.Parse(m.Groups[1].Value);
                     int no = int.Parse(m.Groups[2].Value);
                     var va = kvp.Value.Split(':');
-                    var wi = new AgentWearables.WearableInfo()
+                    var wi = new AgentWearables.WearableInfo
                     {
                         ItemID = UUID.Parse(va[0])
                     };

@@ -85,7 +85,7 @@ namespace SilverSim.Viewer.Core
         private readonly UserAccount m_UntrustedAccountInfo;
         public override UserAccount UntrustedAccountInfo => new UserAccount(m_UntrustedAccountInfo);
 
-        public override SessionInfo Session => new SessionInfo()
+        public override SessionInfo Session => new SessionInfo
         {
             SessionID = SessionID,
             SecureSessionID = m_SecureSessionID,
@@ -808,7 +808,7 @@ namespace SilverSim.Viewer.Core
                             m_AgentRequestedSitOffset = sitOffset;
                         }
 
-                        var sitres = new AvatarSitResponse()
+                        var sitres = new AvatarSitResponse
                         {
                             SitObject = sitOnLink.ID,
                             IsAutoPilot = false,
@@ -876,7 +876,7 @@ namespace SilverSim.Viewer.Core
                 if (m_IsActiveGod && !scene.IsPossibleGod(Owner))
                 {
                     /* revoke god powers when changing region and new region has a different owner */
-                    var gm = new GrantGodlikePowers()
+                    var gm = new GrantGodlikePowers
                     {
                         AgentID = ID,
                         SessionID = circuit.SessionID,
@@ -902,7 +902,7 @@ namespace SilverSim.Viewer.Core
                     }
                 }
 
-                var amc = new AgentMovementComplete()
+                var amc = new AgentMovementComplete
                 {
                     AgentID = cam.AgentID,
                     ChannelVersion = VersionInfo.SimulatorVersion,
@@ -923,12 +923,12 @@ namespace SilverSim.Viewer.Core
 
                 scene.SendAgentObjectToAllAgents(this);
 
-                var clu = new CoarseLocationUpdate()
+                var clu = new CoarseLocationUpdate
                 {
                     You = 0,
                     Prey = -1
                 };
-                var ad = new CoarseLocationUpdate.AgentDataEntry()
+                var ad = new CoarseLocationUpdate.AgentDataEntry
                 {
                     X = (byte)(uint)GlobalPosition.X,
                     Y = (byte)(uint)GlobalPosition.Y,
@@ -991,7 +991,7 @@ namespace SilverSim.Viewer.Core
 #if DEBUG
                     m_Log.DebugFormat("Removing agent {0}: Sending logout reply for {1}", ID, scene.ID);
 #endif
-                    var lrep = new LogoutReply()
+                    var lrep = new LogoutReply
                     {
                         AgentID = lr.AgentID,
                         SessionID = lr.SessionID
@@ -1077,7 +1077,7 @@ namespace SilverSim.Viewer.Core
 
         public override void SendRegionNotice(UUI fromAvatar, string message, UUID fromSceneID)
         {
-            var im = new GridInstantMessage()
+            var im = new GridInstantMessage
             {
                 FromAgent = fromAvatar,
                 ToAgent = Owner,

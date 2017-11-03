@@ -206,7 +206,7 @@ namespace SilverSim.Viewer.Core
                     remaining = 50;
                 }
 
-                var msg = new EstateOwnerMessage()
+                var msg = new EstateOwnerMessage
                 {
                     TransactionID = transactionID,
                     Invoice = invoice,
@@ -247,7 +247,7 @@ namespace SilverSim.Viewer.Core
                     remaining = 50;
                 }
 
-                var msg = new EstateOwnerMessage()
+                var msg = new EstateOwnerMessage
                 {
                     TransactionID = transactionID,
                     Invoice = invoice,
@@ -313,7 +313,7 @@ namespace SilverSim.Viewer.Core
 
         public override void SendEstateUpdateInfo(UUID invoice, UUID transactionID, EstateInfo estate, UUID fromSceneID, bool sendToAgentOnly = true)
         {
-            var msg = new EstateOwnerMessage()
+            var msg = new EstateOwnerMessage
             {
                 AgentID = Owner.ID,
                 SessionID = SessionID,
@@ -620,7 +620,7 @@ namespace SilverSim.Viewer.Core
                 }
             }
 
-            var m = new EstateOwnerMessage()
+            var m = new EstateOwnerMessage
             {
                 TransactionID = req.TransactionID,
                 Invoice = req.Invoice,
@@ -1043,7 +1043,7 @@ namespace SilverSim.Viewer.Core
                     break;
             }
 
-            var res = new TelehubInfo()
+            var res = new TelehubInfo
             {
                 ObjectID = scene.RegionSettings.TelehubObject
             };

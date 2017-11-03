@@ -74,7 +74,7 @@ namespace SilverSim.Database.Memory.SimulationData
         #endregion
 
         #region helpers
-        private ObjectGroup ObjectGroupFromMap(Map map) => new ObjectGroup()
+        private ObjectGroup ObjectGroupFromMap(Map map) => new ObjectGroup
         {
             IsTempOnRez = map["IsTempOnRez"].AsBoolean,
             Owner = new UUI(map["Owner"].ToString()),

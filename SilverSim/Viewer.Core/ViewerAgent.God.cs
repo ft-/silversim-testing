@@ -43,7 +43,7 @@ namespace SilverSim.Viewer.Core
                 /* request god powers */
                 if(CheckForGodPowers(m.CircuitSceneID, ID))
                 {
-                    var r = new GrantGodlikePowers()
+                    var r = new GrantGodlikePowers
                     {
                         AgentID = m.AgentID,
                         SessionID = m.SessionID,
@@ -56,7 +56,7 @@ namespace SilverSim.Viewer.Core
                 }
                 else
                 {
-                    var r = new AlertMessage()
+                    var r = new AlertMessage
                     {
                         Message = "NOTIFY: GodlikeRequestFailed"
                     };

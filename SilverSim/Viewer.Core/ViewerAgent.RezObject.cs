@@ -75,7 +75,7 @@ namespace SilverSim.Viewer.Core
                 SendAlertMessage("ALERT: InvalidObjectParams", m.CircuitSceneID);
                 return;
             }
-            var rezparams = new SceneInterface.RezObjectParams()
+            var rezparams = new SceneInterface.RezObjectParams
             {
                 RayStart = req.RezData.RayStart,
                 RayEnd = req.RezData.RayEnd,

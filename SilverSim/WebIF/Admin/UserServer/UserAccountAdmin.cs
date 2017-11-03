@@ -121,7 +121,7 @@ namespace SilverSim.WebIF.Admin.UserServer
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.AlreadyExists);
                 return;
             }
-            var uai = new UserAuthInfo()
+            var uai = new UserAuthInfo
             {
                 ID = account.Principal.ID,
                 Password = jsondata["password"].ToString()

@@ -235,7 +235,7 @@ namespace SilverSim.Types.Asset.Format
 
         public static implicit operator AssetData(Material v)
         {
-            var asset = new AssetData()
+            var asset = new AssetData
             {
                 ID = v.MaterialID
             };

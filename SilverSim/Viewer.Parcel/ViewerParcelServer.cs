@@ -127,7 +127,7 @@ namespace SilverSim.Viewer.Parcel
             {
                 parcelFlags |= (1 << 7);
             }
-            var reply = new ParcelInfoReply()
+            var reply = new ParcelInfoReply
             {
                 AgentID = circuit.AgentID,
                 OwnerID = pinfo.Owner.ID,

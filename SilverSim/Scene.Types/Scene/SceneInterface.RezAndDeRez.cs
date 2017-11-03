@@ -513,7 +513,7 @@ namespace SilverSim.Scene.Types.Scene
                         else if (!CanReturn(agent, grp, grp.Position))
                         {
                             agent.SendAlertMessage(string.Format(this.GetLanguageString(agent.CurrentCulture, "NoPermissionToReturnObjectToOwner", "No permission to return object '{0}' to owner"), grp.Name), ID);
-                            ackres = new Viewer.Messages.Object.DeRezAck()
+                            ackres = new Viewer.Messages.Object.DeRezAck
                             {
                                 TransactionID = req.TransactionID,
                                 Success = false
@@ -525,7 +525,7 @@ namespace SilverSim.Scene.Types.Scene
                     break;
 
                 case DeRezAction.SaveIntoAgentInventory:
-                    ackres = new Viewer.Messages.Object.DeRezAck()
+                    ackres = new Viewer.Messages.Object.DeRezAck
                     {
                         TransactionID = req.TransactionID,
                         Success = false
@@ -543,7 +543,7 @@ namespace SilverSim.Scene.Types.Scene
                         else if (!CanTake(agent, grp, grp.Position))
                         {
                             agent.SendAlertMessage(string.Format(this.GetLanguageString(agent.CurrentCulture, "NoPermissionToTakeObject", "No permission to take object '{0}'"), grp.Name), ID);
-                            ackres = new Viewer.Messages.Object.DeRezAck()
+                            ackres = new Viewer.Messages.Object.DeRezAck
                             {
                                 TransactionID = req.TransactionID,
                                 Success = false
@@ -560,7 +560,7 @@ namespace SilverSim.Scene.Types.Scene
                         if (!CanTakeCopy(agent, grp, grp.Position))
                         {
                             agent.SendAlertMessage(string.Format(this.GetLanguageString(agent.CurrentCulture, "NoPermissionToCopyObject", "No permission to copy object '{0}'"), grp.Name), ID);
-                            ackres = new Viewer.Messages.Object.DeRezAck()
+                            ackres = new Viewer.Messages.Object.DeRezAck
                             {
                                 TransactionID = req.TransactionID,
                                 Success = false
@@ -573,7 +573,7 @@ namespace SilverSim.Scene.Types.Scene
 
                 default:
                     agent.SendAlertMessage(this.GetLanguageString(agent.CurrentCulture, "InvalidDerezRequestByViewer", "Invalid derez request by viewer"), ID);
-                    ackres = new Viewer.Messages.Object.DeRezAck()
+                    ackres = new Viewer.Messages.Object.DeRezAck
                     {
                         TransactionID = req.TransactionID,
                         Success = false

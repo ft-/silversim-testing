@@ -701,7 +701,7 @@ namespace SilverSim.Main.Cmd.Region
 
                 foreach (IConfig regionEntry in cfg.Configs)
                 {
-                    var r = new RegionInfo()
+                    var r = new RegionInfo
                     {
                         Name = regionEntry.Name,
                         ID = regionEntry.GetString("RegionUUID"),
@@ -816,7 +816,7 @@ namespace SilverSim.Main.Cmd.Region
             {
                 EstateInfo selectedEstate = null;
                 bool ownerSet = false;
-                rInfo = new RegionInfo()
+                rInfo = new RegionInfo
                 {
                     Name = args[2],
                     ID = UUID.Random,

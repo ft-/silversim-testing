@@ -112,7 +112,7 @@ namespace SilverSim.Types.Primitive
 
             public static explicit operator Entry(Map m)
             {
-                var e = new Entry()
+                var e = new Entry
                 {
                     IsAlternativeImageEnabled = m["alt_image_enable"].AsBoolean,
                     IsAutoLoop = m["auto_loop"].AsBoolean,

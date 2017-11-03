@@ -59,7 +59,7 @@ namespace SilverSim.Viewer.Core.Capabilities
         public override UUID GetUploaderID(Map reqmap)
         {
             var transaction = UUID.Random;
-            var item = new InventoryItem()
+            var item = new InventoryItem
             {
                 Description = reqmap["description"].ToString(),
                 Name = reqmap["name"].ToString(),
@@ -148,7 +148,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                     if (texture_list.Count > 0)
                     {
                         var textureFolder = m_InventoryService.Folder[Creator.ID, AssetType.Texture].ID;
-                        var folder = new InventoryFolder()
+                        var folder = new InventoryFolder
                         {
                             Name = data.Name + " - Textures",
                             Owner = Creator,
@@ -163,7 +163,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                         {
                             ++idx;
 
-                            var newasset = new AssetData()
+                            var newasset = new AssetData
                             {
                                 ID = UUID.Random,
                                 Type = AssetType.Texture,
@@ -173,7 +173,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                             textureids.Add(newasset.ID);
                             m_AssetService.Store(newasset);
 
-                            var item = new InventoryItem()
+                            var item = new InventoryItem
                             {
                                 AssetID = newasset.ID,
                                 AssetType = AssetType.Texture,
@@ -247,7 +247,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                                         LlsdBinary.Serialize(mesh_list[idx], meshstream);
                                     }
                                     meshstream.Flush();
-                                    var newasset = new AssetData()
+                                    var newasset = new AssetData
                                     {
                                         ID = UUID.Random,
                                         Type = AssetType.Mesh,

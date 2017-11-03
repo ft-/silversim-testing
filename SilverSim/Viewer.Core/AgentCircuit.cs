@@ -187,7 +187,7 @@ namespace SilverSim.Viewer.Core
 
         private void ChatListenerAction(ListenEvent le)
         {
-            var cfs = new ChatFromSimulator()
+            var cfs = new ChatFromSimulator
             {
                 Audible = ChatAudibleLevel.Fully,
                 ChatType = (ChatType)(byte)le.Type,
@@ -921,7 +921,7 @@ namespace SilverSim.Viewer.Core
                     else
                     {
                         /* specific decoder for ListenEvent */
-                        var ev = new ListenEvent()
+                        var ev = new ListenEvent
                         {
                             TargetID = p.ReadUUID(),
                             Channel = p.ReadInt32(),
@@ -943,7 +943,7 @@ namespace SilverSim.Viewer.Core
                     }
                     else
                     {
-                        var ev = new ListenEvent()
+                        var ev = new ListenEvent
                         {
                             ID = AgentID,
                             Message = p.ReadStringLen16(),
@@ -1077,7 +1077,7 @@ namespace SilverSim.Viewer.Core
                 switch(im.Dialog)
                 {
                     case GridInstantMessageDialog.MessageFromAgent:
-                        var m = new ImprovedInstantMessage()
+                        var m = new ImprovedInstantMessage
                         {
                             AgentID = im.FromAgent.ID,
                             SessionID = UUID.Zero,

@@ -211,7 +211,7 @@ namespace SilverSim.ServiceInterfaces.Groups
 
         public virtual GroupInfo CreateGroup(UUI requestingAgent, GroupInfo ginfo, GroupPowers everyonePowers, GroupPowers ownerPowers)
         {
-            var role_everyone = new GroupRole()
+            var role_everyone = new GroupRole
             {
                 ID = UUID.Zero,
                 Group = ginfo.ID,
@@ -220,7 +220,7 @@ namespace SilverSim.ServiceInterfaces.Groups
                 Title = "Member of " + ginfo.ID.GroupName,
                 Powers = everyonePowers
             };
-            var role_owner = new GroupRole()
+            var role_owner = new GroupRole
             {
                 ID = UUID.Random,
                 Group = ginfo.ID,
@@ -231,13 +231,13 @@ namespace SilverSim.ServiceInterfaces.Groups
             };
             ginfo.OwnerRoleID = role_owner.ID;
 
-            var gmemrole_owner = new GroupRolemember()
+            var gmemrole_owner = new GroupRolemember
             {
                 Group = ginfo.ID,
                 RoleID = role_owner.ID,
                 Principal = ginfo.Founder
             };
-            var gmemrole_everyone = new GroupRolemember()
+            var gmemrole_everyone = new GroupRolemember
             {
                 Group = ginfo.ID,
                 RoleID = role_everyone.ID,
@@ -278,7 +278,7 @@ namespace SilverSim.ServiceInterfaces.Groups
             {
                 if (!Rolemembers.ContainsKey(requestingAgent, group, UUID.Zero, agent))
                 {
-                    var rolemember = new GroupRolemember()
+                    var rolemember = new GroupRolemember
                     {
                         Group = group,
                         Principal = agent,
@@ -289,7 +289,7 @@ namespace SilverSim.ServiceInterfaces.Groups
 
                 if(UUID.Zero != roleid)
                 {
-                    var rolemember = new GroupRolemember()
+                    var rolemember = new GroupRolemember
                     {
                         Group = group,
                         Principal = agent,

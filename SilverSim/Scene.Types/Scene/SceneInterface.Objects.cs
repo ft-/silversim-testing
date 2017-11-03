@@ -100,7 +100,7 @@ namespace SilverSim.Scene.Types.Scene
             ObjectPart part;
             if(Primitives.TryGetValue(req.ObjectID, out part))
             {
-                var rep = new PayPriceReply()
+                var rep = new PayPriceReply
                 {
                     ObjectID = req.ObjectID
                 };

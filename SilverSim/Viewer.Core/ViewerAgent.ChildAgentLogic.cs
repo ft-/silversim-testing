@@ -40,7 +40,7 @@ namespace SilverSim.Viewer.Core
                 {
                     foreach (var kvp in ActiveChilds)
                     {
-                        var m = new ChildAgentPositionUpdate()
+                        var m = new ChildAgentPositionUpdate
                         {
                             AgentID = ID,
                             AgentPosition = GlobalPosition,
@@ -71,7 +71,7 @@ namespace SilverSim.Viewer.Core
                 {
                     foreach (var kvp in ActiveChilds)
                     {
-                        var m = new ChildAgentUpdate()
+                        var m = new ChildAgentUpdate
                         {
                             RegionID = scene.ID,
                             RegionLocation = scene.GridPosition,

@@ -104,7 +104,7 @@ namespace SilverSim.Scene.Types.Scene
                 get
                 {
                     AssetData ad = m_ResourceAssets.GetAsset(key);
-                    return new AssetMetadata()
+                    return new AssetMetadata
                     {
                         AccessTime = ad.AccessTime,
                         CreateTime = ad.CreateTime,

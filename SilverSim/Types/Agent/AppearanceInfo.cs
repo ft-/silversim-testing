@@ -172,7 +172,7 @@ namespace SilverSim.Types.Agent
                     throw new InvalidAppearanceInfoSerializationException();
                 }
 
-                var appearanceInfo = new AppearanceInfo()
+                var appearanceInfo = new AppearanceInfo
                 {
                     AvatarHeight = m["height"].AsReal,
                     VisualParams = m["visualparams"] as BinaryData
@@ -206,7 +206,7 @@ namespace SilverSim.Types.Agent
                         {
                             throw new InvalidAppearanceInfoSerializationException();
                         }
-                        var wi = new AgentWearables.WearableInfo()
+                        var wi = new AgentWearables.WearableInfo
                         {
                             ItemID = mw["item"].AsUUID,
                             AssetID = mw["asset"].AsUUID
@@ -300,7 +300,7 @@ namespace SilverSim.Types.Agent
                     writer.WriteEndElement();
                 }
 
-                return new Notecard()
+                return new Notecard
                 {
                     Text = ms.ToArray().FromUTF8Bytes()
                 };

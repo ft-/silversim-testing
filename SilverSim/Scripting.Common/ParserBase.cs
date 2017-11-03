@@ -214,7 +214,7 @@ namespace SilverSim.Scripting.Common
 
         public void Push(TextReader stream, string filename, int lineNumber = 1)
         {
-            var pi = new ParserInput()
+            var pi = new ParserInput
             {
                 FileName = filename,
                 Reader = stream,

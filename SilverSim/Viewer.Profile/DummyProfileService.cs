@@ -124,7 +124,7 @@ namespace SilverSim.Viewer.Profile
             {
                 get
                 {
-                    return new ProfilePreferences()
+                    return new ProfilePreferences
                     {
                         IMviaEmail = false,
                         User = user,
@@ -152,7 +152,7 @@ namespace SilverSim.Viewer.Profile
             {
                 get
                 {
-                    return new ProfileProperties()
+                    return new ProfileProperties
                     {
                         User = user,
                         Partner = UUI.Unknown,

@@ -64,7 +64,7 @@ namespace SilverSim.Viewer.Profile
             throw new NotSupportedException();
         }
 
-        public override UserInfo GetUserInfo(UUI user) => new UserInfo()
+        public override UserInfo GetUserInfo(UUI user) => new UserInfo
         {
             FirstName = user.FirstName,
             LastName = user.LastName,

@@ -90,7 +90,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                     return;
                 }
                 parcelInfo.MediaURI = new URI(url);
-                var pmu = new ParcelMediaUpdate()
+                var pmu = new ParcelMediaUpdate
                 {
                     MediaAutoScale = parcelInfo.MediaAutoScale,
                     MediaDesc = parcelInfo.MediaDescription,

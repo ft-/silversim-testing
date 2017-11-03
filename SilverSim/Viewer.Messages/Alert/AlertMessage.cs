@@ -67,7 +67,7 @@ namespace SilverSim.Viewer.Messages.Alert
             uint n = p.ReadUInt8();
             for(uint i = 0; i < n; ++i)
             {
-                m.AlertInfo.Add(new Data()
+                m.AlertInfo.Add(new Data
                 {
                     Message = p.ReadStringLen8(),
                     ExtraParams = p.ReadBytes(p.ReadUInt8())

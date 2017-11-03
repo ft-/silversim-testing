@@ -53,7 +53,7 @@ namespace SilverSim.Viewer.Messages.Image
 
         public static RequestImage Decode(UDPPacket p)
         {
-            var m = new RequestImage()
+            var m = new RequestImage
             {
                 AgentID = p.ReadUUID(),
                 SessionID = p.ReadUUID()

@@ -67,7 +67,7 @@ namespace SilverSim.Viewer.Messages.Object
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
             {
-                m.ObjectData.Add(new Data()
+                m.ObjectData.Add(new Data
                 {
                     ObjectLocalID = p.ReadUInt32(),
                     PathCurve = p.ReadUInt8(),

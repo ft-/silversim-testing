@@ -109,7 +109,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             public WLVector4 SunMoonColor;
             public double SunMoonPosition;
 
-            public static WindlightSkyData Defaults => new WindlightSkyData()
+            public static WindlightSkyData Defaults => new WindlightSkyData
             {
                 Horizon = new WLVector4(0.25, 0.25, 0.32, 0.32),
                 HazeHorizon = 0.19,
@@ -153,7 +153,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             public Color Color;
             public double FogDensityExponent;
 
-            public static WindlightWaterData Defaults => new WindlightWaterData()
+            public static WindlightWaterData Defaults => new WindlightWaterData
             {
                 Color = new Color(4 / 255f, 38 / 255f, 64 / 255f),
                 FogDensityExponent = 4,
@@ -314,7 +314,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         #region Windlight message compiler
         private GenericMessage CompileResetWindlightSettings()
         {
-            var m = new GenericMessage()
+            var m = new GenericMessage
             {
                 Method = "WindlightReset"
             };
@@ -324,7 +324,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
 
         private GenericMessage CompileWindlightSettings(WindlightSkyData skyWindlight, WindlightWaterData waterWindlight)
         {
-            var m = new GenericMessage()
+            var m = new GenericMessage
             {
                 Method = "Windlight"
             };

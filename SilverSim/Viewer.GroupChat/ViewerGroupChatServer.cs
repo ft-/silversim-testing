@@ -265,7 +265,7 @@ namespace SilverSim.Viewer.GroupChat
                 }
             }
 
-            var gn = new GroupNotice()
+            var gn = new GroupNotice
             {
                 ID = UUID.Random,
                 Group = group,
@@ -280,7 +280,7 @@ namespace SilverSim.Viewer.GroupChat
             gn.AttachmentItemID = item != null ? item.ID : UUID.Zero;
             gn.AttachmentOwner = item != null ? item.Owner : UUI.Unknown;
 
-            var gim = new GridInstantMessage()
+            var gim = new GridInstantMessage
             {
                 FromAgent = agent.Owner,
                 Dialog = GridInstantMessageDialog.GroupNotice,

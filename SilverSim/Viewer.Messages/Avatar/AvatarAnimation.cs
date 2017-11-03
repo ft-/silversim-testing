@@ -105,7 +105,7 @@ namespace SilverSim.Viewer.Messages.Avatar
             n = p.ReadUInt8();
             for(uint i = 0; i < n; ++i)
             {
-                m.PhysicalAvatarEventList.Add(new PhysicalAvatarEventData()
+                m.PhysicalAvatarEventList.Add(new PhysicalAvatarEventData
                 {
                     TypeData = p.ReadBytes(p.ReadUInt8())
                 });

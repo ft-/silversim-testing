@@ -68,7 +68,7 @@ namespace SilverSim.Viewer.Core
         public GridVector CacheInterGridDestination(RegionInfo di)
         {
             CleanDestinationCache();
-            var hgRegionHandle = new GridVector()
+            var hgRegionHandle = new GridVector
             {
                 GridX = NewInterGridRegionLocX,
                 GridY = 0

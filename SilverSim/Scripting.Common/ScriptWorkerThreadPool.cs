@@ -128,7 +128,7 @@ namespace SilverSim.Scripting.Common
             m_Log.InfoFormat("Starting {0} minimum threads for {1}", minimumThreads, m_SceneID.ToString());
             for (int threadCount = 0; threadCount < m_MinimumThreads; ++threadCount)
             {
-                var tc = new ScriptThreadContext()
+                var tc = new ScriptThreadContext
                 {
                     ScriptThread = ThreadManager.CreateThread(ThreadMain),
                     ThreadPool = this
@@ -174,7 +174,7 @@ namespace SilverSim.Scripting.Common
                     {
                         try
                         {
-                            var tc = new ScriptThreadContext()
+                            var tc = new ScriptThreadContext
                             {
                                 ScriptThread = ThreadManager.CreateThread(ThreadMain),
                                 ThreadPool = this

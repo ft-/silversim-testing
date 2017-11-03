@@ -153,7 +153,7 @@ namespace SilverSim.Scene.Npc
                         InventoryService.Item.Update(item);
                     }
 
-                    item = new InventoryItem()
+                    item = new InventoryItem
                     {
                         LastOwner = Owner,
                         Owner = Owner,

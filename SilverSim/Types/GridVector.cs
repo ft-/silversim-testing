@@ -145,7 +145,7 @@ namespace SilverSim.Types
         public GridVector AlignToZoomlevel(int zoomlevel)
         {
             var zoomborder = (uint)(256 << (zoomlevel - 1));
-            return new GridVector()
+            return new GridVector
             {
                 X = X - (X % zoomborder),
                 Y = Y - (Y % zoomborder)

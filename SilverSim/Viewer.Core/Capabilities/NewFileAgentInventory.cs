@@ -55,7 +55,7 @@ namespace SilverSim.Viewer.Core.Capabilities
         public override UUID GetUploaderID(Map reqmap)
         {
             var transaction = UUID.Random;
-            var item = new InventoryItem()
+            var item = new InventoryItem
             {
                 Description = reqmap["description"].ToString(),
                 Name = reqmap["name"].ToString(),

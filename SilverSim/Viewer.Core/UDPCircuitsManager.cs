@@ -326,7 +326,7 @@ namespace SilverSim.Viewer.Core
 
                                             var scene = Scene;
                                             RegionOptionFlags regionFlags = scene.RegionSettings.AsFlags;
-                                            var rh = new RegionHandshake()
+                                            var rh = new RegionHandshake
                                             {
                                                 RegionFlags = regionFlags,
                                                 SimAccess = scene.Access,
@@ -359,7 +359,7 @@ namespace SilverSim.Viewer.Core
                                                 ProductSKU = VersionInfo.SimulatorVersion,
                                                 ProductName = scene.ProductName
                                             };
-                                            rh.RegionExtData.Add(new RegionHandshake.RegionExtDataEntry()
+                                            rh.RegionExtData.Add(new RegionHandshake.RegionExtDataEntry
                                             {
                                                 RegionFlagsExtended = (ulong)regionFlags,
                                                 RegionProtocols = 1 /* 0 => no SSB, 1 => SSB */
@@ -501,7 +501,7 @@ namespace SilverSim.Viewer.Core
                 Scene = thisScene
             };
             AddCircuit(circuit);
-            var useCircuitCode = new UseCircuitCode()
+            var useCircuitCode = new UseCircuitCode
             {
                 SessionID = sessionID,
                 AgentID = thisScene.ID,

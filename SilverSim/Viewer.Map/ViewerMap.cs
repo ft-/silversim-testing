@@ -149,7 +149,7 @@ namespace SilverSim.Viewer.Map
 
             foreach(var ri in ris)
             {
-                results.Add(new MapBlockReply.DataEntry()
+                results.Add(new MapBlockReply.DataEntry
                 {
                     X = ri.Location.GridX,
                     Y = ri.Location.GridY,
@@ -244,7 +244,7 @@ namespace SilverSim.Viewer.Map
                 else if(ri != null)
                 {
                     var hgLoc = agent.CacheInterGridDestination(ri);
-                    results.Add(new MapBlockReply.DataEntry()
+                    results.Add(new MapBlockReply.DataEntry
                     {
                         /* we map foreign grid locations in specific agent only */
                         X = hgLoc.GridX,
@@ -285,7 +285,7 @@ namespace SilverSim.Viewer.Map
 
                     foreach(var ri in ris)
                     {
-                        results.Add(new MapBlockReply.DataEntry()
+                        results.Add(new MapBlockReply.DataEntry
                         {
                             X = ri.Location.GridX,
                             Y = ri.Location.GridY,
@@ -308,7 +308,7 @@ namespace SilverSim.Viewer.Map
 
         private void SendMapBlocks(ViewerAgent agent, SceneInterface scene, MapAgentFlags mapflags, List<MapBlockReply.DataEntry> mapBlocks)
         {
-            mapBlocks.Add(new MapBlockReply.DataEntry()
+            mapBlocks.Add(new MapBlockReply.DataEntry
             {
                 Agents = 0,
                 Access = RegionAccess.NonExistent,
@@ -334,7 +334,7 @@ namespace SilverSim.Viewer.Map
 
                 if (replymsg == null)
                 {
-                    replymsg = new MapBlockReply()
+                    replymsg = new MapBlockReply
                     {
                         AgentID = agent.ID,
                         Flags = mapflags
@@ -363,7 +363,7 @@ namespace SilverSim.Viewer.Map
                 return;
             }
 
-            var reply = new MapItemReply()
+            var reply = new MapItemReply
             {
                 AgentID = agent.ID,
                 Flags = req.Flags,
@@ -397,7 +397,7 @@ namespace SilverSim.Viewer.Map
                         {
                             if(sceneagent.IsInScene(accessScene) && !sceneagent.Owner.Equals(agent.Owner) && sceneagent is ViewerAgent)
                             {
-                                var d = new MapItemReply.DataEntry()
+                                var d = new MapItemReply.DataEntry
                                 {
                                     X = (ushort)sceneagent.GlobalPosition.X,
                                     Y = (ushort)sceneagent.GlobalPosition.Y,

@@ -579,7 +579,7 @@ namespace SilverSim.Grid.Login
                 }
             }
 
-            var pInfo = new PresenceInfo()
+            var pInfo = new PresenceInfo
             {
                 UserID = loginData.Account.Principal,
                 SessionID = loginData.SessionInfo.SessionID,
@@ -623,7 +623,7 @@ namespace SilverSim.Grid.Login
 
         private XmlRpc.XmlRpcResponse LoginAuthenticatedAndPresenceAndGridUserAdded(XmlRpc.XmlRpcRequest req, LoginData loginData)
         {
-            var hgdata = new TravelingDataInfo()
+            var hgdata = new TravelingDataInfo
             {
                 SessionID = loginData.SessionInfo.SessionID,
                 UserID = loginData.Account.Principal.ID,
@@ -690,7 +690,7 @@ namespace SilverSim.Grid.Login
                 { "region_size_y", loginData.DestinationInfo.Size.Y.ToString() },
                 { "circuit_code", (int)loginData.CircuitInfo.CircuitCode }
             };
-            var res = new XmlRpc.XmlRpcResponse()
+            var res = new XmlRpc.XmlRpcResponse
             {
                 ReturnValue = resStruct
             };
@@ -1002,7 +1002,7 @@ namespace SilverSim.Grid.Login
                 { "message", message },
                 { "login", "false" }
             };
-            return new XmlRpc.XmlRpcResponse()
+            return new XmlRpc.XmlRpcResponse
             {
                 ReturnValue = m
             };

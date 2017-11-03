@@ -49,7 +49,7 @@ namespace SilverSim.Types.IM
 
         public GridInstantMessage Clone()
         {
-            var gim = new GridInstantMessage()
+            var gim = new GridInstantMessage
             {
                 FromAgent = FromAgent,
                 FromGroup = FromGroup,

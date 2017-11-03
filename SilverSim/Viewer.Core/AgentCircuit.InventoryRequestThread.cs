@@ -42,33 +42,25 @@ namespace SilverSim.Viewer.Core
         private const int MAX_FOLDERS_PER_PACKET = 6;
         private const int MAX_ITEMS_PER_PACKET = 5;
 
-        private void SendAssetNotFound(TransferRequest req)
+        private void SendAssetNotFound(TransferRequest req) => SendMessage(new TransferInfo
         {
-            var res = new TransferInfo()
-            {
-                ChannelType = 2,
-                Status = -2,
-                TargetType = (int)req.SourceType,
-                Params = req.Params,
-                Size = 0,
-                TransferID = req.TransferID
-            };
-            SendMessage(res);
-        }
+            ChannelType = 2,
+            Status = -2,
+            TargetType = (int)req.SourceType,
+            Params = req.Params,
+            Size = 0,
+            TransferID = req.TransferID
+        });
 
-        private void SendAssetInsufficientPermissions(Messages.Transfer.TransferRequest req)
+        private void SendAssetInsufficientPermissions(TransferRequest req) => SendMessage(new TransferInfo
         {
-            var res = new TransferInfo()
-            {
-                ChannelType = 2,
-                Status = -5,
-                TargetType = (int)req.SourceType,
-                Params = req.Params,
-                Size = 0,
-                TransferID = req.TransferID
-            };
-            SendMessage(res);
-        }
+            ChannelType = 2,
+            Status = -5,
+            TargetType = (int)req.SourceType,
+            Params = req.Params,
+            Size = 0,
+            TransferID = req.TransferID
+        });
 
         private void FetchInventoryThread(object param)
         {
@@ -350,7 +342,7 @@ namespace SilverSim.Viewer.Core
                 }
             }
 
-            var ti = new TransferInfo()
+            var ti = new TransferInfo
             {
                 Params = req.Params,
                 ChannelType = 2,
@@ -382,7 +374,7 @@ namespace SilverSim.Viewer.Core
             int assetOffset = 0;
             while (assetOffset < asset.Data.Length)
             {
-                var tp = new TransferPacket()
+                var tp = new TransferPacket
                 {
                     Packet = packetNumber++,
                     ChannelType = 2,
@@ -458,7 +450,7 @@ namespace SilverSim.Viewer.Core
                 }
                 catch
                 {
-                    var res = new AlertMessage()
+                    var res = new AlertMessage
                     {
                         Message = this.GetLanguageString(Agent.CurrentCulture, "FailedToCopyItem", "Failed to copy item")
                     };
@@ -483,7 +475,7 @@ namespace SilverSim.Viewer.Core
                     SendMessage(new AlertMessage("ALERT: CantCreateRequestedInvFolder"));
                     return;
                 }
-                folder = new InventoryFolder()
+                folder = new InventoryFolder
                 {
                     ID = req.FolderID,
                     ParentFolderID = req.ParentFolderID,
@@ -494,7 +486,7 @@ namespace SilverSim.Viewer.Core
                 };
                 Agent.InventoryService.Folder.Add(folder);
 
-                var res = new BulkUpdateInventory()
+                var res = new BulkUpdateInventory
                 {
                     AgentID = req.AgentID,
                     TransactionID = UUID.Zero
@@ -532,13 +524,13 @@ namespace SilverSim.Viewer.Core
 
                 if (res == null)
                 {
-                    res = new FetchInventoryReply()
+                    res = new FetchInventoryReply
                     {
                         AgentID = req.AgentID
                     };
                 }
 
-                var rd = new FetchInventoryReply.ItemDataEntry()
+                var rd = new FetchInventoryReply.ItemDataEntry
                 {
                     ItemID = item.ID,
                     FolderID = item.ParentFolderID,
@@ -625,7 +617,7 @@ namespace SilverSim.Viewer.Core
                 {
                     if (res == null)
                     {
-                        res = new InventoryDescendents()
+                        res = new InventoryDescendents
                         {
                             AgentID = req.AgentID,
                             FolderID = req.FolderID,
@@ -634,7 +626,7 @@ namespace SilverSim.Viewer.Core
                             Descendents = folders.Count + items.Count
                         };
                     }
-                    var d = new InventoryDescendents.FolderDataEntry()
+                    var d = new InventoryDescendents.FolderDataEntry
                     {
                         FolderID = folder.ID,
                         ParentID = folder.ParentFolderID,
@@ -663,7 +655,7 @@ namespace SilverSim.Viewer.Core
                 {
                     if (res == null)
                     {
-                        res = new InventoryDescendents()
+                        res = new InventoryDescendents
                         {
                             AgentID = req.AgentID,
                             FolderID = req.FolderID,
@@ -672,7 +664,7 @@ namespace SilverSim.Viewer.Core
                             Descendents = folders.Count + items.Count
                         };
                     }
-                    var d = new InventoryDescendents.ItemDataEntry()
+                    var d = new InventoryDescendents.ItemDataEntry
                     {
                         ItemID = item.ID,
                         FolderID = item.ParentFolderID,
@@ -714,7 +706,7 @@ namespace SilverSim.Viewer.Core
 
             if (!message_sent)
             {
-                res = new InventoryDescendents()
+                res = new InventoryDescendents
                 {
                     AgentID = req.AgentID,
                     FolderID = req.FolderID,
@@ -734,7 +726,7 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            var item = new InventoryItem()
+            var item = new InventoryItem
             {
                 Owner = Agent.Owner,
                 Creator = Agent.Owner,
@@ -760,7 +752,7 @@ namespace SilverSim.Viewer.Core
             {
                 m_Log.DebugFormat("LinkInventoryItem failed {0} {1}\n{2}", e.GetType().FullName, e.Message, e.StackTrace);
 
-                var res = new AlertMessage()
+                var res = new AlertMessage
                 {
                     Message = "ALERT: CantCreateInventory"
                 };
@@ -895,7 +887,7 @@ namespace SilverSim.Viewer.Core
                 }
                 catch
                 {
-                    var res = new AlertMessage()
+                    var res = new AlertMessage
                     {
                         Message = string.Format("Could not update folder {0}", d.Name)
                     };
@@ -999,7 +991,7 @@ namespace SilverSim.Viewer.Core
                 bool sendUpdate = false;
                 if (d.NextOwnerMask != 0)
                 {
-                    var p = new InventoryPermissionsData()
+                    var p = new InventoryPermissionsData
                     {
                         Base = d.BaseMask,
                         Current = d.OwnerMask,
@@ -1211,7 +1203,7 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            item = new InventoryItem()
+            item = new InventoryItem
             {
                 InventoryType = req.InvType,
                 AssetType = req.AssetType,

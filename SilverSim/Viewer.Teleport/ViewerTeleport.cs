@@ -152,7 +152,7 @@ namespace SilverSim.Viewer.Teleport
 #endif
                     if (!agent.TeleportTo(circuit.Scene, hgRegionInfo.GridURI, hgRegionInfo.ID, req.Position, req.LookAt, TeleportFlags.ViaLocation))
                     {
-                        var failedmsg = new TeleportFailed()
+                        var failedmsg = new TeleportFailed
                         {
                             AgentID = agent.ID,
                             Reason = agent.GetLanguageString(agent.CurrentCulture, "TeleportNotPossibleToRegion", "Teleport to region not possible")
@@ -162,7 +162,7 @@ namespace SilverSim.Viewer.Teleport
                 }
                 else if (!agent.TeleportTo(circuit.Scene, req.GridPosition, req.Position, req.LookAt, TeleportFlags.ViaLocation))
                 {
-                    var failedmsg = new TeleportFailed()
+                    var failedmsg = new TeleportFailed
                     {
                         AgentID = agent.ID,
                         Reason = this.GetLanguageString(agent.CurrentCulture, "TeleportNotPossibleToRegion", "Teleport to region not possible")
@@ -190,7 +190,7 @@ namespace SilverSim.Viewer.Teleport
                 /* TODO: we need the specific local list for HG destinations */
                 if (!agent.TeleportTo(circuit.Scene, req.RegionID, req.Position, req.LookAt, TeleportFlags.ViaLocation))
                 {
-                    var failedmsg = new TeleportFailed()
+                    var failedmsg = new TeleportFailed
                     {
                         AgentID = agent.ID,
                         Reason = agent.GetLanguageString(agent.CurrentCulture, "TeleportNotPossibleToRegion", "Teleport to region not possible")

@@ -444,7 +444,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 get
                 {
-                    var d = new Decoded()
+                    var d = new Decoded
                     {
                         ShapeType = Type,
                         SculptType = SculptType,
@@ -1328,16 +1328,13 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.Text:
+                    Text = new TextParam
                     {
-                        var p = new TextParam()
-                        {
-                            Text = ParamsHelper.GetString(enumerator, "PRIM_TEXT")
-                        };
-                        Vector3 v = ParamsHelper.GetVector(enumerator, "PRIM_TEXT");
-                        double alpha = ParamsHelper.GetDouble(enumerator, "PRIM_TEXT");
-                        p.TextColor = new ColorAlpha(v, alpha);
-                        Text = p;
-                    }
+                        Text = ParamsHelper.GetString(enumerator, "PRIM_TEXT"),
+                        TextColor = new ColorAlpha(
+                            ParamsHelper.GetVector(enumerator, "PRIM_TEXT"),
+                            ParamsHelper.GetDouble(enumerator, "PRIM_TEXT"))
+                    };
                     break;
 
                 case PrimitiveParamsType.Color:
@@ -1388,16 +1385,14 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.PointLight:
+                    PointLight = new PointLightParam
                     {
-                        PointLight = new PointLightParam()
-                        {
-                            IsLight = ParamsHelper.GetBoolean(enumerator, "PRIM_POINT_LIGHT"),
-                            LightColor = new Color(ParamsHelper.GetVector(enumerator, "PRIM_POINT_LIGHT")),
-                            Intensity = ParamsHelper.GetDouble(enumerator, "PRIM_POINT_LIGHT"),
-                            Radius = ParamsHelper.GetDouble(enumerator, "PRIM_POINT_LIGHT"),
-                            Falloff = ParamsHelper.GetDouble(enumerator, "PRIM_POINT_LIGHT")
-                        };
-                    }
+                        IsLight = ParamsHelper.GetBoolean(enumerator, "PRIM_POINT_LIGHT"),
+                        LightColor = new Color(ParamsHelper.GetVector(enumerator, "PRIM_POINT_LIGHT")),
+                        Intensity = ParamsHelper.GetDouble(enumerator, "PRIM_POINT_LIGHT"),
+                        Radius = ParamsHelper.GetDouble(enumerator, "PRIM_POINT_LIGHT"),
+                        Falloff = ParamsHelper.GetDouble(enumerator, "PRIM_POINT_LIGHT")
+                    };
                     break;
 
                 case PrimitiveParamsType.FullBright:
@@ -1416,17 +1411,15 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.Flexible:
+                    Flexible = new FlexibleParam
                     {
-                        Flexible = new FlexibleParam()
-                        {
-                            IsFlexible = ParamsHelper.GetBoolean(enumerator, "PRIM_FLEXIBLE"),
-                            Softness = ParamsHelper.GetInteger(enumerator, "PRIM_FLEXIBLE"),
-                            Gravity = ParamsHelper.GetDouble(enumerator, "PRIM_FLEXIBLE"),
-                            Friction = ParamsHelper.GetDouble(enumerator, "PRIM_FLEXIBLE"),
-                            Wind = ParamsHelper.GetDouble(enumerator, "PRIM_FLEXIBLE"),
-                            Force = ParamsHelper.GetVector(enumerator, "PRIM_FLEXIBLE")
-                        };
-                    }
+                        IsFlexible = ParamsHelper.GetBoolean(enumerator, "PRIM_FLEXIBLE"),
+                        Softness = ParamsHelper.GetInteger(enumerator, "PRIM_FLEXIBLE"),
+                        Gravity = ParamsHelper.GetDouble(enumerator, "PRIM_FLEXIBLE"),
+                        Friction = ParamsHelper.GetDouble(enumerator, "PRIM_FLEXIBLE"),
+                        Wind = ParamsHelper.GetDouble(enumerator, "PRIM_FLEXIBLE"),
+                        Force = ParamsHelper.GetVector(enumerator, "PRIM_FLEXIBLE")
+                    };
                     break;
 
                 case PrimitiveParamsType.TexGen:
@@ -1462,14 +1455,12 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.Omega:
+                    Omega = new OmegaParam
                     {
-                        Omega = new OmegaParam()
-                        {
-                            Axis = ParamsHelper.GetVector(enumerator, "PRIM_OMEGA"),
-                            Spinrate = ParamsHelper.GetDouble(enumerator, "PRIM_OMEGA"),
-                            Gain = ParamsHelper.GetDouble(enumerator, "PRIM_OMEGA")
-                        };
-                    }
+                        Axis = ParamsHelper.GetVector(enumerator, "PRIM_OMEGA"),
+                        Spinrate = ParamsHelper.GetDouble(enumerator, "PRIM_OMEGA"),
+                        Gain = ParamsHelper.GetDouble(enumerator, "PRIM_OMEGA")
+                    };
                     break;
 
                 case PrimitiveParamsType.AllowUnsit:
@@ -1501,16 +1492,14 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.Projector:
+                    Projection = new ProjectionParam
                     {
-                        var param = new ProjectionParam()
-                        {
-                            IsProjecting = ParamsHelper.GetBoolean(enumerator, "PRIM_PROJECTOR"),
-                            ProjectionTextureID = GetTextureParam(enumerator, "PRIM_PROJECTOR"),
-                            ProjectionFOV = ParamsHelper.GetDouble(enumerator, "PRIM_PROJECTOR"),
-                            ProjectionFocus = ParamsHelper.GetDouble(enumerator, "PRIM_PROJECTOR"),
-                            ProjectionAmbience = ParamsHelper.GetDouble(enumerator, "PRIM_PROJECTOR")
-                        };
-                    }
+                        IsProjecting = ParamsHelper.GetBoolean(enumerator, "PRIM_PROJECTOR"),
+                        ProjectionTextureID = GetTextureParam(enumerator, "PRIM_PROJECTOR"),
+                        ProjectionFOV = ParamsHelper.GetDouble(enumerator, "PRIM_PROJECTOR"),
+                        ProjectionFocus = ParamsHelper.GetDouble(enumerator, "PRIM_PROJECTOR"),
+                        ProjectionAmbience = ParamsHelper.GetDouble(enumerator, "PRIM_PROJECTOR")
+                    };
                     break;
 
                 case PrimitiveParamsType.ProjectorEnabled:

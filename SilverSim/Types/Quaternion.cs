@@ -645,7 +645,7 @@ namespace SilverSim.Types
             double yz = Y * Z;
             double xw = X * W;
 
-            return new Matrix4()
+            return new Matrix4
             {
                 M11 = 1f - (2f * (yy + zz)),
                 M12 = 2f * (xy + zw),

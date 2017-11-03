@@ -77,7 +77,7 @@ namespace SilverSim.Viewer.Core
             }
             catch
             {
-                var res = new AlertMessage()
+                var res = new AlertMessage
                 {
                     Message = "ALERT: ScriptMissing"
                 };
@@ -93,7 +93,7 @@ namespace SilverSim.Viewer.Core
                 }
                 catch
                 {
-                    var res = new AlertMessage()
+                    var res = new AlertMessage
                     {
                         Message = "ALERT: ScriptMissing"
                     };
@@ -104,7 +104,7 @@ namespace SilverSim.Viewer.Core
 
             if(item.AssetType != AssetType.LSLText)
             {
-                var res = new AlertMessage()
+                var res = new AlertMessage
                 {
                     Message = "Unable to rez a non-script asset as script"
                 };
@@ -128,7 +128,7 @@ namespace SilverSim.Viewer.Core
                 }
                 catch
                 {
-                    var res = new AlertMessage()
+                    var res = new AlertMessage
                     {
                         Message = "ALERT: ScriptMissing"
                     };
@@ -147,7 +147,7 @@ namespace SilverSim.Viewer.Core
                 }
                 catch
                 {
-                    var res = new AlertMessage()
+                    var res = new AlertMessage
                     {
                         Message = "ALERT: UnableToLoadScript"
                     };
@@ -158,7 +158,7 @@ namespace SilverSim.Viewer.Core
 
             if (data.Type != AssetType.LSLText)
             {
-                var res = new Messages.Alert.AlertMessage()
+                var res = new AlertMessage
                 {
                     Message = this.GetLanguageString(CurrentCulture, "UnableToRezANonScriptAsScript", "Unable to rez a non-script asset as script")
                 };
@@ -184,7 +184,7 @@ namespace SilverSim.Viewer.Core
             }
             catch
             {
-                var res = new AlertMessage()
+                var res = new AlertMessage
                 {
                     Message = "ALERT: ScriptMissing"
                 };
@@ -199,14 +199,14 @@ namespace SilverSim.Viewer.Core
         {
             if(!part.CheckPermissions(Owner, Group, InventoryPermissionsMask.Modify))
             {
-                var res = new AlertMessage()
+                var res = new AlertMessage
                 {
                     Message = "ALERT: NoPermModifyObject"
                 };
                 circuit.SendMessage(res);
                 return;
             }
-            var item = new ObjectPartInventoryItem()
+            var item = new ObjectPartInventoryItem
             {
                 Name = req.InventoryBlock.Name,
                 AssetID = data.ID,
@@ -243,7 +243,7 @@ namespace SilverSim.Viewer.Core
             }
             catch
             {
-                var res = new AlertMessage()
+                var res = new AlertMessage
                 {
                     Message = this.GetLanguageString(circuit.Agent.CurrentCulture, "CouldNotCompileScript", "Could not compile script")
                 };

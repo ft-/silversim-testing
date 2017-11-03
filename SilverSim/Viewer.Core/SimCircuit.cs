@@ -103,7 +103,7 @@ namespace SilverSim.Viewer.Core
 
                 case MessageType.ChatPass:
                     {
-                        var ev = new ListenEvent()
+                        var ev = new ListenEvent
                         {
                             Channel = p.ReadInt32(),
                             GlobalPosition = p.ReadVector3f(),

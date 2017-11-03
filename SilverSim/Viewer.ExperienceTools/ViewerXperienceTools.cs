@@ -231,7 +231,7 @@ namespace SilverSim.Viewer.ExperienceTools
             {
                 ids.Add(id);
             }
-            Map resdata = new Map()
+            var resdata = new Map
             {
                 ["experience_ids"] = ids,
                 ["purchase"] = new ABoolean(true)
@@ -484,7 +484,7 @@ namespace SilverSim.Viewer.ExperienceTools
             {
                 ids.Add(id);
             }
-            Map resdata = new Map()
+            var resdata = new Map
             {
                 ["experience_ids"] = ids
             };
@@ -541,7 +541,7 @@ namespace SilverSim.Viewer.ExperienceTools
             {
                 ids.Add(id);
             }
-            Map resdata = new Map()
+            var resdata = new Map
             {
                 ["experience_ids"] = ids
             };
@@ -754,7 +754,7 @@ namespace SilverSim.Viewer.ExperienceTools
             {
                 ids.Add(id);
             }
-            Map resdata = new Map()
+            var resdata = new Map
             {
                 ["experience_ids"] = ids
             };

@@ -332,7 +332,7 @@ namespace SilverSim.Viewer.Core
             UInt64 XferID = NextXferID;
             m_AssetTransactions.Add(transactionID, XferID, t);
             t.XferID = XferID;
-            var m = new RequestXfer()
+            var m = new RequestXfer
             {
                 ID = t.XferID,
                 VFileType = (short)t.AssetType,
@@ -345,7 +345,7 @@ namespace SilverSim.Viewer.Core
             return transactionID;
         }
 
-        private AssetData BuildUploadedAsset(AssetUploadTransaction t) => new AssetData()
+        private AssetData BuildUploadedAsset(AssetUploadTransaction t) => new AssetData
         {
             Data = BuildUploadedData(t),
             ID = t.AssetID,
@@ -409,7 +409,7 @@ namespace SilverSim.Viewer.Core
 #if DEBUG
                 m_Log.DebugFormat("AssetUploadRequest(): Added asset upload transaction {0} for {1}: Xfer packets", req.TransactionID, Owner.FullName);
 #endif
-                var reqxfer = new RequestXfer()
+                var reqxfer = new RequestXfer
                 {
                     ID = transaction.XferID,
                     VFileType = (short)transaction.AssetType,
@@ -479,7 +479,7 @@ namespace SilverSim.Viewer.Core
                 }
             }
             m_AssetTransactions.Remove(transaction.XferID);
-            var req = new AssetUploadComplete()
+            var req = new AssetUploadComplete
             {
                 AssetID = data.ID,
                 AssetType = data.Type,
@@ -495,7 +495,7 @@ namespace SilverSim.Viewer.Core
             var id = UUID.Random;
             t.XferID = NextXferID;
             m_TerrainTransactions.Add(id, t.XferID, t);
-            var m = new RequestXfer()
+            var m = new RequestXfer
             {
                 ID = t.XferID,
                 VFileType = 0,
@@ -528,7 +528,7 @@ namespace SilverSim.Viewer.Core
                     assettransaction.DataBlocks.Add(req.Data);
                 }
 
-                var p = new ConfirmXferPacket()
+                var p = new ConfirmXferPacket
                 {
                     ID = assettransaction.XferID,
                     Packet = req.Packet
@@ -556,7 +556,7 @@ namespace SilverSim.Viewer.Core
             {
                 terraintransaction.DataBlocks.Add(req.Data);
 
-                var p = new ConfirmXferPacket()
+                var p = new ConfirmXferPacket
                 {
                     ID = terraintransaction.XferID,
                     Packet = req.Packet
