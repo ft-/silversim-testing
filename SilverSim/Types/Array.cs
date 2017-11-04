@@ -142,8 +142,7 @@ namespace SilverSim.Types
             iv = this[key];
             if (!(iv is T))
             {
-                val = default(T);
-                return false;
+                return AccessorTypecastHelper.TryConvertTo(iv, out val);
             }
             val = (T)iv;
             return true;
