@@ -766,14 +766,7 @@ namespace SilverSim.Scene.Agent
             get
             {
                 byte[] vp = m_VisualParams;
-                if(vp.Length > 31)
-                {
-                    return vp[31] / 255;
-                }
-                else
-                {
-                    return 0;
-                }
+                return (vp.Length > 31) ? vp[31] / 255 : 0;
             }
         }
 
