@@ -33,12 +33,13 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
     {
         private Bitmap m_BakeGloves;
         private byte[] m_BumpGloves;
-        private UUID m_GlovesTextureId;
-        private Color3 m_GlovesColor;
-        private double m_GlovesLength;
-        private double m_GlovesFingers;
-        private double m_GlovesFingersBump;
-        private double m_GlovesLengthBump;
+
+        private readonly UUID m_GlovesTextureId;
+        private readonly Color3 m_GlovesColor;
+        private readonly double m_GlovesLength;
+        private readonly double m_GlovesFingers;
+        private readonly double m_GlovesFingersBump;
+        private readonly double m_GlovesLengthBump;
 
         public GlovesSubBaker(Wearable gloves)
         {

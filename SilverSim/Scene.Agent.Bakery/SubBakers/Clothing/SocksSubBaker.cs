@@ -34,10 +34,10 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
         private Bitmap m_LowerBake;
         private byte[] m_LowerBump;
 
-        private UUID m_TextureId;
-        private Color3 m_Color;
-        private double m_SocksLength;
-        private double m_SocksLengthBump;
+        private readonly UUID m_TextureId;
+        private readonly Color3 m_Color;
+        private readonly double m_SocksLength;
+        private readonly double m_SocksLengthBump;
 
         public SocksSubBaker(Wearable socks)
         {

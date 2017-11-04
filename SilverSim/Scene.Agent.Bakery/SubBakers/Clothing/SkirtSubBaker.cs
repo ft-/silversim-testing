@@ -34,13 +34,13 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
         private Bitmap m_Bake;
         private byte[] m_Bump;
 
-        private UUID m_TextureId;
-        private double m_SkirtLength;
-        private double m_SlitFront;
-        private double m_SlitBack;
-        private double m_SlitLeft;
-        private double m_SlitRight;
-        private Color3 m_Color;
+        private readonly UUID m_TextureId;
+        private readonly double m_SkirtLength;
+        private readonly double m_SlitFront;
+        private readonly double m_SlitBack;
+        private readonly double m_SlitLeft;
+        private readonly double m_SlitRight;
+        private readonly Color3 m_Color;
 
         public SkirtSubBaker(Wearable skirt)
         {

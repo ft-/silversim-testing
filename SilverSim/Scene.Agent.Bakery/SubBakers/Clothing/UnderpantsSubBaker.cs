@@ -34,12 +34,12 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
         private Bitmap m_LowerBake;
         private byte[] m_LowerBump;
 
-        private Color3 m_Color;
-        private double m_PantsLength;
-        private double m_PantsLengthBump;
-        private double m_PantsWaist;
-        private double m_PantsWaistBump;
-        private UUID m_TextureId;
+        private readonly Color3 m_Color;
+        private readonly double m_PantsLength;
+        private readonly double m_PantsLengthBump;
+        private readonly double m_PantsWaist;
+        private readonly double m_PantsWaistBump;
+        private readonly UUID m_TextureId;
 
         public UnderpantsSubBaker(Wearable underpants)
         {

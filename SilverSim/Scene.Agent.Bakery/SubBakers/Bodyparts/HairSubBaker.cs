@@ -35,8 +35,8 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
         private Image m_HairBake;
 
         //parameters
-        private ColorAlpha m_HairColor;
-        private UUID m_HairTextureId;
+        private readonly ColorAlpha m_HairColor;
+        private readonly UUID m_HairTextureId;
 
         public HairSubBaker(Wearable hair)
         {

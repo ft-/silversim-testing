@@ -37,11 +37,11 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
         private Image LowerBake;
 
         /* parameters */
-        private Color3 m_TattooUpperColor;
-        private Color3 m_TattooLowerColor;
-        private UUID m_HeadTattooId;
-        private UUID m_UpperTattooId;
-        private UUID m_LowerTattooId;
+        private readonly Color3 m_TattooUpperColor;
+        private readonly Color3 m_TattooLowerColor;
+        private readonly UUID m_HeadTattooId;
+        private readonly UUID m_UpperTattooId;
+        private readonly UUID m_LowerTattooId;
 
         public TattooSubBaker(Wearable tattoo)
         {

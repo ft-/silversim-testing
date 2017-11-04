@@ -37,20 +37,20 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
         private Image LowerBake;
 
         /* parameters */
-        private Color3 m_SkinColor;
-        private ColorAlpha m_RosyComplexionColor;
-        private ColorAlpha m_LipPinknessColor;
-        private ColorAlpha m_LipstickColor;
-        private ColorAlpha m_BlushColor;
-        private ColorAlpha m_OutershadowColor;
-        private ColorAlpha m_InnershadowColor;
-        private ColorAlpha m_EyelinerColor;
-        private ColorAlpha m_NailpolishColor;
-        private double m_Innershadow;
-        private double m_Outershadow;
-        private UUID m_HeadTextureId;
-        private UUID m_UpperTextureId;
-        private UUID m_LowerTextureId;
+        private readonly Color3 m_SkinColor;
+        private readonly ColorAlpha m_RosyComplexionColor;
+        private readonly ColorAlpha m_LipPinknessColor;
+        private readonly ColorAlpha m_LipstickColor;
+        private readonly ColorAlpha m_BlushColor;
+        private readonly ColorAlpha m_OutershadowColor;
+        private readonly ColorAlpha m_InnershadowColor;
+        private readonly ColorAlpha m_EyelinerColor;
+        private readonly ColorAlpha m_NailpolishColor;
+        private readonly double m_Innershadow;
+        private readonly double m_Outershadow;
+        private readonly UUID m_HeadTextureId;
+        private readonly UUID m_UpperTextureId;
+        private readonly UUID m_LowerTextureId;
 
         public SkinSubBaker(Wearable skin)
         {

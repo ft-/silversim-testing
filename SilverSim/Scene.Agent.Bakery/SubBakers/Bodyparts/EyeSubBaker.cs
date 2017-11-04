@@ -33,8 +33,8 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
         public Image EyeBake;
 
         //Parameters
-        private Color3 m_EyeColor;
-        private UUID m_EyeTextureId;
+        private readonly Color3 m_EyeColor;
+        private readonly UUID m_EyeTextureId;
 
         public EyeSubBaker(Wearable eyes)
         {

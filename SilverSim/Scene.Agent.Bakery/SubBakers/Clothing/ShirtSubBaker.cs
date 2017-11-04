@@ -34,17 +34,17 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
         private Bitmap m_UpperBake;
         private byte[] m_UpperBump;
 
-        private Color3 m_ShirtColor;
-        private UUID m_UpperTextureId;
-        private double m_SleeveLength;
-        private double m_BottomLength;
-        private double m_CollarFrontHeight;
-        private double m_CollarBackHeight;
-        private double m_SleeveLengthBump;
-        private double m_BottomLengthBump;
-        private double m_CollarFrontHeightBump;
-        private double m_CollarBackHeightBump;
-        private double m_Displace;
+        private readonly Color3 m_ShirtColor;
+        private readonly UUID m_UpperTextureId;
+        private readonly double m_SleeveLength;
+        private readonly double m_BottomLength;
+        private readonly double m_CollarFrontHeight;
+        private readonly double m_CollarBackHeight;
+        private readonly double m_SleeveLengthBump;
+        private readonly double m_BottomLengthBump;
+        private readonly double m_CollarFrontHeightBump;
+        private readonly double m_CollarBackHeightBump;
+        private readonly double m_Displace;
 
         public ShirtSubBaker(Wearable shirt)
         {

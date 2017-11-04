@@ -552,8 +552,8 @@ namespace SilverSim.Http
 
         public class Http2Stream : Stream
         {
-            private BlockingQueue<Http2Frame> m_Http2Queue = new BlockingQueue<Http2Frame>();
-            private BlockingQueue<Http2Frame> m_Http2WindowUpdateQueue = new BlockingQueue<Http2Frame>();
+            private readonly BlockingQueue<Http2Frame> m_Http2Queue = new BlockingQueue<Http2Frame>();
+            private readonly BlockingQueue<Http2Frame> m_Http2WindowUpdateQueue = new BlockingQueue<Http2Frame>();
             private readonly Http2Connection m_Conn;
             private readonly uint m_StreamIdentifier;
             private bool m_HaveReceivedHeaders;
@@ -563,9 +563,9 @@ namespace SilverSim.Http
             private byte[] m_BufferedReceiveData;
             private int m_ConsumedReceiveDataBytes;
             private int m_AvailableReceiveDataBytes;
-            private byte[] m_BufferedTransmitData = new byte[16384];
+            private const int m_MaxTransmitDataBytes = 16384;
+            private readonly byte[] m_BufferedTransmitData = new byte[m_MaxTransmitDataBytes];
             private int m_BufferedTransmitDataBytes;
-            private int m_MaxTransmitDataBytes = 16384;
             private readonly List<KeyValuePair<byte[], byte[]>> m_RxDynamicTable = new List<KeyValuePair<byte[], byte[]>>();
             private uint m_MaxTableByteSize;
             private uint m_WindowSize;

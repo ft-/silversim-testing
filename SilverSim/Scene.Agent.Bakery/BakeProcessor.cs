@@ -199,7 +199,8 @@ namespace SilverSim.Scene.Agent.Bakery
         private byte[] ResizeBump(byte[] srcbump, int targetDimension)
         {
             int n = targetDimension * targetDimension;
-            int di = 0, si;
+            int di = 0;
+            int si;
 
             var dstbump = new byte[n];
             int srcDimension = 128;
@@ -288,7 +289,8 @@ namespace SilverSim.Scene.Agent.Bakery
                     {
                         continue;
                     }
-                    Tgt.Images.Add(idx, bmp = new Bitmap(dimensions, dimensions, PixelFormat.Format32bppArgb));
+                    bmp = new Bitmap(dimensions, dimensions, PixelFormat.Format32bppArgb);
+                    Tgt.Images.Add(idx, bmp);
                     Graphics gfx = Graphics.FromImage(bmp);
                     if(idx == BakeTarget.Hair)
                     {

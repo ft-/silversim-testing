@@ -35,11 +35,11 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
         private Image m_LowerbodyBake;
         private Image m_EyesBake;
 
-        private UUID m_HairTextureId;
-        private UUID m_HeadTextureId;
-        private UUID m_UpperbodyTextureId;
-        private UUID m_LowerbodyTextureId;
-        private UUID m_EyesTextureId;
+        private readonly UUID m_HairTextureId;
+        private readonly UUID m_HeadTextureId;
+        private readonly UUID m_UpperbodyTextureId;
+        private readonly UUID m_LowerbodyTextureId;
+        private readonly UUID m_EyesTextureId;
 
         public AlphaMaskSubBaker(Wearable alpha)
         {
