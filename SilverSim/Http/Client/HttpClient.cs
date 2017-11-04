@@ -186,7 +186,7 @@ namespace SilverSim.Http.Client
             string postdata = request.RequestBody;
             if (postdata != null)
             {
-                var buffer = new byte[0];
+                byte[] buffer;
                 request.RequestContentLength = 0;
 
                 buffer = postdata.ToUTF8Bytes();
@@ -745,13 +745,11 @@ redoafter401:
 
             IDictionary<string, string> headers = request.Headers;
             string content_type = request.RequestContentType;
-            int content_length = request.RequestContentLength;
             bool compressed = request.IsCompressed;
             bool expect100Continue = request.Expect100Continue;
 
             if (headers != null)
             {
-                var removal = new List<string>();
                 foreach (KeyValuePair<string, string> k in headers)
                 {
                     string kn = k.Key.ToLower();

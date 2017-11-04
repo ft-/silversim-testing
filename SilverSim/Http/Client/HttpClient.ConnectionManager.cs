@@ -302,7 +302,6 @@ namespace SilverSim.Http.Client
             SslProtocols enabledSslProtocols,
             bool checkCertificateRevocation)
         {
-            string key = scheme + "://" + host + ":" + port.ToString();
             Http2Connection.Http2Stream h2stream = TryReuseStream(scheme, host, port);
             if(h2stream != null)
             {
