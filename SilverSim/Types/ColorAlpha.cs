@@ -32,15 +32,9 @@ namespace SilverSim.Types
         public double B;
         public double A;
 
-        public static Color FromRgb(uint r, uint g, uint b)
-        {
-            return new Color(r / 255.0, g / 255.0, b / 255.0);
-        }
+        public static Color FromRgb(uint r, uint g, uint b) => new Color(r / 255.0, g / 255.0, b / 255.0);
 
-        public static ColorAlpha FromRgba(uint r, uint g, uint b, uint a)
-        {
-            return new ColorAlpha(r / 255.0, g / 255.0, b / 255.0, a / 255.0);
-        }
+        public static ColorAlpha FromRgba(uint r, uint g, uint b, uint a) => new ColorAlpha(r / 255.0, g / 255.0, b / 255.0, a / 255.0);
 
         #region Constructors
         public ColorAlpha(double r, double g, double b, double alpha)
@@ -223,35 +217,17 @@ namespace SilverSim.Types
 
         public byte[] AsByte => new byte[] { R_AsByte, G_AsByte, B_AsByte, A_AsByte };
 
-        public override string ToString()
-        {
-            return string.Format("R={0},G={1},B={2},A={3}", R.ToString(CultureInfo.InvariantCulture), G.ToString(CultureInfo.InvariantCulture), B.ToString(CultureInfo.InvariantCulture), A.ToString(CultureInfo.InvariantCulture));
-        }
+        public override string ToString() => string.Format("R={0},G={1},B={2},A={3}", R.ToString(CultureInfo.InvariantCulture), G.ToString(CultureInfo.InvariantCulture), B.ToString(CultureInfo.InvariantCulture), A.ToString(CultureInfo.InvariantCulture));
 
-        public bool Equals(ColorAlpha other)
-        {
-            return R == other.R && G == other.G && B == other.B && A == other.A;
-        }
+        public bool Equals(ColorAlpha other) => R == other.R && G == other.G && B == other.B && A == other.A;
 
-        public override int GetHashCode()
-        {
-            return R.GetHashCode() ^ G.GetHashCode() ^ B.GetHashCode() ^ A.GetHashCode();
-        }
+        public override int GetHashCode() => R.GetHashCode() ^ G.GetHashCode() ^ B.GetHashCode() ^ A.GetHashCode();
 
-        public override bool Equals(object obj)
-        {
-            return (obj is ColorAlpha) ? Equals((ColorAlpha)obj) : false;
-        }
+        public override bool Equals(object obj) => (obj is ColorAlpha) && Equals((ColorAlpha)obj);
 
-        public static bool operator==(ColorAlpha a, ColorAlpha b)
-        {
-            return a.Equals(b);
-        }
+        public static bool operator ==(ColorAlpha a, ColorAlpha b) => a.Equals(b);
 
-        public static bool operator !=(ColorAlpha a, ColorAlpha b)
-        {
-            return !a.Equals(b);
-        }
+        public static bool operator !=(ColorAlpha a, ColorAlpha b) => !a.Equals(b);
         #endregion
 
         /// <summary>A Color4 with zero RGB values and fully opaque (alpha 1.0)</summary>

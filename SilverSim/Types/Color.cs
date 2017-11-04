@@ -32,10 +32,7 @@ namespace SilverSim.Types
         public double B;
 
         #region Constructors
-        public static Color FromRgb(uint r, uint g, uint b)
-        {
-            return new Color(r / 255.0, g / 255.0, b / 255.0);
-        }
+        public static Color FromRgb(uint r, uint g, uint b) => new Color(r / 255.0, g / 255.0, b / 255.0);
 
         public Color(double r, double g, double b)
         {
@@ -154,36 +151,18 @@ namespace SilverSim.Types
 
         public byte[] AsByte => new byte[] { R_AsByte, G_AsByte, B_AsByte };
 
-        public override string ToString()
-        {
-            return string.Format("R={0},G={1},B={2}", R.ToString(CultureInfo.InvariantCulture), G.ToString(CultureInfo.InvariantCulture), B.ToString(CultureInfo.InvariantCulture));
-        }
+        public override string ToString() => string.Format("R={0},G={1},B={2}", R.ToString(CultureInfo.InvariantCulture), G.ToString(CultureInfo.InvariantCulture), B.ToString(CultureInfo.InvariantCulture));
 
 
-        public bool Equals(Color other)
-        {
-            return R == other.R && G == other.G && B == other.B;
-        }
+        public bool Equals(Color other) => R == other.R && G == other.G && B == other.B;
 
-        public override int GetHashCode()
-        {
-            return R.GetHashCode() ^ G.GetHashCode() ^ B.GetHashCode();
-        }
+        public override int GetHashCode() => R.GetHashCode() ^ G.GetHashCode() ^ B.GetHashCode();
 
-        public override bool Equals(object obj)
-        {
-            return (obj is Color) ? Equals((Color)obj) : false;
-        }
+        public override bool Equals(object obj) => (obj is Color) && Equals((Color)obj);
 
-        public static bool operator ==(Color a, Color b)
-        {
-            return a.Equals(b);
-        }
+        public static bool operator ==(Color a, Color b) => a.Equals(b);
 
-        public static bool operator !=(Color a, Color b)
-        {
-            return !a.Equals(b);
-        }
+        public static bool operator !=(Color a, Color b) => !a.Equals(b);
         #endregion
     }
 }

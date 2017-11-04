@@ -85,15 +85,9 @@ namespace SilverSim.Types
         public static bool operator ==(GridVector a, GridVector b) => a.X == b.X && a.Y == b.Y;
         public static bool operator !=(GridVector a, GridVector b) => a.X != b.X || a.Y != b.Y;
 
-        public override bool Equals(object o)
-        {
-            return (o is GridVector) ? this == (GridVector)o : false;
-        }
+        public override bool Equals(object o) => (o is GridVector) && this == (GridVector)o;
 
-        public override int GetHashCode()
-        {
-            return X.GetHashCode() ^ Y.GetHashCode();
-        }
+        public override int GetHashCode() => X.GetHashCode() ^ Y.GetHashCode();
 
         #endregion
 
