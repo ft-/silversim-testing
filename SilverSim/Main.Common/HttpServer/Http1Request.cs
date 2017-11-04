@@ -387,6 +387,11 @@ namespace SilverSim.Main.Common.HttpServer
                 callerIP;
         }
 
+        ~Http1Request()
+        {
+            m_Body?.Dispose();
+        }
+
         public override HttpResponse BeginResponse()
         {
             FinishRequestBody();

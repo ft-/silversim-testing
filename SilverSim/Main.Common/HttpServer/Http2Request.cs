@@ -176,6 +176,11 @@ namespace SilverSim.Main.Common.HttpServer
                 callerIP;
         }
 
+        ~Http2Request()
+        {
+            m_Body?.Dispose();
+        }
+
         public override HttpResponse BeginChunkedResponse() =>
             BeginResponse(HttpStatusCode.OK, "OK");
 
