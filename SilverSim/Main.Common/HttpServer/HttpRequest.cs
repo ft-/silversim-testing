@@ -136,7 +136,7 @@ namespace SilverSim.Main.Common.HttpServer
             using (HttpResponse res = BeginResponse(contentType))
             using (res.GetOutputStream(0))
             {
-
+                /* intentionally left empty */
             }
         }
 
@@ -161,7 +161,7 @@ namespace SilverSim.Main.Common.HttpServer
                 res.ContentType = "text/plain";
                 using (res.GetOutputStream(0))
                 {
-
+                    /* intentionally left empty */
                 }
             }
         }

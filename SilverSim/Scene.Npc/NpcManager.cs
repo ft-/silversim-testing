@@ -466,7 +466,6 @@ namespace SilverSim.Scene.Npc
         {
             UUID ncid;
             UGI group = UGI.Unknown;
-            UUI owner = UUI.Unknown;
             if (args[0] == "help" || args.Count < 5)
             {
                 io.Write("create npc <firstname> <lastname> <notecardid> [params...] - Remove NPC\n" +
@@ -524,7 +523,7 @@ namespace SilverSim.Scene.Npc
                 }
             }
 
-            owner = scene.Owner;
+            UUI owner = scene.Owner;
 
             UUID groupid;
 

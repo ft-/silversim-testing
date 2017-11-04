@@ -233,7 +233,8 @@ namespace SilverSim.Main.Common.HttpServer
 
         public class RequestBodyStream : Stream
         {
-            Http2Request m_Req;
+            private readonly Http2Request m_Req;
+
             public RequestBodyStream(Http2Request req)
             {
                 m_Req = req;

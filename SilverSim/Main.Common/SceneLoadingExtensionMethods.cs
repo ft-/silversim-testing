@@ -343,7 +343,6 @@ namespace SilverSim.Main.Common
                         {
                             if (valid[px, py] == 0)
                             {
-                                LayerPatch p = loadparams.Scene.Terrain.Patch[px, py];
                                 loadparams.Scene.Terrain.Patch.MarkDirty(px, py);
                                 ++count;
                             }

@@ -207,13 +207,10 @@ retry:
                                     throw new SimGridInfoXmlException();
                                 }
                                 bool success = LoadFromGridsXml_Root(config, reader, gridId);
-                                if(!success && filename != gridspecificfile)
+                                if (!success && filename != gridspecificfile && TryInstallingFromPackage(gridId))
                                 {
-                                    if(TryInstallingFromPackage(gridId))
-                                    {
-                                        filename = gridspecificfile;
-                                        goto retry;
-                                    }
+                                    filename = gridspecificfile;
+                                    goto retry;
                                 }
                                 return success;
 

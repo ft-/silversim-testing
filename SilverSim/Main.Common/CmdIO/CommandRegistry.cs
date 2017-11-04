@@ -32,7 +32,7 @@ namespace SilverSim.Main.Common.CmdIO
         private readonly object m_RegisterCmdGroupLock = new object();
 
         public RwLockedDictionary<string, Action<List<string>, TTY, UUID>> Commands { get; } = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
-        private Dictionary<string, RwLockedDictionary<string, Action<List<string>, TTY, UUID>>> m_SubCommands = new Dictionary<string, RwLockedDictionary<string, Action<List<string>, TTY, UUID>>>();
+        private readonly Dictionary<string, RwLockedDictionary<string, Action<List<string>, TTY, UUID>>> m_SubCommands = new Dictionary<string, RwLockedDictionary<string, Action<List<string>, TTY, UUID>>>();
 
         public RwLockedDictionary<string, Action<List<string>, TTY, UUID>> CheckAddCommandType(string cmd)
         {
