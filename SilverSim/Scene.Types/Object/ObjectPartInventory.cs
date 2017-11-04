@@ -149,7 +149,7 @@ namespace SilverSim.Scene.Types.Object
                     if (item.InventoryType == InventoryType.LSL)
                     {
                         var script = item.ScriptInstance;
-                        if(script?.IsRunning == true)
+                        if(script?.IsRunning ?? false)
                         {
                             ++n;
                         }

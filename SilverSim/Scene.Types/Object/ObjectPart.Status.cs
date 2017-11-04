@@ -25,11 +25,11 @@ namespace SilverSim.Scene.Types.Object
 {
     public partial class ObjectPart
     {
-        private bool m_IsSandbox = false;
-        private bool m_IsBlockGrab = false;
-        private bool m_IsDieAtEdge = false;
-        private bool m_IsReturnAtEdge = false;
-        private bool m_IsBlockGrabObject = false;
+        private bool m_IsSandbox;
+        private bool m_IsBlockGrab;
+        private bool m_IsDieAtEdge;
+        private bool m_IsReturnAtEdge;
+        private bool m_IsBlockGrabObject;
 
         public bool IsSandbox
         {

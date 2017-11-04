@@ -79,7 +79,7 @@ namespace SilverSim.Types.Asset.Format
                     {
                         im = LlsdXml.Deserialize(i) as Map;
                     }
-                    if (im?.ContainsKey("serial") == true &&
+                    if (im?.ContainsKey("serial") ?? false &&
                         im.ContainsKey("height") &&
                         im.ContainsKey("wearables") &&
                         im.ContainsKey("textures") &&

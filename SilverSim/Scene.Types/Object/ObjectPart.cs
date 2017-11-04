@@ -117,7 +117,7 @@ namespace SilverSim.Scene.Types.Object
             get
             {
                 ObjectGroup grp = ObjectGroup;
-                if(grp?.IsAttached == true)
+                if(grp?.IsAttached ?? false)
                 {
                     return PathfindingType.Other;
                 }

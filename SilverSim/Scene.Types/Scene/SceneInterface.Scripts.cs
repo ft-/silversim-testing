@@ -89,7 +89,7 @@ namespace SilverSim.Scene.Types.Scene
             {
                 ItemID = req.ItemID,
                 ObjectID = req.ObjectID,
-                IsRunning = instance?.IsRunning == true
+                IsRunning = instance?.IsRunning ?? false
             };
             agent.SendMessageAlways(reply, ID);
         }
@@ -126,7 +126,7 @@ namespace SilverSim.Scene.Types.Scene
             {
                 ItemID = req.ItemID,
                 ObjectID = req.ObjectID,
-                IsRunning = instance?.IsRunning == true
+                IsRunning = instance?.IsRunning ?? false
             };
             agent.SendMessageAlways(reply, ID);
         }

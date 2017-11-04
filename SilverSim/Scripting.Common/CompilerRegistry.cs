@@ -288,7 +288,7 @@ namespace SilverSim.Scripting.Common
 
                 using (var headReader = new StreamReaderAddHead(header.ToString(), reader))
                 {
-                    return Compile(user, shbangs, assetID, headReader, 1, cultureInfo);
+                    return Compile(user, shbangs, assetID, headReader, cultureInfo: cultureInfo);
                 }
             }
 
@@ -310,7 +310,7 @@ namespace SilverSim.Scripting.Common
 
                 using (var headReader = new StreamReaderAddHead(header.ToString(), reader))
                 {
-                    Compile(user, shbangs, assetID, headReader, 1, cultureInfo);
+                    Compile(user, shbangs, assetID, headReader, cultureInfo: cultureInfo);
                 }
             }
 
@@ -331,7 +331,7 @@ namespace SilverSim.Scripting.Common
                 }
                 using (var headReader = new StreamReaderAddHead(header.ToString(), reader))
                 {
-                    SyntaxCheckAndDump(s, user, shbangs, assetID, headReader, 1, cultureInfo);
+                    SyntaxCheckAndDump(s, user, shbangs, assetID, headReader, cultureInfo: cultureInfo);
                 }
             }
 
@@ -355,7 +355,7 @@ namespace SilverSim.Scripting.Common
 
                 using (var headReader = new StreamReaderAddHead(header.ToString(), reader))
                 {
-                    compiler.CompileToDisk(filename, AppDomain.CurrentDomain, user, shbangs, assetID, headReader, 1, cultureInfo);
+                    compiler.CompileToDisk(filename, AppDomain.CurrentDomain, user, shbangs, assetID, headReader, cultureInfo: cultureInfo);
                 }
             }
         }

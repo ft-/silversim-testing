@@ -46,7 +46,7 @@ namespace SilverSim.AssetPurger
 
         private QueueStat GetQueueStat()
         {
-            return new QueueStat(m_IsRunning ? "PROCESSING" : "IDLE", 0, (uint)m_Processed);
+            return new QueueStat(m_IsRunning ? "PROCESSING" : "IDLE", 0, m_Processed);
         }
 
         public IList<QueueStatAccessor> QueueStats

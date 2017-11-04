@@ -66,7 +66,7 @@ namespace SilverSim.Scene.Types
 
         public bool Equals(Angle a) => Radians.Equals(a.Radians);
 
-        public override bool Equals(object a) => (a is Angle) ? Radians.Equals((Angle)a) : false;
+        public override bool Equals(object a) => (a is Angle) && Radians.Equals((Angle)a);
 
         public override int GetHashCode() => Radians.GetHashCode();
 

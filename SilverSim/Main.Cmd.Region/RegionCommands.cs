@@ -322,7 +322,7 @@ namespace SilverSim.Main.Cmd.Region
                                 part.Name, part.ID,
                                 group.Name, group.ID,
                                 instance != null ? "yes" : "no",
-                                instance?.IsRunning == true ? "running" : "not running");
+                                instance?.IsRunning ?? false ? "running" : "not running");
                         }
                     }
                 }
@@ -421,7 +421,7 @@ namespace SilverSim.Main.Cmd.Region
                     foreach(ObjectPartInventoryItem item in part.Inventory.Values)
                     {
                         ScriptInstance instance = item.ScriptInstance;
-                        if(instance?.IsRunning == false)
+                        if(!(instance?.IsRunning ?? true))
                         {
                             instance.IsRunning = true;
                             ++count;
