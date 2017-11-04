@@ -55,7 +55,7 @@ namespace SilverSim.Viewer.Parcel
         private readonly BlockingQueue<KeyValuePair<AgentCircuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
 
         public ShutdownOrder ShutdownOrder => ShutdownOrder.LogoutRegion;
-        private bool m_ShutdownParcel = false;
+        private bool m_ShutdownParcel;
         private SceneList m_Scenes;
 
         public void Shutdown()
