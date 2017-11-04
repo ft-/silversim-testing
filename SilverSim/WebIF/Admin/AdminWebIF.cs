@@ -1565,10 +1565,8 @@ namespace SilverSim.WebIF.Admin
         [AdminWebIfRequiredRight("serverparams.manage")]
         private void GetServerParamsExplicitly(HttpRequest req, Map jsondata)
         {
-            IValue ipara;
             AnArray paradata;
-            if (!jsondata.TryGetValue("parameters", out ipara) ||
-                (paradata = ipara as AnArray) == null)
+            if (!jsondata.TryGetValue("parameters", out paradata))
             {
                 ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
@@ -1619,10 +1617,8 @@ namespace SilverSim.WebIF.Admin
         [AdminWebIfRequiredRight("serverparams.manage")]
         private void GetServerParams(HttpRequest req, Map jsondata)
         {
-            IValue ipara;
             AnArray paradata;
-            if(!jsondata.TryGetValue("parameters", out ipara) ||
-                (paradata = ipara as AnArray) == null)
+            if(!jsondata.TryGetValue("parameters", out paradata))
             {
                 ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
