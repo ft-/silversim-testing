@@ -147,7 +147,7 @@ namespace SilverSim.Scene.Types.Object
                             {
                                 using (XmlTextWriter innerWriter = ms.UTF8XmlTextWriter())
                                 {
-                                    Media.ToXml(writer);
+                                    Media.ToXml(innerWriter);
                                 }
                                 writer.WriteValue(ms.ToArray().FromUTF8Bytes());
                             }
