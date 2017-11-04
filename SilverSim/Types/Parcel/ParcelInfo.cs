@@ -253,7 +253,6 @@ namespace SilverSim.Types.Parcel
             if (targetPosition.X < AABBMin.X || targetPosition.X > AABBMax.X)
             {
                 /* point is to the left or right, so better go for vertical scan */
-                int xlinecnt = Math.Abs(endx - startx) + 1;
                 for (int x = startx; (endx - x) * dirx >= 0; x += dirx)
                 {
                     bool onepointnearer = false;
@@ -264,13 +263,10 @@ namespace SilverSim.Types.Parcel
                         {
                             onepointnearer = true;
                         }
-                        if (LandBitmap[x, y])
+                        if (LandBitmap[x, y] && (distance < 0 || distance > dist))
                         {
-                            if (distance < 0 || distance > dist)
-                            {
-                                distance = dist;
-                                targetPosition = new Vector3(x, y, originPosition.Z);
-                            }
+                            distance = dist;
+                            targetPosition = new Vector3(x, y, originPosition.Z);
                         }
                         if (!onepointnearer)
                         {
@@ -283,7 +279,6 @@ namespace SilverSim.Types.Parcel
             else
             {
                 /* point is to the top or bottom, so better go for horizontal scan */
-                int ylinecnt = Math.Abs(endy - starty) + 1;
                 for (int y = starty; (endy - y) * diry >= 0; y += diry)
                 {
                     bool onepointnearer = false;
@@ -294,13 +289,10 @@ namespace SilverSim.Types.Parcel
                         {
                             onepointnearer = true;
                         }
-                        if (LandBitmap[x, y])
+                        if (LandBitmap[x, y] && (distance < 0 || distance > dist))
                         {
-                            if (distance < 0 || distance > dist)
-                            {
-                                distance = dist;
-                                targetPosition = new Vector3(x, y, originPosition.Z);
-                            }
+                            distance = dist;
+                            targetPosition = new Vector3(x, y, originPosition.Z);
                         }
                         if (!onepointnearer)
                         {

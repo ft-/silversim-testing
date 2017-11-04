@@ -69,15 +69,8 @@ namespace SilverSim.Types
             {
                 /* could be a foreign grid URI, check for number in second place */
                 uint val;
-                if (!uint.TryParse(s[1], out val))
-                {
-                    /* not a foreign grid map name */
-                }
-                else if (val > 65535)
-                {
-                    /* not a foreign grid map name */
-                }
-                else if (!Uri.IsWellFormedUriString("http://" + s[0] + ":" + s[1] + "/", UriKind.Absolute))
+                if (!uint.TryParse(s[1], out val) || val > 65535 ||
+                    !Uri.IsWellFormedUriString("http://" + s[0] + ":" + s[1] + "/", UriKind.Absolute))
                 {
                     /* not a foreign grid map name */
                 }

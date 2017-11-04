@@ -255,9 +255,9 @@ namespace SilverSim.Types
         #endregion
 
         /// <summary>A Color4 with zero RGB values and fully opaque (alpha 1.0)</summary>
-        public static ColorAlpha Black = new ColorAlpha(0f, 0f, 0f, 1f);
+        public static readonly ColorAlpha Black = new ColorAlpha(0f, 0f, 0f, 1f);
 
         /// <summary>A Color4 with full RGB values (1.0) and fully opaque (alpha 1.0)</summary>
-        public static ColorAlpha White = new ColorAlpha(1f, 1f, 1f, 1f);
+        public static readonly ColorAlpha White = new ColorAlpha(1f, 1f, 1f, 1f);
     }
 }

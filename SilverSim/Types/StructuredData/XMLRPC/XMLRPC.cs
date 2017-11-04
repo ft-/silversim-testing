@@ -743,7 +743,7 @@ namespace SilverSim.Types.StructuredData.XmlRpc
         {
             var t = iv.GetType();
 
-            if(t == typeof(UUID) || t == typeof(AString))
+            if(t == typeof(UUID) || t == typeof(AString) || t == typeof(URI))
             {
                 w.WriteStartElement("value");
                 w.WriteNamedValue("string", iv.ToString());
@@ -811,12 +811,6 @@ namespace SilverSim.Types.StructuredData.XmlRpc
                 var iv_bin = (BinaryData)iv;
                 w.WriteStartElement("value");
                 w.WriteNamedValue("base64", iv_bin);
-                w.WriteEndElement();
-            }
-            else if(t == typeof(URI))
-            {
-                w.WriteStartElement("value");
-                w.WriteNamedValue("string", iv.ToString());
                 w.WriteEndElement();
             }
             else
