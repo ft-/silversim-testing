@@ -216,13 +216,14 @@ namespace SilverSim.WebIF.Admin.Simulator
         [AdminWebIfRequiredRight("regions.view")]
         private void HandleGet(HttpRequest req, Map jsondata)
         {
-            if(!jsondata.ContainsKey("id"))
+            UUID regionid;
+            if(!jsondata.TryGetValue("id", out regionid))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
                 return;
             }
             RegionInfo rInfo;
-            if(m_RegionStorage.TryGetValue(jsondata["id"].AsUUID, out rInfo))
+            if(m_RegionStorage.TryGetValue(regionid, out rInfo))
             {
                 rInfo.Owner = m_WebIF.ResolveName(rInfo.Owner);
                 Map m = rInfo.ToJsonMap();
@@ -304,8 +305,10 @@ namespace SilverSim.WebIF.Admin.Simulator
         [AdminWebIfRequiredRight("regions.manage")]
         private void HandleChangeAccess(HttpRequest req, Map jsondata)
         {
-            if (!jsondata.ContainsKey("id") ||
-                !jsondata.ContainsKey("access"))
+            string accessStr;
+            UUID regionid;
+            if (!jsondata.TryGetValue("id", out regionid) ||
+                !jsondata.TryGetValue("access", out accessStr))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
                 return;
@@ -313,7 +316,7 @@ namespace SilverSim.WebIF.Admin.Simulator
 
             RegionInfo rInfo;
             RegionAccess access;
-            switch(jsondata["access"].ToString().ToLower())
+            switch(accessStr.ToLower())
             {
                 case "pg":
                     access = RegionAccess.PG;
@@ -332,7 +335,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                     return;
             }
 
-            if (!m_RegionStorage.TryGetValue(jsondata["id"].AsUUID, out rInfo))
+            if (!m_RegionStorage.TryGetValue(regionid, out rInfo))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
                 return;
@@ -362,8 +365,10 @@ namespace SilverSim.WebIF.Admin.Simulator
         [AdminWebIfRequiredRight("regions.manage")]
         private void HandleChangeOwner(HttpRequest req, Map jsondata)
         {
-            if (!jsondata.ContainsKey("id") ||
-                !jsondata.ContainsKey("owner"))
+            UUID regionid;
+            string owner;
+            if (!jsondata.TryGetValue("id", out regionid) ||
+                !jsondata.TryGetValue("owner", out owner))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
                 return;
@@ -371,13 +376,13 @@ namespace SilverSim.WebIF.Admin.Simulator
 
             RegionInfo rInfo;
 
-            if (!m_RegionStorage.TryGetValue(jsondata["id"].AsUUID, out rInfo))
+            if (!m_RegionStorage.TryGetValue(regionid, out rInfo))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
                 return;
             }
 
-            if (!m_WebIF.TranslateToUUI(jsondata["owner"].ToString(), out rInfo.Owner))
+            if (!m_WebIF.TranslateToUUI(owner, out rInfo.Owner))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                 return;
@@ -405,8 +410,10 @@ namespace SilverSim.WebIF.Admin.Simulator
         [AdminWebIfRequiredRight("regions.manage")]
         private void HandleChangeLocation(HttpRequest req, Map jsondata)
         {
-            if (!jsondata.ContainsKey("id") ||
-                !jsondata.ContainsKey("location"))
+            UUID regionid;
+            string location;
+            if (!jsondata.TryGetValue("id", out regionid) ||
+                !jsondata.TryGetValue("location", out location))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
                 return;
@@ -414,7 +421,7 @@ namespace SilverSim.WebIF.Admin.Simulator
 
             RegionInfo rInfo;
 
-            if (!m_RegionStorage.TryGetValue(jsondata["id"].AsUUID, out rInfo))
+            if (!m_RegionStorage.TryGetValue(regionid, out rInfo))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
                 return;
@@ -422,7 +429,7 @@ namespace SilverSim.WebIF.Admin.Simulator
 
             try
             {
-                rInfo.Location = new GridVector(jsondata["location"].ToString(), 256);
+                rInfo.Location = new GridVector(location, 256);
             }
             catch
             {
@@ -458,8 +465,10 @@ namespace SilverSim.WebIF.Admin.Simulator
         [AdminWebIfRequiredRight("regions.manage")]
         private void HandleChangeEstate(HttpRequest req, Map jsondata)
         {
-            if(!jsondata.ContainsKey("id") ||
-                !jsondata.ContainsKey("estateid"))
+            UUID regionid;
+            uint estateID;
+            if(!jsondata.TryGetValue("id", out regionid) ||
+                !jsondata.TryGetValue("estateid", out estateID))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
                 return;
@@ -467,8 +476,8 @@ namespace SilverSim.WebIF.Admin.Simulator
 
             RegionInfo rInfo;
             EstateInfo eInfo;
-            if(!m_RegionStorage.TryGetValue(jsondata["id"].AsUUID, out rInfo) ||
-                !m_EstateService.TryGetValue(jsondata["estateid"].AsUInt, out eInfo))
+            if(!m_RegionStorage.TryGetValue(regionid, out rInfo) ||
+                !m_EstateService.TryGetValue(estateID, out eInfo))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
                 return;
@@ -497,15 +506,17 @@ namespace SilverSim.WebIF.Admin.Simulator
         {
             agent = null;
             scene = null;
-            if (!jsondata.ContainsKey("id") || !jsondata.ContainsKey("agentid"))
+            UUID regionid;
+            UUID agentid;
+            if (!jsondata.TryGetValue("id", out regionid) || !jsondata.TryGetValue("agentid", out agentid))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
-            else if (!m_Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
+            else if (!m_Scenes.TryGetValue(regionid, out scene))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotRunning);
             }
-            else if (scene.RootAgents.TryGetValue(jsondata["agentid"].AsUUID, out agent))
+            else if (scene.RootAgents.TryGetValue(agentid, out agent))
             {
                 return true;
             }
@@ -523,10 +534,10 @@ namespace SilverSim.WebIF.Admin.Simulator
             SceneInterface si;
             if(TryGetRootAgent(req, jsondata, out si, out agent))
             {
-                var msg = this.GetLanguageString(agent.CurrentCulture, "YouHaveBeenKickedSinceYouCouldNotBeTeleportedHome", "You have been kicked since you could not be teleported home.");
-                if (jsondata.ContainsKey("message"))
+                string msg;
+                if (!jsondata.TryGetValue("message", out msg))
                 {
-                    msg = jsondata["message"].ToString();
+                    msg = this.GetLanguageString(agent.CurrentCulture, "YouHaveBeenKickedSinceYouCouldNotBeTeleportedHome", "You have been kicked since you could not be teleported home.");
                 }
                 if(!agent.TeleportHome(si))
                 {
@@ -543,10 +554,10 @@ namespace SilverSim.WebIF.Admin.Simulator
             SceneInterface si;
             if (TryGetRootAgent(req, jsondata, out si, out agent))
             {
-                var msg = this.GetLanguageString(agent.CurrentCulture, "YouHaveBeenKicked", "You have been kicked.");
-                if(jsondata.ContainsKey("message"))
+                string msg;
+                if (jsondata.TryGetValue("message", out msg))
                 {
-                    msg = jsondata["message"].ToString();
+                    msg = this.GetLanguageString(agent.CurrentCulture, "YouHaveBeenKicked", "You have been kicked.");
                 }
                 agent.KickUser(msg);
                 m_WebIF.SuccessResponse(req, new Map());
@@ -558,15 +569,17 @@ namespace SilverSim.WebIF.Admin.Simulator
         {
             SceneInterface si;
             IAgent agent;
-            if (!jsondata.ContainsKey("id") || !jsondata.ContainsKey("agentid"))
+            UUID regionid;
+            UUID agentid;
+            if (!jsondata.TryGetValue("id", out regionid) || !jsondata.TryGetValue("agentid", out agentid))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
-            else if (!m_Scenes.TryGetValue(jsondata["id"].AsUUID, out si))
+            else if (!m_Scenes.TryGetValue(regionid, out si))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotRunning);
             }
-            else if (!si.Agents.TryGetValue(jsondata["agentid"].AsUUID, out agent))
+            else if (!si.Agents.TryGetValue(agentid, out agent))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
@@ -584,11 +597,12 @@ namespace SilverSim.WebIF.Admin.Simulator
         private void HandleAgentsView(HttpRequest req, Map jsondata)
         {
             SceneInterface si;
-            if (!jsondata.ContainsKey("id"))
+            UUID regionid;
+            if (!jsondata.TryGetValue("id", out regionid))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
-            else if (!m_Scenes.TryGetValue(jsondata["id"].AsUUID, out si))
+            else if (!m_Scenes.TryGetValue(regionid, out si))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotRunning);
             }
@@ -621,7 +635,11 @@ namespace SilverSim.WebIF.Admin.Simulator
         private void HandleCreate(HttpRequest req, Map jsondata)
         {
             RegionInfo rInfo;
-            if (!jsondata.ContainsKey("name") || !jsondata.ContainsKey("port") || !jsondata.ContainsKey("location"))
+            string name;
+            uint port;
+            string location;
+
+            if (!jsondata.TryGetValue("name", out name) || !jsondata.TryGetValue("port", out port) || !jsondata.TryGetValue("location", out location))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
@@ -638,22 +656,18 @@ namespace SilverSim.WebIF.Admin.Simulator
                 EstateInfo selectedEstate = null;
                 rInfo = new RegionInfo
                 {
-                    Name = jsondata["name"].ToString(),
+                    Name = name,
                     ID = UUID.Random,
                     Access = RegionAccess.Mature,
                     ServerHttpPort = m_HttpServer.Port,
                     ScopeID = UUID.Zero,
                     ServerIP = string.Empty,
+                    ServerPort = port,
                     Size = GridVector.StandardRegionSize,
                     ProductName = "Mainland"
                 };
 
                 if (Uri.IsWellFormedUriString(rInfo.Name, UriKind.Absolute))
-                {
-                    m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
-                    return;
-                }
-                if (!uint.TryParse(jsondata["port"].ToString(), out rInfo.ServerPort))
                 {
                     m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                     return;
@@ -666,7 +680,7 @@ namespace SilverSim.WebIF.Admin.Simulator
 
                 try
                 {
-                    rInfo.Location = new GridVector(jsondata["location"].ToString(), 256);
+                    rInfo.Location = new GridVector(location, 256);
                 }
                 catch
                 {
@@ -674,9 +688,11 @@ namespace SilverSim.WebIF.Admin.Simulator
                     return;
                 }
 
-                if(jsondata.ContainsKey("externalhostname"))
+                string sval;
+
+                if(jsondata.TryGetValue("externalhostname", out sval))
                 {
-                    rInfo.ServerIP = jsondata["externalhostname"].ToString();
+                    rInfo.ServerIP = sval;
                 }
                 if(jsondata.ContainsKey("regionid") &&
                     !UUID.TryParse(jsondata["regionid"].ToString(), out rInfo.ID))
@@ -696,11 +712,11 @@ namespace SilverSim.WebIF.Admin.Simulator
                     m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                     return;
                 }
-                if(jsondata.ContainsKey("size"))
+                if(jsondata.TryGetValue("size", out sval))
                 {
                     try
                     {
-                        rInfo.Size = new GridVector(jsondata["size"].ToString(), 1);
+                        rInfo.Size = new GridVector(sval, 1);
                     }
                     catch
                     {
@@ -713,9 +729,9 @@ namespace SilverSim.WebIF.Admin.Simulator
                         return;
                     }
                 }
-                if (jsondata.ContainsKey("productname"))
+                if (jsondata.TryGetValue("productname", out sval))
                 {
-                    rInfo.ProductName = jsondata["productname"].ToString();
+                    rInfo.ProductName = sval;
                 }
                 if(jsondata.ContainsKey("estate"))
                 {
@@ -816,11 +832,12 @@ namespace SilverSim.WebIF.Admin.Simulator
         private void HandleChange(HttpRequest req, Map jsondata)
         {
             RegionInfo rInfo;
-            if(!jsondata.ContainsKey("id"))
+            UUID regionid;
+            if(!jsondata.TryGetValue("id", out regionid))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
-            else if (!m_RegionStorage.TryGetValue(UUID.Zero, jsondata["id"].AsUUID, out rInfo))
+            else if (!m_RegionStorage.TryGetValue(UUID.Zero, regionid, out rInfo))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
@@ -828,9 +845,10 @@ namespace SilverSim.WebIF.Admin.Simulator
             {
                 bool changeRegionData = false;
                 EstateInfo selectedEstate = null;
-                if(jsondata.ContainsKey("name"))
+                string sval;
+                if(jsondata.TryGetValue("name", out sval))
                 {
-                    rInfo.Name = jsondata["name"].ToString();
+                    rInfo.Name = sval;
                     if (Uri.IsWellFormedUriString(rInfo.Name, UriKind.Absolute))
                     {
                         m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
@@ -857,14 +875,14 @@ namespace SilverSim.WebIF.Admin.Simulator
                     }
                     changeRegionData = true;
                 }
-                if(jsondata.ContainsKey("productname"))
+                if(jsondata.TryGetValue("productname", out sval))
                 {
-                    rInfo.ProductName = jsondata["productname"].ToString();
+                    rInfo.ProductName = sval;
                     changeRegionData = true;
                 }
-                if(jsondata.ContainsKey("owner"))
+                if(jsondata.TryGetValue("owner", out sval))
                 {
-                    if(!m_WebIF.TranslateToUUI(jsondata["owner"].ToString(), out rInfo.Owner))
+                    if(!m_WebIF.TranslateToUUI(sval, out rInfo.Owner))
                     {
                         m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                         return;
@@ -880,14 +898,14 @@ namespace SilverSim.WebIF.Admin.Simulator
                     }
                     changeRegionData = true;
                 }
-                if(jsondata.ContainsKey("externalhostname"))
+                if(jsondata.TryGetValue("externalhostname", out sval))
                 {
-                    rInfo.ServerIP = jsondata["externalhostname"].ToString();
+                    rInfo.ServerIP = sval;
                     changeRegionData = true;
                 }
-                if(jsondata.ContainsKey("access"))
+                if(jsondata.TryGetValue("access", out sval))
                 {
-                    switch (jsondata["access"].ToString().ToLower())
+                    switch (sval.ToLower())
                     {
                         case "pg":
                             rInfo.Access = RegionAccess.PG;
@@ -946,11 +964,12 @@ namespace SilverSim.WebIF.Admin.Simulator
         private void HandleDelete(HttpRequest req, Map jsondata)
         {
             RegionInfo region;
-            if (!jsondata.ContainsKey("id"))
+            UUID regionid;
+            if (!jsondata.TryGetValue("id", out regionid))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
-            else if (!m_RegionStorage.TryGetValue(jsondata["id"].AsUUID, out region))
+            else if (!m_RegionStorage.TryGetValue(regionid, out region))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
@@ -980,11 +999,12 @@ namespace SilverSim.WebIF.Admin.Simulator
         private void HandleLoginEnable(HttpRequest req, Map jsondata)
         {
             SceneInterface scene;
-            if (!jsondata.ContainsKey("id"))
+            UUID regionid;
+            if (!jsondata.TryGetValue("id", out regionid))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
-            else if (!m_Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
+            else if (!m_Scenes.TryGetValue(regionid, out scene))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
@@ -999,11 +1019,12 @@ namespace SilverSim.WebIF.Admin.Simulator
         private void HandleLoginDisable(HttpRequest req, Map jsondata)
         {
             SceneInterface scene;
-            if (!jsondata.ContainsKey("id"))
+            UUID regionid;
+            if (!jsondata.TryGetValue("id", out regionid))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
-            else if (!m_Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
+            else if (!m_Scenes.TryGetValue(regionid, out scene))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
@@ -1020,17 +1041,19 @@ namespace SilverSim.WebIF.Admin.Simulator
         private void HandleRestart(HttpRequest req, Map jsondata)
         {
             SceneInterface scene;
-            if (!jsondata.ContainsKey("id") || !jsondata.ContainsKey("seconds"))
+            UUID regionid;
+            int seconds;
+            if (!jsondata.TryGetValue("id", out regionid) || !jsondata.TryGetValue("seconds", out seconds))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
-            else if (!m_Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
+            else if (!m_Scenes.TryGetValue(regionid, out scene))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
             else
             {
-                scene.RequestRegionRestart(jsondata["seconds"].AsInt);
+                scene.RequestRegionRestart(seconds);
                 m_WebIF.SuccessResponse(req, new Map());
             }
         }
@@ -1039,11 +1062,12 @@ namespace SilverSim.WebIF.Admin.Simulator
         private void HandleRestartAbort(HttpRequest req, Map jsondata)
         {
             SceneInterface scene;
-            if (!jsondata.ContainsKey("id"))
+            UUID regionid;
+            if (!jsondata.TryGetValue("id", out regionid))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
-            else if (!m_Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
+            else if (!m_Scenes.TryGetValue(regionid, out scene))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
@@ -1058,11 +1082,12 @@ namespace SilverSim.WebIF.Admin.Simulator
         private void HandleStart(HttpRequest req, Map jsondata)
         {
             RegionInfo region;
-            if (!jsondata.ContainsKey("id"))
+            UUID regionid;
+            if (!jsondata.TryGetValue("id", out regionid))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
-            else if (!m_RegionStorage.TryGetValue(jsondata["id"].AsUUID, out region))
+            else if (!m_RegionStorage.TryGetValue(regionid, out region))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
@@ -1094,11 +1119,12 @@ namespace SilverSim.WebIF.Admin.Simulator
         private void HandleStop(HttpRequest req, Map jsondata)
         {
             SceneInterface scene;
-            if (!jsondata.ContainsKey("id"))
+            UUID regionid;
+            if (!jsondata.TryGetValue("id", out regionid))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
-            else if (!m_Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
+            else if (!m_Scenes.TryGetValue(regionid, out scene))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
@@ -1115,11 +1141,13 @@ namespace SilverSim.WebIF.Admin.Simulator
         private void HandleNotice(HttpRequest req, Map jsondata)
         {
             SceneInterface scene;
-            if (!jsondata.ContainsKey("id") || !jsondata.ContainsKey("message"))
+            UUID regionid;
+            string message;
+            if (!jsondata.TryGetValue("id", out regionid) || !jsondata.TryGetValue("message", out message))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
-            else if (!m_Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
+            else if (!m_Scenes.TryGetValue(regionid, out scene))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
@@ -1127,7 +1155,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             {
                 foreach(IAgent agent in scene.RootAgents)
                 {
-                    agent.SendRegionNotice(scene.Owner, jsondata["message"].ToString(), scene.ID);
+                    agent.SendRegionNotice(scene.Owner, message, scene.ID);
                 }
                 m_WebIF.SuccessResponse(req, new Map());
             }
@@ -1138,20 +1166,23 @@ namespace SilverSim.WebIF.Admin.Simulator
         {
             SceneInterface scene;
             IAgent agent;
-            if (!jsondata.ContainsKey("id") ||
-                !jsondata.ContainsKey("agentid") ||
-                !jsondata.ContainsKey("message"))
+            UUID regionid;
+            UUID agentid;
+            string message;
+            if (!jsondata.TryGetValue("id", out regionid) ||
+                !jsondata.TryGetValue("agentid", out agentid) ||
+                !jsondata.TryGetValue("message", out message))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
-            else if (!m_Scenes.TryGetValue(jsondata["id"].AsUUID, out scene) ||
-                !scene.RootAgents.TryGetValue(jsondata["agentid"].AsUUID, out agent))
+            else if (!m_Scenes.TryGetValue(regionid, out scene) ||
+                !scene.RootAgents.TryGetValue(agentid, out agent))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
             else
             {
-                agent.SendRegionNotice(scene.Owner, jsondata["message"].ToString(), scene.ID);
+                agent.SendRegionNotice(scene.Owner, message, scene.ID);
                 m_WebIF.SuccessResponse(req, new Map());
             }
         }
@@ -1159,7 +1190,8 @@ namespace SilverSim.WebIF.Admin.Simulator
         [AdminWebIfRequiredRight("regions.notice")]
         private void HandleNotices(HttpRequest req, Map jsondata)
         {
-            if (!jsondata.ContainsKey("message"))
+            string message;
+            if (!jsondata.TryGetValue("message", out message))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
@@ -1169,7 +1201,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                 {
                     foreach (var agent in scene.RootAgents)
                     {
-                        agent.SendRegionNotice(scene.Owner, jsondata["message"].ToString(), scene.ID);
+                        agent.SendRegionNotice(scene.Owner, message, scene.ID);
                     }
                 }
                 m_WebIF.SuccessResponse(req, new Map());
@@ -1182,11 +1214,12 @@ namespace SilverSim.WebIF.Admin.Simulator
         private void HandleEnable(HttpRequest req, Map jsondata)
         {
             RegionInfo region;
-            if (!jsondata.ContainsKey("id"))
+            UUID regionid;
+            if (!jsondata.TryGetValue("id", out regionid))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
-            else if (!m_RegionStorage.TryGetValue(jsondata["id"].AsUUID, out region))
+            else if (!m_RegionStorage.TryGetValue(regionid, out region))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
@@ -1208,11 +1241,12 @@ namespace SilverSim.WebIF.Admin.Simulator
         private void HandleDisable(HttpRequest req, Map jsondata)
         {
             RegionInfo region;
-            if (!jsondata.ContainsKey("id"))
+            UUID regionid;
+            if (!jsondata.TryGetValue("id", out regionid))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
-            else if (!m_RegionStorage.TryGetValue(jsondata["id"].AsUUID, out region))
+            else if (!m_RegionStorage.TryGetValue(regionid, out region))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
@@ -1240,17 +1274,19 @@ namespace SilverSim.WebIF.Admin.Simulator
         private void HandleEnableEstateOwnerSimConsole(HttpRequest req, Map jsondata)
         {
             RegionInfo region;
-            if (!jsondata.ContainsKey("id") || !jsondata.ContainsKey("value"))
+            UUID regionid;
+            string value;
+            if (!jsondata.TryGetValue("id", out regionid) || !jsondata.TryGetValue("value", out value))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
-            else if (!m_RegionStorage.TryGetValue(jsondata["id"].AsUUID, out region))
+            else if (!m_RegionStorage.TryGetValue(regionid, out region))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
             else
             {
-                switch (jsondata["value"].ToString())
+                switch (value)
                 {
                     case "enable":
                         m_ServerParams[region.ID, EstateOwnerIsSimConsoleUser] = "true";
@@ -1282,17 +1318,19 @@ namespace SilverSim.WebIF.Admin.Simulator
         private void HandleEnableEstateManagerSimConsole(HttpRequest req, Map jsondata)
         {
             RegionInfo region;
-            if (!jsondata.ContainsKey("id") || !jsondata.ContainsKey("value"))
+            UUID regionid;
+            string value;
+            if (!jsondata.TryGetValue("id", out regionid) || !jsondata.TryGetValue("value", out value))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
-            else if (!m_RegionStorage.TryGetValue(jsondata["id"].AsUUID, out region))
+            else if (!m_RegionStorage.TryGetValue(regionid, out region))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
             else
             {
-                switch (jsondata["value"].ToString())
+                switch (value)
                 {
                     case "enable":
                         m_ServerParams[region.ID, EstateManagerIsSimConsoleUser] = "true";
@@ -1324,17 +1362,19 @@ namespace SilverSim.WebIF.Admin.Simulator
         private void HandleEnableRegionOwnerSimConsole(HttpRequest req, Map jsondata)
         {
             RegionInfo region;
-            if (!jsondata.ContainsKey("id") || !jsondata.ContainsKey("value"))
+            UUID regionid;
+            string value;
+            if (!jsondata.TryGetValue("id", out regionid) || !jsondata.TryGetValue("value", out value))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
-            else if (!m_RegionStorage.TryGetValue(jsondata["id"].AsUUID, out region))
+            else if (!m_RegionStorage.TryGetValue(regionid, out region))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
             else
             {
-                switch (jsondata["value"].ToString())
+                switch (value)
                 {
                     case "enable":
                         m_ServerParams[region.ID, RegionOwnerIsSimConsoleUser] = "true";
@@ -1369,11 +1409,14 @@ namespace SilverSim.WebIF.Admin.Simulator
         public void HandleEnvironmentSet(HttpRequest req, Map jsondata)
         {
             SceneInterface scene;
-            if (!jsondata.ContainsKey("id") || !jsondata.ContainsKey("parameter") || !jsondata.ContainsKey("value"))
+            UUID regionid;
+            string parameter;
+            IValue value;
+            if (!jsondata.TryGetValue("id", out regionid) || !jsondata.TryGetValue("parameter", out parameter) || !jsondata.TryGetValue("value", out value))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
-            else if (!m_Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
+            else if (!m_Scenes.TryGetValue(regionid, out scene))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
@@ -1382,7 +1425,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                 uint secperday;
                 uint daysperyear;
 
-                switch (jsondata["parameter"].ToString())
+                switch (parameter)
                 {
                     case "UpdateTidalModelEveryMsecs":
                         scene.Environment.UpdateTidalModelEveryMsecs = jsondata["value"].AsInt;
@@ -1465,7 +1508,9 @@ namespace SilverSim.WebIF.Admin.Simulator
         public void HandleEnvironmentGet(HttpRequest req, Map jsondata)
         {
             SceneInterface scene;
-            if (!jsondata.ContainsKey("id") || !jsondata.ContainsKey("parameter"))
+            UUID regionid;
+            string parameter;
+            if (!jsondata.TryGetValue("id", out regionid) || !jsondata.TryGetValue("parameter", out parameter))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
@@ -1479,7 +1524,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                 uint secperday;
                 uint daysperyear;
 
-                switch(jsondata["parameter"].ToString())
+                switch(parameter)
                 {
                     case "UpdateTidalModelEveryMsecs":
                         res.Add("value", scene.Environment.UpdateTidalModelEveryMsecs);
@@ -1559,17 +1604,19 @@ namespace SilverSim.WebIF.Admin.Simulator
         public void HandleEnvironmentResetToDefaults(HttpRequest req, Map jsondata)
         {
             SceneInterface scene;
-            if (!jsondata.ContainsKey("id") || !jsondata.ContainsKey("which"))
+            UUID regionid;
+            string which;
+            if (!jsondata.TryGetValue("id", out regionid) || !jsondata.TryGetValue("which", out which))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
-            else if (!m_Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
+            else if (!m_Scenes.TryGetValue(regionid, out scene))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
             else
             {
-                switch (jsondata["which"].ToString())
+                switch (which)
                 {
                     case "all":
                         scene.Environment.ResetToDefaults();

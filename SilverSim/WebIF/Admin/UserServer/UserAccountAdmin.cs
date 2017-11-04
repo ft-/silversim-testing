@@ -78,39 +78,45 @@ namespace SilverSim.WebIF.Admin.UserServer
         {
             var account = new UserAccount();
             account.Principal.ID = UUID.Random;
-            if (!jsondata.ContainsKey("firstname") ||
-                !jsondata.ContainsKey("lastname") ||
-                !jsondata.ContainsKey("password"))
+            string firstname;
+            string lastname;
+            string password;
+            if (!jsondata.TryGetValue("firstname", out firstname) ||
+                !jsondata.TryGetValue("lastname", out lastname) ||
+                !jsondata.TryGetValue("password", out password))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
                 return;
             }
-            account.Principal.FirstName = jsondata["firstname"].ToString();
-            account.Principal.LastName = jsondata["lastname"].ToString();
+            account.Principal.FirstName = firstname;
+            account.Principal.LastName = lastname;
             if (!jsondata.TryGetValue("scopeid", out account.ScopeID))
             {
                 account.ScopeID = UUID.Zero;
             }
-            if (jsondata.ContainsKey("userlevel"))
+            int ival;
+            string sval;
+            uint uval;
+            if (jsondata.TryGetValue("userlevel", out ival))
             {
-                account.UserLevel = jsondata["userlevel"].AsInt;
+                account.UserLevel = ival;
                 if (account.UserLevel > 255)
                 {
                     m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                     return;
                 }
             }
-            if (jsondata.ContainsKey("usertitle"))
+            if (jsondata.TryGetValue("usertitle", out sval))
             {
-                account.UserTitle = jsondata["usertitle"].ToString();
+                account.UserTitle = sval;
             }
-            if (jsondata.ContainsKey("userflags"))
+            if (jsondata.TryGetValue("userflags", out uval))
             {
-                account.UserFlags = jsondata["userflags"].AsUInt;
+                account.UserFlags = uval;
             }
-            if (jsondata.ContainsKey("email"))
+            if (jsondata.TryGetValue("email", out sval))
             {
-                account.Email = jsondata["email"].ToString();
+                account.Email = sval;
             }
             try
             {
@@ -124,7 +130,7 @@ namespace SilverSim.WebIF.Admin.UserServer
             var uai = new UserAuthInfo
             {
                 ID = account.Principal.ID,
-                Password = jsondata["password"].ToString()
+                Password = password
             };
             try
             {
@@ -153,37 +159,41 @@ namespace SilverSim.WebIF.Admin.UserServer
         private void HandleUserAccountChange(HttpRequest req, Map jsondata)
         {
             UserAccount account;
-            if (!jsondata.ContainsKey("id"))
+            UUID userid;
+            if (!jsondata.TryGetValue("id", out userid))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
                 return;
             }
-            if(!m_UserAccountService.TryGetValue(UUID.Zero, jsondata["id"].AsUUID, out account))
+            if(!m_UserAccountService.TryGetValue(UUID.Zero, userid, out account))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
                 return;
             }
 
-            if (jsondata.ContainsKey("userlevel"))
+            int ival;
+            string sval;
+            uint uval;
+            if (jsondata.TryGetValue("userlevel", out ival))
             {
-                account.UserLevel = jsondata["userlevel"].AsInt;
+                account.UserLevel = ival;
                 if(account.UserLevel > 255)
                 {
                     m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                     return;
                 }
             }
-            if (jsondata.ContainsKey("usertitle"))
+            if (jsondata.TryGetValue("usertitle", out sval))
             {
-                account.UserTitle = jsondata["usertitle"].ToString();
+                account.UserTitle = sval;
             }
-            if (jsondata.ContainsKey("userflags"))
+            if (jsondata.TryGetValue("userflags", out uval))
             {
-                account.UserFlags = jsondata["userflags"].AsUInt;
+                account.UserFlags = uval;
             }
-            if (jsondata.ContainsKey("email"))
+            if (jsondata.TryGetValue("email", out sval))
             {
-                account.Email = jsondata["email"].ToString();
+                account.Email = sval;
             }
             try
             {
@@ -200,8 +210,8 @@ namespace SilverSim.WebIF.Admin.UserServer
         [AdminWebIfRequiredRight("useraccounts.delete")]
         private void HandleUserAccountDelete(HttpRequest req, Map jsondata)
         {
-            IValue id;
-            IValue scopeid;
+            UUID id;
+            UUID scopeid;
             if (!jsondata.TryGetValue("id", out id))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
@@ -212,7 +222,7 @@ namespace SilverSim.WebIF.Admin.UserServer
                 scopeid = UUID.Zero;
             }
 
-            if (!m_UserAccountService.ContainsKey(scopeid.AsUUID, id.AsUUID))
+            if (!m_UserAccountService.ContainsKey(scopeid, id))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
@@ -222,7 +232,7 @@ namespace SilverSim.WebIF.Admin.UserServer
                 {
                     try
                     {
-                        delService.Remove(scopeid.AsUUID, id.AsUUID);
+                        delService.Remove(scopeid, id);
                     }
                     catch
                     {
@@ -238,8 +248,9 @@ namespace SilverSim.WebIF.Admin.UserServer
         {
             UUID id;
             UserAuthInfo uai;
+            string password;
             if (!jsondata.TryGetValue("id", out id) ||
-                !jsondata.ContainsKey("password"))
+                !jsondata.TryGetValue("password", out password))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
                 return;
@@ -259,7 +270,7 @@ namespace SilverSim.WebIF.Admin.UserServer
                     m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                     return;
                 }
-                uai.Password = jsondata["password"].ToString();
+                uai.Password = password;
                 try
                 {
                     m_AuthInfoService.Store(uai);
@@ -276,25 +287,20 @@ namespace SilverSim.WebIF.Admin.UserServer
         [AdminWebIfRequiredRight("useraccount.get")]
         private void HandleUserAccountGet(HttpRequest req, Map jsondata)
         {
-            IValue id;
+            UUID id;
             if (!jsondata.TryGetValue("id", out id))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
                 return;
             }
             UUID scopeid;
-            IValue scopeiv;
-            if (!jsondata.TryGetValue("scopeid", out scopeiv))
+            if (!jsondata.TryGetValue("scopeid", out scopeid))
             {
                 scopeid = UUID.Zero;
             }
-            else
-            {
-                scopeid = scopeiv.AsUUID;
-            }
 
             UserAccount acc;
-            if (m_UserAccountService.TryGetValue(scopeid, id.AsUUID, out acc))
+            if (m_UserAccountService.TryGetValue(scopeid, id, out acc))
             {
                 var result = new Map
                 {
@@ -330,24 +336,25 @@ namespace SilverSim.WebIF.Admin.UserServer
             {
                 scopeid = UUID.Zero;
             }
-            if (!jsondata.ContainsKey("query"))
+            string query;
+            if (!jsondata.TryGetValue("query", out query))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
                 return;
             }
-            if (jsondata.ContainsKey("start"))
+            int ival;
+            if (jsondata.TryGetValue("start", out ival))
             {
-                start = jsondata["start"].AsInt;
+                start = ival;
             }
-            if (jsondata.ContainsKey("count"))
+            if (jsondata.TryGetValue("count", out ival))
             {
-                count = jsondata["count"].AsInt;
+                count = ival;
             }
             if (count > 1000 || count < 0)
             {
                 count = 1000;
             }
-            string query = jsondata["query"].ToString();
             foreach (var acc in m_UserAccountService.GetAccounts(scopeid, query))
             {
                 if (start > 0)

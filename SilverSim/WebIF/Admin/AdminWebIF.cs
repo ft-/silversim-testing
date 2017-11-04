@@ -453,13 +453,15 @@ namespace SilverSim.WebIF.Admin
 
         private void HandleLoginRequest(HttpRequest req, Map jsonreq)
         {
-            if(!jsonreq.ContainsKey("sessionid") || !jsonreq.ContainsKey("user") || !jsonreq.ContainsKey("response"))
+            string sessionid;
+            string response;
+            if(!jsonreq.TryGetValue("sessionid", out sessionid) || !jsonreq.TryGetValue("response", out response))
             {
                 ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
                 return;
             }
 
-            var sessionKey = req.CallerIP + "+" + jsonreq["sessionid"].ToString();
+            var sessionKey = req.CallerIP + "+" + sessionid;
             SessionInfo sessionInfo;
             if(!m_Sessions.TryGetValue(sessionKey, out sessionInfo) || sessionInfo.IsAuthenticated)
             {
@@ -471,7 +473,7 @@ namespace SilverSim.WebIF.Admin
             }
             else
             {
-                if(jsonreq["response"].ToString().ToLower() == sessionInfo.ExpectedResponse)
+                if(response.ToLower() == sessionInfo.ExpectedResponse)
                 {
                     sessionInfo.LastSeenTickCount = Environment.TickCount;
                     sessionInfo.IsAuthenticated = true;
@@ -491,7 +493,7 @@ namespace SilverSim.WebIF.Admin
                     }
                     using (var httpres = req.BeginResponse(JsonContentType))
                     {
-                        httpres.Headers["Set-Cookie"] = "sessionid=" + jsonreq["sessionid"].ToString() +";path=/admin";
+                        httpres.Headers["Set-Cookie"] = "sessionid=" + sessionid +";path=/admin";
                         using (Stream o = httpres.GetOutputStream())
                         {
                             Json.Serialize(res, o);
@@ -508,7 +510,7 @@ namespace SilverSim.WebIF.Admin
 
         public UUID GetSelectedRegion(HttpRequest req, Map jsonreq)
         {
-            var sessionKey = req.CallerIP + "+" + jsonreq["sessionid"].ToString();
+            var sessionKey = req.CallerIP + "+" + jsonreq["sessionid"];
             SessionInfo info;
             if(m_Sessions.TryGetValue(sessionKey,out info))
             {
@@ -519,7 +521,7 @@ namespace SilverSim.WebIF.Admin
 
         public void SetSelectedRegion(HttpRequest req, Map jsonreq, UUID sceneID)
         {
-            var sessionKey = req.CallerIP + "+" + jsonreq["sessionid"].ToString();
+            var sessionKey = req.CallerIP + "+" + jsonreq["sessionid"];
             SessionInfo info;
             if (m_Sessions.TryGetValue(sessionKey, out info))
             {
@@ -536,15 +538,18 @@ namespace SilverSim.WebIF.Admin
                 ["sessionid"] = sessionID,
                 ["challenge"] = challenge
             };
-            if (!jsonreq.ContainsKey("user"))
+            string username;
+            if (!jsonreq.TryGetValue("user", out username))
             {
                 ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
                 return;
             }
 
-            var sessionInfo = new SessionInfo();
+            var sessionInfo = new SessionInfo
+            {
+                UserName = username.ToLower()
+            };
             m_Sessions.Add(req.CallerIP + "+" + sessionID.ToString(), sessionInfo);
-            sessionInfo.UserName = jsonreq["user"].ToString().ToLower();
             FindUser(sessionInfo, challenge);
             SuccessResponse(req, resdata);
         }
@@ -822,13 +827,13 @@ namespace SilverSim.WebIF.Admin
                             return;
                         }
                         Action<HttpRequest, Map> del;
-                        if (!jsondata.ContainsKey("method"))
+                        string methodName;
+                        if (!jsondata.TryGetValue("method", out methodName))
                         {
                             ErrorResponse(req, AdminWebIfErrorResult.MissingMethod);
                             return;
                         }
 
-                        var methodName = jsondata["method"].ToString();
                         string sessionKey;
 
 #if DEBUG
@@ -846,12 +851,13 @@ namespace SilverSim.WebIF.Admin
                                 break;
 
                             default:
-                                if (!jsondata.ContainsKey("sessionid"))
+                                string sessionid;
+                                if (!jsondata.TryGetValue("sessionid", out sessionid))
                                 {
                                     ErrorResponse(req, AdminWebIfErrorResult.MissingSessionId);
                                     return;
                                 }
-                                sessionKey = req.CallerIP + "+" + jsondata["sessionid"].ToString();
+                                sessionKey = req.CallerIP + "+" + sessionid;
                                 if (!m_Sessions.TryGetValue(sessionKey, out sessionInfo) ||
                                     !sessionInfo.IsAuthenticated)
                                 {
@@ -1254,8 +1260,8 @@ namespace SilverSim.WebIF.Admin
         #region WebIF admin functions
         private void HandleFindExactUser(HttpRequest req, Map jsondata)
         {
-            IValue q1;
-            IValue q2;
+            string q1;
+            string q2;
 
             if (!jsondata.TryGetValue("firstname", out q1) || !jsondata.TryGetValue("lastname", out q2))
             {
@@ -1264,7 +1270,7 @@ namespace SilverSim.WebIF.Admin
             }
 
             UUI uui;
-            if(!m_AvatarNameService.TryGetValue(q1.ToString(), q2.ToString(), out uui))
+            if(!m_AvatarNameService.TryGetValue(q1, q2, out uui))
             {
                 ErrorResponse(req, AdminWebIfErrorResult.NotFound);
                 return;
@@ -1284,17 +1290,17 @@ namespace SilverSim.WebIF.Admin
 
         private void HandleFindUser(HttpRequest req, Map jsondata)
         {
-            IValue q1;
-            IValue q2;
+            string q1;
+            string q2;
             List<UUI> uuis;
 
             if(jsondata.TryGetValue("firstname", out q1) && jsondata.TryGetValue("lastname", out q2))
             {
-                uuis = m_AvatarNameService.Search(new string[] { q1.ToString(), q2.ToString() });
+                uuis = m_AvatarNameService.Search(new string[] { q1, q2 });
             }
             else if(jsondata.TryGetValue("query", out q1))
             {
-                uuis = m_AvatarNameService.Search(new string[] { q1.ToString() });
+                uuis = m_AvatarNameService.Search(new string[] { q1 });
             }
             else
             {
@@ -1318,14 +1324,15 @@ namespace SilverSim.WebIF.Admin
 
         private void HandleGetUserDetails(HttpRequest req, Map jsondata)
         {
-            if(!jsondata.ContainsKey("uuid"))
+            UUID id;
+            if(!jsondata.TryGetValue("uuid", out id))
             {
                 ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
                 return;
             }
 
             UUI uui;
-            if(!m_AvatarNameService.TryGetValue(jsondata["uuid"].AsUUID, out uui))
+            if(!m_AvatarNameService.TryGetValue(id, out uui))
             {
                 ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
@@ -1376,13 +1383,14 @@ namespace SilverSim.WebIF.Admin
         [AdminWebIfRequiredRight("dnscache.manage")]
         private void DnsCacheRemove(HttpRequest req, Map jsondata)
         {
-            if (!jsondata.ContainsKey("host"))
+            string hostname;
+            if (!jsondata.TryGetValue("host", out hostname))
             {
                 ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
                 return;
             }
 
-            if(DnsNameCache.RemoveCachedDnsEntry(jsondata["host"].ToString()))
+            if(DnsNameCache.RemoveCachedDnsEntry(hostname))
             {
                 SuccessResponse(req, new Map());
             }
@@ -1416,7 +1424,8 @@ namespace SilverSim.WebIF.Admin
         [AdminWebIfRequiredRight("modules.view")]
         private void ModuleGet(HttpRequest req, Map jsondata)
         {
-            if(!jsondata.ContainsKey("name"))
+            string reqname;
+            if(!jsondata.TryGetValue("name", out reqname))
             {
                 ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
                 return;
@@ -1424,11 +1433,11 @@ namespace SilverSim.WebIF.Admin
 
             var plugins = m_Loader.AllServices;
             IPlugin plugin;
-            if(plugins.TryGetValue(jsondata["name"].ToString(), out plugin))
+            if(plugins.TryGetValue(reqname, out plugin))
             {
                 var res = new Map
                 {
-                    { "Name", jsondata["name"].ToString() }
+                    { "Name", reqname }
                 };
                 var pluginType = plugin.GetType();
                 var descAttr = Attribute.GetCustomAttribute(pluginType, typeof(DescriptionAttribute)) as DescriptionAttribute;
@@ -1528,21 +1537,21 @@ namespace SilverSim.WebIF.Admin
         [AdminWebIfRequiredRight("serverparams.manage")]
         private void SetServerParam(HttpRequest req, Map jsondata)
         {
-            if(!jsondata.ContainsKey("parameter") || !jsondata.ContainsKey("value"))
+            string parameter;
+            string value;
+            if(!jsondata.TryGetValue("parameter", out parameter) || !jsondata.TryGetValue("value", out value))
             {
                 ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
             else
             {
                 UUID regionid = UUID.Zero;
-                if(jsondata.ContainsKey("regionid") && !UUID.TryParse(jsondata["regionid"].ToString(), out regionid))
+                if(jsondata.ContainsKey("regionid") && !jsondata.TryGetValue("regionid", out regionid))
                 {
                     ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                     return;
                 }
 
-                var parameter = jsondata["parameter"].ToString();
-                var value = jsondata["value"].ToString();
                 if(parameter.StartsWith("WebIF.Admin.User."))
                 {
                     ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
@@ -1576,18 +1585,18 @@ namespace SilverSim.WebIF.Admin
                 foreach (var iv in paradata)
                 {
                     var reqdata = iv as Map;
-                    if (reqdata == null || !reqdata.ContainsKey("parameter"))
+                    string parameter;
+                    if (reqdata == null || !reqdata.TryGetValue("parameter", out parameter))
                     {
                         ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                         return;
                     }
                     UUID regionid = UUID.Zero;
-                    if (reqdata.ContainsKey("regionid") && !UUID.TryParse(reqdata["regionid"].ToString(), out regionid))
+                    if (reqdata.ContainsKey("regionid") && !reqdata.TryGetValue("regionid", out regionid))
                     {
                         ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                         return;
                     }
-                    string parameter = reqdata["parameter"].ToString();
                     string value;
                     if (parameter.StartsWith("WebIF.Admin.User."))
                     {
@@ -1628,18 +1637,18 @@ namespace SilverSim.WebIF.Admin
                 foreach(var iv in paradata)
                 {
                     var reqdata = iv as Map;
-                    if(reqdata == null || !reqdata.ContainsKey("parameter"))
+                    string parameter;
+                    if(reqdata == null || !reqdata.TryGetValue("parameter", out parameter))
                     {
                         ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                         return;
                     }
                     var regionid = UUID.Zero;
-                    if (reqdata.ContainsKey("regionid") && !UUID.TryParse(reqdata["regionid"].ToString(), out regionid))
+                    if (reqdata.ContainsKey("regionid") && !reqdata.TryGetValue("regionid", out regionid))
                     {
                         ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                         return;
                     }
-                    var parameter = reqdata["parameter"].ToString();
                     string value;
                     if (parameter.StartsWith("WebIF.Admin.User."))
                     {
@@ -1679,20 +1688,20 @@ namespace SilverSim.WebIF.Admin
         [AdminWebIfRequiredRight("serverparams.manage")]
         private void GetServerParam(HttpRequest req, Map jsondata)
         {
-            if (!jsondata.ContainsKey("parameter"))
+            string parameter;
+            if (!jsondata.TryGetValue("parameter", out parameter))
             {
                 ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
             else
             {
                 var regionid = UUID.Zero;
-                if (jsondata.ContainsKey("regionid") && !UUID.TryParse(jsondata["regionid"].ToString(), out regionid))
+                if (jsondata.ContainsKey("regionid") && !jsondata.TryGetValue("regionid", out regionid))
                 {
                     ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                     return;
                 }
 
-                var parameter = jsondata["parameter"].ToString();
                 string value;
                 if (parameter.StartsWith("WebIF.Admin.User."))
                 {
@@ -1737,15 +1746,19 @@ namespace SilverSim.WebIF.Admin
         [AdminWebIfRequiredRight("webif.admin.users.manage")]
         private void GrantRight(HttpRequest req, Map jsondata)
         {
-            if (!jsondata.ContainsKey("user") || !jsondata.ContainsKey("right"))
+            string username;
+            string right;
+            if (!jsondata.TryGetValue("user", out username) || !jsondata.TryGetValue("right", out right))
             {
                 ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
             else
             {
-                var userRef = "WebIF.Admin.User." + jsondata["user"].ToString().ToLower() + ".";
+                var userRef = "WebIF.Admin.User." + username.ToLower() + ".";
                 string pass_sha1;
                 string rights;
+
+                right = right.ToLower();
 
                 if (m_ServerParams.TryGetValue(UUID.Zero, userRef + "PassCode", out pass_sha1) &&
                     m_ServerParams.TryGetValue(UUID.Zero, userRef + "Rights", out rights))
@@ -1758,10 +1771,10 @@ namespace SilverSim.WebIF.Admin
                         rightlistnew.Add(r.Trim());
                         resdata.Add(r.Trim());
                     }
-                    if(!rightlistnew.Contains(jsondata["right"].ToString().ToLower()))
+                    if(!rightlistnew.Contains(right))
                     {
-                        rightlistnew.Add(jsondata["right"].ToString().ToLower());
-                        resdata.Add(jsondata["right"].ToString().ToLower());
+                        rightlistnew.Add(right);
+                        resdata.Add(right);
                     }
                     m_ServerParams[UUID.Zero, userRef + "Rights"] = string.Join(",", rightlistnew);
                     var m = new Map
@@ -1781,15 +1794,19 @@ namespace SilverSim.WebIF.Admin
         [AdminWebIfRequiredRight("webif.admin.users.manage")]
         private void RevokeRight(HttpRequest req, Map jsondata)
         {
-            if (!jsondata.ContainsKey("user") || !jsondata.ContainsKey("right"))
+            string username;
+            string right;
+            if (!jsondata.TryGetValue("user", out username) || !jsondata.TryGetValue("right", out right))
             {
                 ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
             else
             {
-                var userRef = "WebIF.Admin.User." + jsondata["user"].ToString().ToLower() + ".";
+                var userRef = "WebIF.Admin.User." + username.ToLower() + ".";
                 string pass_sha1;
                 string rights;
+
+                right = right.ToLower();
 
                 if (m_ServerParams.TryGetValue(UUID.Zero, userRef + "PassCode", out pass_sha1) &&
                     m_ServerParams.TryGetValue(UUID.Zero, userRef + "Rights", out rights))
@@ -1800,7 +1817,7 @@ namespace SilverSim.WebIF.Admin
                     foreach (var r in rightlist)
                     {
                         var trimmed = r.Trim();
-                        if (trimmed != jsondata["right"].ToString())
+                        if (trimmed != right)
                         {
                             rightlistnew.Add(r.Trim());
                             resdata.Add(r.Trim());
@@ -1824,13 +1841,14 @@ namespace SilverSim.WebIF.Admin
         [AdminWebIfRequiredRight("webif.admin.users.manage")]
         private void DeleteUser(HttpRequest req, Map jsondata)
         {
-            if (!jsondata.ContainsKey("user"))
+            string username;
+            if (!jsondata.TryGetValue("user", out username))
             {
                 ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
             else
             {
-                var userRef = "WebIF.Admin.User." + jsondata["user"].ToString().ToLower() + ".";
+                var userRef = "WebIF.Admin.User." + username.ToLower() + ".";
 
                 m_ServerParams.Remove(UUID.Zero, userRef + "Rights");
                 if (m_ServerParams.Remove(UUID.Zero, userRef + "PassCode"))

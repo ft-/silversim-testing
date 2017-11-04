@@ -84,12 +84,13 @@ namespace SilverSim.WebIF.Admin
         private void PackageGetInstalledDetails(HttpRequest req, Map jsondata)
         {
             PackageDescription desc;
-            if (!jsondata.ContainsKey("package"))
+            string package;
+            if (!jsondata.TryGetValue("package", out package))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
                 return;
             }
-            else if(!CoreUpdater.Instance.TryGetInstalledPackageDetails(jsondata["package"].ToString(), out desc))
+            else if(!CoreUpdater.Instance.TryGetInstalledPackageDetails(package, out desc))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
@@ -103,12 +104,13 @@ namespace SilverSim.WebIF.Admin
         private void PackageGetAvailableDetails(HttpRequest req, Map jsondata)
         {
             PackageDescription desc;
-            if (!jsondata.ContainsKey("package"))
+            string package;
+            if (!jsondata.TryGetValue("package", out package))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
                 return;
             }
-            else if (!CoreUpdater.Instance.TryGetAvailablePackageDetails(jsondata["package"].ToString(), out desc))
+            else if (!CoreUpdater.Instance.TryGetAvailablePackageDetails(package, out desc))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
@@ -122,12 +124,13 @@ namespace SilverSim.WebIF.Admin
         private void PackageGetDetails(HttpRequest req, Map jsondata)
         {
             PackageDescription desc;
-            if (!jsondata.ContainsKey("package"))
+            string package;
+            if (!jsondata.TryGetValue("package", out package))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
                 return;
             }
-            else if (!CoreUpdater.Instance.TryGetPackageDetails(jsondata["package"].ToString(), out desc))
+            else if (!CoreUpdater.Instance.TryGetPackageDetails(package, out desc))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
@@ -218,7 +221,8 @@ namespace SilverSim.WebIF.Admin
         [AdminWebIfRequiredRight("packages.install")]
         private void PackageInstall(HttpRequest req, Map jsondata)
         {
-            if (!jsondata.ContainsKey("package"))
+            string package;
+            if (!jsondata.TryGetValue("package", out package))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
                 return;
@@ -226,7 +230,7 @@ namespace SilverSim.WebIF.Admin
 
             try
             {
-                CoreUpdater.Instance.InstallPackage(jsondata["package"].ToString());
+                CoreUpdater.Instance.InstallPackage(package);
             }
             catch
             {
@@ -239,7 +243,8 @@ namespace SilverSim.WebIF.Admin
         [AdminWebIfRequiredRight("packages.uninstall")]
         private void PackageUninstall(HttpRequest req, Map jsondata)
         {
-            if (!jsondata.ContainsKey("package"))
+            string package;
+            if (!jsondata.TryGetValue("package", out package))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
                 return;
@@ -247,7 +252,7 @@ namespace SilverSim.WebIF.Admin
 
             try
             {
-                CoreUpdater.Instance.UninstallPackage(jsondata["package"].ToString());
+                CoreUpdater.Instance.UninstallPackage(package);
             }
             catch
             {

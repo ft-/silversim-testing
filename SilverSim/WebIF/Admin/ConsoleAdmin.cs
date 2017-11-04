@@ -64,13 +64,13 @@ namespace SilverSim.WebIF.Admin
         [AdminWebIfRequiredRight("console.access")]
         public void ConsoleCommand(HttpRequest req, Map jsondata)
         {
-            if(!jsondata.ContainsKey("command"))
+            string cmd;
+            if(!jsondata.TryGetValue("command", out cmd))
             {
                 req.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
                 return;
             }
 
-            string cmd = jsondata["command"].ToString();
             using (HttpResponse res = req.BeginResponse("text/plain"))
             {
                 using (Stream o = res.GetOutputStream())

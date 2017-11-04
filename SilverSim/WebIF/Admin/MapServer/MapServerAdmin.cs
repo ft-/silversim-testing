@@ -122,10 +122,10 @@ namespace SilverSim.WebIF.Admin.MapServer
                 var setFlags = RegionFlags.None;
                 var removeFlags = RegionFlags.None;
 
-                IValue iv;
-                if(jsondata.TryGetValue("fallback", out iv))
+                bool flag;
+                if(jsondata.TryGetValue("fallback", out flag))
                 {
-                    if(iv.AsBoolean)
+                    if(flag)
                     {
                         setFlags |= RegionFlags.FallbackRegion;
                     }
@@ -134,9 +134,9 @@ namespace SilverSim.WebIF.Admin.MapServer
                         removeFlags |= RegionFlags.FallbackRegion;
                     }
                 }
-                if (jsondata.TryGetValue("default", out iv))
+                if (jsondata.TryGetValue("default", out flag))
                 {
-                    if (iv.AsBoolean)
+                    if (flag)
                     {
                         setFlags |= RegionFlags.DefaultRegion;
                     }
@@ -145,9 +145,9 @@ namespace SilverSim.WebIF.Admin.MapServer
                         removeFlags |= RegionFlags.DefaultRegion;
                     }
                 }
-                if (jsondata.TryGetValue("defaulthg", out iv))
+                if (jsondata.TryGetValue("defaulthg", out flag))
                 {
-                    if (iv.AsBoolean)
+                    if (flag)
                     {
                         setFlags |= RegionFlags.DefaultHGRegion;
                     }
@@ -156,9 +156,9 @@ namespace SilverSim.WebIF.Admin.MapServer
                         removeFlags |= RegionFlags.DefaultHGRegion;
                     }
                 }
-                if (jsondata.TryGetValue("persistent", out iv))
+                if (jsondata.TryGetValue("persistent", out flag))
                 {
-                    if (iv.AsBoolean)
+                    if (flag)
                     {
                         setFlags |= RegionFlags.Persistent;
                     }
@@ -245,7 +245,7 @@ namespace SilverSim.WebIF.Admin.MapServer
         [AdminWebIfRequiredRight("mapserver.view")]
         private void HandleMapServerSearch(HttpRequest req, Map jsondata)
         {
-            IValue searchkey;
+            string searchkey;
             if(!jsondata.TryGetValue("query", out searchkey))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
@@ -255,7 +255,7 @@ namespace SilverSim.WebIF.Admin.MapServer
             List<RegionInfo> regions;
             try
             {
-                regions = m_GridService.SearchRegionsByName(UUID.Zero, searchkey.ToString());
+                regions = m_GridService.SearchRegionsByName(UUID.Zero, searchkey);
             }
             catch
             {

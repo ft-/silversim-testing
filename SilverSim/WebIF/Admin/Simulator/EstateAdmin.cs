@@ -94,10 +94,12 @@ namespace SilverSim.WebIF.Admin.Simulator
         private void HandleGet(HttpRequest req, Map jsondata)
         {
             EstateInfo estateInfo;
-            if ((jsondata.ContainsKey("name") &&
-                    m_EstateService.TryGetValue(jsondata["name"].ToString(), out estateInfo)) ||
-                (jsondata.ContainsKey("id") &&
-                    m_EstateService.TryGetValue(jsondata["id"].AsUInt, out estateInfo)))
+            string estateName;
+            uint estateID;
+            if ((jsondata.TryGetValue("name", out estateName) &&
+                    m_EstateService.TryGetValue(estateName, out estateInfo)) ||
+                (jsondata.TryGetValue("id", out estateID) &&
+                    m_EstateService.TryGetValue(estateID, out estateInfo)))
             {
                 /* found estate via name or via id */
             }
@@ -134,7 +136,8 @@ namespace SilverSim.WebIF.Admin.Simulator
         private void HandleUpdate(HttpRequest req, Map jsondata)
         {
             EstateInfo estateInfo;
-            if (jsondata.ContainsKey("id") && m_EstateService.TryGetValue(jsondata["id"].AsUInt, out estateInfo))
+            uint estateID;
+            if (jsondata.TryGetValue("id", out estateID) && m_EstateService.TryGetValue(estateID, out estateInfo))
             {
                 /* found estate via id */
             }
@@ -144,8 +147,9 @@ namespace SilverSim.WebIF.Admin.Simulator
                 return;
             }
 
-            if (jsondata.ContainsKey("owner") &&
-                !m_WebIF.TranslateToUUI(jsondata["owner"].ToString(), out estateInfo.Owner))
+            string owner;
+            if (jsondata.TryGetValue("owner", out owner) &&
+                !m_WebIF.TranslateToUUI(owner, out estateInfo.Owner))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                 return;
@@ -153,34 +157,40 @@ namespace SilverSim.WebIF.Admin.Simulator
 
             try
             {
-                if (jsondata.ContainsKey("name"))
+                string name;
+                if (jsondata.TryGetValue("name", out name))
                 {
-                    estateInfo.Name = jsondata["name"].ToString();
+                    estateInfo.Name = name;
                 }
 
-                if (jsondata.ContainsKey("flags"))
+                uint uval;
+                int ival;
+                double fval;
+                string sval;
+
+                if (jsondata.TryGetValue("flags", out uval))
                 {
-                    estateInfo.Flags = (RegionOptionFlags)jsondata["flags"].AsUInt;
+                    estateInfo.Flags = (RegionOptionFlags)uval;
                 }
 
-                if (jsondata.ContainsKey("pricepermeter"))
+                if (jsondata.TryGetValue("pricepermeter", out ival))
                 {
-                    estateInfo.PricePerMeter = jsondata["pricepermeter"].AsInt;
+                    estateInfo.PricePerMeter = ival;
                 }
 
-                if (jsondata.ContainsKey("billablefactor"))
+                if (jsondata.TryGetValue("billablefactor", out fval))
                 {
-                    estateInfo.BillableFactor = jsondata["billablefactor"].AsReal;
+                    estateInfo.BillableFactor = fval;
                 }
 
-                if (jsondata.ContainsKey("abuseemail"))
+                if (jsondata.TryGetValue("abuseemail", out sval))
                 {
-                    estateInfo.AbuseEmail = jsondata["abuseemail"].ToString();
+                    estateInfo.AbuseEmail = sval;
                 }
 
-                if (jsondata.ContainsKey("parentestateid"))
+                if (jsondata.TryGetValue("parentestateid", out uval))
                 {
-                    estateInfo.ParentEstateID = jsondata["parentestateid"].AsUInt;
+                    estateInfo.ParentEstateID = uval;
                 }
             }
             catch
@@ -301,13 +311,14 @@ namespace SilverSim.WebIF.Admin.Simulator
         [AdminWebIfRequiredRight("estate.notice")]
         private void HandleNotice(HttpRequest req, Map jsondata)
         {
-            if(!jsondata.ContainsKey("id") || !jsondata.ContainsKey("message"))
+            uint estateID;
+            string message;
+            if(!jsondata.TryGetValue("id", out estateID) || !jsondata.TryGetValue("message", out message))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
             else
             {
-                uint estateID = jsondata["id"].AsUInt;
                 var regionIds = m_EstateService.RegionMap[estateID];
 
                 if(regionIds.Count == 0)
@@ -327,7 +338,6 @@ namespace SilverSim.WebIF.Admin.Simulator
                 }
                 else
                 {
-                    string message = jsondata["message"].ToString();
                     var regions = new AnArray();
 
                     foreach(var regionId in regionIds)
