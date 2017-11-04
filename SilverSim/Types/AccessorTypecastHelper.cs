@@ -38,9 +38,9 @@ namespace SilverSim.Types
             {
                 result = (T)Convert.ChangeType(iv.ToString(), targetType);
             }
-            else if(targetType == typeof(UUID) && sourceType == typeof(string))
+            else if(targetType == typeof(UUID) && sourceType == typeof(AString))
             {
-                result = (T)Convert.ChangeType(iv.AsUUID, targetType);
+                result = (T)Convert.ChangeType(UUID.Parse(iv.ToString()), targetType);
             }
             else if (targetType == typeof(int))
             {
@@ -60,7 +60,7 @@ namespace SilverSim.Types
             }
             else if (targetType == typeof(double) || targetType == typeof(float))
             {
-                result = (T)Convert.ChangeType(iv.AsReal, targetType);
+                result = (T)Convert.ChangeType((double)iv.AsReal, targetType);
             }
             else if (targetType == typeof(Vector3))
             {
