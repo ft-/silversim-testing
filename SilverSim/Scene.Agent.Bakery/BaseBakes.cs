@@ -175,7 +175,8 @@ namespace SilverSim.Scene.Agent.Bakery
                     headSkinGrain.UnlockBits(inLockBits);
                 }
                 Marshal.Copy(outLockBits.Scan0, outData, 0, 512 * 512 * 4);
-                for (int i = 512 * 512 * 4; i != 0;)
+                int i = 512 * 512 * 4;
+                while(i != 0)
                 {
                     byte alpha = inData[--i - 1];
                     outData[i] = Math.Min(outData[i], alphaData[i]);
@@ -203,7 +204,8 @@ namespace SilverSim.Scene.Agent.Bakery
                     skinGrain.UnlockBits(inLockBits);
                 }
                 Marshal.Copy(outLockBits.Scan0, outData, 0, 512 * 512 * 4);
-                for (int i = 512 * 512 * 4; i != 0;)
+                int i = 512 * 512 * 4;
+                while (i != 0)
                 {
                     byte alpha = inData[--i];
                     --i;
@@ -230,7 +232,8 @@ namespace SilverSim.Scene.Agent.Bakery
                     skinGrain.UnlockBits(inLockBits);
                 }
                 Marshal.Copy(outLockBits.Scan0, outData, 0, 512 * 512 * 4);
-                for (int i = 512 * 512 * 4; i != 0;)
+                int i = 512 * 512 * 4;
+                while (i != 0)
                 {
                     byte alpha = inData[--i];
                     --i;
