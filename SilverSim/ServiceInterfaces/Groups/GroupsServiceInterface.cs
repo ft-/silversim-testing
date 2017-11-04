@@ -265,7 +265,7 @@ namespace SilverSim.ServiceInterfaces.Groups
 
         public GroupMember AddAgentToGroup(UUI requestingAgent, UGI group, UUID roleid, UUI agent, string accessToken)
         {
-            bool alreadyInGroup = false;
+            bool alreadyInGroup;
 
             GroupMember gmem;
             alreadyInGroup = Members.TryGetValue(requestingAgent, group, agent, out gmem);

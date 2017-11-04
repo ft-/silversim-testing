@@ -104,7 +104,6 @@ namespace SilverSim.Types
                         /* this is a foreign grid URI of form <url> <region name> */
                         gatekeeperURI = s[0];
                         regionName = s[1];
-                        isForeignGridTarget = true;
                     }
                     else
                     {
@@ -116,7 +115,6 @@ namespace SilverSim.Types
                     /* this is a foreign Grid URI for the Default Region */
                     gatekeeperURI = requestedName;
                     regionName = string.Empty;
-                    isForeignGridTarget = true;
                 }
                 else
                 {

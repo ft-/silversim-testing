@@ -73,7 +73,6 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
                 }
 
                 Image img;
-                Rectangle bakeRect = GetTargetBakeDimensions(target);
                 m_BakeGloves = cache.TryGetTexture(m_GlovesTextureId, target, out img) ?
                     new Bitmap(img) : CreateWhiteBakeImage(target);
 
