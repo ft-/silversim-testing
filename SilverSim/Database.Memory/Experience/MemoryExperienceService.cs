@@ -42,6 +42,7 @@ namespace SilverSim.Database.Memory.Experience
 
         public void Startup(ConfigurationLoader loader)
         {
+            /* intentionally left empty */
         }
 
         public override ExperienceInfo this[UUID experienceID]

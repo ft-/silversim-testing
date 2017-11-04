@@ -69,7 +69,6 @@ namespace SilverSim.Database.Memory.SimulationData
         public bool TryGetDefault(UUID regionID, List<LayerPatch> list)
         {
             RwLockedDictionary<uint, byte[]> patchesData;
-            var patches = new List<LayerPatch>();
             if (m_DefaultTerrainData.TryGetValue(regionID, out patchesData))
             {
                 foreach (var kvp in patchesData)

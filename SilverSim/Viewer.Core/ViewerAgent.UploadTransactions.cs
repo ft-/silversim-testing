@@ -223,12 +223,12 @@ namespace SilverSim.Viewer.Core
 #endif
                     AssetUploadCompleted(transaction, transaction.SceneID);
                 }
+#if DEBUG
                 else
                 {
-#if DEBUG
                     m_Log.DebugFormat("SetAssetUploadAsCreateInventoryItem(): Appended action to transaction {0} for {1}", transactionID, Owner.FullName);
-#endif
                 }
+#endif
             }
         }
 
@@ -276,12 +276,12 @@ namespace SilverSim.Viewer.Core
 #endif
                     AssetUploadCompleted(transaction, transaction.SceneID);
                 }
+#if DEBUG
                 else
                 {
-#if DEBUG
                     m_Log.DebugFormat("SetAssetUploadAsCompletionAction(): Appended action to transaction {0} for {1}", transactionID, Owner.FullName);
-#endif
                 }
+#endif
             }
         }
 
@@ -313,12 +313,12 @@ namespace SilverSim.Viewer.Core
 #endif
                     AssetUploadCompleted(transaction, transaction.SceneID);
                 }
+#if DEBUG
                 else
                 {
-#if DEBUG
                     m_Log.DebugFormat("SetAssetUploadAsUpdateInventoryItem(): Appended action to transaction {0} for {1}", transactionID, Owner.FullName);
-#endif
                 }
+#endif
             }
         }
         #endregion

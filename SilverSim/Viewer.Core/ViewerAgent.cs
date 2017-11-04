@@ -687,12 +687,10 @@ namespace SilverSim.Viewer.Core
             }
 
             AgentCircuit circuit;
-            if(experienceID != UUID.Zero && Circuits.TryGetValue(part.ObjectGroup.Scene.ID, out circuit))
+            if (experienceID != UUID.Zero && Circuits.TryGetValue(part.ObjectGroup.Scene.ID, out circuit) &&
+                !circuit.AddExperienceTimeout(part.ID, itemID))
             {
-                if(!circuit.AddExperienceTimeout(part.ID, itemID))
-                {
-                    return ScriptPermissions.None;
-                }
+                return ScriptPermissions.None;
             }
             var m = new ScriptQuestion
             {

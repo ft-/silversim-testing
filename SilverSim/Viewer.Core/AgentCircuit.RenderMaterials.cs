@@ -136,7 +136,7 @@ namespace SilverSim.Viewer.Core
                         }
                     }
                 }
-                else if(zippedDataMap?.ContainsKey("FullMaterialsPerFace") == true)
+                else if(zippedDataMap?.ContainsKey("FullMaterialsPerFace") ?? false)
                 {
                     var faceData = zippedDataMap["FullMaterialsPerFace"] as AnArray;
                     if (faceData != null)

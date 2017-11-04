@@ -40,6 +40,7 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
 
         public override void Dispose()
         {
+            /* nothing to do in here */
         }
     }
 }

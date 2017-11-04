@@ -95,12 +95,9 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
         {
             if(target == BakeTarget.Skirt)
             {
-                if(m_Bump == null)
+                if (m_Bump == null && !cache.TryGetBump(m_TextureId, target, out m_Bump))
                 {
-                    if(!cache.TryGetBump(m_TextureId, target, out m_Bump))
-                    {
-                        m_Bump = new byte[512 * 512];
-                    }
+                    m_Bump = new byte[512 * 512];
                 }
                 return m_Bump;
             }

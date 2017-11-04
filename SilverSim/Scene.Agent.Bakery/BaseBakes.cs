@@ -125,7 +125,7 @@ namespace SilverSim.Scene.Agent.Bakery
             m_HeadBump = LoadResourceBumpmap("bump.bump_head_base.png");
             m_UpperBodyBump = LoadResourceBumpmap("bump.bump_upperbody_base.png");
             m_LowerBodyBump = LoadResourceBumpmap("bump.bump_lowerbody_base.png");
-            JacketLengthUpperAlpha = LoadResourceBumpmap("jacket.jacket_length_upper_alpha.png"); ;
+            JacketLengthUpperAlpha = LoadResourceBumpmap("jacket.jacket_length_upper_alpha.png");
             JacketLengthLowerAlpha = LoadResourceBumpmap("jacket.jacket_length_lower_alpha.png");
             JacketOpenUpperAlpha = LoadResourceBumpmap("jacket.jacket_open_upper_alpha.png");
             JacketOpenLowerAlpha = LoadResourceBumpmap("jacket.jacket_open_lower_alpha.png");

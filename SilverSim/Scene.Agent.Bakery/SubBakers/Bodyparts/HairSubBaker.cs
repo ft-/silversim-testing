@@ -152,15 +152,10 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Bodyparts
                 col += new Color3(val, val, val);
             }
 
-            ColorAlpha alphaCol = (ColorAlpha)col;
-            if(hair.Params.TryGetValue(751, out val))
-            {
-                alphaCol.A = 1 - (val);
-            }
-            else
-            {
-                alphaCol.A = 0.7;
-            }
+            var alphaCol = (ColorAlpha)col;
+            alphaCol.A = hair.Params.TryGetValue(751, out val) ? 
+                1 - (val) : 
+                0.7;
             return alphaCol;
         }
         #endregion
