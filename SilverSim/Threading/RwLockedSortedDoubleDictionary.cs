@@ -36,7 +36,7 @@ namespace SilverSim.Threading
             {
             }
 
-            public ChangeKeyFailedException() : base()
+            public ChangeKeyFailedException()
             {
             }
 
