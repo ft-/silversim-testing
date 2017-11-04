@@ -36,27 +36,27 @@ namespace SilverSim.Scene.Agent.Bakery.SubBakers.Clothing
         private byte[] m_UpperBump;
         private byte[] m_LowerBump;
 
-        private UUID m_UpperTextureId;
-        private UUID m_LowerTextureId;
+        private readonly UUID m_UpperTextureId;
+        private readonly UUID m_LowerTextureId;
 
-        private double m_JacketUpperLength;
-        private double m_JacketLowerLength;
-        private double m_JacketUpperOpen;
-        private double m_JacketLowerOpen;
-        private double m_JacketSleeveLength;
-        private double m_JacketCollarFront;
-        private double m_JacketCollarBack;
+        private readonly double m_JacketUpperLength;
+        private readonly double m_JacketLowerLength;
+        private readonly double m_JacketUpperOpen;
+        private readonly double m_JacketLowerOpen;
+        private readonly double m_JacketSleeveLength;
+        private readonly double m_JacketCollarFront;
+        private readonly double m_JacketCollarBack;
 
-        private double m_JacketUpperLengthBump;
-        private double m_JacketLowerLengthBump;
-        private double m_JacketUpperOpenBump;
-        private double m_JacketLowerOpenBump;
-        private double m_JacketSleeveLengthBump;
-        private double m_JacketCollarFrontBump;
-        private double m_JacketCollarBackBump;
+        private readonly double m_JacketUpperLengthBump;
+        private readonly double m_JacketLowerLengthBump;
+        private readonly double m_JacketUpperOpenBump;
+        private readonly double m_JacketLowerOpenBump;
+        private readonly double m_JacketSleeveLengthBump;
+        private readonly double m_JacketCollarFrontBump;
+        private readonly double m_JacketCollarBackBump;
 
-        private Color3 m_JacketUpperColor;
-        private Color3 m_JacketLowerColor;
+        private readonly Color3 m_JacketUpperColor;
+        private readonly Color3 m_JacketLowerColor;
 
         public JacketSubBaker(Wearable jacket)
         {
