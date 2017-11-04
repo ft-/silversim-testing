@@ -42,7 +42,8 @@ namespace SilverSim.Http.Client
             UpgradeHttp2,
             Http2PriorKnowledge
         }
-        public static ConnectionModeEnum ConnectionReuse = ConnectionModeEnum.Keepalive;
+
+        public const ConnectionModeEnum ConnectionReuse = ConnectionModeEnum.Keepalive;
 
         private struct StreamInfo
         {

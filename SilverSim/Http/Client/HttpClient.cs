@@ -110,6 +110,7 @@ namespace SilverSim.Http.Client
         {
             int pos = 0;
             var paradata = new Dictionary<string, string>();
+            var sb = new StringBuilder();
             while (pos < para.Length)
             {
                 if (char.IsWhiteSpace(para[pos]))
@@ -118,11 +119,12 @@ namespace SilverSim.Http.Client
                     continue;
                 }
 
-                string paraname = string.Empty;
+                sb.Clear();
                 while (pos < para.Length && char.IsLetterOrDigit(para[pos]))
                 {
-                    paraname += para[pos++];
+                    sb.Append(para[pos++]);
                 }
+                string paraname = sb.ToString();
 
                 if (pos == para.Length || para[pos] != '=')
                 {
@@ -134,7 +136,7 @@ namespace SilverSim.Http.Client
                     ++pos;
                 }
 
-                string paravalue = string.Empty;
+                sb.Clear();
                 if (para[pos] == '\"')
                 {
                     ++pos;
@@ -145,7 +147,7 @@ namespace SilverSim.Http.Client
                         {
                             return null;
                         }
-                        paravalue += para[pos++];
+                        sb.Append(para[pos++]);
                     }
 
                     if (pos == para.Length || para[pos] != '\"')
@@ -153,6 +155,7 @@ namespace SilverSim.Http.Client
                         return null;
                     }
                 }
+                string paravalue = sb.ToString();
 
                 while (pos < para.Length && char.IsWhiteSpace(para[pos]))
                 {
@@ -237,9 +240,9 @@ namespace SilverSim.Http.Client
             string method = request.Method;
 
 redoafter401:        
-            string reqdata = uri.IsDefaultPort ?
+            var reqdata = new StringBuilder(uri.IsDefaultPort ?
                     $"{method} {uri.PathAndQuery} HTTP/1.1\r\nHost: {uri.Host}\r\n":
-                    $"{method} {uri.PathAndQuery} HTTP/1.1\r\nHost: {uri.Host}:{uri.Port}\r\n";
+                    $"{method} {uri.PathAndQuery} HTTP/1.1\r\nHost: {uri.Host}:{uri.Port}\r\n");
 
             bool doPost = false;
             bool doChunked = false;
@@ -291,13 +294,13 @@ redoafter401:
             {
                 foreach (KeyValuePair<string, string> kvp in headers)
                 {
-                    reqdata += $"{kvp.Key}: {kvp.Value}\r\n";
+                    reqdata.Append($"{kvp.Key}: {kvp.Value}\r\n");
                 }
             }
 
             if(request.UseChunkedEncoding)
             {
-                reqdata += "Transfer-Encoding: chunked\r\n";
+                reqdata.Append("Transfer-Encoding: chunked\r\n");
             }
 
             string content_type = request.RequestContentType;
@@ -307,22 +310,22 @@ redoafter401:
             {
                 if(content_type != null)
                 {
-                    reqdata += $"Content-Type: {content_type}\r\n";
+                    reqdata.Append($"Content-Type: {content_type}\r\n");
                 }
 
                 if (request.UseChunkedEncoding)
                 {
                     doPost = true;
                     doChunked = true;
-                    reqdata += "Transfer-Encoding: chunked\r\n";
+                    reqdata.Append("Transfer-Encoding: chunked\r\n");
                     if (compressed && content_type != "application/x-gzip")
                     {
-                        reqdata += "X-Content-Encoding: gzip\r\n";
+                        reqdata.Append("X-Content-Encoding: gzip\r\n");
                     }
 
                     if (expect100Continue)
                     {
-                        reqdata += "Expect: 100-continue\r\n";
+                        reqdata.Append("Expect: 100-continue\r\n");
                     }
                 }
                 else
@@ -333,33 +336,33 @@ redoafter401:
                         expect100Continue = true;
                         request.Expect100Continue = true;
                     }
-                    reqdata += $"Content-Length: {content_length}\r\n";
+                    reqdata.Append($"Content-Length: {content_length}\r\n");
                     if (compressed && content_type != "application/x-gzip")
                     {
-                        reqdata += "X-Content-Encoding: gzip\r\n";
+                        reqdata.Append("X-Content-Encoding: gzip\r\n");
                     }
 
                     if (expect100Continue)
                     {
-                        reqdata += "Expect: 100-continue\r\n";
+                        reqdata.Append("Expect: 100-continue\r\n");
                     }
                 }
             }
 
             if(method != "HEAD")
             {
-                reqdata += "Accept-Encoding: gzip, deflate\r\n";
+                reqdata.Append("Accept-Encoding: gzip, deflate\r\n");
             }
 
             if(!haveAccept)
             {
-                reqdata += "Accept: */*\r\n";
+                reqdata.Append("Accept: */*\r\n");
             }
 
             int retrycnt = 1;
             retry:
             AbstractHttpStream s = OpenStream(uri.Scheme, uri.Host, uri.Port, request.ClientCertificates, request.EnabledSslProtocols, request.CheckCertificateRevocation, request.ConnectionMode);
-            string finalreqdata = reqdata;
+            string finalreqdata = reqdata.ToString();
             if (!s.IsReusable)
             {
                 finalreqdata += "Connection: close\r\n";

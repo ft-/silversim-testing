@@ -95,7 +95,7 @@ namespace SilverSim.Http
 
             Guid m_Guid = Guid.NewGuid();
             string webSocketKey = Convert.ToBase64String(m_Guid.ToByteArray());
-            string webSocketRequest = string.Format("GET {0} HTTP/1.1\r\n" +
+            var webSocketRequest = new StringBuilder(string.Format("GET {0} HTTP/1.1\r\n" +
                                         "Host: {1}\r\n" +
                                         "Upgrade: websocket\r\n" +
                                         "Connection: Upgrade\r\n" +
@@ -103,10 +103,10 @@ namespace SilverSim.Http
                                         "Sec-WebSocket-Version: 13\r\n",
                                         uri.PathAndQuery,
                                         host,
-                                        webSocketKey);
+                                        webSocketKey));
             if (protocols != null)
             {
-                webSocketRequest += "Sec-WebSocket-Protocol: " + string.Join(",", protocols) + "\r\n";
+                webSocketRequest.Append("Sec-WebSocket-Protocol: " + string.Join(",", protocols) + "\r\n");
             }
 
             if(authorization != null)
@@ -115,11 +115,11 @@ namespace SilverSim.Http
                 authorization.GetRequestHeaders(txheaders, "GET", uri.PathAndQuery);
                 foreach(KeyValuePair<string, string> kvp in txheaders)
                 {
-                    webSocketRequest += $"{kvp.Key}: {kvp.Value}\r\n";
+                    webSocketRequest.Append($"{kvp.Key}: {kvp.Value}\r\n");
                 }
             }
 
-            webSocketRequest += "\r\n";
+            webSocketRequest.Append("\r\n");
 
             string websocketkeyuuid = webSocketKey + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
             byte[] websocketacceptdata = Encoding.ASCII.GetBytes(websocketkeyuuid);
@@ -129,7 +129,7 @@ namespace SilverSim.Http
                 websocketaccept = Convert.ToBase64String(sha1.ComputeHash(websocketacceptdata));
             }
 
-            byte[] reqdata = Encoding.ASCII.GetBytes(webSocketRequest);
+            byte[] reqdata = Encoding.ASCII.GetBytes(webSocketRequest.ToString());
             stream.Write(reqdata, 0, reqdata.Length);
 
             string resline = ReadHeaderLine(stream);
