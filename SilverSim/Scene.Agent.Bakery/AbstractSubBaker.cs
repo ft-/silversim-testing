@@ -179,7 +179,7 @@ namespace SilverSim.Scene.Agent.Bakery
             var alphalevel = (byte)((1 - val) * 255);
             int grayPos = 0;
             int bitmapPos = 0;
-            while(bitmapPos < img.Length)
+            while(bitmapPos < bitmapLength)
             {
                 bitmapPos += 3;
                 img[bitmapPos] = Math.Min((byte)(graymap[grayPos] >= alphalevel ? 255 : 0), img[bitmapPos]);
@@ -190,7 +190,7 @@ namespace SilverSim.Scene.Agent.Bakery
 
         protected void MultiplyBump(byte[] img, double val)
         {
-            uint v = (uint)(256 * val);
+            var v = (uint)(256 * val);
             for(int i = 0; i < img.Length; ++i)
             {
                 uint cal = img[i] * v;
@@ -208,7 +208,7 @@ namespace SilverSim.Scene.Agent.Bakery
             int bitmapLength = img.Length;
             var alphalevel = (byte)((1 - val) * 255);
             int blendPos = 0;
-            while (blendPos < img.Length)
+            while (blendPos < bitmapLength)
             {
                 img[blendPos] = Math.Min((byte)(graymap[blendPos] >= alphalevel ? 255 : 0), img[blendPos]);
                 ++blendPos;

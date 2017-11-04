@@ -53,7 +53,7 @@ namespace SilverSim.Viewer.Messages.Appearance
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
             {
-                var d = new EffectData
+                m.Effects.Add(new EffectData
                 {
                     ID = p.ReadUUID(),
                     AgentID = p.ReadUUID(),
@@ -61,7 +61,7 @@ namespace SilverSim.Viewer.Messages.Appearance
                     Duration = p.ReadFloat(),
                     EffectColor = new ColorAlpha(p.ReadBytes(4)),
                     TypeData = p.ReadBytes(p.ReadUInt8())
-                };
+                });
             }
 
             return m;

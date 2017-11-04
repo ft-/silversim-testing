@@ -67,7 +67,6 @@ namespace SilverSim.Viewer.Core
             {
                 using (var text = res.GetOutputStream().UTF8XmlTextWriter())
                 {
-                    var baditems = new List<UUID>();
                     text.WriteStartElement("llsd");
                     text.WriteStartElement("map");
                     foreach (var iv in (AnArray)reqmap["object_ids"])
