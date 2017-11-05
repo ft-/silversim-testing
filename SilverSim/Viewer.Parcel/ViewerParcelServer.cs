@@ -42,6 +42,9 @@ using SilverSim.Main.Common.HttpServer;
 using System.Net;
 using SilverSim.Types.StructuredData.Llsd;
 using System.IO;
+using SilverSim.ServiceInterfaces.Economy;
+using SilverSim.Types.Economy.Transactions;
+using SilverSim.Scene.Types.Object;
 
 namespace SilverSim.Viewer.Parcel
 {
@@ -52,6 +55,7 @@ namespace SilverSim.Viewer.Parcel
         private static readonly ILog m_Log = LogManager.GetLogger("LL PARCEL");
 
         [PacketHandler(MessageType.ParcelInfoRequest)]
+        [PacketHandler(MessageType.ParcelBuy)]
         private readonly BlockingQueue<KeyValuePair<AgentCircuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
 
         public ShutdownOrder ShutdownOrder => ShutdownOrder.LogoutRegion;
@@ -99,6 +103,9 @@ namespace SilverSim.Viewer.Parcel
                             HandleParcelInfoRequest(req.Key, scene, m);
                             break;
 
+                        case MessageType.ParcelBuy:
+                            HandleParcelBuy(req.Key, scene, m);
+                            break;
                     }
                 }
                 catch (Exception e)
@@ -152,6 +159,83 @@ namespace SilverSim.Viewer.Parcel
             if (scene.Parcels.TryGetValue(req.ParcelID.RegionPos, out pinfo))
             {
                 SendParcelInfo(circuit, location, scene.Name, pinfo);
+            }
+        }
+
+        private void HandleParcelBuy(AgentCircuit circuit, SceneInterface scene, Message m)
+        {
+            var req = (ParcelBuy)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+
+            ViewerAgent agent = circuit.Agent;
+
+            ParcelInfo pinfo;
+            if(scene.Parcels.TryGetValue(req.LocalID, out pinfo) && (pinfo.Flags & ParcelFlags.ForSale) != 0)
+            {
+                if(pinfo.AuthBuyer.EqualsGrid(agent.Owner) || pinfo.AuthBuyer == UUI.Unknown)
+                {
+                    if(pinfo.SalePrice != 0)
+                    {
+                        /* we have to process it on economy */
+                        EconomyServiceInterface economyService = agent.EconomyService;
+                        if(economyService != null)
+                        {
+                            if (pinfo.GroupOwned)
+                            {
+                                economyService.TransferMoney(agent.Owner, pinfo.Owner, new LandSaleTransaction(scene.GetRegionInfo().Location, scene.ID, scene.Name)
+                                {
+                                    ParcelID = pinfo.ID,
+                                    ParcelName = pinfo.Name
+                                }, pinfo.SalePrice, () => ChangeParcelOwnership(scene, pinfo, agent.Owner, pinfo.SalePrice, req));
+                            }
+                            else
+                            {
+                                /* there is no group account yet implemented */
+                            }
+                        }
+                    }
+                    else
+                    {
+                        ChangeParcelOwnership(scene, pinfo, agent.Owner, pinfo.SalePrice, req);
+                    }
+                }
+            }
+        }
+
+        private void ChangeParcelOwnership(SceneInterface scene, ParcelInfo pinfo, UUI newOwner, int soldforprice, ParcelBuy req)
+        {
+            bool sellParcelObjects = (pinfo.Flags & ParcelFlags.SellParcelObjects) != 0;
+            UUI oldOwner = pinfo.Owner;
+            pinfo.Owner = newOwner;
+            pinfo.Group = UGI.Unknown;
+            pinfo.GroupOwned = false;
+            pinfo.ClaimDate = Date.Now;
+            pinfo.ClaimPrice = soldforprice;
+            pinfo.SalePrice = 0;
+            pinfo.AuthBuyer = UUI.Unknown;
+            pinfo.Flags &= ~(ParcelFlags.ForSale | ParcelFlags.ForSaleObjects | ParcelFlags.SellParcelObjects | ParcelFlags.ShowDirectory);
+            scene.TriggerParcelUpdate(pinfo);
+
+            if(sellParcelObjects)
+            {
+                foreach(ObjectGroup grp in scene.ObjectGroups)
+                {
+                    try
+                    {
+                        if (pinfo.LandBitmap.ContainsLocation(grp.GlobalPosition) && grp.Owner == oldOwner)
+                        {
+                            grp.Owner = newOwner;
+                        }
+                    }
+                    catch
+                    {
+                        /* do not trip on this */
+                    }
+                }
             }
         }
 
@@ -230,7 +314,7 @@ namespace SilverSim.Viewer.Parcel
 
             AnArray locationArray;
             IValue iv_target;
-            ParcelID parcelid = new ParcelID();
+            var parcelid = new ParcelID();
             if(reqmap.TryGetValue("location", out locationArray))
             {
                 uint x = locationArray[0].AsUInt;
