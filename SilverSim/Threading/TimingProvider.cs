@@ -38,10 +38,11 @@ namespace SilverSim.Threading
 
     public sealed class StopWatchSource : TimingProvider
     {
-        public override long SecsToTicks(long secs) => secs * Stopwatch.Frequency;
-        public override long MsecsToTicks(long millisecs) => millisecs * Stopwatch.Frequency / 1000;
         public override long TickCount => Stopwatch.GetTimestamp();
         public override long Frequency => Stopwatch.Frequency;
+
+        public override long SecsToTicks(long secs) => secs * Stopwatch.Frequency;
+        public override long MsecsToTicks(long millisecs) => millisecs * Stopwatch.Frequency / 1000;
         public override double NormalizedToEventsPerSeconds(int events, long deltaticks) => events * Stopwatch.Frequency / (double)deltaticks;
         public override long TicksElapsed(long newts, long oldts) => newts - oldts;
         public override double TicksToSecs(long ticks) => ticks / (double)Stopwatch.Frequency;
@@ -50,10 +51,11 @@ namespace SilverSim.Threading
 
     public sealed class EnvironmentSource : TimingProvider
     {
-        public override long SecsToTicks(long secs) => secs * Stopwatch.Frequency;
-        public override long MsecsToTicks(long millisecs) => millisecs * Stopwatch.Frequency / 1000;
-        public override long TickCount => Stopwatch.GetTimestamp();
-        public override long Frequency => Stopwatch.Frequency;
+        public override long TickCount => Environment.TickCount;
+        public override long Frequency => 1000;
+
+        public override long SecsToTicks(long secs) => secs * 1000;
+        public override long MsecsToTicks(long millisecs) => millisecs;
         public override double NormalizedToEventsPerSeconds(int events, long deltaticks) => events * 1000 / (double)deltaticks;
         public override long TicksElapsed(long newts, long oldts) => (int)newts - (int)oldts;
         public override double TicksToSecs(long ticks) => ticks / 1000.0;

@@ -290,6 +290,25 @@ namespace SilverSim.Main.Common
             }
         }
 
+        private static void ShowTimeSourcesCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        {
+            if (args[0] == "help")
+            {
+                io.Write("Show time sources");
+            }
+            else
+            {
+                FormattedListBuilder fb = new FormattedListBuilder()
+                    .AddColumn("Source", 20)
+                    .AddColumn("Elapsed time (s)", 20)
+                    .AddColumn("Ticks per secs", 20)
+                    .AddHeader();
+                fb.AddData("Stopwatch", TimingProvider.StopWatch.TicksToSecs(TimingProvider.StopWatch.TickCount).ToString("N3"), TimingProvider.StopWatch.Frequency);
+                fb.AddData("Environment", TimingProvider.Environment.TicksToSecs(TimingProvider.Environment.TickCount).ToString("N3"), TimingProvider.Environment.Frequency);
+                io.Write(fb.ToString());
+            }
+        }
+
         private void ShowQueuesCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             if (args[0] == "help")

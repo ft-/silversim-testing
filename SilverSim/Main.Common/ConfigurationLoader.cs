@@ -730,6 +730,7 @@ namespace SilverSim.Main.Common
             CommandRegistry.AddShowCommand("cacheddns", ShowCachedDnsCommand);
             CommandRegistry.AddDeleteCommand("cacheddns", RemoveCachedDnsCommand);
             CommandRegistry.AddShowCommand("ports", ShowPortAllocationsCommand);
+            CommandRegistry.AddShowCommand("time-sources", ShowTimeSourcesCommand);
 #if DEBUG
             CommandRegistry.AddShowCommand("http-handlers", ShowHttpHandlersCommand);
             CommandRegistry.AddShowCommand("xmlrpc-handlers", ShowXmlRpcHandlersCommand);
