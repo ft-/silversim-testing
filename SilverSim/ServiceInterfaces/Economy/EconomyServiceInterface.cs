@@ -96,6 +96,11 @@ namespace SilverSim.ServiceInterfaces.Economy
             throw new NotSupportedException();
         }
 
+        /** <summary>Request script debit permission</summary>
+         * this function has to throw exception for signaling error
+         */
+        public virtual UUID RequestScriptDebitPermission(UUI sourceID) => UUID.Zero;
+
         public void ChargeAmount(UUI agentID, BaseTransaction transactionData, int amount, Action processOperation)
         {
             IActiveTransaction transaction = BeginChargeTransaction(agentID, transactionData, amount);
