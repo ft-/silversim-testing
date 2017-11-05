@@ -331,7 +331,7 @@ namespace SilverSim.Viewer.Parcel
                 if(reqmap.TryGetValue("region_handle", out iv_target))
                 {
                     byte[] regHandleBytes = (BinaryData)iv_target;
-                    GridVector v = new GridVector(regHandleBytes, 0);
+                    var v = new GridVector(regHandleBytes, 0);
                     RegionInfo rInfo;
 
                     if(v == scene.GridPosition)
@@ -371,7 +371,7 @@ namespace SilverSim.Viewer.Parcel
                 }
             }
 
-            Map resmap = new Map
+            var resmap = new Map
             {
                 ["parcel_id"] = new UUID(parcelid.GetBytes(), 0)
             };
