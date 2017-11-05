@@ -25,7 +25,7 @@ namespace SilverSim.Viewer.Messages.Object
 {
     [UDPMessage(MessageType.ForceObjectSelect)]
     [Reliable]
-    [NotTrusted]
+    [Trusted]
     public class ForceObjectSelect : Message
     {
         public bool ResetList;
