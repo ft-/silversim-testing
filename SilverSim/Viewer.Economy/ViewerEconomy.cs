@@ -40,6 +40,7 @@ namespace SilverSim.Viewer.Economy
         private static readonly ILog m_Log = LogManager.GetLogger("LL ECONOMY");
 
         [PacketHandler(MessageType.MoneyBalanceRequest)]
+        [PacketHandler(MessageType.MoneyTransferRequest)]
         [PacketHandler(MessageType.EconomyDataRequest)]
         private readonly BlockingQueue<KeyValuePair<AgentCircuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
 
@@ -166,7 +167,7 @@ namespace SilverSim.Viewer.Economy
                 try
                 {
                     var economyService = agent.EconomyService;
-                    mbrep.MoneyBalance= (economyService != null) ?
+                    mbrep.MoneyBalance = (economyService != null) ?
                         economyService.MoneyBalance[agent.Owner] :
                         0;
                     mbrep.TransactionSuccess = true;
