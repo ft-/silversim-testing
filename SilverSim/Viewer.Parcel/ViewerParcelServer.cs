@@ -186,7 +186,7 @@ namespace SilverSim.Viewer.Parcel
                         {
                             if (pinfo.GroupOwned)
                             {
-                                economyService.TransferMoney(agent.Owner, pinfo.Owner, new LandSaleTransaction(scene.GetRegionInfo().Location, scene.ID, scene.Name)
+                                economyService.TransferMoney(agent.Owner, pinfo.Group, new LandSaleTransaction(scene.GetRegionInfo().Location, scene.ID, scene.Name)
                                 {
                                     ParcelID = pinfo.ID,
                                     ParcelName = pinfo.Name
@@ -194,7 +194,11 @@ namespace SilverSim.Viewer.Parcel
                             }
                             else
                             {
-                                /* there is no group account yet implemented */
+                                economyService.TransferMoney(agent.Owner, pinfo.Owner, new LandSaleTransaction(scene.GetRegionInfo().Location, scene.ID, scene.Name)
+                                {
+                                    ParcelID = pinfo.ID,
+                                    ParcelName = pinfo.Name
+                                }, pinfo.SalePrice, () => ChangeParcelOwnership(scene, pinfo, agent.Owner, pinfo.SalePrice, req));
                             }
                         }
                     }
@@ -210,6 +214,9 @@ namespace SilverSim.Viewer.Parcel
         {
             bool sellParcelObjects = (pinfo.Flags & ParcelFlags.SellParcelObjects) != 0;
             UUI oldOwner = pinfo.Owner;
+            UGI oldGroup = pinfo.Group;
+            bool wasGroupOwned = pinfo.GroupOwned;
+
             pinfo.Owner = newOwner;
             pinfo.Group = UGI.Unknown;
             pinfo.GroupOwned = false;
@@ -226,7 +233,8 @@ namespace SilverSim.Viewer.Parcel
                 {
                     try
                     {
-                        if (pinfo.LandBitmap.ContainsLocation(grp.GlobalPosition) && grp.Owner == oldOwner)
+                        if (pinfo.LandBitmap.ContainsLocation(grp.GlobalPosition) && 
+                            wasGroupOwned ? (grp.IsGroupOwned && grp.Group == oldGroup) : (!grp.IsGroupOwned && grp.Owner == oldOwner))
                         {
                             grp.Owner = newOwner;
                         }
