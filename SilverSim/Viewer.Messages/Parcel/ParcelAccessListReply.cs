@@ -28,7 +28,7 @@ namespace SilverSim.Viewer.Messages.Parcel
     [UDPMessage(MessageType.ParcelAccessListReply)]
     [Reliable]
     [Zerocoded]
-    [NotTrusted]
+    [Trusted]
     public class ParcelAccessListReply : Message
     {
         public UUID AgentID;

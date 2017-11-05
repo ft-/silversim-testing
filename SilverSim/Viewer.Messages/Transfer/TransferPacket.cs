@@ -26,7 +26,7 @@ namespace SilverSim.Viewer.Messages.Transfer
 {
     [UDPMessage(MessageType.TransferPacket)]
     [Reliable]
-    [Trusted]
+    [NotTrusted]
     public class TransferPacket : Message
     {
         public UUID TransferID;

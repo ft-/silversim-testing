@@ -429,8 +429,8 @@ namespace SilverSim.Viewer.Core
                     try
                     {
                         string[] parts = t.Split(';');
-                        UUID partID = new UUID(parts[0]);
-                        UUID itemID = new UUID(parts[1]);
+                        var partID = new UUID(parts[0]);
+                        var itemID = new UUID(parts[1]);
 
                         ObjectPart part;
                         ObjectPartInventoryItem item;
@@ -862,6 +862,24 @@ namespace SilverSim.Viewer.Core
             m_Log.DebugFormat("Registered {0} GenericMessage handlers", m_GenericMessageRouting.Count);
             m_Log.DebugFormat("Registered {0} GodlikeMessage handlers", m_GodlikeMessageRouting.Count);
             m_Log.DebugFormat("Registered {0} capabilities", m_RegisteredCapabilities.Count);
+
+            foreach(MessageType mtype in m_PacketDecoder.PacketTypes.Keys)
+            {
+                if(m_MessageRouting.ContainsKey(mtype) ||
+                    mtype == MessageType.PacketAck ||
+                    mtype == MessageType.CompletePingCheck || 
+                    mtype == MessageType.StartPingCheck ||
+                    mtype == MessageType.GenericMessage ||
+                    mtype == MessageType.ImprovedInstantMessage ||
+                    mtype == MessageType.GodlikeMessage ||
+                    mtype == MessageType.EstateOwnerMessage ||
+                    mtype == MessageType.UseCircuitCode)
+                {
+                    continue;
+                }
+
+                m_Log.DebugFormat("MessageType.{0} not implemented", mtype.ToString());
+            }
 #endif
         }
 

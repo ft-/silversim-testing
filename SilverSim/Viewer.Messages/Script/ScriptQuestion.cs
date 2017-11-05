@@ -26,6 +26,7 @@ namespace SilverSim.Viewer.Messages.Script
 {
     [UDPMessage(MessageType.ScriptQuestion)]
     [Reliable]
+    [Trusted]
     public class ScriptQuestion : Message
     {
         public UUID TaskID = UUID.Zero;
