@@ -1521,9 +1521,10 @@ namespace SilverSim.Main.Cmd.Region
             }
 
             var formattedList = new FormattedListBuilder()
-                .AddColumn("Region", 30)
+                .AddColumn("Region", 20)
                 .AddColumn("Env FPS", 10)
                 .AddColumn("Phys FPS", 10)
+                .AddColumn("Phys Time", 10)
                 .AddColumn("Phys Engine", 20)
                 .AddHeader()
                 .AddSeparator();
@@ -1535,6 +1536,7 @@ namespace SilverSim.Main.Cmd.Region
                         scene.Name,
                         scene.Environment.EnvironmentFps.ToString("N2"),
                         scene.PhysicsScene.PhysicsFPS.ToString("N2"),
+                        (scene.PhysicsScene.PhysicsExecutionTime * 1000).ToString("N2") + " ms",
                         scene.PhysicsScene.PhysicsEngineName);
                 }
             }
