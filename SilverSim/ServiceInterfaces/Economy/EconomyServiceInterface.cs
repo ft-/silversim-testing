@@ -208,6 +208,7 @@ namespace SilverSim.ServiceInterfaces.Economy
 
         public abstract void BuyCurrency(UUI sourceID, string language, CurrencyBuy quote);
 
+        /** <summary>extended exception to provide an actual URL describing an error into transaction system</summary> */
         public class UrlAttachedErrorException : Exception
         {
             public readonly string Uri = string.Empty;
