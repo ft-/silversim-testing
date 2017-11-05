@@ -302,7 +302,8 @@ namespace SilverSim.Main.Common
                     .AddColumn("Source", 20)
                     .AddColumn("Elapsed time (s)", 20)
                     .AddColumn("Ticks per secs", 20)
-                    .AddHeader();
+                    .AddHeader()
+                    .AddSeparator();
                 fb.AddData("Stopwatch", TimingProvider.StopWatch.TicksToSecs(TimingProvider.StopWatch.TickCount).ToString("N3"), TimingProvider.StopWatch.Frequency);
                 fb.AddData("Environment", TimingProvider.Environment.TicksToSecs(TimingProvider.Environment.TickCount).ToString("N3"), TimingProvider.Environment.Frequency);
                 io.Write(fb.ToString());
