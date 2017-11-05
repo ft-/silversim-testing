@@ -47,7 +47,7 @@ namespace SilverSim.Http.Client
 
         private struct StreamInfo
         {
-            public int ValidUntil;
+            public long ValidUntil;
             public AbstractHttpStream Stream;
             public string Scheme;
             public string Host;
@@ -59,13 +59,13 @@ namespace SilverSim.Http.Client
                 Scheme = scheme;
                 Host = host;
                 Port = port;
-                ValidUntil = Environment.TickCount + 5000;
+                ValidUntil = StopWatchTime.TickCount + StopWatchTime.SecsToTicks(5);
             }
         }
 
         private struct H2StreamInfo
         {
-            public int ValidUntil;
+            public long ValidUntil;
             public Http2Connection Connection;
             public string Scheme;
             public string Host;
@@ -77,7 +77,7 @@ namespace SilverSim.Http.Client
                 Scheme = scheme;
                 Host = host;
                 Port = port;
-                ValidUntil = Environment.TickCount + 5000;
+                ValidUntil = StopWatchTime.TickCount + StopWatchTime.SecsToTicks(5);
             }
         }
 
@@ -94,7 +94,7 @@ namespace SilverSim.Http.Client
                     var removelist = new List<H2StreamInfo>();
                     foreach(H2StreamInfo si in infolist)
                     {
-                        if(si.ValidUntil - Environment.TickCount < 0)
+                        if(si.ValidUntil - StopWatchTime.TickCount < 0)
                         {
                             removelist.Add(si);
                         }
@@ -119,7 +119,7 @@ namespace SilverSim.Http.Client
             {
                 foreach (RwLockedList<StreamInfo> infolist in m_StreamList.Values)
                 {
-                    while ((infolist[0].ValidUntil - Environment.TickCount) < 0)
+                    while ((infolist[0].ValidUntil - StopWatchTime.TickCount) < 0)
                     {
                         infolist.RemoveAt(0);
                     }
@@ -185,7 +185,7 @@ namespace SilverSim.Http.Client
                     {
                         if (streaminfo.Count > 0)
                         {
-                            if ((streaminfo[0].ValidUntil - Environment.TickCount) > 0)
+                            if ((streaminfo[0].ValidUntil - StopWatchTime.TickCount) > 0)
                             {
                                 stream = streaminfo[0].Stream;
                             }
@@ -285,10 +285,10 @@ namespace SilverSim.Http.Client
                     for (int i = 0; i < streaminfo.Count; ++i)
                     {
                         H2StreamInfo h2info = streaminfo[i];
-                        if ((h2info.ValidUntil - Environment.TickCount) > 0 &&
+                        if ((h2info.ValidUntil - StopWatchTime.TickCount) > 0 &&
                             h2info.Connection.AvailableStreams > 0)
                         {
-                            h2info.ValidUntil = Environment.TickCount + 5000;
+                            h2info.ValidUntil = StopWatchTime.TickCount + StopWatchTime.SecsToTicks(5);
                             h2stream = h2info.Connection.OpenClientStream();
                         }
                     }

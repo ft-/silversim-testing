@@ -81,18 +81,18 @@ namespace SilverSim.Viewer.Profile
         {
             public ProfileServiceInterface ProfileService;
             public UserAgentServiceInterface UserAgentService;
-            public int TicksAt;
+            public long TicksAt;
 
             public ProfileServiceData(UserAgentServiceInterface userAgent, ProfileServiceInterface profileService)
             {
                 UserAgentService = userAgent;
                 ProfileService = profileService;
-                TicksAt = Environment.TickCount;
+                TicksAt = StopWatchTime.TickCount;
             }
         }
 
         private readonly RwLockedDictionary<string, ProfileServiceData> m_LastKnownProfileServices = new RwLockedDictionary<string, ProfileServiceData>();
-        private readonly RwLockedDictionary<UUID, KeyValuePair<UUI, int>> m_ClassifiedQueryCache = new RwLockedDictionary<UUID, KeyValuePair<UUI, int>>();
+        private readonly RwLockedDictionary<UUID, KeyValuePair<UUI, long>> m_ClassifiedQueryCache = new RwLockedDictionary<UUID, KeyValuePair<UUI, long>>();
 
         public void CleanupTimer(object sender, ElapsedEventArgs e)
         {
@@ -100,7 +100,7 @@ namespace SilverSim.Viewer.Profile
             var removeClassifiedList = new List<UUID>();
             foreach(KeyValuePair<string, ProfileServiceData> kvp in m_LastKnownProfileServices)
             {
-                if(Environment.TickCount - kvp.Value.TicksAt > 60000)
+                if(StopWatchTime.TickCount - kvp.Value.TicksAt > StopWatchTime.SecsToTicks(60))
                 {
                     removeList.Add(kvp.Key);
                 }
@@ -113,7 +113,7 @@ namespace SilverSim.Viewer.Profile
             /* remove classifieds query caches after half an hour */
             foreach (var kvp in m_ClassifiedQueryCache)
             {
-                if(Environment.TickCount - kvp.Value.Value > 1800000)
+                if(StopWatchTime.TickCount - kvp.Value.Value > StopWatchTime.SecsToTicks(1800))
                 {
                     removeClassifiedList.Add(kvp.Key);
                 }
@@ -417,7 +417,7 @@ namespace SilverSim.Viewer.Profile
                     Name = classified.Value
                 };
                 reply.Data.Add(d);
-                m_ClassifiedQueryCache[classified.Key] = new KeyValuePair<UUI, int>(uui, Environment.TickCount);
+                m_ClassifiedQueryCache[classified.Key] = new KeyValuePair<UUI, long>(uui, StopWatchTime.TickCount);
                 messageFill += entryLen;
             }
 
@@ -436,7 +436,7 @@ namespace SilverSim.Viewer.Profile
                 return;
             }
 
-            KeyValuePair<UUI, int> kvp;
+            KeyValuePair<UUI, long> kvp;
             if(!m_ClassifiedQueryCache.TryGetValue(req.ClassifiedID, out kvp))
             {
                 return;

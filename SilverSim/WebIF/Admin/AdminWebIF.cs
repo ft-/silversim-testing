@@ -67,7 +67,7 @@ namespace SilverSim.WebIF.Admin
 
         private class SessionInfo
         {
-            public int LastSeenTickCount = Environment.TickCount;
+            public long LastSeenTickCount = StopWatchTime.TickCount;
             public bool IsAuthenticated;
             public string UserName = string.Empty;
             public string ExpectedResponse = string.Empty;
@@ -281,7 +281,7 @@ namespace SilverSim.WebIF.Admin
             var removeList = new List<string>();
             foreach(KeyValuePair<string, SessionInfo> kvp in m_Sessions)
             {
-                if(Environment.TickCount - kvp.Value.LastSeenTickCount > 1000 * 600) /* 10 minutes */
+                if(StopWatchTime.TickCount - kvp.Value.LastSeenTickCount > StopWatchTime.SecsToTicks(600)) /* 10 minutes */
                 {
                     removeList.Add(kvp.Key);
                 }
@@ -475,7 +475,7 @@ namespace SilverSim.WebIF.Admin
             {
                 if(response.ToLower() == sessionInfo.ExpectedResponse)
                 {
-                    sessionInfo.LastSeenTickCount = Environment.TickCount;
+                    sessionInfo.LastSeenTickCount = StopWatchTime.TickCount;
                     sessionInfo.IsAuthenticated = true;
                     sessionInfo.ExpectedResponse = string.Empty;
                     var res = new Map();
@@ -737,7 +737,7 @@ namespace SilverSim.WebIF.Admin
                     }
                     else
                     {
-                        sessionInfo.LastSeenTickCount = Environment.TickCount;
+                        sessionInfo.LastSeenTickCount = StopWatchTime.TickCount;
                     }
 
                     HandleWebSocketLog(req, m_LogPlainReceivers);
@@ -762,7 +762,7 @@ namespace SilverSim.WebIF.Admin
                     }
                     else
                     {
-                        sessionInfo.LastSeenTickCount = Environment.TickCount;
+                        sessionInfo.LastSeenTickCount = StopWatchTime.TickCount;
                     }
 
                     HandleWebSocketLog(req, m_LogHtmlReceivers);
@@ -787,7 +787,7 @@ namespace SilverSim.WebIF.Admin
                     }
                     else
                     {
-                        sessionInfo.LastSeenTickCount = Environment.TickCount;
+                        sessionInfo.LastSeenTickCount = StopWatchTime.TickCount;
                     }
 
                     HandleWebSocketConsole(req, req.RawUrl.Substring(15));
@@ -866,7 +866,7 @@ namespace SilverSim.WebIF.Admin
                                 }
                                 else
                                 {
-                                    sessionInfo.LastSeenTickCount = Environment.TickCount;
+                                    sessionInfo.LastSeenTickCount = StopWatchTime.TickCount;
                                 }
                                 if (methodName == "logout")
                                 {

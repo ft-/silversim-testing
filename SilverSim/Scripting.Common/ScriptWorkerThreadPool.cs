@@ -43,7 +43,7 @@ namespace SilverSim.Scripting.Common
 
         private int m_ScriptEventCounter;
         private int m_LastScriptEventCounter;
-        private int m_LastScriptEventTickCount;
+        private long m_LastScriptEventTickCount;
         private bool m_FirstEventEps = true;
 
         public void IncrementScriptEventCounter()
@@ -80,7 +80,7 @@ namespace SilverSim.Scripting.Common
             RwLockedDictionary<uint /* localids */, ScriptReportData> oldTopScripts = m_TopScripts;
             m_TopScripts = new RwLockedDictionary<uint, ScriptReportData>();
             m_LastTopScripts = oldTopScripts;
-            int tickCount = Environment.TickCount;
+            long tickCount = StopWatchTime.TickCount;
             if (m_FirstEventEps)
             {
                 m_LastScriptEventTickCount = tickCount;
@@ -90,7 +90,7 @@ namespace SilverSim.Scripting.Common
             else if (tickCount - m_LastScriptEventTickCount >= 1000)
             {
                 int newEvents = m_ScriptEventCounter;
-                ScriptEventsPerSec = (newEvents - m_LastScriptEventCounter) * 1000.0 / (tickCount - m_LastScriptEventTickCount);
+                ScriptEventsPerSec = (newEvents - m_LastScriptEventCounter) * StopWatchTime.Frequency / (tickCount - m_LastScriptEventTickCount);
                 m_LastScriptEventTickCount = tickCount;
                 m_LastScriptEventCounter = newEvents;
             }
@@ -284,7 +284,7 @@ namespace SilverSim.Scripting.Common
                     continue;
                 }
 
-                int executionStart = Environment.TickCount;
+                long executionStart = StopWatchTime.TickCount;
                 try
                 {
                     Interlocked.Increment(ref m_ExecutingScripts);
@@ -370,7 +370,7 @@ namespace SilverSim.Scripting.Common
                         try
                         {
                             localId = tc.CurrentScriptInstance.Part.LocalID[m_SceneID];
-                            executionStart = Environment.TickCount - executionStart;
+                            executionStart = StopWatchTime.TickCount - executionStart;
                             if (executionStart > 0)
                             {
                                 RwLockedDictionary<uint, ScriptReportData> execTime = m_TopScripts;
@@ -380,7 +380,7 @@ namespace SilverSim.Scripting.Common
                                     prevexectime = new ScriptReportData();
                                     execTime.Add(localId, prevexectime);
                                 }
-                                prevexectime.AddScore(executionStart);
+                                prevexectime.AddScore(executionStart * 1000 / StopWatchTime.Frequency);
                             }
                         }
                         catch

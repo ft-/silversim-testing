@@ -22,6 +22,7 @@
 #pragma warning disable IDE0018
 #pragma warning disable RCS1029
 
+using SilverSim.Threading;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.LayerData;
 using System;
@@ -139,7 +140,7 @@ namespace SilverSim.Viewer.Core
 
         protected bool m_CircuitIsClosing;
 
-        protected abstract void SendSimStats(int dt);
+        protected abstract void SendSimStats(long dt);
 
         public event Action OnTerminateCircuit;
 
@@ -182,9 +183,9 @@ namespace SilverSim.Viewer.Core
         private void TransmitThread(object param)
         {
             Thread.CurrentThread.IsBackground = true;
-            int lastAckTick = Environment.TickCount;
-            int lastPingTick = Environment.TickCount;
-            int lastSimStatsTick = Environment.TickCount;
+            long lastAckTick = StopWatchTime.TickCount;
+            long lastPingTick = StopWatchTime.TickCount;
+            long lastSimStatsTick = StopWatchTime.TickCount;
             byte pingID = 0;
             Thread.CurrentThread.Name = string.Format("LLUDP:Transmitter for CircuitCode {0} / IP {1}", CircuitCode, RemoteEndPoint.ToString());
             var QueueList = new Queue<Message>[(int)Message.QueueOutType.NumQueues];
@@ -362,8 +363,8 @@ namespace SilverSim.Viewer.Core
                                     Server.SendPacketTo(p, RemoteEndPoint);
 
                                     Interlocked.Increment(ref m_PacketsSent);
-                                    p.EnqueuedAtTime = Environment.TickCount;
-                                    p.TransferredAtTime = Environment.TickCount;
+                                    p.EnqueuedAtTime = StopWatchTime.TickCount;
+                                    p.TransferredAtTime = StopWatchTime.TickCount;
                                     if (m.IsReliable)
                                     {
                                         p.IsResent = true;
@@ -381,13 +382,13 @@ namespace SilverSim.Viewer.Core
                                         lock (m_LogoutReplyLock)
                                         {
                                             m_LogoutReplySeqNo = p.SequenceNumber;
-                                            m_LogoutReplySentAtTime = Environment.TickCount;
+                                            m_LogoutReplySentAtTime = StopWatchTime.TickCount;
                                             m_LogoutReplySent = true;
                                         }
                                     }
                                     if (m.Number == MessageType.KickUser)
                                     {
-                                        m_KickUserSentAtTime = Environment.TickCount;
+                                        m_KickUserSentAtTime = StopWatchTime.TickCount;
                                         m_KickUserSent = true;
                                     }
                                 }
@@ -405,7 +406,7 @@ namespace SilverSim.Viewer.Core
                         }
                     } while (qcount != 0);
 
-                    if (Environment.TickCount - m_LastReceivedPacketAtTime >= 60000)
+                    if (StopWatchTime.TickCount - m_LastReceivedPacketAtTime >= StopWatchTime.SecsToTicks(60))
                     {
                         LogMsgOnTimeout();
                         /* do not do sync termination here */
@@ -413,8 +414,8 @@ namespace SilverSim.Viewer.Core
                         return;
                     }
 
-                    if ((Environment.TickCount - m_LogoutReplySentAtTime >= 10000 && m_LogoutReplySent) ||
-                        (Environment.TickCount - m_KickUserSentAtTime >= 10000 && m_KickUserSent))
+                    if ((StopWatchTime.TickCount - m_LogoutReplySentAtTime >= StopWatchTime.SecsToTicks(10) && m_LogoutReplySent) ||
+                        (StopWatchTime.TickCount - m_KickUserSentAtTime >= StopWatchTime.SecsToTicks(10) && m_KickUserSent))
                     {
                         LogMsgLogoutReply();
                         /* do not do sync termination here */
@@ -422,21 +423,21 @@ namespace SilverSim.Viewer.Core
                         return;
                     }
 
-                    if (Environment.TickCount - lastSimStatsTick >= 1000)
+                    if (StopWatchTime.TickCount - lastSimStatsTick >= StopWatchTime.SecsToTicks(1))
                     {
-                        int deltatime = Environment.TickCount - lastSimStatsTick;
-                        lastSimStatsTick = Environment.TickCount;
+                        long deltatime = StopWatchTime.TickCount - lastSimStatsTick;
+                        lastSimStatsTick = StopWatchTime.TickCount;
                         SendSimStats(deltatime);
                     }
 
-                    if (Environment.TickCount - lastPingTick >= 5000 &&
+                    if (StopWatchTime.TickCount - lastPingTick >= StopWatchTime.SecsToTicks(5) &&
                         !m_PingSendTicks.ContainsKey(pingID))
                     {
-                        lastPingTick = Environment.TickCount;
+                        lastPingTick = StopWatchTime.TickCount;
                         var p = new UDPPacket();
                         p.WriteMessageNumber(MessageType.StartPingCheck);
                         p.WriteUInt8(pingID++);
-                        m_PingSendTicks[pingID] = Environment.TickCount;
+                        m_PingSendTicks[pingID] = StopWatchTime.TickCount;
                         p.WriteUInt32(0);
                         try
                         {
@@ -449,9 +450,9 @@ namespace SilverSim.Viewer.Core
                         }
                     }
 
-                    if (Environment.TickCount - lastAckTick >= 1000)
+                    if (StopWatchTime.TickCount - lastAckTick >= StopWatchTime.SecsToTicks(1))
                     {
-                        lastAckTick = Environment.TickCount;
+                        lastAckTick = StopWatchTime.TickCount;
                         /* check for acks to be send */
                         int c = m_AckList.Count;
                         while (c > 0)

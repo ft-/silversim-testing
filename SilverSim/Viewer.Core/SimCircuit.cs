@@ -222,7 +222,7 @@ namespace SilverSim.Viewer.Core
             /* no additional threads required */
         }
 
-        protected override void SendSimStats(int dt)
+        protected override void SendSimStats(long dt)
         {
             /* no sim stats */
         }
