@@ -45,9 +45,11 @@ using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Account;
+using SilverSim.Types.Asset;
 using SilverSim.Types.Friends;
 using SilverSim.Types.Grid;
 using SilverSim.Types.IM;
+using SilverSim.Types.Inventory;
 using SilverSim.Types.Parcel;
 using SilverSim.Types.Script;
 using SilverSim.Types.StructuredData.Llsd;
@@ -55,8 +57,10 @@ using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Agent;
 using SilverSim.Viewer.Messages.Alert;
 using SilverSim.Viewer.Messages.Avatar;
+using SilverSim.Viewer.Messages.CallingCard;
 using SilverSim.Viewer.Messages.Circuit;
 using SilverSim.Viewer.Messages.God;
+using SilverSim.Viewer.Messages.Inventory;
 using SilverSim.Viewer.Messages.Parcel;
 using SilverSim.Viewer.Messages.Script;
 using SilverSim.Viewer.Messages.User;
@@ -402,21 +406,70 @@ namespace SilverSim.Viewer.Core
             var sceneID = SceneID;
             if (Circuits.TryGetValue(sceneID, out c))
             {
-                var im = new Messages.IM.ImprovedInstantMessage(gim);
-                if (gim.IsSystemMessage)
+                if (gim.Dialog == GridInstantMessageDialog.OfferCallingCard)
                 {
-                    /* this is a system message, so we change its sender name */
-                    im.FromAgentName = "System";
-                    im.RegionID = UUID.Zero;
-                    im.ParentEstateID = 0;
-                    im.Position = Vector3.Zero;
+                    var m = new OfferCallingCard
+                    {
+                        AgentID = gim.FromAgent.ID,
+                        SessionID = UUID.Zero,
+                        DestID = ID,
+                        TransactionID = CreateCallingCard(gim.FromAgent, false)
+                    };
+                    SendMessageAlways(m, sceneID);
                 }
-                SendMessageAlways(im, sceneID);
+                else
+                {
+                    var im = new Messages.IM.ImprovedInstantMessage(gim);
+                    if (gim.IsSystemMessage)
+                    {
+                        /* this is a system message, so we change its sender name */
+                        im.FromAgentName = "System";
+                        im.RegionID = UUID.Zero;
+                        im.ParentEstateID = 0;
+                        im.Position = Vector3.Zero;
+                    }
+                    SendMessageAlways(im, sceneID);
+                }
                 return true;
             }
             return false;
         }
         #endregion
+
+        public UUID CreateCallingCard(UUI agentid, bool isgod)
+        {
+            var item = new InventoryItem
+            {
+                AssetID = UUID.Zero,
+                AssetType = AssetType.CallingCard,
+                Creator = agentid,
+                Owner = Owner,
+                CreationDate = Date.Now,
+                InventoryType = InventoryType.CallingCard,
+                Flags = InventoryFlags.None,
+                Name = Name,
+            };
+
+            item.Permissions.Base = InventoryPermissionsMask.Copy | InventoryPermissionsMask.Modify;
+            if (isgod)
+            {
+                item.Permissions.Base |= InventoryPermissionsMask.Transfer | InventoryPermissionsMask.Modify;
+            }
+
+            item.Permissions.EveryOne = InventoryPermissionsMask.None;
+            item.Permissions.Current = item.Permissions.Base;
+            item.Permissions.NextOwner = InventoryPermissionsMask.Copy | InventoryPermissionsMask.Modify;
+
+            item.ParentFolderID = InventoryService.Folder[ID, AssetType.CallingCard].ID;
+            InventoryService.Item.Add(item);
+            var m = new BulkUpdateInventory
+            {
+                AgentID = ID
+            };
+            m.AddInventoryItem(item, 0);
+            SendMessageAlways(m, SceneID);
+            return item.ID;
+        }
 
         public override DetectedTypeFlags DetectedType
         {

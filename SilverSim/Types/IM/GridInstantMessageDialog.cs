@@ -63,6 +63,7 @@ namespace SilverSim.Types.IM
         FriendshipDeclined = 40,
         StartTyping = 41,
         StopTyping = 42,
-        EjectedFromGroup = -46
+        EjectedFromGroup = -46,
+        OfferCallingCard = -45
     }
 }

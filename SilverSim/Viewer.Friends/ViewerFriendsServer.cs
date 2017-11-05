@@ -31,13 +31,17 @@ using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces;
 using SilverSim.ServiceInterfaces.Friends;
 using SilverSim.ServiceInterfaces.IM;
+using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.Threading;
 using SilverSim.Types;
+using SilverSim.Types.Asset;
 using SilverSim.Types.Friends;
 using SilverSim.Types.IM;
+using SilverSim.Types.Inventory;
 using SilverSim.Viewer.Core;
 using SilverSim.Viewer.Messages;
+using SilverSim.Viewer.Messages.CallingCard;
 using SilverSim.Viewer.Messages.Friend;
 using SilverSim.Viewer.Messages.IM;
 using System;
@@ -62,6 +66,9 @@ namespace SilverSim.Viewer.Friends
         [PacketHandler(MessageType.TerminateFriendship)]
         [PacketHandler(MessageType.GrantUserRights)]
         [IMMessageHandler(GridInstantMessageDialog.FriendshipOffered)]
+        [PacketHandler(MessageType.AcceptCallingCard)]
+        [PacketHandler(MessageType.DeclineCallingCard)]
+        [PacketHandler(MessageType.OfferCallingCard)]
         private readonly BlockingQueue<KeyValuePair<AgentCircuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
 
         private IMServiceInterface m_IMService;
@@ -124,6 +131,14 @@ namespace SilverSim.Viewer.Friends
                             HandleGrantUserRights(m);
                             break;
 
+                        case MessageType.OfferCallingCard:
+                            HandleOfferCallingCard(m);
+                            break;
+
+                        case MessageType.DeclineCallingCard:
+                            HandleDeclineCallingCard(m);
+                            break;
+
                         case MessageType.ImprovedInstantMessage:
                             {
                                 var im = (ImprovedInstantMessage)m;
@@ -147,6 +162,85 @@ namespace SilverSim.Viewer.Friends
                 {
                     m_Log.ErrorFormat("Exception during friendship handling: {0}: {1}\n{2}", e.GetType().FullName, e.Message, e.StackTrace);
                 }
+            }
+        }
+
+        private void HandleOfferCallingCard(Message m)
+        {
+            var req = (OfferCallingCard)m;
+            if(req.AgentID != req.CircuitAgentID ||
+                req.SessionID != req.CircuitSessionID)
+            {
+                return;
+            }
+
+            SceneInterface scene;
+            if (!m_Scenes.TryGetValue(req.CircuitSceneID, out scene))
+            {
+                return;
+            }
+
+            IAgent agent;
+            if (!scene.Agents.TryGetValue(req.AgentID, out agent))
+            {
+                return;
+            }
+
+            UUI destagent;
+            if (scene.AvatarNameService.TryGetValue(req.DestID, out destagent))
+            {
+                if (agent.IsActiveGod && agent.IsInScene(scene))
+                {
+                    /* take calling card */
+                    var vagent = agent as ViewerAgent;
+                    vagent?.CreateCallingCard(destagent, true);
+                }
+                else if (scene.AvatarNameService.TryGetValue(req.DestID, out destagent))
+                {
+                    var gim = new GridInstantMessage
+                    {
+                        RegionID = req.CircuitSceneID,
+                        FromAgent = agent.Owner,
+                        ToAgent = destagent,
+                        Dialog = GridInstantMessageDialog.OfferCallingCard,
+                        OnResult = (im, success) => { }
+                    };
+                    scene.GetService<IMServiceInterface>()?.Send(gim);
+                }
+            }
+        }
+
+        private void HandleDeclineCallingCard(Message m)
+        {
+            var req = (DeclineCallingCard)m;
+            if (req.AgentID != req.CircuitAgentID ||
+                req.SessionID != req.CircuitSessionID)
+            {
+                return;
+            }
+
+            SceneInterface scene;
+            if (!m_Scenes.TryGetValue(req.CircuitSceneID, out scene))
+            {
+                return;
+            }
+
+            IAgent agent;
+            if (!scene.Agents.TryGetValue(req.AgentID, out agent))
+            {
+                return;
+            }
+
+            InventoryServiceInterface inventoryService = agent.InventoryService;
+            if(inventoryService == null)
+            {
+                return;
+            }
+
+            InventoryFolder folder;
+            if (inventoryService.Folder.TryGetValue(req.AgentID, AssetType.TrashFolder, out folder))
+            {
+                inventoryService.Item.Move(req.AgentID, req.TransactionID, folder.ID);
             }
         }
 
