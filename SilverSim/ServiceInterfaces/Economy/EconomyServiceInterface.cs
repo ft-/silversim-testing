@@ -99,7 +99,11 @@ namespace SilverSim.ServiceInterfaces.Economy
         /** <summary>Request script debit permission</summary>
          * this function has to throw exception for signaling error
          */
-        public virtual void RequestScriptDebitPermission(UUI sourceID, UUID regionID, UUID objectID, UUID itemID)
+        public virtual UUID RequestScriptDebitPermission(UUI sourceID, UUID regionID, UUID objectID, UUID itemID) => UUID.Zero;
+
+        /** <summary>Request script debit permission</summary>
+         */
+        public virtual void RevokeScriptDebitPermission(UUID scriptdebitkeyid)
         {
         }
 
