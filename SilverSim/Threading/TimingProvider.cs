@@ -33,7 +33,7 @@ namespace SilverSim.Threading
         public abstract double NormalizedToEventsPerSeconds(int events, long deltaticks);
         public abstract long TicksElapsed(long newts, long oldts);
         public abstract double TicksToSecs(long ticks);
-        public abstract double TicksToMillisecs(long ticks);
+        public abstract double TicksToMsecs(long ticks);
     }
 
     public sealed class StopWatchSource : TimingProvider
@@ -46,7 +46,7 @@ namespace SilverSim.Threading
         public override double NormalizedToEventsPerSeconds(int events, long deltaticks) => events * Stopwatch.Frequency / (double)deltaticks;
         public override long TicksElapsed(long newts, long oldts) => newts - oldts;
         public override double TicksToSecs(long ticks) => ticks / (double)Stopwatch.Frequency;
-        public override double TicksToMillisecs(long ticks) => ticks * 1000.0 / Stopwatch.Frequency;
+        public override double TicksToMsecs(long ticks) => ticks * 1000.0 / Stopwatch.Frequency;
     }
 
     public sealed class EnvironmentSource : TimingProvider
@@ -59,7 +59,7 @@ namespace SilverSim.Threading
         public override double NormalizedToEventsPerSeconds(int events, long deltaticks) => events * 1000 / (double)deltaticks;
         public override long TicksElapsed(long newts, long oldts) => (int)newts - (int)oldts;
         public override double TicksToSecs(long ticks) => ticks / 1000.0;
-        public override double TicksToMillisecs(long ticks) => ticks;
+        public override double TicksToMsecs(long ticks) => ticks;
     }
 
     public abstract partial class TimingProvider

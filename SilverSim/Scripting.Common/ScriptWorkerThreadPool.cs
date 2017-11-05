@@ -40,11 +40,14 @@ namespace SilverSim.Scripting.Common
         private readonly UUID m_SceneID;
         private bool m_ShutdownThreads;
         private readonly System.Timers.Timer m_FrameTimer = new System.Timers.Timer(1 / 10.0);
+        private static readonly TimingProvider TimeSource = TimingProvider.StopWatch;
 
         private int m_ScriptEventCounter;
         private int m_LastScriptEventCounter;
-        private int m_LastScriptEventTickCount;
+        private long m_LastScriptEventTickCount;
         private bool m_FirstEventEps = true;
+        private long m_ScriptRuntimeAccumulatingTickCount;
+        private long m_LastScriptRuntimeAccumulatingTickCount;
 
         public void IncrementScriptEventCounter()
         {
@@ -59,11 +62,19 @@ namespace SilverSim.Scripting.Common
             private set;
         }
 
+        public double ScriptTimeMsPerSec
+        {
+            get;
+            private set;
+        }
+
         public class ScriptThreadContext
         {
             public ScriptInstance CurrentScriptInstance;
             public Thread ScriptThread;
             public ScriptWorkerThreadPool ThreadPool;
+            public bool IsExecuting;
+            public long ExecutionStartTickCount;
         }
 
         private readonly RwLockedList<ScriptThreadContext> m_Threads = new RwLockedList<ScriptThreadContext>();
@@ -80,19 +91,34 @@ namespace SilverSim.Scripting.Common
             RwLockedDictionary<uint /* localids */, ScriptReportData> oldTopScripts = m_TopScripts;
             m_TopScripts = new RwLockedDictionary<uint, ScriptReportData>();
             m_LastTopScripts = oldTopScripts;
-            int tickCount = Environment.TickCount;
+            long tickCount = TimeSource.TickCount;
             if (m_FirstEventEps)
             {
                 m_LastScriptEventTickCount = tickCount;
                 m_LastScriptEventCounter = m_ScriptEventCounter;
                 m_FirstEventEps = false;
             }
-            else if (tickCount - m_LastScriptEventTickCount >= 1000)
+            else if (TimeSource.TicksElapsed(tickCount, m_LastScriptEventTickCount) >= TimeSource.Frequency)
             {
+                long deltaticks = TimeSource.TicksElapsed(tickCount, m_LastScriptEventTickCount);
                 int newEvents = m_ScriptEventCounter;
-                ScriptEventsPerSec = (newEvents - m_LastScriptEventCounter) * 1000.0 / (tickCount - m_LastScriptEventTickCount);
+                ScriptEventsPerSec = TimeSource.NormalizedToEventsPerSeconds(newEvents - m_LastScriptEventCounter, deltaticks);
                 m_LastScriptEventTickCount = tickCount;
                 m_LastScriptEventCounter = newEvents;
+                long newaccum = m_ScriptRuntimeAccumulatingTickCount;
+                long totalscriptexec = newaccum - m_LastScriptRuntimeAccumulatingTickCount;
+                m_LastScriptRuntimeAccumulatingTickCount = newaccum;
+
+                /* add execution times of actually running scripts */
+                foreach(ScriptThreadContext tc in m_Threads)
+                {
+                    if(tc.IsExecuting)
+                    {
+                        long diff = Math.Min(TimeSource.TicksElapsed(tickCount, tc.ExecutionStartTickCount), deltaticks);
+                        totalscriptexec += diff;
+                    }
+                }
+                ScriptTimeMsPerSec = TimeSource.TicksToMsecs(totalscriptexec);
             }
         }
 
@@ -284,7 +310,9 @@ namespace SilverSim.Scripting.Common
                     continue;
                 }
 
-                int executionStart = Environment.TickCount;
+                long executionStart = TimeSource.TickCount;
+                tc.ExecutionStartTickCount = executionStart;
+                tc.IsExecuting = true;
                 try
                 {
                     Interlocked.Increment(ref m_ExecutingScripts);
@@ -364,13 +392,14 @@ namespace SilverSim.Scripting.Common
                 finally
                 {
                     Interlocked.Decrement(ref m_ExecutingScripts);
+                    tc.IsExecuting = false;
                     uint localId;
                     lock (tc)
                     {
                         try
                         {
                             localId = tc.CurrentScriptInstance.Part.LocalID[m_SceneID];
-                            executionStart = Environment.TickCount - executionStart;
+                            executionStart = TimeSource.TicksElapsed(TimeSource.TickCount, executionStart);
                             if (executionStart > 0)
                             {
                                 RwLockedDictionary<uint, ScriptReportData> execTime = m_TopScripts;
@@ -380,7 +409,8 @@ namespace SilverSim.Scripting.Common
                                     prevexectime = new ScriptReportData();
                                     execTime.Add(localId, prevexectime);
                                 }
-                                prevexectime.AddScore(executionStart);
+                                prevexectime.AddScore(TimeSource.TicksToMsecs(executionStart));
+                                Interlocked.Add(ref m_ScriptRuntimeAccumulatingTickCount, executionStart);
                             }
                         }
                         catch

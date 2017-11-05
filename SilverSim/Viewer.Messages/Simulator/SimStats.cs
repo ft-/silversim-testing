@@ -42,7 +42,7 @@ namespace SilverSim.Viewer.Messages.Simulator
                 PhysicsTimeMs = 7,
                 AgentTimeMs = 8,
                 ImageTimeMs = 9,
-                ScriptMS = 10,
+                ScriptMs = 10,
                 TotalPrim = 11,
                 ActivePrim = 12,
                 Agents = 13,

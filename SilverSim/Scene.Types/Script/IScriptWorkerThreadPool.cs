@@ -84,6 +84,7 @@ namespace SilverSim.Scene.Types.Script
         void IncrementScriptEventCounter();
         int ScriptEventCounter { get; }
         double ScriptEventsPerSec { get; }
+        double ScriptTimeMsPerSec { get; }
         int ExecutingScripts { get; }
     }
 }

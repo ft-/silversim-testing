@@ -45,6 +45,7 @@ namespace SilverSim.Viewer.Core
             ActiveScripts,
             ScriptEventsPerSeconds,
             PercentExecutingScripts,
+            ScriptsTimeMs,
 
             NumStatIndex
         }
@@ -70,6 +71,7 @@ namespace SilverSim.Viewer.Core
             m_SimStatsData[(int)SimStatIndex.ActiveScripts] = new SimStats.Data(SimStats.Data.StatType.ActiveScripts, 0);
             m_SimStatsData[(int)SimStatIndex.ScriptEventsPerSeconds] = new SimStats.Data(SimStats.Data.StatType.ScriptEps, 0);
             m_SimStatsData[(int)SimStatIndex.PercentExecutingScripts] = new SimStats.Data(SimStats.Data.StatType.PercentScriptsRun, 0);
+            m_SimStatsData[(int)SimStatIndex.ScriptsTimeMs] = new SimStats.Data(SimStats.Data.StatType.ScriptMs, 0);
         }
 
         private int m_LastPacketsReceived;
@@ -121,6 +123,7 @@ namespace SilverSim.Viewer.Core
                 int activeScripts = scene.ActiveScripts;
                 m_SimStatsData[(int)SimStatIndex.ActiveScripts].StatValue = scene.ScriptedObjects;
                 m_SimStatsData[(int)SimStatIndex.SimFPS].StatValue = scene.Environment.EnvironmentFps;
+                m_SimStatsData[(int)SimStatIndex.ScriptsTimeMs].StatValue = scene.ScriptThreadPool.ScriptTimeMsPerSec;
                 m_SimStatsData[(int)SimStatIndex.ScriptEventsPerSeconds].StatValue = scene.ScriptThreadPool.ScriptEventsPerSec;
                 m_SimStatsData[(int)SimStatIndex.PercentExecutingScripts].StatValue = 100.0 * scene.ScriptThreadPool.ExecutingScripts / activeScripts;
 
