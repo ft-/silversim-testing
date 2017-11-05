@@ -115,14 +115,7 @@ namespace SilverSim.Viewer.Core
 
             public virtual void OnCompletion()
             {
-                var e = OnCompletionEvent;
-                if (e != null)
-                {
-                    foreach (Action<UUID> d in e.GetInvocationList())
-                    {
-                        d(AssetID);
-                    }
-                }
+                OnCompletionEvent?.Invoke(AssetID);
             }
 
             public virtual void OnAbort()
@@ -131,14 +124,7 @@ namespace SilverSim.Viewer.Core
 
             public event Action<UUID> OnCompletionEvent;
 
-            public bool HasActions
-            {
-                get
-                {
-                    var e = OnCompletionEvent;
-                    return e != null && e.GetInvocationList().Length != 0;
-                }
-            }
+            public bool HasActions => OnCompletionEvent?.GetInvocationList().Length != 0;
         }
 
         internal RwLockedDoubleDictionary<UUID, UInt64, AssetUploadTransaction> m_AssetTransactions = new RwLockedDoubleDictionary<UUID, UInt64, AssetUploadTransaction>();

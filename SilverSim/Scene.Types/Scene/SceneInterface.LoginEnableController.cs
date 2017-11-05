@@ -21,6 +21,7 @@
 
 using SilverSim.Types;
 using System;
+using System.Linq;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -82,7 +83,7 @@ namespace SilverSim.Scene.Types.Scene
             private void TriggerLoginsEnabled(bool state)
             {
                 UUID sceneID = m_Scene.ID;
-                foreach (Action<UUID, bool> del in OnLoginsEnabled?.GetInvocationList() ?? new Delegate[0])
+                foreach (Action<UUID, bool> del in OnLoginsEnabled?.GetInvocationList().OfType<Action<UUID, bool>>() ?? new Action<UUID, bool>[0])
                 {
                     try
                     {

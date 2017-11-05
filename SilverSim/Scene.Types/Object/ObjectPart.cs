@@ -31,6 +31,7 @@ using SilverSim.Types.Inventory;
 using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SilverSim.Scene.Types.Object
 {
@@ -562,7 +563,7 @@ namespace SilverSim.Scene.Types.Object
 
             ObjectGroup.OriginalAssetID = UUID.Zero;
 
-            foreach (Action<ObjectPart, UpdateChangedFlags> del in OnUpdate?.GetInvocationList() ?? new Delegate[0])
+            foreach (Action<ObjectPart, UpdateChangedFlags> del in OnUpdate?.GetInvocationList().OfType<Action<ObjectPart, UpdateChangedFlags>>() ?? new Action<ObjectPart, UpdateChangedFlags>[0])
             {
                 try
                 {
@@ -586,7 +587,7 @@ namespace SilverSim.Scene.Types.Object
                 return;
             }
 
-            foreach (Action<ObjectPart, UpdateChangedFlags> del in OnUpdate?.GetInvocationList() ?? new Delegate[0])
+            foreach (Action<ObjectPart, UpdateChangedFlags> del in OnUpdate?.GetInvocationList().OfType<Action<ObjectPart, UpdateChangedFlags>>() ?? new Action<ObjectPart, UpdateChangedFlags>[0])
             {
                 try
                 {
@@ -610,7 +611,7 @@ namespace SilverSim.Scene.Types.Object
                 return;
             }
 
-            foreach(Action<IObject> del in OnPositionChange?.GetInvocationList() ?? new Delegate[0])
+            foreach (Action<IObject> del in OnPositionChange?.GetInvocationList().OfType<Action<IObject>>() ?? new Action<IObject>[0])
             {
                 try
                 {

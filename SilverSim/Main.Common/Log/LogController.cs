@@ -23,6 +23,7 @@ using log4net.Appender;
 using log4net.Core;
 using SilverSim.Threading;
 using System;
+using System.Linq;
 
 namespace SilverSim.Main.Common.Log
 {
@@ -37,7 +38,7 @@ namespace SilverSim.Main.Common.Log
             {
                 q.Enqueue(loggingEvent);
             }
-            foreach(Action<DateTime, string, string, string> d in LogCallbacks?.GetInvocationList() ?? new Delegate[0])
+            foreach (Action<DateTime, string, string, string> d in LogCallbacks?.GetInvocationList().OfType<Action<DateTime, string, string, string>>() ?? new Action<DateTime, string, string, string>[0])
             {
                 try
                 {

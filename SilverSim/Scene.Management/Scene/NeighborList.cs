@@ -93,19 +93,13 @@ namespace SilverSim.Scene.Management.Scene
         public void Add(RegionInfo region)
         {
             this[region.ID] = region;
-            foreach (Action<RegionInfo> del in OnNeighborAddOrUpdate?.GetInvocationList())
-            {
-                del(region);
-            }
+            OnNeighborAddOrUpdate?.Invoke(region);
         }
 
         public void Remove(RegionInfo region)
         {
             Remove(region.ID);
-            foreach (Action<RegionInfo> del in OnNeighborRemove?.GetInvocationList() ?? new Delegate[0])
-            {
-                del(region);
-            }
+            OnNeighborRemove?.Invoke(region);
         }
     }
 }

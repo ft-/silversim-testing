@@ -25,6 +25,7 @@ using SilverSim.Types;
 using SilverSim.Types.Script;
 using System;
 using System.Globalization;
+using System.Linq;
 
 namespace SilverSim.Scene.Types.Script
 {
@@ -99,7 +100,7 @@ namespace SilverSim.Scene.Types.Script
 
         protected void TriggerOnStateChange()
         {
-            foreach (Action<ScriptInstance> del in OnStateChange?.GetInvocationList() ?? new Delegate[0])
+            foreach (Action<ScriptInstance> del in OnStateChange?.GetInvocationList().OfType<Action<ScriptInstance>>() ?? new Action<ScriptInstance>[0])
             {
                 try
                 {
@@ -114,7 +115,7 @@ namespace SilverSim.Scene.Types.Script
 
         protected void TriggerOnScriptReset()
         {
-            foreach (Action<ScriptInstance> del in OnScriptReset?.GetInvocationList() ?? new Delegate[0])
+            foreach (Action<ScriptInstance> del in OnScriptReset?.GetInvocationList().OfType<Action<ScriptInstance>>() ?? new Action<ScriptInstance>[0])
             {
                 try
                 {

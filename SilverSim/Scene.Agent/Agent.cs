@@ -53,6 +53,7 @@ using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Agent;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SilverSim.Scene.Agent
 {
@@ -181,7 +182,7 @@ namespace SilverSim.Scene.Agent
 
         public virtual void InvokeOnPositionUpdate()
         {
-            foreach (Action<IObject> del in OnPositionChange?.GetInvocationList() ?? new Delegate[0])
+            foreach (Action<IObject> del in OnPositionChange?.GetInvocationList().OfType<Action<IObject>>())
             {
                 try
                 {

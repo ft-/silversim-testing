@@ -33,6 +33,7 @@ using SilverSim.Types.Inventory;
 using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SilverSim.Scene.Types.Object
 {
@@ -306,7 +307,7 @@ namespace SilverSim.Scene.Types.Object
 
         internal void TriggerOnAssetIDChange()
         {
-            foreach (Action<ObjectGroup, UpdateChangedFlags> del in OnUpdate?.GetInvocationList() ?? new Delegate[0])
+            foreach (Action<ObjectGroup, UpdateChangedFlags> del in OnUpdate?.GetInvocationList().OfType<Action<ObjectGroup, UpdateChangedFlags>>() ?? new Action<ObjectGroup, UpdateChangedFlags>[0])
             {
                 try
                 {
@@ -334,7 +335,7 @@ namespace SilverSim.Scene.Types.Object
                 m_BoundingBox = null;
             }
 
-            foreach (Action<ObjectGroup, UpdateChangedFlags> del in OnUpdate?.GetInvocationList() ?? new Delegate[0])
+            foreach (Action<ObjectGroup, UpdateChangedFlags> del in OnUpdate?.GetInvocationList().OfType<Action<ObjectGroup, UpdateChangedFlags>>() ?? new Action<ObjectGroup, UpdateChangedFlags>[0])
             {
                 try
                 {

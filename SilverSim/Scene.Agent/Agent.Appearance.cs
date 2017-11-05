@@ -32,6 +32,7 @@ using SilverSim.Types.Primitive;
 using SilverSim.Viewer.Messages.Appearance;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 
 namespace SilverSim.Scene.Agent
@@ -105,7 +106,7 @@ namespace SilverSim.Scene.Agent
 
         protected void InvokeOnAppearanceUpdate()
         {
-            foreach(Action<IAgent> del in OnAppearanceUpdate?.GetInvocationList() ?? new Delegate[0])
+            foreach(Action<IAgent> del in OnAppearanceUpdate?.GetInvocationList().OfType<Action<IAgent>>() ?? new Action<IAgent>[0])
             {
                 try
                 {
