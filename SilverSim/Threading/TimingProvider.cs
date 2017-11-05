@@ -51,7 +51,7 @@ namespace SilverSim.Threading
 
     public sealed class EnvironmentSource : TimingProvider
     {
-        public override long TickCount => Environment.TickCount;
+        public override long TickCount => System.Environment.TickCount;
         public override long Frequency => 1000;
 
         public override long SecsToTicks(long secs) => secs * 1000;
