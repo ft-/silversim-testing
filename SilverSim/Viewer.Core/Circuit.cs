@@ -45,15 +45,15 @@ namespace SilverSim.Viewer.Core
         private int __SequenceNumber;
         private readonly NonblockingQueue<UInt32> m_AckList = new NonblockingQueue<UInt32>();
         public EndPoint RemoteEndPoint;
-        private readonly RwLockedDictionary<byte, long> m_PingSendTicks = new RwLockedDictionary<byte, long>();
-        public long LastMeasuredLatencyTickCount { get; private set; }
+        private readonly RwLockedDictionary<byte, int> m_PingSendTicks = new RwLockedDictionary<byte, int>();
+        public int LastMeasuredLatencyTickCount { get; private set; }
         private uint m_LogoutReplySeqNo;
         private bool m_LogoutReplySent;
         private readonly object m_LogoutReplyLock = new object(); /* this is only for guarding access sequence to m_LogoutReply* variables */
-        private long m_LogoutReplySentAtTime;
-        private long m_LastReceivedPacketAtTime;
+        private int m_LogoutReplySentAtTime;
+        private int m_LastReceivedPacketAtTime;
 
-        private long m_KickUserSentAtTime;
+        private int m_KickUserSentAtTime;
         private bool m_KickUserSent;
 
         protected readonly BlockingQueue<UDPPacket> m_TxObjectPool = new BlockingQueue<UDPPacket>();
@@ -104,7 +104,7 @@ namespace SilverSim.Viewer.Core
         public struct ResendAge
         {
             public uint SeqNo;
-            public long TickCount;
+            public int TickCount;
         }
         public List<ResendAge> m_ResentAge = new List<ResendAge>();
 
@@ -115,7 +115,7 @@ namespace SilverSim.Viewer.Core
             Server = server;
             CircuitCode = circuitcode;
 
-            m_LastReceivedPacketAtTime = StopWatchTime.TickCount;
+            m_LastReceivedPacketAtTime = Environment.TickCount;
             uint pcks;
             for (pcks = 0; pcks < 200; ++pcks)
             {
@@ -141,7 +141,7 @@ namespace SilverSim.Viewer.Core
              */
             MessageType mType = pck.ReadMessageType();
 
-            m_LastReceivedPacketAtTime = StopWatchTime.TickCount;
+            m_LastReceivedPacketAtTime = Environment.TickCount;
 
             Interlocked.Increment(ref m_PacketsReceived);
 
@@ -327,11 +327,11 @@ namespace SilverSim.Viewer.Core
                                 }
                                 Value = m_UnackedPacketsHash[keyval];
                             }
-                            if (StopWatchTime.TickCount - Value.TransferredAtTime > StopWatchTime.SecsToTicks(1))
+                            if (Environment.TickCount - Value.TransferredAtTime > 1000)
                             {
                                 if (Value.ResentCount < 5)
                                 {
-                                    Value.TransferredAtTime = StopWatchTime.TickCount;
+                                    Value.TransferredAtTime = Environment.TickCount;
                                     Server.SendPacketTo(Value, RemoteEndPoint);
                                 }
                                 ++Value.ResentCount;
@@ -346,10 +346,10 @@ namespace SilverSim.Viewer.Core
 
                 case MessageType.CompletePingCheck:
                     byte ackPingID = pck.ReadUInt8();
-                    long timesent;
+                    int timesent;
                     if (m_PingSendTicks.Remove(ackPingID, out timesent))
                     {
-                        LastMeasuredLatencyTickCount = (timesent - StopWatchTime.TickCount) / 2;
+                        LastMeasuredLatencyTickCount = (timesent - Environment.TickCount) / 2;
                     }
                     break;
 
@@ -365,7 +365,7 @@ namespace SilverSim.Viewer.Core
                             isnewpacket = !m_ResentDetectSet.Contains(seqNo) || !pck.IsResent;
                             if (isnewpacket)
                             {
-                                m_ResentAge.Add(new ResendAge { SeqNo = seqNo, TickCount = StopWatchTime.TickCount });
+                                m_ResentAge.Add(new ResendAge { SeqNo = seqNo, TickCount = Environment.TickCount });
                                 m_ResentDetectSet.Add(seqNo);
                             }
                         }
@@ -383,8 +383,8 @@ namespace SilverSim.Viewer.Core
                 if (m_ResentAge.Count > 0)
                 {
                     ResendAge age = m_ResentAge[0];
-                    long actAge = StopWatchTime.TickCount - age.TickCount;
-                    if (actAge > StopWatchTime.SecsToTicks(30))
+                    int actAge = Environment.TickCount - age.TickCount;
+                    if (actAge > 30000)
                     {
                         m_ResentDetectSet.Remove(age.SeqNo);
                         m_ResentAge.RemoveAt(0);

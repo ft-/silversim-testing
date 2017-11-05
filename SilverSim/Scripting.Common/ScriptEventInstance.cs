@@ -92,9 +92,9 @@ namespace SilverSim.Scripting.Common
             {
                 return;
             }
-            long exectime;
+            int exectime;
             float execfloat;
-            long startticks = StopWatchTime.TickCount;
+            int startticks = Environment.TickCount;
 
             try
             {
@@ -102,8 +102,8 @@ namespace SilverSim.Scripting.Common
             }
             finally
             {
-                exectime = StopWatchTime.TickCount - startticks;
-                execfloat = exectime / StopWatchTime.Frequency;
+                exectime = Environment.TickCount - startticks;
+                execfloat = exectime / 1000f;
                 lock (m_Lock)
                 {
                     m_ExecutionTime += execfloat;

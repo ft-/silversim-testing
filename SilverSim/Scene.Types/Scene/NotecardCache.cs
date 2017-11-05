@@ -33,7 +33,7 @@ namespace SilverSim.Scene.Types.Scene
     {
         private readonly SceneInterface m_Scene;
         private readonly RwLockedDictionary<UUID, Notecard> m_Notecards = new RwLockedDictionary<UUID, Notecard>();
-        private readonly RwLockedDictionary<UUID, long> m_LastAccessed = new RwLockedDictionary<UUID, long>();
+        private readonly RwLockedDictionary<UUID, int> m_LastAccessed = new RwLockedDictionary<UUID, int>();
         private readonly Timer m_Timer = new Timer(1);
 
         public NotecardCache(SceneInterface scene)
@@ -52,9 +52,9 @@ namespace SilverSim.Scene.Types.Scene
 
         public void OnTimer(object source, ElapsedEventArgs e)
         {
-            foreach(KeyValuePair<UUID, long> kvp in m_LastAccessed)
+            foreach(KeyValuePair<UUID, int> kvp in m_LastAccessed)
             {
-                if(StopWatchTime.TickCount - kvp.Value > StopWatchTime.SecsToTicks(30))
+                if(Environment.TickCount - kvp.Value > 30000)
                 {
                     /* no need for locking here since we take out the last accessed first */
                     m_LastAccessed.Remove(kvp.Key);
@@ -78,7 +78,7 @@ namespace SilverSim.Scene.Types.Scene
                     throw new NotANotecardFormatException();
                 }
 
-                m_LastAccessed[assetid] = StopWatchTime.TickCount;
+                m_LastAccessed[assetid] = Environment.TickCount;
                 return m_Notecards.GetOrAddIfNotExists(assetid, () => new Notecard(asset));
             }
         }

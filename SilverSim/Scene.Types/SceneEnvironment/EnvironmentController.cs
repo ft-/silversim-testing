@@ -22,7 +22,6 @@
 using log4net;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
-using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Viewer.Messages;
 
@@ -122,7 +121,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                 {
                     EnvironmentTimer(this, null);
                     m_Timer.Elapsed += EnvironmentTimer;
-                    m_LastFpsTickCount = StopWatchTime.TickCount;
+                    m_LastFpsTickCount = System.Environment.TickCount;
                     m_LastWindModelUpdateTickCount = m_LastFpsTickCount;
                     m_LastSunUpdateTickCount = m_LastFpsTickCount;
                     m_LastTidalModelUpdateTickCount = m_LastFpsTickCount;
@@ -145,11 +144,11 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         }
         #endregion
 
-        private long m_LastFpsTickCount;
-        private long m_LastWindModelUpdateTickCount;
-        private long m_LastSunUpdateTickCount;
-        private long m_LastTidalModelUpdateTickCount;
-        private long m_CountedTicks;
+        private int m_LastFpsTickCount;
+        private int m_LastWindModelUpdateTickCount;
+        private int m_LastSunUpdateTickCount;
+        private int m_LastTidalModelUpdateTickCount;
+        private int m_CountedTicks;
         private double m_EnvironmentFps;
 
         public double EnvironmentFps
@@ -166,14 +165,14 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         private void EnvironmentTimer(object sender, System.Timers.ElapsedEventArgs e)
         {
             ++m_CountedTicks;
-            long newTickCount = StopWatchTime.TickCount;
+            int newTickCount = System.Environment.TickCount;
             if (newTickCount - m_LastFpsTickCount >= 1000)
             {
-                long timeDiff = newTickCount - m_LastFpsTickCount;
+                int timeDiff = newTickCount - m_LastFpsTickCount;
                 m_LastFpsTickCount = newTickCount;
                 lock (m_EnvironmentLock)
                 {
-                    m_EnvironmentFps = m_CountedTicks * StopWatchTime.Frequency / (double)timeDiff;
+                    m_EnvironmentFps = m_CountedTicks * 1000f / (double)timeDiff;
                 }
                 m_CountedTicks = 0;
             }
@@ -195,7 +194,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                 }
             }
 
-            long lastwinddt = newTickCount - m_LastWindModelUpdateTickCount;
+            int lastwinddt = newTickCount - m_LastWindModelUpdateTickCount;
             if (lastwinddt >= m_UpdateWindModelEveryMsecs)
             {
                 m_LastWindModelUpdateTickCount = newTickCount;

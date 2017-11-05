@@ -19,7 +19,6 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.Threading;
 using SilverSim.Types.Estate;
 using SilverSim.Viewer.Messages.Simulator;
 
@@ -77,7 +76,7 @@ namespace SilverSim.Viewer.Core
         private int m_LastPacketsSent;
         private int m_LastAgentUpdatesReceived;
 
-        protected override void SendSimStats(long dt)
+        protected override void SendSimStats(int dt)
         {
             int packetsReceived = m_PacketsReceived - m_LastPacketsReceived;
             int packetsSent = m_PacketsSent - m_LastPacketsSent;
@@ -97,15 +96,15 @@ namespace SilverSim.Viewer.Core
             m_LastPacketsReceived = m_PacketsReceived;
             m_LastAgentUpdatesReceived = m_AgentUpdatesReceived;
 
-            m_SimStatsData[(int)SimStatIndex.InPacketsPerSecond].StatValue = (double)packetsReceived * StopWatchTime.Frequency / dt;
-            m_SimStatsData[(int)SimStatIndex.OutPacketsPerSecond].StatValue = (double)packetsSent * StopWatchTime.Frequency / dt;
+            m_SimStatsData[(int)SimStatIndex.InPacketsPerSecond].StatValue = (double)packetsReceived * 1000f / dt;
+            m_SimStatsData[(int)SimStatIndex.OutPacketsPerSecond].StatValue = (double)packetsSent * 1000f / dt;
 
             m_SimStatsData[(int)SimStatIndex.PendingDownloads].StatValue = agent != null ?
                 m_TextureDownloadQueue.Count + m_InventoryRequestQueue.Count + agent.m_DownloadTransfersByName.Count :
                 m_TextureDownloadQueue.Count + m_InventoryRequestQueue.Count;
 
             m_SimStatsData[(int)SimStatIndex.PendingUploads].StatValue = activeUploads;
-            m_SimStatsData[(int)SimStatIndex.AgentUpdates].StatValue = (double)agentUpdatesReceived * StopWatchTime.Frequency / dt;
+            m_SimStatsData[(int)SimStatIndex.AgentUpdates].StatValue = (double)agentUpdatesReceived * 1000f / dt;
             m_SimStatsData[(int)SimStatIndex.UnAckedBytes].StatValue = m_UnackedBytes;
             if (scene != null)
             {

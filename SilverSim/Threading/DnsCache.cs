@@ -30,7 +30,7 @@ namespace SilverSim.Threading
 {
     public static class DnsNameCache
     {
-        private static readonly RwLockedDictionary<string, KeyValuePair<IPAddress[], long>> m_DnsCache = new RwLockedDictionary<string, KeyValuePair<IPAddress[], long>>();
+        private static readonly RwLockedDictionary<string, KeyValuePair<IPAddress[], int>> m_DnsCache = new RwLockedDictionary<string, KeyValuePair<IPAddress[], int>>();
         private const int MAX_DNS_CACHE_TIME_IN_MILLISECONDS = 60 * 1000;
 
         private static readonly Timer m_Timer;
@@ -47,9 +47,9 @@ namespace SilverSim.Threading
             try
             {
                 var removeList = new List<string>();
-                foreach (KeyValuePair<string, KeyValuePair<IPAddress[], long>> kvp in m_DnsCache)
+                foreach (KeyValuePair<string, KeyValuePair<IPAddress[], int>> kvp in m_DnsCache)
                 {
-                    long diffTime = kvp.Value.Value - StopWatchTime.TickCount;
+                    int diffTime = kvp.Value.Value - Environment.TickCount;
                     if (diffTime < 0)
                     {
                         removeList.Add(kvp.Key);
@@ -68,12 +68,12 @@ namespace SilverSim.Threading
 
         public static IPAddress[] GetHostAddresses(string host, bool ipv4only = false)
         {
-            KeyValuePair<IPAddress[], long> kvp;
+            KeyValuePair<IPAddress[], int> kvp;
             IPAddress[] addresses;
-            if (!m_DnsCache.TryGetValue(host, out kvp) || 0 > (kvp.Value - StopWatchTime.TickCount))
+            if (!m_DnsCache.TryGetValue(host, out kvp) || 0 > (kvp.Value - Environment.TickCount))
             {
                 addresses = Dns.GetHostAddresses(host);
-                m_DnsCache[host] = new KeyValuePair<IPAddress[], long>(addresses, StopWatchTime.TickCount + StopWatchTime.MillsecsToTicks(MAX_DNS_CACHE_TIME_IN_MILLISECONDS));
+                m_DnsCache[host] = new KeyValuePair<IPAddress[], int>(addresses, Environment.TickCount + MAX_DNS_CACHE_TIME_IN_MILLISECONDS);
             }
             else
             {

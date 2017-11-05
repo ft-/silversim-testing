@@ -117,8 +117,8 @@ namespace SilverSim.Viewer.Core
             p.SequenceNumber = NextSequenceNumber;
 
             Interlocked.Increment(ref m_PacketsSent);
-            p.EnqueuedAtTime = StopWatchTime.TickCount;
-            p.TransferredAtTime = StopWatchTime.TickCount;
+            p.EnqueuedAtTime = Environment.TickCount;
+            p.TransferredAtTime = Environment.TickCount;
             if (p.IsReliable)
             {
                 Interlocked.Increment(ref m_AckThrottlingCount[(int)Message.QueueOutType.Object]);

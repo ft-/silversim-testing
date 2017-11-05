@@ -21,7 +21,6 @@
 
 using Nini.Config;
 using SilverSim.ServiceInterfaces;
-using SilverSim.Threading;
 using System;
 using System.IO;
 using System.Net.NetworkInformation;
@@ -33,13 +32,13 @@ namespace SilverSim.Main.Common
         private sealed class SystemIPv4Service : ExternalHostNameServiceInterface
         {
             private string m_IPv4Cached = string.Empty;
-            private long m_IPv4LastCached;
+            private int m_IPv4LastCached;
 
             public override string ExternalHostName
             {
                 get
                 {
-                    if (StopWatchTime.TickCount - m_IPv4LastCached < StopWatchTime.SecsToTicks(60) && m_IPv4Cached.Length != 0)
+                    if (Environment.TickCount - m_IPv4LastCached < 60000 && m_IPv4Cached.Length != 0)
                     {
                         return m_IPv4Cached;
                     }
@@ -53,7 +52,7 @@ namespace SilverSim.Main.Common
                                 if (ip.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
                                 {
                                     m_IPv4Cached = ip.Address.ToString();
-                                    m_IPv4LastCached = StopWatchTime.TickCount;
+                                    m_IPv4LastCached = Environment.TickCount;
                                     return m_IPv4Cached;
                                 }
                             }

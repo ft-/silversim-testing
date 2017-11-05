@@ -394,14 +394,14 @@ namespace SilverSim.Viewer.Core
             throw new ArgumentException("Handler resolver error");
         }
 
-        private readonly RwLockedDictionary<string, long> m_ExperienceTimeouts = new RwLockedDictionary<string, long>();
+        private readonly RwLockedDictionary<string, int> m_ExperienceTimeouts = new RwLockedDictionary<string, int>();
 
         internal bool AddExperienceTimeout(UUID partID, UUID itemID)
         {
             string k = partID.ToString() + ";" + itemID.ToString();
             try
             {
-                m_ExperienceTimeouts.Add(k, StopWatchTime.TickCount + StopWatchTime.SecsToTicks(30));
+                m_ExperienceTimeouts.Add(k, Environment.TickCount + 30000);
                 return true;
             }
             catch
@@ -412,10 +412,10 @@ namespace SilverSim.Viewer.Core
 
         private void CheckExperienceTimeouts()
         {
-            var timedout = new List<string>();
-            foreach (KeyValuePair<string, long> kvp in m_ExperienceTimeouts)
+            List<string> timedout = new List<string>();
+            foreach (KeyValuePair<string, int> kvp in m_ExperienceTimeouts)
             {
-                long t = kvp.Value - StopWatchTime.TickCount;
+                int t = kvp.Value - Environment.TickCount;
                 if (t < 0)
                 {
                     timedout.Add(kvp.Key);
@@ -429,8 +429,8 @@ namespace SilverSim.Viewer.Core
                     try
                     {
                         string[] parts = t.Split(';');
-                        var partID = new UUID(parts[0]);
-                        var itemID = new UUID(parts[1]);
+                        UUID partID = new UUID(parts[0]);
+                        UUID itemID = new UUID(parts[1]);
 
                         ObjectPart part;
                         ObjectPartInventoryItem item;

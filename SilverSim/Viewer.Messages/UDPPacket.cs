@@ -39,8 +39,8 @@ namespace SilverSim.Viewer.Messages
 
         public int DataPos = 6;
 
-        public long TransferredAtTime;
-        public long EnqueuedAtTime;
+        public int TransferredAtTime;
+        public int EnqueuedAtTime;
         public uint ResentCount;
 
         public Message.QueueOutType OutQueue = Message.QueueOutType.Low;
@@ -75,7 +75,7 @@ namespace SilverSim.Viewer.Messages
             {
                 if(BitConverter.IsLittleEndian)
                 {
-                    var b = new byte[4];
+                    byte[] b = new byte[4];
                     Buffer.BlockCopy(Data, 1, b, 0, 4);
                     Array.Reverse(b);
                     return BitConverter.ToUInt32(b, 0);
