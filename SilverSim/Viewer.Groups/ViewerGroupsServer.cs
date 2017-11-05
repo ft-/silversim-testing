@@ -57,6 +57,7 @@ namespace SilverSim.Viewer.Groups
         private static readonly ILog m_Log = LogManager.GetLogger("LL GROUPS");
 
         [PacketHandler(MessageType.GroupNoticesListRequest)]
+        [PacketHandler(MessageType.GroupNoticeRequest)]
         [PacketHandler(MessageType.CreateGroupRequest)]
         [PacketHandler(MessageType.UpdateGroupInfo)]
         [PacketHandler(MessageType.GroupRoleChanges)]
@@ -196,6 +197,10 @@ namespace SilverSim.Viewer.Groups
                     {
                         case MessageType.GroupNoticesListRequest:
                             HandleGroupNoticesListRequest(req.Key.Agent, scene, m);
+                            break;
+
+                        case MessageType.GroupNoticeRequest:
+                            HandleGroupNoticeRequest(req.Key.Agent, scene, m);
                             break;
 
                         case MessageType.CreateGroupRequest:
@@ -377,6 +382,76 @@ namespace SilverSim.Viewer.Groups
         #endregion
 
         #region Group notices
+        private void HandleGroupNoticeRequest(ViewerAgent agent, SceneInterface scene, Message m)
+        {
+            var req = (GroupNoticeRequest)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+            var groupsService = scene.GroupsService;
+
+            if (groupsService == null)
+            {
+            }
+            else
+            {
+                GroupNotice notice;
+                try
+                {
+                    notice = groupsService.Notices[agent.Owner, req.GroupNoticeID];
+                }
+                catch
+                {
+                    return;
+                }
+
+                if((GetGroupPowers(agent.Owner, groupsService, notice.Group) & GroupPowers.ReceiveNotices) != 0)
+                {
+                    return;
+                }
+
+                var reply = new GridInstantMessage
+                {
+                    IMSessionID = notice.ID,
+                    ToAgent = agent.Owner,
+                    Dialog = GridInstantMessageDialog.GroupNoticeRequested,
+                    IsFromGroup = true,
+                    FromGroup = notice.Group,
+                    ParentEstateID = 0,
+                    Position = Vector3.Zero,
+                    RegionID = UUID.Zero,
+                    Message = notice.Subject + "|" + notice.Message,
+                    OnResult = (im, result) => { }
+                };
+
+                reply.FromAgent.FullName = notice.FromName;
+
+                if(notice.HasAttachment)
+                {
+                    byte[] name = notice.AttachmentName.ToUTF8Bytes();
+                    var bucket = new byte[19 + name.Length];
+                    bucket[0] = 1; /* group notice has attachment */
+                    bucket[1] = (byte)notice.AttachmentType;
+                    notice.AttachmentItemID.ToBytes(bucket, 2);
+                    Buffer.BlockCopy(name, 0, bucket, 18, name.Length);
+                    reply.BinaryBucket = bucket;
+                }
+                else
+                {
+                    var bucket = new byte[19];
+                    Array.Clear(bucket, 0, 19); /* no attachment */
+                    reply.BinaryBucket = bucket;
+                }
+
+                if (reply != null)
+                {
+                    agent.IMSend(reply);
+                }
+            }
+        }
+
         private void HandleGroupNoticesListRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
             var req = (GroupNoticesListRequest)m;
