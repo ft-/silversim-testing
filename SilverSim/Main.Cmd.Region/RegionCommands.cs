@@ -1524,8 +1524,8 @@ namespace SilverSim.Main.Cmd.Region
                 .AddColumn("Region", 20)
                 .AddColumn("Env FPS", 10)
                 .AddColumn("Phys FPS", 10)
-                .AddColumn("Phys Time", 10)
-                .AddColumn("Phys Engine", 20)
+                .AddColumn("Phys Time", 15)
+                .AddColumn("Phys Engine", 15)
                 .AddHeader()
                 .AddSeparator();
             if (selectedScene == UUID.Zero)
