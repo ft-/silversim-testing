@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Types.Asset.Format;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -55,27 +56,62 @@ namespace SilverSim.Types.Asset
                 {
                     case AssetType.Bodypart:
                     case AssetType.Clothing:
-                        refs = new Format.Wearable(this).References;
-                        refs.Remove(ID);
+                        try
+                        {
+                            refs = new Wearable(this).References;
+                            refs.Remove(ID);
+                        }
+                        catch
+                        {
+                            refs = new List<UUID>();
+                        }
                         return refs;
 
                     case AssetType.Gesture:
-                        refs = new Format.Gesture(this).References;
-                        refs.Remove(ID);
+                        try
+                        {
+                            refs = new Gesture(this).References;
+                            refs.Remove(ID);
+                        }
+                        catch
+                        {
+                            refs = new List<UUID>();
+                        }
                         return refs;
 
                     case AssetType.Material:
-                        refs = new Format.Material(this).References;
-                        refs.Remove(ID);
+                        try
+                        {
+                            refs = new Material(this).References;
+                            refs.Remove(ID);
+                        }
+                        catch
+                        {
+                            refs = new List<UUID>();
+                        }
                         return refs;
 
                     case AssetType.Notecard:
-                        refs = new Format.Notecard(this).References;
-                        refs.Remove(ID);
+                        try
+                        {
+                            refs = new Notecard(this).References;
+                            refs.Remove(ID);
+                        }
+                        catch
+                        {
+                            refs = new List<UUID>();
+                        }
                         return refs;
 
                     case AssetType.Object:
-                        return Format.ObjectReferenceDecoder.GetReferences(this);
+                        try
+                        {
+                            return ObjectReferenceDecoder.GetReferences(this);
+                        }
+                        catch
+                        {
+                            return new List<UUID>();
+                        }
 
                     default:
                         break;
