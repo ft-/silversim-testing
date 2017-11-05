@@ -22,6 +22,7 @@
 #pragma warning disable IDE0018
 #pragma warning disable RCS1029
 
+using SilverSim.Threading;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.LayerData;
 using System;
@@ -429,23 +430,37 @@ namespace SilverSim.Viewer.Core
                         SendSimStats(deltatime);
                     }
 
-                    if (Environment.TickCount - lastPingTick >= 5000 &&
-                        !m_PingSendTicks.ContainsKey(pingID))
+                    if (Environment.TickCount - lastPingTick >= 5000)
                     {
-                        lastPingTick = Environment.TickCount;
-                        var p = new UDPPacket();
-                        p.WriteMessageNumber(MessageType.StartPingCheck);
-                        p.WriteUInt8(pingID++);
-                        m_PingSendTicks[pingID] = Environment.TickCount;
-                        p.WriteUInt32(0);
-                        try
+                        long lasttimesent;
+                        if (!m_PingSendTicks.TryGetValue(pingID, out lasttimesent))
                         {
-                            Server.SendPacketTo(p, RemoteEndPoint);
-                            Interlocked.Increment(ref m_PacketsSent);
+                            lastPingTick = Environment.TickCount;
+                            var p = new UDPPacket();
+                            p.WriteMessageNumber(MessageType.StartPingCheck);
+                            p.WriteUInt8(pingID);
+                            m_PingSendTicks[pingID] = PingTimeSource.TickCount;
+                            pingID++;
+                            p.WriteUInt32(0);
+                            try
+                            {
+                                Server.SendPacketTo(p, RemoteEndPoint);
+                                Interlocked.Increment(ref m_PacketsSent);
+                            }
+                            catch (ObjectDisposedException)
+                            {
+                                return;
+                            }
                         }
-                        catch (ObjectDisposedException)
+                        else if(PingTimeSource.TicksElapsed(PingTimeSource.TickCount, lasttimesent) >= PingTimeSource.SecsToTicks(5))
                         {
-                            return;
+                            m_PingSendTicks.Remove(pingID);
+#if DEBUG
+                            if (!IsCircuitInPause)
+                            {
+                                m_Log.DebugFormat("Missing response to ping id {0}", pingID);
+                            }
+#endif
                         }
                     }
 

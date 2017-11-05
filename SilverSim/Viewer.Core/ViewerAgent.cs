@@ -357,10 +357,25 @@ namespace SilverSim.Viewer.Core
 
         public override bool IsActiveGod => m_IsActiveGod;
 
-        public override int LastMeasuredLatencyTickCount /* info from Circuit ping measurement */
+        public override int LastMeasuredLatencyMsecs /* info from Circuit ping measurement */
         {
-            get;
-            set;
+            get
+            {
+                int pingms = 0;
+                int count = 0;
+                foreach (AgentCircuit circuit in Circuits.Values)
+                {
+                    pingms += circuit.LastMeasuredLatencyMsecs;
+                    ++count;
+                }
+
+                if (count > 0)
+                {
+                    pingms /= count;
+                }
+
+                return pingms;
+            }
         }
 
         protected override AssetServiceInterface SceneAssetService

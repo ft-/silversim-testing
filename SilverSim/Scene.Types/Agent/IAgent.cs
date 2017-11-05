@@ -104,10 +104,9 @@ namespace SilverSim.Scene.Types.Agent
 
         int NextParcelSequenceId { get; }
 
-        int LastMeasuredLatencyTickCount /* info from Circuit ping measurement */
+        int LastMeasuredLatencyMsecs /* info from Circuit ping measurement */
         {
             get;
-            set;
         }
 
         Vector4 CollisionPlane { get; set; }

@@ -45,8 +45,8 @@ namespace SilverSim.Viewer.Core
         private int __SequenceNumber;
         private readonly NonblockingQueue<UInt32> m_AckList = new NonblockingQueue<UInt32>();
         public EndPoint RemoteEndPoint;
-        private readonly RwLockedDictionary<byte, int> m_PingSendTicks = new RwLockedDictionary<byte, int>();
-        public int LastMeasuredLatencyTickCount { get; private set; }
+        private readonly RwLockedDictionary<byte, long> m_PingSendTicks = new RwLockedDictionary<byte, long>();
+        public int LastMeasuredLatencyMsecs { get; private set; }
         private uint m_LogoutReplySeqNo;
         private bool m_LogoutReplySent;
         private readonly object m_LogoutReplyLock = new object(); /* this is only for guarding access sequence to m_LogoutReply* variables */
@@ -61,6 +61,7 @@ namespace SilverSim.Viewer.Core
         protected int m_PacketsSent;
         protected int m_UnackedBytes;
         protected readonly object m_UnackedBytesLock = new object();
+        private static readonly TimingProvider PingTimeSource = TimingProvider.StopWatch;
 
         public bool IsCircuitInPause { get; set; }
 
@@ -348,10 +349,10 @@ namespace SilverSim.Viewer.Core
 
                 case MessageType.CompletePingCheck:
                     byte ackPingID = pck.ReadUInt8();
-                    int timesent;
+                    long timesent;
                     if (m_PingSendTicks.Remove(ackPingID, out timesent))
                     {
-                        LastMeasuredLatencyTickCount = (timesent - Environment.TickCount) / 2;
+                        LastMeasuredLatencyMsecs = (int)PingTimeSource.TicksToMsecs(PingTimeSource.TicksElapsed(PingTimeSource.TickCount, timesent)) / 2;
                     }
                     break;
 

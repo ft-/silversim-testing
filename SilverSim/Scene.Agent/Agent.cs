@@ -1006,7 +1006,7 @@ namespace SilverSim.Scene.Agent
         public abstract RwLockedDictionary<UUID, AgentChildInfo> ActiveChilds { get; }
         public abstract RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>> TransmittedTerrainSerials { get; }
         public abstract RwLockedDictionary<UUID, FriendStatus> KnownFriends { get; }
-        public abstract int LastMeasuredLatencyTickCount { get; set; }
+        public abstract int LastMeasuredLatencyMsecs { get; }
         public abstract Vector3 CameraPosition { get; set; }
         public abstract Quaternion CameraRotation { get; set; }
         public abstract Vector3 CameraAtAxis { get; set; }

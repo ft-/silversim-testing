@@ -261,11 +261,9 @@ namespace SilverSim.Scene.Npc
 
         public override RwLockedDictionary<UUID, FriendStatus> KnownFriends => new RwLockedDictionary<UUID, FriendStatus>();
 
-        public override int LastMeasuredLatencyTickCount
+        public override int LastMeasuredLatencyMsecs
         {
             get { return 0; }
-
-            set { throw new NotSupportedException("LastMeasuredLatencyTickCount"); }
         }
 
         public override OfflineIMServiceInterface OfflineIMService

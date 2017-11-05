@@ -1886,7 +1886,7 @@ namespace SilverSim.Main.Cmd.Region
 
             foreach(IAgent agent in agents)
             {
-                output.AppendFormat("\n{0}\n    id={1}  Type={2}\n", agent.Owner.FullName, agent.Owner.ID.ToString(), agent.IsInScene(scene) ? "Root" : "Child");
+                output.AppendFormat("\n{0}\n    id={1}  Type={2}\n    Latency={3} ms\n", agent.Owner.FullName, agent.Owner.ID.ToString(), agent.IsInScene(scene) ? "Root" : "Child", agent.LastMeasuredLatencyMsecs);
             }
             io.Write(output.ToString());
         }
