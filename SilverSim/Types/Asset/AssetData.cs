@@ -26,7 +26,7 @@ using System.IO;
 
 namespace SilverSim.Types.Asset
 {
-    public class AssetData : AssetMetadata, Format.IReferencesAccessor
+    public class AssetData : AssetMetadata, IReferencesAccessor
     {
         public byte[] Data = new byte[0];
 
