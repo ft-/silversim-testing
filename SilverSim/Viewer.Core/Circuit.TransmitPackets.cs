@@ -405,7 +405,7 @@ namespace SilverSim.Viewer.Core
                         }
                     } while (qcount != 0);
 
-                    if (Environment.TickCount - m_LastReceivedPacketAtTime >= 60000)
+                    if (Environment.TickCount - m_LastReceivedPacketAtTime >= (IsCircuitInPause ? 300000 : 60000))
                     {
                         LogMsgOnTimeout();
                         /* do not do sync termination here */

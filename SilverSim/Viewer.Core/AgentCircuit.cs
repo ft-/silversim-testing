@@ -37,6 +37,7 @@ using SilverSim.Types;
 using SilverSim.Types.Grid;
 using SilverSim.Types.IM;
 using SilverSim.Viewer.Messages;
+using SilverSim.Viewer.Messages.Agent;
 using SilverSim.Viewer.Messages.Chat;
 using SilverSim.Viewer.Messages.Generic;
 using SilverSim.Viewer.Messages.IM;
@@ -917,6 +918,30 @@ namespace SilverSim.Viewer.Core
         protected override void LogMsgLogoutReply()
         {
             m_Log.InfoFormat("LogoutReply for agent {0} {1} ({2}) timed out", Agent.FirstName, Agent.LastName, Agent.ID);
+        }
+
+        [PacketHandler(MessageType.AgentResume)]
+        public void HandleAgentResume(Message m)
+        {
+            var req = (AgentResume)m;
+            if(req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+            IsCircuitInPause = false;
+        }
+
+        [PacketHandler(MessageType.AgentPause)]
+        public void HandleAgentPause(Message m)
+        {
+            var req = (AgentPause)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+            IsCircuitInPause = true;
         }
 
         #region Receive Logic

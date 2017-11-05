@@ -62,6 +62,8 @@ namespace SilverSim.Viewer.Core
         protected int m_UnackedBytes;
         protected readonly object m_UnackedBytesLock = new object();
 
+        public bool IsCircuitInPause { get; set; }
+
         public string RemoteIP
         {
             get
