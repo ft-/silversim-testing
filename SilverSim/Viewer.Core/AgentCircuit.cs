@@ -412,7 +412,7 @@ namespace SilverSim.Viewer.Core
 
         private void CheckExperienceTimeouts()
         {
-            List<string> timedout = new List<string>();
+            var timedout = new List<string>();
             foreach (KeyValuePair<string, int> kvp in m_ExperienceTimeouts)
             {
                 int t = kvp.Value - Environment.TickCount;
@@ -873,7 +873,8 @@ namespace SilverSim.Viewer.Core
                     mtype == MessageType.ImprovedInstantMessage ||
                     mtype == MessageType.GodlikeMessage ||
                     mtype == MessageType.EstateOwnerMessage ||
-                    mtype == MessageType.UseCircuitCode)
+                    mtype == MessageType.UseCircuitCode ||
+                    mtype == MessageType.ScriptDialogReply)
                 {
                     continue;
                 }
