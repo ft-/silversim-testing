@@ -25,6 +25,7 @@ namespace SilverSim.Types.Economy.Transactions
     {
         public string ObjectName = string.Empty;
         public UUID ObjectID = UUID.Zero;
+        public UUID DebitPermissionKey = UUID.Zero;
 
         public ObjectPaysTransaction(GridVector regionHandle, UUID regionID, string regionName)
             : base(regionHandle, regionID, regionName)

@@ -98,12 +98,13 @@ namespace SilverSim.ServiceInterfaces.Economy
 
         /** <summary>Request script debit permission</summary>
          * this function has to throw exception for signaling error
+         * <returns>returns a debit permission key on success</returns>
          */
         public virtual UUID RequestScriptDebitPermission(UUI sourceID, UUID regionID, UUID objectID, UUID itemID) => UUID.Zero;
 
         /** <summary>Request script debit permission</summary>
          */
-        public virtual void RevokeScriptDebitPermission(UUID scriptdebitkeyid)
+        public virtual void RevokeScriptDebitPermission(UUID debitpermissionkey)
         {
         }
 
