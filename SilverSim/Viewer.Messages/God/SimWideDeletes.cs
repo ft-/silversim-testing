@@ -32,6 +32,7 @@ namespace SilverSim.Viewer.Messages.God
         [Flags]
         public enum DeleteFlags : uint
         {
+            None = 0,
             OthersLandOnly = 1 << 0,
             AlwaysReturnObjects = 1 << 1,
             ScriptedOnly = 1 << 2

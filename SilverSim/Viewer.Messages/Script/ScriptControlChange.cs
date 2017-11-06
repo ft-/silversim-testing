@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Types.Agent;
 using System;
 using System.Collections.Generic;
 
@@ -32,7 +33,7 @@ namespace SilverSim.Viewer.Messages.Script
         public struct DataEntry
         {
             public bool TakeControls;
-            public UInt32 Controls;
+            public ControlFlags Controls;
             public bool PassToAgent;
         }
 
@@ -44,7 +45,7 @@ namespace SilverSim.Viewer.Messages.Script
             foreach(var d in Data)
             {
                 p.WriteBoolean(d.TakeControls);
-                p.WriteUInt32(d.Controls);
+                p.WriteUInt32((uint)d.Controls);
                 p.WriteBoolean(d.PassToAgent);
             }
         }
@@ -58,7 +59,7 @@ namespace SilverSim.Viewer.Messages.Script
                 m.Data.Add(new DataEntry
                 {
                     TakeControls = p.ReadBoolean(),
-                    Controls = p.ReadUInt32(),
+                    Controls = (ControlFlags)p.ReadUInt32(),
                     PassToAgent = p.ReadBoolean()
                 });
             }

@@ -27,6 +27,7 @@ using SilverSim.Types.Inventory;
 using SilverSim.Types.Parcel;
 using SilverSim.Types.Primitive;
 using SilverSim.Viewer.Messages;
+using SilverSim.Viewer.Messages.God;
 using SilverSim.Viewer.Messages.Object;
 using SilverSim.Viewer.Messages.Parcel;
 using System;
@@ -1301,6 +1302,56 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
+        [PacketHandler(MessageType.ParcelReturnObjects)]
+        public void HandleParcelReturnObjects(Message m)
+        {
+            var req = (ParcelReturnObjects)m;
+            if (req.AgentID != req.CircuitAgentID ||
+                req.SessionID != req.CircuitSessionID)
+            {
+                return;
+            }
+
+            ParcelInfo pinfo;
+            IAgent agent;
+            var returnlist = new List<UUID>();
+
+            if (Agents.TryGetValue(req.AgentID, out agent) && Parcels.TryGetValue(req.LocalID, out pinfo))
+            {
+                foreach (Object.ObjectGroup grp in ObjectGroups)
+                {
+                    if(grp.IsAttached)
+                    {
+                        continue;
+                    }
+
+                    if (!pinfo.LandBitmap.ContainsLocation(grp.GlobalPosition))
+                    {
+                        continue;
+                    }
+
+                    bool isOwner = grp.Owner.EqualsGrid(pinfo.Owner);
+
+                    if (!CanReturn(agent, grp, grp.GlobalPosition))
+                    {
+                        continue;
+                    }
+
+                    if (((req.ReturnType & ObjectReturnType.Owner) != 0 && isOwner) ||
+                        ((req.ReturnType & ObjectReturnType.Other) != 0 && !isOwner) ||
+                        ((req.ReturnType & ObjectReturnType.Group) != 0 && grp.Group == pinfo.Group) ||
+                        ((req.ReturnType & ObjectReturnType.Sell) != 0 && grp.SaleType != InventoryItem.SaleInfoData.SaleType.NoSale) ||
+                        ((req.ReturnType & ObjectReturnType.List) != 0 && req.TaskIDs.Contains(grp.ID)) ||
+                        ((req.ReturnType & ObjectReturnType.List) != 0 && req.OwnerIDs.Contains(grp.Owner.ID)))
+                    {
+                        returnlist.Add(grp.ID);
+                    }
+                }
+            }
+
+            ReturnObjects(agent.Owner, returnlist);
+        }
+
         [PacketHandler(MessageType.ParcelSelectObjects)]
         public void HandleParcelSelectObjects(Message m)
         {
@@ -1322,7 +1373,12 @@ namespace SilverSim.Scene.Types.Scene
             {
                 foreach (Object.ObjectGroup grp in ObjectGroups)
                 {
-                    if(!pinfo.LandBitmap.ContainsLocation(grp.GlobalPosition))
+                    if (grp.IsAttached)
+                    {
+                        continue;
+                    }
+
+                    if (!pinfo.LandBitmap.ContainsLocation(grp.GlobalPosition))
                     {
                         continue;
                     }
@@ -1346,6 +1402,65 @@ namespace SilverSim.Scene.Types.Scene
 
                 agent.SendMessageAlways(reply, ID);
             }
+        }
+
+        [PacketHandler(MessageType.SimWideDeletes)]
+        public void HandleSimWideDeletes(Message m)
+        {
+            var req = (SimWideDeletes)m;
+            if(req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+
+            IAgent agent;
+            if(!Agents.TryGetValue(req.AgentID, out agent))
+            {
+                return;
+            }
+
+            if(!agent.IsInScene(this) || !agent.IsActiveGod)
+            {
+                return;
+            }
+
+            var grps = new List<UUID>();
+            foreach(Object.ObjectGroup grp in ObjectGroups)
+            {
+                if(grp.Owner.ID != req.TargetID || grp.IsAttached)
+                {
+                    continue;
+                }
+
+                ParcelInfo pinfo;
+                if((req.Flags & SimWideDeletes.DeleteFlags.OthersLandOnly) != 0 && (
+                    Parcels.TryGetValue(grp.GlobalPosition, out pinfo) && 
+                    (grp.IsGroupOwned ? pinfo.Group.Equals(grp.Group) : pinfo.Owner.EqualsGrid(grp.Owner))))
+                {
+                    continue;
+                }
+
+                if((req.Flags & SimWideDeletes.DeleteFlags.ScriptedOnly) != 0 && !IsObjectScripted(grp))
+                {
+                    continue;
+                }
+                grps.Add(grp.ID);
+            }
+
+            ReturnObjects(agent.Owner, grps);
+        }
+
+        private bool IsObjectScripted(Object.ObjectGroup grp)
+        {
+            foreach(ObjectPart p in grp.Values)
+            {
+                if(p.IsScripted)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

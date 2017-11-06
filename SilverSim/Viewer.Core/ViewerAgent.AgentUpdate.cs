@@ -27,6 +27,7 @@ using SilverSim.Types.Agent;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Agent;
 using SilverSim.Viewer.Messages.Camera;
+using SilverSim.Viewer.Messages.Script;
 using System.Collections.Generic;
 
 namespace SilverSim.Viewer.Core
@@ -106,6 +107,44 @@ namespace SilverSim.Viewer.Core
                         m_IgnoredControls |= sc.Ignored;
                     }
                 }
+                ControlFlags taken = m_TakenControls;
+                ControlFlags ignored = m_IgnoredControls;
+
+                var msg = new ScriptControlChange();
+                if(taken != ignored)
+                {
+                    msg.Data.Add(new ScriptControlChange.DataEntry
+                    {
+                        Controls = taken,
+                        PassToAgent = true,
+                        TakeControls = true
+                    });
+                    msg.Data.Add(new ScriptControlChange.DataEntry
+                    {
+                        Controls = ignored,
+                        PassToAgent = false,
+                        TakeControls = true
+                    });
+                }
+                else if(taken != ControlFlags.None)
+                {
+                    msg.Data.Add(new ScriptControlChange.DataEntry
+                    {
+                        Controls = taken,
+                        PassToAgent = true,
+                        TakeControls = true
+                    });
+                }
+                else
+                {
+                    msg.Data.Add(new ScriptControlChange.DataEntry
+                    {
+                        Controls = ControlFlags.None,
+                        PassToAgent = true,
+                        TakeControls = false
+                    });
+                }
+                SendMessageAlways(msg, SceneID);
             }
         }
 
@@ -114,6 +153,24 @@ namespace SilverSim.Viewer.Core
 
         public ControlFlags IgnoredControls => m_IgnoredControls;
         #endregion
+
+        [PacketHandler(MessageType.ForceScriptControlRelease)]
+        public void HandleForceScriptControlRelease(Message m)
+        {
+            var req = (ForceScriptControlRelease)m;
+            if(req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+
+            lock (m_ScriptControls)
+            {
+                m_ScriptControls.Clear();
+                m_TakenControls = ControlFlags.None;
+                m_IgnoredControls = ControlFlags.None;
+            }
+        }
 
         private void ProcessAgentControls()
         {
