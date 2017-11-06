@@ -24,9 +24,11 @@ using SilverSim.Scene.Types.Object;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Inventory;
+using SilverSim.Types.Parcel;
 using SilverSim.Types.Primitive;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Object;
+using SilverSim.Viewer.Messages.Parcel;
 using System;
 using System.Collections.Generic;
 
@@ -1296,6 +1298,53 @@ namespace SilverSim.Scene.Types.Scene
             if (Agents.TryGetValue(req.AgentID, out agent))
             {
                 agent.SendMessageAlways(res, ID);
+            }
+        }
+
+        [PacketHandler(MessageType.ParcelSelectObjects)]
+        public void HandleParcelSelectObjects(Message m)
+        {
+            var req = (ParcelSelectObjects)m;
+            if (req.AgentID != req.CircuitAgentID ||
+                req.SessionID != req.CircuitSessionID)
+            {
+                return;
+            }
+
+            ParcelInfo pinfo;
+            IAgent agent;
+            var reply = new ForceObjectSelect
+            {
+                ResetList = true
+            };
+
+            if (Agents.TryGetValue(req.AgentID, out agent) && Parcels.TryGetValue(req.LocalID, out pinfo))
+            {
+                foreach (Object.ObjectGroup grp in ObjectGroups)
+                {
+                    if(!pinfo.LandBitmap.ContainsLocation(grp.GlobalPosition))
+                    {
+                        continue;
+                    }
+
+                    bool isOwner = grp.Owner.EqualsGrid(pinfo.Owner);
+
+                    if(((req.ReturnType & ObjectReturnType.Owner) != 0 && isOwner) ||
+                        ((req.ReturnType & ObjectReturnType.Other) != 0 && !isOwner) ||
+                        ((req.ReturnType & ObjectReturnType.Group) != 0 && grp.Group == pinfo.Group) ||
+                        ((req.ReturnType & ObjectReturnType.Sell) != 0 && grp.SaleType != InventoryItem.SaleInfoData.SaleType.NoSale) ||
+                        ((req.ReturnType & ObjectReturnType.List) != 0 && req.ReturnIDs.Contains(grp.ID)))
+                    {
+                        if(reply.LocalIDs.Count >= 251)
+                        {
+                            agent.SendMessageAlways(reply, ID);
+                            reply = new ForceObjectSelect();
+                        }
+                        reply.LocalIDs.Add(grp.LocalID[ID]);
+                    }
+                }
+
+                agent.SendMessageAlways(reply, ID);
             }
         }
     }

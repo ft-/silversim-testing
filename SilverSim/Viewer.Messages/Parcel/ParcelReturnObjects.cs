@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using SilverSim.Types;
+using SilverSim.Types.Parcel;
 using System;
 using System.Collections.Generic;
 
@@ -35,7 +36,7 @@ namespace SilverSim.Viewer.Messages.Parcel
         public UUID SessionID = UUID.Zero;
 
         public Int32 LocalID;
-        public UInt32 ReturnType;
+        public ObjectReturnType ReturnType;
         public List<UUID> TaskIDs = new List<UUID>();
         public List<UUID> OwnerIDs = new List<UUID>();
 
@@ -46,7 +47,7 @@ namespace SilverSim.Viewer.Messages.Parcel
                 AgentID = p.ReadUUID(),
                 SessionID = p.ReadUUID(),
                 LocalID = p.ReadInt32(),
-                ReturnType = p.ReadUInt32()
+                ReturnType = (ObjectReturnType)p.ReadUInt32()
             };
             uint cnt = p.ReadUInt8();
             for (uint i = 0; i < cnt; ++i)
@@ -62,13 +63,12 @@ namespace SilverSim.Viewer.Messages.Parcel
             return m;
         }
 
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteUUID(AgentID);
             p.WriteUUID(SessionID);
             p.WriteInt32(LocalID);
-            p.WriteUInt32(ReturnType);
+            p.WriteUInt32((uint)ReturnType);
             p.WriteUInt8((byte)TaskIDs.Count);
             foreach(UUID tid in TaskIDs)
             {
