@@ -21,6 +21,7 @@
 
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Script;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Inventory;
@@ -1312,11 +1313,11 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            ParcelInfo pinfo;
+            ParcelInfo pinfo = null;
             IAgent agent;
             var returnlist = new List<UUID>();
 
-            if (Agents.TryGetValue(req.AgentID, out agent) && Parcels.TryGetValue(req.LocalID, out pinfo))
+            if (Agents.TryGetValue(req.AgentID, out agent) && (req.LocalID == -1 || Parcels.TryGetValue(req.LocalID, out pinfo)))
             {
                 foreach (Object.ObjectGroup grp in ObjectGroups)
                 {
@@ -1325,7 +1326,7 @@ namespace SilverSim.Scene.Types.Scene
                         continue;
                     }
 
-                    if (!pinfo.LandBitmap.ContainsLocation(grp.GlobalPosition))
+                    if (pinfo != null && !pinfo.LandBitmap.ContainsLocation(grp.GlobalPosition))
                     {
                         continue;
                     }
@@ -1350,6 +1351,64 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             ReturnObjects(agent.Owner, returnlist);
+        }
+
+        [PacketHandler(MessageType.ParcelDisableObjects)]
+        public void HandleParcelDisableObjects(Message m)
+        {
+            var req = (ParcelReturnObjects)m;
+            if (req.AgentID != req.CircuitAgentID ||
+                req.SessionID != req.CircuitSessionID)
+            {
+                return;
+            }
+
+            ParcelInfo pinfo = null;
+            IAgent agent;
+            var returnlist = new List<UUID>();
+
+            if (Agents.TryGetValue(req.AgentID, out agent) && (req.LocalID == -1 || Parcels.TryGetValue(req.LocalID, out pinfo)))
+            {
+                foreach (Object.ObjectGroup grp in ObjectGroups)
+                {
+                    if (grp.IsAttached)
+                    {
+                        continue;
+                    }
+
+                    if (pinfo != null && !pinfo.LandBitmap.ContainsLocation(grp.GlobalPosition))
+                    {
+                        continue;
+                    }
+
+                    bool isOwner = grp.Owner.EqualsGrid(pinfo.Owner);
+
+                    if (!CanReturn(agent, grp, grp.GlobalPosition))
+                    {
+                        continue;
+                    }
+
+                    if (((req.ReturnType & ObjectReturnType.Owner) != 0 && isOwner) ||
+                        ((req.ReturnType & ObjectReturnType.Other) != 0 && !isOwner) ||
+                        ((req.ReturnType & ObjectReturnType.Group) != 0 && grp.Group == pinfo.Group) ||
+                        ((req.ReturnType & ObjectReturnType.Sell) != 0 && grp.SaleType != InventoryItem.SaleInfoData.SaleType.NoSale) ||
+                        ((req.ReturnType & ObjectReturnType.List) != 0 && req.TaskIDs.Contains(grp.ID)) ||
+                        ((req.ReturnType & ObjectReturnType.List) != 0 && req.OwnerIDs.Contains(grp.Owner.ID)))
+                    {
+                        foreach(ObjectPart part in grp.Values)
+                        {
+                            foreach(ObjectPartInventoryItem item in part.Inventory.Values)
+                            {
+                                ScriptInstance instance = item.ScriptInstance;
+                                if (item.ScriptInstance != null)
+                                {
+                                    item.ScriptInstance.IsRunning = false;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         [PacketHandler(MessageType.ParcelSelectObjects)]
