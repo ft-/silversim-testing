@@ -42,8 +42,8 @@ namespace SilverSim.Viewer.Core
 
         private sealed class AgentRezRestoreObjectHandler : RezRestoreObjectHandler
         {
-            public AgentRezRestoreObjectHandler(SceneInterface scene, UUID assetid, AssetServiceInterface source, UUI rezzingagent, InventoryPermissionsMask itemOwnerPermissions = InventoryPermissionsMask.Every)
-                : base(scene, assetid, source, rezzingagent, itemOwnerPermissions)
+            public AgentRezRestoreObjectHandler(SceneInterface scene, UUID assetid, AssetServiceInterface source, UUI rezzingagent, UGI rezzinggroup, InventoryPermissionsMask itemOwnerPermissions = InventoryPermissionsMask.Every)
+                : base(scene, assetid, source, rezzingagent, rezzinggroup, itemOwnerPermissions)
             {
             }
         }
@@ -84,11 +84,20 @@ namespace SilverSim.Viewer.Core
                 SendAlertMessage("ALERT: InvalidObjectParams", m.CircuitSceneID);
                 return;
             }
+
+            UGI restoreGroup = UGI.Unknown;
+
+            if(!(Circuits[m.CircuitSceneID].Scene.GroupsNameService?.TryGetValue(req.GroupID, out restoreGroup) ?? false))
+            {
+                restoreGroup = UGI.Unknown;
+            }
+
             var rezHandler = new AgentRezRestoreObjectHandler(
                 Circuits[m.CircuitSceneID].Scene,
                 item.AssetID,
                 AssetService,
-                Owner);
+                Owner,
+                restoreGroup);
 
             ThreadPool.UnsafeQueueUserWorkItem(HandleAssetTransferWorkItem, rezHandler);
         }

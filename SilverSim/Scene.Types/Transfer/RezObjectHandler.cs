@@ -115,13 +115,15 @@ namespace SilverSim.Scene.Types.Transfer
         private static readonly ILog m_Log = LogManager.GetLogger("REZRESTOREOBJECT");
         private readonly SceneInterface m_Scene;
         private readonly UUI m_RezzingAgent;
+        private readonly UGI m_RezzingGroup;
         private readonly InventoryPermissionsMask m_ItemOwnerPermissions;
 
-        protected RezRestoreObjectHandler(SceneInterface scene, UUID assetid, AssetServiceInterface source, UUI rezzingagent, InventoryPermissionsMask itemOwnerPermissions = InventoryPermissionsMask.Every)
+        protected RezRestoreObjectHandler(SceneInterface scene, UUID assetid, AssetServiceInterface source, UUI rezzingagent, UGI rezzinggroup, InventoryPermissionsMask itemOwnerPermissions = InventoryPermissionsMask.Every)
             : base(scene.AssetService, source, assetid, ReferenceSource.Destination)
         {
             m_Scene = scene;
             m_RezzingAgent = rezzingagent;
+            m_RezzingGroup = rezzinggroup;
             m_ItemOwnerPermissions = itemOwnerPermissions;
         }
 
@@ -166,6 +168,10 @@ namespace SilverSim.Scene.Types.Transfer
                 {
                     if (m_Scene.CanRez(m_RezzingAgent, grp.GlobalPosition))
                     {
+                        if (m_Scene.GroupsService?.Members.ContainsKey(m_RezzingAgent, m_RezzingGroup, m_RezzingAgent) ?? false)
+                        {
+                            grp.Group = m_RezzingGroup;
+                        }
                         m_Scene.RezObject(grp, m_RezzingAgent);
                     }
                 }
