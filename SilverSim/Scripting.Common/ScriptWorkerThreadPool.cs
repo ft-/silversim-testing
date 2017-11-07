@@ -40,7 +40,7 @@ namespace SilverSim.Scripting.Common
         private readonly UUID m_SceneID;
         private bool m_ShutdownThreads;
         private readonly System.Timers.Timer m_FrameTimer = new System.Timers.Timer(1 / 10.0);
-        private static readonly TimingProvider TimeSource = TimingProvider.StopWatch;
+        private static readonly TimeProvider TimeSource = TimeProvider.StopWatch;
 
         private int m_ScriptEventCounter;
         private int m_LastScriptEventCounter;

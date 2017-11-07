@@ -61,7 +61,7 @@ namespace SilverSim.Viewer.Core
         protected int m_PacketsSent;
         protected int m_UnackedBytes;
         protected readonly object m_UnackedBytesLock = new object();
-        private static readonly TimingProvider PingTimeSource = TimingProvider.StopWatch;
+        private static readonly TimeProvider PingTimeSource = TimeProvider.StopWatch;
 
         public bool IsCircuitInPause { get; set; }
 

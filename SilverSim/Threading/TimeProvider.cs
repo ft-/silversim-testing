@@ -23,7 +23,7 @@ using System.Diagnostics;
 
 namespace SilverSim.Threading
 {
-    public abstract partial class TimingProvider
+    public abstract partial class TimeProvider
     {
         public abstract long TickCount { get; }
         public abstract long Frequency { get; }
@@ -36,7 +36,7 @@ namespace SilverSim.Threading
         public abstract double TicksToMsecs(long ticks);
     }
 
-    public sealed class StopWatchSource : TimingProvider
+    public sealed class StopWatchSource : TimeProvider
     {
         public override long TickCount => Stopwatch.GetTimestamp();
         public override long Frequency => Stopwatch.Frequency;
@@ -49,7 +49,7 @@ namespace SilverSim.Threading
         public override double TicksToMsecs(long ticks) => ticks * 1000.0 / Stopwatch.Frequency;
     }
 
-    public sealed class EnvironmentSource : TimingProvider
+    public sealed class EnvironmentSource : TimeProvider
     {
         public override long TickCount => System.Environment.TickCount;
         public override long Frequency => 1000;
@@ -62,9 +62,9 @@ namespace SilverSim.Threading
         public override double TicksToMsecs(long ticks) => ticks;
     }
 
-    public abstract partial class TimingProvider
+    public abstract partial class TimeProvider
     {
-        public static readonly TimingProvider StopWatch = new StopWatchSource();
-        public static readonly TimingProvider Environment = new EnvironmentSource();
+        public static readonly TimeProvider StopWatch = new StopWatchSource();
+        public static readonly TimeProvider Environment = new EnvironmentSource();
     }
 }
