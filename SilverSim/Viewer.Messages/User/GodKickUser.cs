@@ -32,7 +32,7 @@ namespace SilverSim.Viewer.Messages.User
         public UUID GodID = UUID.Zero;
         public UUID GodSessionID = UUID.Zero;
         public UUID AgentID = UUID.Zero;
-        public UInt32 KickFlags;
+        public KickFlags KickFlags;
         public string Reason;
 
         public static Message Decode(UDPPacket p) => new GodKickUser
@@ -40,7 +40,7 @@ namespace SilverSim.Viewer.Messages.User
             GodID = p.ReadUUID(),
             GodSessionID = p.ReadUUID(),
             AgentID = p.ReadUUID(),
-            KickFlags = p.ReadUInt32(),
+            KickFlags = (KickFlags)p.ReadUInt32(),
             Reason = p.ReadStringLen16()
         };
 
@@ -49,7 +49,7 @@ namespace SilverSim.Viewer.Messages.User
             p.WriteUUID(GodID);
             p.WriteUUID(GodSessionID);
             p.WriteUUID(AgentID);
-            p.WriteUInt32(KickFlags);
+            p.WriteUInt32((uint)KickFlags);
             p.WriteStringLen16(Reason);
         }
     }

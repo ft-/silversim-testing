@@ -19,34 +19,15 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.Types;
+using System;
 
 namespace SilverSim.Viewer.Messages.User
 {
-    [UDPMessage(MessageType.FreezeUser)]
-    [Reliable]
-    [NotTrusted]
-    public class FreezeUser : Message
+    [Flags]
+    public enum KickFlags : uint
     {
-        public UUID AgentID = UUID.Zero;
-        public UUID SessionID = UUID.Zero;
-        public UUID TargetID = UUID.Zero;
-        public KickFlags Flags;
-
-        public static Message Decode(UDPPacket p) => new FreezeUser
-        {
-            AgentID = p.ReadUUID(),
-            SessionID = p.ReadUUID(),
-            TargetID = p.ReadUUID(),
-            Flags = (KickFlags)p.ReadUInt32()
-        };
-
-        public override void Serialize(UDPPacket p)
-        {
-            p.WriteUUID(AgentID);
-            p.WriteUUID(SessionID);
-            p.WriteUUID(TargetID);
-            p.WriteUInt32((uint)Flags);
-        }
+        Default = 0,
+        Freeze = 1,
+        Unfreeze = 2
     }
 }
