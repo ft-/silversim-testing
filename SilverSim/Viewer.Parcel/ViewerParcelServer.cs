@@ -153,6 +153,10 @@ namespace SilverSim.Viewer.Parcel
                         case MessageType.ParcelPropertiesUpdate:
                             HandleParcelPropertiesUpdate(req.Key, scene, m);
                             break;
+
+                        case MessageType.ParcelClaim:
+                            HandleParcelClaim(req.Key, scene, m);
+                            break;
                     }
                 }
                 catch (Exception e)
@@ -464,8 +468,8 @@ namespace SilverSim.Viewer.Parcel
                 totalPrice += CalculateClaimPrice(d);
             }
 
-            int parcelClaimPrice = scene.RegionSettings.ParcelClaimPrice;
-            double parcelClaimFactor = scene.RegionSettings.ParcelClaimFactor;
+            int parcelClaimPrice = scene.EconomyData.PriceParcelClaim;
+            double parcelClaimFactor = scene.EconomyData.PriceParcelClaimFactor;
 
             totalPrice = (int)Math.Ceiling(totalPrice * parcelClaimPrice * parcelClaimFactor);
             EconomyServiceInterface economyService = agent.EconomyService;
