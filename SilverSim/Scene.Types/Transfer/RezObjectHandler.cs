@@ -55,7 +55,7 @@ namespace SilverSim.Scene.Types.Transfer
         protected void SendAlertMessage(string msg)
         {
             IAgent agent;
-            if(m_Scene.Agents.TryGetValue(m_RezzingAgent.ID, out agent))
+            if (m_Scene.Agents.TryGetValue(m_RezzingAgent.ID, out agent))
             {
                 agent.SendAlertMessage(msg, m_Scene.ID);
             }
@@ -69,7 +69,7 @@ namespace SilverSim.Scene.Types.Transfer
             {
                 data = m_Scene.AssetService[AssetID];
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 m_Log.Error(string.Format("Failed to rez object from asset {0}", AssetID), e);
                 SendAlertMessage("ALERT: CantFindObject");
@@ -80,7 +80,7 @@ namespace SilverSim.Scene.Types.Transfer
             {
                 objgroups = ObjectXML.FromAsset(data, m_RezzingAgent);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 m_Log.Error(string.Format("Unable to decode asset {0} to rez", data.ID), e);
                 SendAlertMessage("ALERT: RezAttemptFailed");
@@ -91,7 +91,86 @@ namespace SilverSim.Scene.Types.Transfer
             {
                 m_Scene.RezObjects(objgroups, m_RezParams);
             }
-            catch(Exception e)
+            catch (Exception e)
+            {
+                m_Log.Error(string.Format("Failed to rez object in scene {0} ({1})", m_Scene.Name, m_Scene.ID), e);
+                SendAlertMessage("ALERT: RezAttemptFailed");
+                return;
+            }
+        }
+
+        public override void AssetTransferFailed(Exception e)
+        {
+            IAgent agent;
+            m_Log.Error(string.Format("Failed to rez object from asset {0}", AssetID), e);
+            if (m_Scene.Agents.TryGetValue(m_RezzingAgent.ID, out agent))
+            {
+                agent.SendAlertMessage("ALERT: RezAttemptFailed", m_Scene.ID);
+            }
+        }
+    }
+
+    public abstract class RezRestoreObjectHandler : AssetTransferWorkItem
+    {
+        private static readonly ILog m_Log = LogManager.GetLogger("REZRESTOREOBJECT");
+        private readonly SceneInterface m_Scene;
+        private readonly UUI m_RezzingAgent;
+        private readonly InventoryPermissionsMask m_ItemOwnerPermissions;
+
+        protected RezRestoreObjectHandler(SceneInterface scene, UUID assetid, AssetServiceInterface source, UUI rezzingagent, InventoryPermissionsMask itemOwnerPermissions = InventoryPermissionsMask.Every)
+            : base(scene.AssetService, source, assetid, ReferenceSource.Destination)
+        {
+            m_Scene = scene;
+            m_RezzingAgent = rezzingagent;
+            m_ItemOwnerPermissions = itemOwnerPermissions;
+        }
+
+        protected void SendAlertMessage(string msg)
+        {
+            IAgent agent;
+            if (m_Scene.Agents.TryGetValue(m_RezzingAgent.ID, out agent))
+            {
+                agent.SendAlertMessage(msg, m_Scene.ID);
+            }
+        }
+
+        public override void AssetTransferComplete()
+        {
+            AssetData data;
+            List<ObjectGroup> objgroups;
+            try
+            {
+                data = m_Scene.AssetService[AssetID];
+            }
+            catch (Exception e)
+            {
+                m_Log.Error(string.Format("Failed to rez object from asset {0}", AssetID), e);
+                SendAlertMessage("ALERT: CantFindObject");
+                return;
+            }
+
+            try
+            {
+                objgroups = ObjectXML.FromAsset(data, m_RezzingAgent);
+            }
+            catch (Exception e)
+            {
+                m_Log.Error(string.Format("Unable to decode asset {0} to rez", data.ID), e);
+                SendAlertMessage("ALERT: RezAttemptFailed");
+                return;
+            }
+
+            try
+            {
+                foreach (ObjectGroup grp in objgroups)
+                {
+                    if (m_Scene.CanRez(m_RezzingAgent, grp.GlobalPosition))
+                    {
+                        m_Scene.RezObject(grp, m_RezzingAgent);
+                    }
+                }
+            }
+            catch (Exception e)
             {
                 m_Log.Error(string.Format("Failed to rez object in scene {0} ({1})", m_Scene.Name, m_Scene.ID), e);
                 SendAlertMessage("ALERT: RezAttemptFailed");

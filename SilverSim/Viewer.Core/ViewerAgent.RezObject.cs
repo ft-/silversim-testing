@@ -23,6 +23,7 @@ using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Transfer;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Types;
+using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using SilverSim.Viewer.Messages;
 using System.Threading;
@@ -37,6 +38,59 @@ namespace SilverSim.Viewer.Core
                 : base(scene, targetpos, assetid, source, rezzingagent, rezparams, itemOwnerPermissions)
             {
             }
+        }
+
+        private sealed class AgentRezRestoreObjectHandler : RezRestoreObjectHandler
+        {
+            public AgentRezRestoreObjectHandler(SceneInterface scene, UUID assetid, AssetServiceInterface source, UUI rezzingagent, InventoryPermissionsMask itemOwnerPermissions = InventoryPermissionsMask.Every)
+                : base(scene, assetid, source, rezzingagent, itemOwnerPermissions)
+            {
+            }
+        }
+
+        [PacketHandler(MessageType.RezRestoreToWorld)]
+        public void HandleRezRestoreToWorld(Message m)
+        {
+            var req = (Messages.Object.RezRestoreToWorld)m;
+            if (req.AgentID != req.CircuitAgentID || req.SessionID != req.CircuitSessionID)
+            {
+                return;
+            }
+
+            InventoryItem item;
+            try
+            {
+                item = InventoryService.Item[Owner.ID, req.ItemID];
+            }
+            catch
+            {
+                SendAlertMessage("ALERT: CantFindInvItem", m.CircuitSceneID);
+                return;
+            }
+            if (item.AssetType == AssetType.Link)
+            {
+                try
+                {
+                    item = InventoryService.Item[Owner.ID, req.ItemID];
+                }
+                catch
+                {
+                    SendAlertMessage("ALERT: CantFindInvItem", m.CircuitSceneID);
+                    return;
+                }
+            }
+            if (item.AssetType != AssetType.Object)
+            {
+                SendAlertMessage("ALERT: InvalidObjectParams", m.CircuitSceneID);
+                return;
+            }
+            var rezHandler = new AgentRezRestoreObjectHandler(
+                Circuits[m.CircuitSceneID].Scene,
+                item.AssetID,
+                AssetService,
+                Owner);
+
+            ThreadPool.UnsafeQueueUserWorkItem(HandleAssetTransferWorkItem, rezHandler);
         }
 
         [PacketHandler(MessageType.RezObject)]
@@ -58,7 +112,7 @@ namespace SilverSim.Viewer.Core
                 SendAlertMessage("ALERT: CantFindInvItem", m.CircuitSceneID);
                 return;
             }
-            if(item.AssetType == Types.Asset.AssetType.Link)
+            if(item.AssetType == AssetType.Link)
             {
                 try
                 {
@@ -70,7 +124,7 @@ namespace SilverSim.Viewer.Core
                     return;
                 }
             }
-            if(item.AssetType != Types.Asset.AssetType.Object)
+            if(item.AssetType != AssetType.Object)
             {
                 SendAlertMessage("ALERT: InvalidObjectParams", m.CircuitSceneID);
                 return;
