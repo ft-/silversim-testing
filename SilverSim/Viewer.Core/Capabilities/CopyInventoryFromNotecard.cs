@@ -115,19 +115,40 @@ namespace SilverSim.Viewer.Core.Capabilities
             var destinationFolderID = reqmap["folder-id"].AsUUID;
             var callbackID = reqmap["callback-id"].AsUInt;
 
-            ObjectPart part;
-            ObjectPartInventoryItem item;
             Notecard nc = null;
             InventoryFolder destinationFolder = null;
             AssetData data;
+            AssetServiceInterface sourceAssetService = null;
 
-            if (m_Scene.Primitives.TryGetValue(objectID, out part) &&
-                part.Inventory.TryGetValue(itemID, out item) &&
-                item.InventoryType == InventoryType.Notecard &&
-                (destinationFolderID == UUID.Zero || m_Agent.InventoryService.Folder.TryGetValue(destinationFolderID, out destinationFolder)) &&
-                m_Scene.AssetService.TryGetValue(item.AssetID, out data))
+            if (objectID != null)
             {
-                nc = new Notecard(data);
+                ObjectPart part;
+                ObjectPartInventoryItem item;
+
+                sourceAssetService = m_Scene.AssetService;
+
+                if (m_Scene.Primitives.TryGetValue(objectID, out part) &&
+                    part.Inventory.TryGetValue(itemID, out item) &&
+                    item.InventoryType == InventoryType.Notecard &&
+                    (destinationFolderID == UUID.Zero || m_Agent.InventoryService.Folder.TryGetValue(destinationFolderID, out destinationFolder)) &&
+                    m_Scene.AssetService.TryGetValue(item.AssetID, out data))
+                {
+                    nc = new Notecard(data);
+                }
+            }
+            else
+            {
+                InventoryItem item;
+
+                sourceAssetService = m_Agent.AssetService;
+
+                if (m_Agent.InventoryService.Item.TryGetValue(m_Agent.ID, itemID, out item) &&
+                    item.InventoryType == InventoryType.Notecard &&
+                    (destinationFolderID == UUID.Zero || m_Agent.InventoryService.Folder.TryGetValue(destinationFolderID, out destinationFolder)) &&
+                    m_Agent.AssetService.TryGetValue(item.AssetID, out data))
+                {
+                    nc = new Notecard(data);
+                }
             }
 
             var transferItems = new List<UUID>();
@@ -163,10 +184,10 @@ namespace SilverSim.Viewer.Core.Capabilities
                         m_Log.WarnFormat("Failed to copy notecard inventory {0} to agent {1} ({2}): {3}: {4}\n{5}", ncitem.Name, m_Agent.Owner.FullName, m_Agent.ID, e.GetType().FullName, e.Message, e.StackTrace);
                     }
                 }
-            }
 
-            var transferItem = new NotecardAssetTransfer(m_Agent.AssetService, m_Scene.AssetService, transferItems);
-            ThreadPool.UnsafeQueueUserWorkItem(HandleAssetTransferWorkItem, transferItem);
+                var transferItem = new NotecardAssetTransfer(m_Agent.AssetService, sourceAssetService, transferItems);
+                ThreadPool.UnsafeQueueUserWorkItem(HandleAssetTransferWorkItem, transferItem);
+            }
 
             using (HttpResponse httpres = httpreq.BeginResponse())
             {
