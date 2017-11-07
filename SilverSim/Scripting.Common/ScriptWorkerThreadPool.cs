@@ -105,7 +105,7 @@ namespace SilverSim.Scripting.Common
                 ScriptEventsPerSec = TimeSource.NormalizedToEventsPerSeconds(newEvents - m_LastScriptEventCounter, deltaticks);
                 m_LastScriptEventTickCount = tickCount;
                 m_LastScriptEventCounter = newEvents;
-                long newaccum = m_ScriptRuntimeAccumulatingTickCount;
+                long newaccum = Interlocked.Read(ref m_ScriptRuntimeAccumulatingTickCount);
                 long totalscriptexec = newaccum - m_LastScriptRuntimeAccumulatingTickCount;
                 m_LastScriptRuntimeAccumulatingTickCount = newaccum;
 
