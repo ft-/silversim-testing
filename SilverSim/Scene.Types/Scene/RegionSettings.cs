@@ -77,6 +77,8 @@ namespace SilverSim.Scene.Types.Scene
             WalkableCoefficientsTerrain1 = new WalkingCoefficients(src.WalkableCoefficientsTerrain1);
             WalkableCoefficientsTerrain2 = new WalkingCoefficients(src.WalkableCoefficientsTerrain2);
             WalkableCoefficientsTerrain3 = new WalkingCoefficients(src.WalkableCoefficientsTerrain3);
+            ParcelClaimPrice = src.ParcelClaimPrice;
+            ParcelClaimFactor = src.ParcelClaimFactor;
         }
 
         public class WalkingCoefficients
@@ -191,6 +193,8 @@ namespace SilverSim.Scene.Types.Scene
         public bool AllowLandmark;
         public bool AllowDirectTeleport;
         public int MaxBasePrims = 45000;
+        public int ParcelClaimPrice = 1;
+        public double ParcelClaimFactor = 1;
         public readonly WalkingCoefficients WalkableCoefficientsUnderwater = new WalkingCoefficients { Avatar = 0, A = 0, B = 0, C = 0, D = 0 };
         public readonly WalkingCoefficients WalkableCoefficientsTerrain0 = new WalkingCoefficients();
         public readonly WalkingCoefficients WalkableCoefficientsTerrain1 = new WalkingCoefficients();

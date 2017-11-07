@@ -45,6 +45,7 @@ using System.IO;
 using SilverSim.ServiceInterfaces.Economy;
 using SilverSim.Types.Economy.Transactions;
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Agent;
 
 namespace SilverSim.Viewer.Parcel
 {
@@ -56,6 +57,16 @@ namespace SilverSim.Viewer.Parcel
 
         [PacketHandler(MessageType.ParcelInfoRequest)]
         [PacketHandler(MessageType.ParcelBuy)]
+        [PacketHandler(MessageType.ParcelGodForceOwner)]
+        [PacketHandler(MessageType.ParcelDeedToGroup)]
+        [PacketHandler(MessageType.ParcelGodMarkAsContent)]
+        [PacketHandler(MessageType.ParcelRelease)]
+        [PacketHandler(MessageType.ParcelJoin)]
+        [PacketHandler(MessageType.ParcelDivide)]
+        [PacketHandler(MessageType.ParcelReclaim)]
+        [PacketHandler(MessageType.ParcelSetOtherCleanTime)]
+        [PacketHandler(MessageType.ParcelPropertiesUpdate)]
+        [PacketHandler(MessageType.ParcelClaim)]
         private readonly BlockingQueue<KeyValuePair<AgentCircuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
 
         public ShutdownOrder ShutdownOrder => ShutdownOrder.LogoutRegion;
@@ -105,6 +116,42 @@ namespace SilverSim.Viewer.Parcel
 
                         case MessageType.ParcelBuy:
                             HandleParcelBuy(req.Key, scene, m);
+                            break;
+
+                        case MessageType.ParcelGodForceOwner:
+                            HandleParcelGodForceOwner(req.Key, scene, m);
+                            break;
+
+                        case MessageType.ParcelDeedToGroup:
+                            HandleParcelDeedToGroup(req.Key, scene, m);
+                            break;
+
+                        case MessageType.ParcelGodMarkAsContent:
+                            HandleParcelGodMarkAsContent(req.Key, scene, m);
+                            break;
+
+                        case MessageType.ParcelRelease:
+                            HandleParcelRelease(req.Key, scene, m);
+                            break;
+
+                        case MessageType.ParcelJoin:
+                            HandleParcelJoin(req.Key, scene, m);
+                            break;
+
+                        case MessageType.ParcelDivide:
+                            HandleParcelDivide(req.Key, scene, m);
+                            break;
+
+                        case MessageType.ParcelReclaim:
+                            HandleParcelReclaim(req.Key, scene, m);
+                            break;
+
+                        case MessageType.ParcelSetOtherCleanTime:
+                            HandleParcelSetOtherCleanTime(req.Key, scene, m);
+                            break;
+
+                        case MessageType.ParcelPropertiesUpdate:
+                            HandleParcelPropertiesUpdate(req.Key, scene, m);
                             break;
                     }
                 }
@@ -160,6 +207,299 @@ namespace SilverSim.Viewer.Parcel
             {
                 SendParcelInfo(circuit, location, scene.Name, pinfo);
             }
+        }
+
+        public void HandleParcelGodForceOwner(AgentCircuit circuit, SceneInterface scene, Message m)
+        {
+            var req = (ParcelGodForceOwner)m;
+            UUI agentID;
+            ParcelInfo pInfo;
+            IAgent godAgent = circuit.Agent;
+
+            if (req.CircuitSessionID != req.SessionID ||
+                req.CircuitAgentID != req.AgentID ||
+                req.OwnerID != req.AgentID ||
+                !scene.Agents.TryGetValue(req.AgentID, out godAgent) ||
+                !scene.AvatarNameService.TryGetValue(req.OwnerID, out agentID) ||
+                !scene.Parcels.TryGetValue(req.LocalID, out pInfo) ||
+                !godAgent.IsActiveGod ||
+                !godAgent.IsInScene(scene))
+            {
+                return;
+            }
+            m_Log.InfoFormat("Forced parcel {0} ({1}) to be owned by {2}", pInfo.Name, pInfo.ID, agentID.FullName);
+            pInfo.Group = UGI.Unknown;
+            pInfo.GroupOwned = false;
+            pInfo.ClaimDate = Date.Now;
+            pInfo.SalePrice = 0;
+            pInfo.AuthBuyer = UUI.Unknown;
+            pInfo.Owner = agentID;
+            pInfo.Flags &= ~(ParcelFlags.ForSale | ParcelFlags.ForSaleObjects | ParcelFlags.SellParcelObjects | ParcelFlags.ShowDirectory);
+            scene.TriggerParcelUpdate(pInfo);
+        }
+
+        public void HandleParcelDeedToGroup(AgentCircuit circuit, SceneInterface scene, Message m)
+        {
+            var req = (ParcelDeedToGroup)m;
+            if (req.AgentID != req.CircuitAgentID ||
+                req.SessionID != req.CircuitSessionID)
+            {
+                return;
+            }
+
+            IAgent agent = circuit.Agent;
+
+            ParcelInfo pInfo;
+            if (scene.Parcels.TryGetValue(req.LocalID, out pInfo) &&
+                scene.CanDeedParcel(agent.Owner, pInfo))
+            {
+                if (!pInfo.Group.Equals(UUI.Unknown))
+                {
+                    pInfo.GroupOwned = true;
+                }
+                scene.TriggerParcelUpdate(pInfo);
+            }
+        }
+
+        
+        public void HandleParcelGodMarkAsContent(AgentCircuit circuit, SceneInterface scene, Message m)
+        {
+            var req = (ParcelGodForceOwner)m;
+            if (req.AgentID != req.CircuitAgentID ||
+                req.SessionID != req.CircuitSessionID)
+            {
+                return;
+            }
+
+            IAgent agent = circuit.Agent;
+
+            ParcelInfo pInfo;
+            if (scene.Parcels.TryGetValue(req.LocalID, out pInfo) &&
+                scene.CanGodMarkParcelAsContent(agent.Owner, pInfo))
+            {
+                pInfo.Group = UGI.Unknown;
+                pInfo.GroupOwned = false;
+                pInfo.ClaimDate = Date.Now;
+                pInfo.SalePrice = 0;
+                pInfo.AuthBuyer = UUI.Unknown;
+                pInfo.Owner = scene.Owner;
+                pInfo.Flags &= ~(ParcelFlags.ForSale | ParcelFlags.ForSaleObjects | ParcelFlags.SellParcelObjects | ParcelFlags.ShowDirectory);
+                scene.TriggerParcelUpdate(pInfo);
+            }
+        }
+
+        
+        public void HandleParcelRelease(AgentCircuit circuit, SceneInterface scene, Message m)
+        {
+            var req = (ParcelRelease)m;
+            if (req.AgentID != req.CircuitAgentID ||
+                req.SessionID != req.CircuitSessionID)
+            {
+                return;
+            }
+
+            IAgent agent = circuit.Agent;
+
+            ParcelInfo pInfo;
+            if (scene.Parcels.TryGetValue(req.LocalID, out pInfo) &&
+                scene.CanReleaseParcel(agent.Owner, pInfo))
+            {
+                pInfo.Group = UGI.Unknown;
+                pInfo.GroupOwned = false;
+                pInfo.Owner = UUI.Unknown;
+                pInfo.SalePrice = 0;
+                pInfo.AuthBuyer = UUI.Unknown;
+                pInfo.Flags &= ~(ParcelFlags.ForSale | ParcelFlags.ForSaleObjects | ParcelFlags.SellParcelObjects | ParcelFlags.ShowDirectory);
+                scene.TriggerParcelUpdate(pInfo);
+            }
+        }
+        
+        public void HandleParcelJoin(AgentCircuit circuit, SceneInterface scene, Message m)
+        {
+            var req = (ParcelJoin)m;
+            if (req.AgentID != req.CircuitAgentID ||
+                req.SessionID != req.CircuitSessionID)
+            {
+                return;
+            }
+
+            IAgent agent = circuit.Agent;
+
+            scene.JoinParcels(agent.Owner, (int)Math.Round(req.West), (int)Math.Round(req.South), (int)Math.Round(req.East), (int)Math.Round(req.North));
+        }
+
+        public void HandleParcelDivide(AgentCircuit circuit, SceneInterface scene, Message m)
+        {
+            var req = (ParcelDivide)m;
+            if (req.AgentID != req.CircuitAgentID ||
+                req.SessionID != req.CircuitSessionID)
+            {
+                return;
+            }
+
+            IAgent agent = circuit.Agent;
+
+            scene.DivideParcel(agent.Owner, (int)Math.Round(req.West), (int)Math.Round(req.South), (int)Math.Round(req.East), (int)Math.Round(req.North));
+        }
+
+        public void HandleParcelReclaim(AgentCircuit circuit, SceneInterface scene, Message m)
+        {
+            var req = (ParcelReclaim)m;
+            if (req.AgentID != req.CircuitAgentID ||
+                req.SessionID != req.CircuitSessionID)
+            {
+                return;
+            }
+
+            IAgent agent = circuit.Agent;
+
+            ParcelInfo pInfo;
+            if (scene.Parcels.TryGetValue(req.LocalID, out pInfo) &&
+                scene.CanReclaimParcel(agent.Owner, pInfo))
+            {
+                pInfo.Group = UGI.Unknown;
+                pInfo.GroupOwned = false;
+                pInfo.ClaimDate = Date.Now;
+                pInfo.SalePrice = 0;
+                pInfo.AuthBuyer = UUI.Unknown;
+                pInfo.Owner = scene.Owner;
+                pInfo.Flags &= ~(ParcelFlags.ForSale | ParcelFlags.ForSaleObjects | ParcelFlags.SellParcelObjects | ParcelFlags.ShowDirectory);
+                scene.TriggerParcelUpdate(pInfo);
+            }
+        }
+
+        public void HandleParcelSetOtherCleanTime(AgentCircuit circuit, SceneInterface scene, Message m)
+        {
+            var req = (ParcelSetOtherCleanTime)m;
+            if (req.AgentID != req.CircuitAgentID ||
+                req.SessionID != req.CircuitSessionID)
+            {
+                return;
+            }
+
+            IAgent agent = circuit.Agent;
+            ParcelInfo pInfo;
+            if (scene.Parcels.TryGetValue(req.LocalID, out pInfo) &&
+                scene.CanEditParcelDetails(agent.Owner, pInfo))
+            {
+                pInfo.OtherCleanTime = req.OtherCleanTime;
+                scene.TriggerParcelUpdate(pInfo);
+            }
+        }
+
+        public void HandleParcelPropertiesUpdate(AgentCircuit circuit, SceneInterface scene, Message m)
+        {
+            var req = (ParcelPropertiesUpdate)m;
+            if (req.AgentID != req.CircuitAgentID ||
+                req.SessionID != req.CircuitSessionID)
+            {
+                return;
+            }
+
+            IAgent agent = circuit.Agent;
+
+            ParcelInfo pInfo;
+            if (scene.Parcels.TryGetValue(req.LocalID, out pInfo) &&
+                scene.CanEditParcelDetails(agent.Owner, pInfo))
+            {
+                pInfo.Flags = req.ParcelFlags;
+                pInfo.SalePrice = req.SalePrice;
+                pInfo.Name = req.Name;
+                pInfo.Description = req.Description;
+                pInfo.MusicURI = (req.MusicURL.Length != 0) && Uri.IsWellFormedUriString(req.MusicURL, UriKind.Absolute) ?
+                        new URI(req.MusicURL) : null;
+
+                pInfo.MediaURI = (req.MediaURL.Length != 0) && Uri.IsWellFormedUriString(req.MediaURL, UriKind.Absolute) ?
+                    new URI(req.MediaURL) : null;
+                pInfo.MediaAutoScale = req.MediaAutoScale;
+                UGI ugi;
+                if (req.GroupID == UUID.Zero)
+                {
+                    ugi = UGI.Unknown;
+                }
+                else if (scene.GroupsNameService.TryGetValue(req.GroupID, out ugi))
+                {
+                    pInfo.Group = ugi;
+                }
+                else
+                {
+                    pInfo.Group = UGI.Unknown;
+                }
+
+                pInfo.PassPrice = req.PassPrice;
+                pInfo.PassHours = req.PassHours;
+                pInfo.Category = req.Category;
+                if (req.AuthBuyerID == UUID.Zero ||
+                    !scene.AvatarNameService.TryGetValue(req.AuthBuyerID, out pInfo.AuthBuyer))
+                {
+                    pInfo.AuthBuyer = UUI.Unknown;
+                }
+
+                pInfo.SnapshotID = req.SnapshotID;
+                pInfo.LandingPosition = req.UserLocation;
+                pInfo.LandingLookAt = req.UserLookAt;
+                pInfo.LandingType = req.LandingType;
+                scene.TriggerParcelUpdate(pInfo);
+            }
+        }
+
+        private void HandleParcelClaim(AgentCircuit circuit, SceneInterface scene, Message m)
+        {
+            var req = (ParcelClaim)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+
+            ViewerAgent agent = circuit.Agent;
+
+            int totalPrice = 0;
+            foreach(ParcelClaim.ParcelDataEntry d in req.ParcelData)
+            {
+                if(!scene.IsParcelClaimable((int)Math.Round(d.West), (int)Math.Round(d.South), (int)Math.Round(d.East), (int)Math.Round(d.North)))
+                {
+                    return;
+                }
+                totalPrice += CalculateClaimPrice(d);
+            }
+
+            int parcelClaimPrice = scene.RegionSettings.ParcelClaimPrice;
+            double parcelClaimFactor = scene.RegionSettings.ParcelClaimFactor;
+
+            totalPrice = (int)Math.Ceiling(totalPrice * parcelClaimPrice * parcelClaimFactor);
+            EconomyServiceInterface economyService = agent.EconomyService;
+            
+            if(totalPrice == 0)
+            {
+                foreach (ParcelClaim.ParcelDataEntry d in req.ParcelData)
+                {
+                    scene.ClaimParcel(agent.Owner, (int)Math.Round(d.West), (int)Math.Round(d.South), (int)Math.Round(d.East), (int)Math.Round(d.North),
+                        CalculateClaimPrice(d));
+                }
+            }
+            else if(economyService != null)
+            {
+                economyService.ChargeAmount(agent.Owner, new LandClaimTransaction(scene.GridPosition, scene.ID, scene.Name), totalPrice, () =>
+                {
+                    foreach (ParcelClaim.ParcelDataEntry d in req.ParcelData)
+                    {
+                        scene.ClaimParcel(agent.Owner, (int)Math.Round(d.West), (int)Math.Round(d.South), (int)Math.Round(d.East), (int)Math.Round(d.North),
+                            CalculateClaimPrice(d));
+                    }
+                });
+            }
+        }
+
+        int CalculateClaimPrice(ParcelClaim.ParcelDataEntry d)
+        {
+            int w = (int)d.West & ~3;
+            int e = (int)d.East & ~3;
+            int n = (int)d.North & ~3;
+            int s = (int)d.South & ~3;
+            int dx = Math.Abs(w - e);
+            int dy = Math.Abs(n - s);
+            return dx * dy;
         }
 
         private void HandleParcelBuy(AgentCircuit circuit, SceneInterface scene, Message m)

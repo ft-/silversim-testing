@@ -422,278 +422,6 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        [PacketHandler(MessageType.ParcelGodForceOwner)]
-        public void HandleParcelGodForceOwner(Message m)
-        {
-            var req = (ParcelGodForceOwner)m;
-            UUI agentID;
-            ParcelInfo pInfo;
-            IAgent godAgent;
-            if(req.CircuitSessionID != req.SessionID ||
-                req.CircuitAgentID != req.AgentID ||
-                req.OwnerID != req.AgentID ||
-                !Agents.TryGetValue(req.AgentID, out godAgent) ||
-                !AvatarNameService.TryGetValue(req.OwnerID, out agentID) ||
-                !Parcels.TryGetValue(req.LocalID, out pInfo) ||
-                !godAgent.IsActiveGod ||
-                !godAgent.IsInScene(this))
-            {
-                return;
-            }
-            m_Log.InfoFormat("Forced parcel {0} ({1}) to be owned by {2}", pInfo.Name, pInfo.ID, agentID.FullName);
-            pInfo.Group = UGI.Unknown;
-            pInfo.GroupOwned = false;
-            pInfo.ClaimDate = Date.Now;
-            pInfo.SalePrice = 0;
-            pInfo.AuthBuyer = UUI.Unknown;
-            pInfo.Owner = agentID;
-            pInfo.Flags &= ~(ParcelFlags.ForSale | ParcelFlags.ForSaleObjects | ParcelFlags.SellParcelObjects | ParcelFlags.ShowDirectory);
-            TriggerParcelUpdate(pInfo);
-        }
-
-        [PacketHandler(MessageType.ParcelDeedToGroup)]
-        public void HandleParcelDeedToGroup(Message m)
-        {
-            var req = (ParcelDeedToGroup)m;
-            if (req.AgentID != req.CircuitAgentID ||
-                req.SessionID != req.CircuitSessionID)
-            {
-                return;
-            }
-
-            IAgent agent;
-            if (!Agents.TryGetValue(req.AgentID, out agent))
-            {
-                return;
-            }
-
-            ParcelInfo pInfo;
-            if (Parcels.TryGetValue(req.LocalID, out pInfo) &&
-                CanDeedParcel(agent.Owner, pInfo))
-            {
-                if (!pInfo.Group.Equals(UUI.Unknown))
-                {
-                    pInfo.GroupOwned = true;
-                }
-                TriggerParcelUpdate(pInfo);
-            }
-        }
-
-        [PacketHandler(MessageType.ParcelGodMarkAsContent)]
-        public void HandleParcelGodMarkAsContent(Message m)
-        {
-            var req = (ParcelGodForceOwner)m;
-            if (req.AgentID != req.CircuitAgentID ||
-                req.SessionID != req.CircuitSessionID)
-            {
-                return;
-            }
-
-            IAgent agent;
-            if (!Agents.TryGetValue(req.AgentID, out agent))
-            {
-                return;
-            }
-
-            ParcelInfo pInfo;
-            if (Parcels.TryGetValue(req.LocalID, out pInfo) &&
-                CanGodMarkParcelAsContent(agent.Owner, pInfo))
-            {
-                pInfo.Group = UGI.Unknown;
-                pInfo.GroupOwned = false;
-                pInfo.ClaimDate = Date.Now;
-                pInfo.SalePrice = 0;
-                pInfo.AuthBuyer = UUI.Unknown;
-                pInfo.Owner = Owner;
-                pInfo.Flags &= ~(ParcelFlags.ForSale | ParcelFlags.ForSaleObjects | ParcelFlags.SellParcelObjects | ParcelFlags.ShowDirectory);
-                TriggerParcelUpdate(pInfo);
-            }
-        }
-
-        [PacketHandler(MessageType.ParcelRelease)]
-        public void HandleParcelRelease(Message m)
-        {
-            var req = (ParcelRelease)m;
-            if (req.AgentID != req.CircuitAgentID ||
-                req.SessionID != req.CircuitSessionID)
-            {
-                return;
-            }
-
-            IAgent agent;
-            if (!Agents.TryGetValue(req.AgentID, out agent))
-            {
-                return;
-            }
-
-            ParcelInfo pInfo;
-            if (Parcels.TryGetValue(req.LocalID, out pInfo) &&
-                CanReleaseParcel(agent.Owner, pInfo))
-            {
-                pInfo.Group = UGI.Unknown;
-                pInfo.GroupOwned = false;
-                pInfo.Owner = UUI.Unknown;
-                pInfo.SalePrice = 0;
-                pInfo.AuthBuyer = UUI.Unknown;
-                pInfo.Flags &= ~(ParcelFlags.ForSale | ParcelFlags.ForSaleObjects | ParcelFlags.SellParcelObjects | ParcelFlags.ShowDirectory);
-                TriggerParcelUpdate(pInfo);
-            }
-        }
-
-        [PacketHandler(MessageType.ParcelJoin)]
-        public void HandleParcelJoin(Message m)
-        {
-            var req = (ParcelJoin)m;
-            if (req.AgentID != req.CircuitAgentID ||
-                req.SessionID != req.CircuitSessionID)
-            {
-                return;
-            }
-
-            IAgent agent;
-            if (!Agents.TryGetValue(req.AgentID, out agent))
-            {
-                return;
-            }
-
-            JoinParcels(agent.Owner, (int)Math.Round(req.West), (int)Math.Round(req.South), (int)Math.Round(req.East), (int)Math.Round(req.North));
-        }
-
-        [PacketHandler(MessageType.ParcelDivide)]
-        public void HandleParcelDivide(Message m)
-        {
-            var req = (ParcelDivide)m;
-            if (req.AgentID != req.CircuitAgentID ||
-                req.SessionID != req.CircuitSessionID)
-            {
-                return;
-            }
-
-            IAgent agent;
-            if (!Agents.TryGetValue(req.AgentID, out agent))
-            {
-                return;
-            }
-
-            DivideParcel(agent.Owner, (int)Math.Round(req.West), (int)Math.Round(req.South), (int)Math.Round(req.East), (int)Math.Round(req.North));
-        }
-
-        [PacketHandler(MessageType.ParcelReclaim)]
-        public void HandleParcelReclaim(Message m)
-        {
-            var req = (ParcelReclaim)m;
-            if (req.AgentID != req.CircuitAgentID ||
-                req.SessionID != req.CircuitSessionID)
-            {
-                return;
-            }
-
-            IAgent agent;
-            if (!Agents.TryGetValue(req.AgentID, out agent))
-            {
-                return;
-            }
-
-            ParcelInfo pInfo;
-            if (Parcels.TryGetValue(req.LocalID, out pInfo) &&
-                CanReclaimParcel(agent.Owner, pInfo))
-            {
-                pInfo.Group = UGI.Unknown;
-                pInfo.GroupOwned = false;
-                pInfo.ClaimDate = Date.Now;
-                pInfo.SalePrice = 0;
-                pInfo.AuthBuyer = UUI.Unknown;
-                pInfo.Owner = Owner;
-                pInfo.Flags &= ~(ParcelFlags.ForSale | ParcelFlags.ForSaleObjects | ParcelFlags.SellParcelObjects | ParcelFlags.ShowDirectory);
-                TriggerParcelUpdate(pInfo);
-            }
-        }
-
-        [PacketHandler(MessageType.ParcelSetOtherCleanTime)]
-        public void HandleParcelSetOtherCleanTime(Message m)
-        {
-            var req = (ParcelSetOtherCleanTime)m;
-            if (req.AgentID != req.CircuitAgentID ||
-                req.SessionID != req.CircuitSessionID)
-            {
-                return;
-            }
-
-            IAgent agent;
-            if (!Agents.TryGetValue(req.AgentID, out agent))
-            {
-                return;
-            }
-            ParcelInfo pInfo;
-            if (Parcels.TryGetValue(req.LocalID, out pInfo) &&
-                CanEditParcelDetails(agent.Owner, pInfo))
-            {
-                pInfo.OtherCleanTime = req.OtherCleanTime;
-                TriggerParcelUpdate(pInfo);
-            }
-        }
-
-        [PacketHandler(MessageType.ParcelPropertiesUpdate)]
-        public void HandleParcelPropertiesUpdate(Message m)
-        {
-            var req = (ParcelPropertiesUpdate)m;
-            if (req.AgentID != req.CircuitAgentID ||
-                req.SessionID != req.CircuitSessionID)
-            {
-                return;
-            }
-
-            IAgent agent;
-            if (!Agents.TryGetValue(req.AgentID, out agent))
-            {
-                return;
-            }
-
-            ParcelInfo pInfo;
-            if (Parcels.TryGetValue(req.LocalID, out pInfo) &&
-                CanEditParcelDetails(agent.Owner, pInfo))
-            {
-                pInfo.Flags = req.ParcelFlags;
-                pInfo.SalePrice = req.SalePrice;
-                pInfo.Name = req.Name;
-                pInfo.Description = req.Description;
-                pInfo.MusicURI = (req.MusicURL.Length != 0) && Uri.IsWellFormedUriString(req.MusicURL, UriKind.Absolute) ?
-                        new URI(req.MusicURL) : null;
-
-                pInfo.MediaURI = (req.MediaURL.Length != 0) && Uri.IsWellFormedUriString(req.MediaURL, UriKind.Absolute) ?
-                    new URI(req.MediaURL) : null;
-                pInfo.MediaAutoScale = req.MediaAutoScale;
-                UGI ugi;
-                if (req.GroupID == UUID.Zero)
-                {
-                    ugi = UGI.Unknown;
-                }
-                else if (GroupsNameService.TryGetValue(req.GroupID, out ugi))
-                {
-                    pInfo.Group = ugi;
-                }
-                else
-                {
-                    pInfo.Group = UGI.Unknown;
-                }
-
-                pInfo.PassPrice = req.PassPrice;
-                pInfo.PassHours = req.PassHours;
-                pInfo.Category = req.Category;
-                if (req.AuthBuyerID == UUID.Zero ||
-                    !AvatarNameService.TryGetValue(req.AuthBuyerID, out pInfo.AuthBuyer))
-                {
-                    pInfo.AuthBuyer = UUI.Unknown;
-                }
-
-                pInfo.SnapshotID = req.SnapshotID;
-                pInfo.LandingPosition = req.UserLocation;
-                pInfo.LandingLookAt = req.UserLookAt;
-                pInfo.LandingType = req.LandingType;
-                TriggerParcelUpdate(pInfo);
-            }
-        }
-
         [PacketHandler(MessageType.ParcelDwellRequest)]
         public void HandleParcelDwellRequest(Message m)
         {
@@ -809,6 +537,99 @@ namespace SilverSim.Scene.Types.Scene
 
             var newParcel = new ParcelInfo(pInfo, true);
             newParcel.ID = UUID.Random;
+            Parcels.Add(newParcel);
+            ParcelInfo.ParcelDataLandBitmap newBmap = newParcel.LandBitmap;
+            for (int py = start_y; py < end_y; ++py)
+            {
+                for (int px = start_x; px < end_x; ++px)
+                {
+                    newBmap[px, py] = true;
+                    bmap[px, py] = false;
+                }
+            }
+            TriggerParcelUpdate(pInfo);
+            TriggerParcelUpdate(newParcel);
+            return true;
+        }
+
+        public bool IsParcelClaimable(int start_x, int start_y, int end_x, int end_y)
+        {
+            ParcelInfo pInfo;
+            if (!Parcels.TryGetValue(new Vector3(start_x, start_y, 0), out pInfo))
+            {
+                return false;
+            }
+
+            ParcelInfo.ParcelDataLandBitmap bmap = pInfo.LandBitmap;
+            if (!bmap[start_x, end_y - 1] || !bmap[end_x - 1, start_x] || !bmap[end_x - 1, end_y - 1])
+            {
+                /* not dividable */
+                return false;
+            }
+
+            start_x &= (~3);
+            start_y &= (~3);
+            end_x &= (~3);
+            end_y &= (~3);
+            for (int py = start_y; py < end_y; py += 4)
+            {
+                for (int px = start_x; px < end_x; px += 4)
+                {
+                    if (!bmap[px, py])
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        public bool ClaimParcel(UUI requestingAgent, int start_x, int start_y, int end_x, int end_y, int soldforprice)
+        {
+            ParcelInfo pInfo;
+            if (!Parcels.TryGetValue(new Vector3(start_x, start_y, 0), out pInfo))
+            {
+                return false;
+            }
+            ParcelInfo.ParcelDataLandBitmap bmap = pInfo.LandBitmap;
+            if (!bmap[start_x, end_y - 1] || !bmap[end_x - 1, start_x] || !bmap[end_x - 1, end_y - 1])
+            {
+                /* not dividable */
+                return false;
+            }
+
+            start_x &= (~3);
+            start_y &= (~3);
+            end_x &= (~3);
+            end_y &= (~3);
+            for (int py = start_y; py < end_y; py += 4)
+            {
+                for (int px = start_x; px < end_x; px += 4)
+                {
+                    if (!bmap[px, py])
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            if (!pInfo.Owner.EqualsGrid(UUI.Unknown))
+            {
+                return false;
+            }
+
+            var newParcel = new ParcelInfo(pInfo, true);
+            newParcel.ID = UUID.Random;
+            newParcel.Owner = requestingAgent;
+            newParcel.Group = UGI.Unknown;
+            newParcel.GroupOwned = false;
+            newParcel.ClaimDate = Date.Now;
+            newParcel.ClaimPrice = soldforprice;
+            newParcel.SalePrice = 0;
+            newParcel.AuthBuyer = UUI.Unknown;
+            newParcel.Flags &= ~(ParcelFlags.ForSale | ParcelFlags.ForSaleObjects | ParcelFlags.SellParcelObjects | ParcelFlags.ShowDirectory);
+
             Parcels.Add(newParcel);
             ParcelInfo.ParcelDataLandBitmap newBmap = newParcel.LandBitmap;
             for (int py = start_y; py < end_y; ++py)
