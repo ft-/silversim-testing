@@ -550,6 +550,28 @@ namespace SilverSim.Viewer.Core
             SendMessageAlways(req, m_CurrentSceneID);
         }
 
+        [PacketHandler(MessageType.GodKickUser)]
+        public void HandleGodKickUser(Message m)
+        {
+            var req = (GodKickUser)m;
+            if(req.GodID != req.CircuitAgentID ||
+                req.GodSessionID != req.CircuitSessionID)
+            {
+                return;
+            }
+
+            SceneInterface scene = Circuits[req.CircuitSceneID].Scene;
+
+            if (IsActiveGod && IsInScene(scene))
+            {
+                IAgent targetAgent;
+                if(scene.Agents.TryGetValue(req.AgentID, out targetAgent))
+                {
+                    targetAgent.KickUser(req.Reason);
+                }
+            }
+        }
+
         public override bool TeleportTo(SceneInterface sceneInterface, string regionName, Vector3 position, Vector3 lookAt, TeleportFlags flags)
         {
             foreach(var service in m_TeleportServices)
