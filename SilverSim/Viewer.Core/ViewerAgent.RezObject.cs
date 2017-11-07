@@ -178,6 +178,46 @@ namespace SilverSim.Viewer.Core
             wi.ProcessAssetTransfer();
         }
 
+        [PacketHandler(MessageType.ObjectDuplicateOnRay)]
+        public void HandleObjectDuplicateOnRay(Message m)
+        {
+            var req = (Messages.Object.ObjectDuplicateOnRay)m;
+            if (req.AgentID != req.CircuitAgentID || req.SessionID != req.CircuitSessionID)
+            {
+                return;
+            }
+
+            SceneInterface scene = Circuits[m.CircuitSceneID].Scene;
+
+            var objgroups = new List<ObjectGroup>();
+            foreach(uint localid in req.ObjectLocalIDs)
+            {
+                ObjectPart part;
+                if(scene.Primitives.TryGetValue(localid, out part))
+                {
+                    objgroups.Add(new ObjectGroup(part.ObjectGroup));
+                }
+            }
+
+            var rezparams = new SceneInterface.RezObjectParams
+            {
+                RayStart = req.RayStart,
+                RayEnd = req.RayEnd,
+                RayTargetID = req.RayTargetID,
+                RayEndIsIntersection = req.RayEndIsIntersection,
+                RezSelected = false,
+                RemoveItem = false,
+                Scale = Vector3.One,
+                Rotation = Quaternion.Identity,
+                ItemFlags = 0,
+                GroupMask = 0,
+                EveryoneMask = 0,
+                NextOwnerMask = 0
+            };
+
+            scene.RezObjects(objgroups, rezparams);
+        }
+
         [PacketHandler(MessageType.RezObjectFromNotecard)]
         public void HandleRezObjectFromNotecard(Message m)
         {
