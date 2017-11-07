@@ -19,13 +19,16 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Transfer;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
+using SilverSim.Types.Asset.Format;
 using SilverSim.Types.Inventory;
 using SilverSim.Viewer.Messages;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace SilverSim.Viewer.Core
@@ -36,6 +39,11 @@ namespace SilverSim.Viewer.Core
         {
             public AgentRezObjectHandler(SceneInterface scene, Vector3 targetpos, UUID assetid, AssetServiceInterface source, UUI rezzingagent, SceneInterface.RezObjectParams rezparams, InventoryPermissionsMask itemOwnerPermissions = InventoryPermissionsMask.Every)
                 : base(scene, targetpos, assetid, source, rezzingagent, rezparams, itemOwnerPermissions)
+            {
+            }
+
+            public AgentRezObjectHandler(SceneInterface scene, Vector3 targetpos, List<UUID> assetids, AssetServiceInterface source, UUI rezzingagent, SceneInterface.RezObjectParams rezparams, InventoryPermissionsMask itemOwnerPermissions = InventoryPermissionsMask.Every)
+                : base(scene, targetpos, assetids, source, rezzingagent, rezparams, itemOwnerPermissions)
             {
             }
         }
@@ -178,6 +186,110 @@ namespace SilverSim.Viewer.Core
             {
                 return;
             }
+
+            SceneInterface scene = Circuits[m.CircuitSceneID].Scene;
+            ObjectPart part;
+            Notecard nc;
+            AssetData data;
+
+            if (req.NotecardData.ObjectID == UUID.Zero)
+            {
+                /* from inventory */
+                InventoryItem item;
+
+                if (!InventoryService.Item.TryGetValue(req.AgentID, req.NotecardData.NotecardItemID, out item))
+                {
+                    return;
+                }
+
+                if (item.AssetType != AssetType.Notecard)
+                {
+                    return;
+                }
+
+                if (!AssetService.TryGetValue(item.AssetID, out data))
+                {
+                    return;
+                }
+
+                try
+                {
+                    nc = new Notecard(data);
+                }
+                catch
+                {
+                    return;
+                }
+            }
+            else if(scene.Primitives.TryGetValue(req.NotecardData.ObjectID, out part))
+            {
+                /* from object */
+                ObjectPartInventoryItem item;
+                if(!part.Inventory.TryGetValue(req.NotecardData.NotecardItemID, out item))
+                {
+                    return;
+                }
+
+                if (item.AssetType != AssetType.Notecard)
+                {
+                    return;
+                }
+
+
+                if (!scene.AssetService.TryGetValue(item.AssetID, out data))
+                {
+                    return;
+                }
+
+                try
+                {
+                    nc = new Notecard(data);
+                }
+                catch
+                {
+                    return;
+                }
+            }
+            else
+            {
+                return;
+            }
+
+            var assetids = new List<UUID>();
+
+            foreach(UUID itemid in req.InventoryData)
+            {
+                NotecardInventoryItem item;
+                if(nc.Inventory.TryGetValue(itemid, out item) && item.AssetType == AssetType.Object)
+                {
+                    assetids.Add(item.AssetID);
+                }
+            }
+
+            var rezparams = new SceneInterface.RezObjectParams
+            {
+                RayStart = req.RezData.RayStart,
+                RayEnd = req.RezData.RayEnd,
+                RayTargetID = req.RezData.RayTargetID,
+                RayEndIsIntersection = req.RezData.RayEndIsIntersection,
+                RezSelected = req.RezData.RezSelected,
+                RemoveItem = req.RezData.RemoveItem,
+                Scale = Vector3.One,
+                Rotation = Quaternion.Identity,
+                ItemFlags = req.RezData.ItemFlags,
+                GroupMask = req.RezData.GroupMask,
+                EveryoneMask = req.RezData.EveryoneMask,
+                NextOwnerMask = req.RezData.NextOwnerMask
+            };
+            var rezHandler = new AgentRezObjectHandler(
+                Circuits[m.CircuitSceneID].Scene,
+                rezparams.RayEnd,
+                assetids,
+                AssetService,
+                Owner,
+                rezparams);
+
+            ThreadPool.UnsafeQueueUserWorkItem(HandleAssetTransferWorkItem, rezHandler);
         }
     }
 }
