@@ -34,3 +34,4 @@ ExpectingARotationParameterFor0Got1=Expecting a rotation parameter for {0}: got 
 ExpectingAVectorParameterFor0Got1=Expecting a vector parameter for {0}: got {1}
 UnableToBuyInsufficientFunds=Unable to buy. Insufficient funds.
 UnableToBuyNoEconomyConfigured=Unable to buy. No economy configured.
+YouHaveBeenKickedFromParcel=You have been kicked from parcel.

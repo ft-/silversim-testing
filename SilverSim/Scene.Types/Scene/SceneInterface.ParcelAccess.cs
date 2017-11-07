@@ -26,12 +26,64 @@ using SilverSim.Types.Economy.Transactions;
 using SilverSim.Types.Parcel;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Parcel;
+using SilverSim.Viewer.Messages.User;
 using System;
 
 namespace SilverSim.Scene.Types.Scene
 {
     public partial class SceneInterface
     {
+        public bool CanEjectFromParcel(UUI requestingAgent, Vector3 position, out ParcelInfo pInfo)
+        {
+            if (Parcels.TryGetValue(position, out pInfo))
+            {
+                if(!pInfo.GroupOwned && pInfo.Owner.EqualsGrid(requestingAgent))
+                {
+                    return true;
+                }
+
+                if(pInfo.GroupOwned && HasGroupPower(requestingAgent, pInfo.Group, SilverSim.Types.Groups.GroupPowers.LandEjectAndFreeze))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        [PacketHandler(MessageType.EjectUser)]
+        public void HandleEjectUser(Message m)
+        {
+            var p = (EjectUser)m;
+            if (p.CircuitAgentID != p.AgentID ||
+                p.CircuitSessionID != p.SessionID)
+            {
+                return;
+            }
+
+            IAgent agent;
+            if (!Agents.TryGetValue(p.AgentID, out agent))
+            {
+                return;
+            }
+
+            IAgent targetAgent;
+            if(!Agents.TryGetValue(p.TargetID, out targetAgent))
+            {
+                return;
+            }
+            ParcelInfo pInfo;
+            UUI targetId = targetAgent.Owner;
+            if(CanEjectFromParcel(agent.Owner, targetAgent.GlobalPosition, out pInfo))
+            {
+                EjectFromParcel(targetAgent.ID, pInfo.ID);
+
+                if((p.Flags & EjectUserFlags.AddBan) != 0)
+                {
+                    Parcels.BlackList.Store(new ParcelAccessEntry { Accessor = targetId, ParcelID = pInfo.ID, RegionID = ID });
+                }
+            }
+        }
+
         [PacketHandler(MessageType.ParcelBuyPass)]
         public void HandleBuyPass(Message m)
         {
@@ -82,7 +134,24 @@ namespace SilverSim.Scene.Types.Scene
 
         public void EjectFromParcel(UUID agentID, UUID parcelID)
         {
-
+            IAgent agent;
+            ParcelInfo parcelInfo;
+            if(RootAgents.TryGetValue(agentID, out agent) &&
+                Parcels.TryGetValue(parcelID, out parcelInfo) &&
+                parcelInfo.LandBitmap.ContainsLocation(agent.GlobalPosition))
+            {
+                ParcelInfo newParcel;
+                Vector3 newPosition;
+                if(TryGetNearestAccessibleParcel(agent, agent.GlobalPosition, out newParcel, out newPosition))
+                {
+                    agent.UnSit();
+                    agent.GlobalPosition = newPosition;
+                }
+                else if(!agent.TeleportHome(this))
+                {
+                    agent.KickUser(typeof(SceneInterface).GetLanguageString(agent.CurrentCulture, "YouHaveBeenKickedFromParcel", "You have been kicked from parcel."));
+                }
+            }
         }
     }
 }

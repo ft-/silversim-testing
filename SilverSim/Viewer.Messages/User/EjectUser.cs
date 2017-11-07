@@ -24,6 +24,12 @@ using System;
 
 namespace SilverSim.Viewer.Messages.User
 {
+    public enum EjectUserFlags : uint
+    {
+        None = 0,
+        AddBan = 1
+    }
+
     [UDPMessage(MessageType.EjectUser)]
     [Reliable]
     [NotTrusted]
@@ -32,14 +38,14 @@ namespace SilverSim.Viewer.Messages.User
         public UUID AgentID = UUID.Zero;
         public UUID SessionID = UUID.Zero;
         public UUID TargetID = UUID.Zero;
-        public UInt32 Flags;
+        public EjectUserFlags Flags;
 
         public static Message Decode(UDPPacket p) => new EjectUser
         {
             AgentID = p.ReadUUID(),
             SessionID = p.ReadUUID(),
             TargetID = p.ReadUUID(),
-            Flags = p.ReadUInt32()
+            Flags = (EjectUserFlags)p.ReadUInt32()
         };
 
         public override void Serialize(UDPPacket p)
@@ -47,7 +53,7 @@ namespace SilverSim.Viewer.Messages.User
             p.WriteUUID(AgentID);
             p.WriteUUID(SessionID);
             p.WriteUUID(TargetID);
-            p.WriteUInt32(Flags);
+            p.WriteUInt32((uint)Flags);
         }
     }
 }

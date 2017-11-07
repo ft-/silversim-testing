@@ -34,3 +34,4 @@ ExpectingARotationParameterFor0Got1=Es wird ein rotation-Parameter für {0} erwa
 ExpectingAVectorParameterFor0Got1=Es wird ein vector-Parameter für {0} erwartet: vorgefunden {1}
 UnableToBuyInsufficientFunds=Kaufen nicht möglich. Vorhandenes Geld reicht nicht aus.
 UnableToBuyNoEconomyConfigured=Kaufen nicht möglich. Keine Währung konfiguriert.
+YouHaveBeenKickedFromParcel=Du wurdest aus der Parzelle geworfen.
