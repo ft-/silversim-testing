@@ -908,16 +908,22 @@ namespace SilverSim.Viewer.Core
         protected override void LogMsgOnLogoutCompletion()
         {
             m_Log.InfoFormat("Logout of agent {0} completed", Agent.ID);
+            Agent.EconomyService?.Logout(Agent.Owner, Agent.Session.SessionID, Agent.Session.SecureSessionID);
+            Agent.DetachAllAttachments();
         }
 
         protected override void LogMsgOnTimeout()
         {
             m_Log.InfoFormat("Packet Timeout for agent {0} {1} ({2}) timed out", Agent.FirstName, Agent.LastName, Agent.ID);
+            Agent.EconomyService?.Logout(Agent.Owner, Agent.Session.SessionID, Agent.Session.SecureSessionID);
+            Agent.DetachAllAttachments();
         }
 
         protected override void LogMsgLogoutReply()
         {
             m_Log.InfoFormat("LogoutReply for agent {0} {1} ({2}) timed out", Agent.FirstName, Agent.LastName, Agent.ID);
+            Agent.EconomyService?.Logout(Agent.Owner, Agent.Session.SessionID, Agent.Session.SecureSessionID);
+            Agent.DetachAllAttachments();
         }
 
         [PacketHandler(MessageType.AgentResume)]

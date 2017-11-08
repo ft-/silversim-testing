@@ -708,8 +708,6 @@ namespace SilverSim.Viewer.Core
             OnPositionChange -= ChildUpdateOnPositionChange;
             lock (m_DataLock)
             {
-                DetachAllAttachments();
-                EconomyService?.Logout(Owner, SessionID, m_SecureSessionID);
                 m_AssetService = null;
                 m_InventoryService = null;
                 m_GroupsService = null;
