@@ -905,25 +905,35 @@ namespace SilverSim.Viewer.Core
             Scene = null;
         }
 
+        private void HandleTermination()
+        {
+            try
+            {
+                Agent.EconomyService?.Logout(Agent.Owner, Agent.Session.SessionID, Agent.Session.SecureSessionID);
+            }
+            catch (Exception e)
+            {
+                m_Log.Warn("Contacting economy service failed", e);
+            }
+            Agent.DetachAllAttachments();
+        }
+
         protected override void LogMsgOnLogoutCompletion()
         {
             m_Log.InfoFormat("Logout of agent {0} completed", Agent.ID);
-            Agent.EconomyService?.Logout(Agent.Owner, Agent.Session.SessionID, Agent.Session.SecureSessionID);
-            Agent.DetachAllAttachments();
+            HandleTermination();
         }
 
         protected override void LogMsgOnTimeout()
         {
             m_Log.InfoFormat("Packet Timeout for agent {0} {1} ({2}) timed out", Agent.FirstName, Agent.LastName, Agent.ID);
-            Agent.EconomyService?.Logout(Agent.Owner, Agent.Session.SessionID, Agent.Session.SecureSessionID);
-            Agent.DetachAllAttachments();
+            HandleTermination();
         }
 
         protected override void LogMsgLogoutReply()
         {
             m_Log.InfoFormat("LogoutReply for agent {0} {1} ({2}) timed out", Agent.FirstName, Agent.LastName, Agent.ID);
-            Agent.EconomyService?.Logout(Agent.Owner, Agent.Session.SessionID, Agent.Session.SecureSessionID);
-            Agent.DetachAllAttachments();
+            HandleTermination();
         }
 
         [PacketHandler(MessageType.AgentResume)]
