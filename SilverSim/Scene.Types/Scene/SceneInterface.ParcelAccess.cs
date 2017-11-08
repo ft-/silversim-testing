@@ -121,15 +121,30 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             var extendSeconds = (ulong)TimeSpan.FromHours(passHours).Seconds;
-            economyService.TransferMoney(agent.Owner, parcelInfo.Owner, new LandpassSaleTransaction(
-                GridPosition,
-                ID,
-                Name)
+            if (parcelInfo.GroupOwned)
             {
-                ParcelID = parcelInfo.ID,
-                ParcelName = parcelInfo.Name,
-                PassHours = passHours
-            }, passPrice, () => Parcels.LandpassList.ExtendExpiry(ID, parcelInfo.ID, agent.Owner, extendSeconds));
+                economyService.TransferMoney(agent.Owner, parcelInfo.Group, new LandpassSaleTransaction(
+                    GridPosition,
+                    ID,
+                    Name)
+                {
+                    ParcelID = parcelInfo.ID,
+                    ParcelName = parcelInfo.Name,
+                    PassHours = passHours
+                }, passPrice, () => Parcels.LandpassList.ExtendExpiry(ID, parcelInfo.ID, agent.Owner, extendSeconds));
+            }
+            else
+            {
+                economyService.TransferMoney(agent.Owner, parcelInfo.Owner, new LandpassSaleTransaction(
+                    GridPosition,
+                    ID,
+                    Name)
+                {
+                    ParcelID = parcelInfo.ID,
+                    ParcelName = parcelInfo.Name,
+                    PassHours = passHours
+                }, passPrice, () => Parcels.LandpassList.ExtendExpiry(ID, parcelInfo.ID, agent.Owner, extendSeconds));
+            }
         }
 
         public void EjectFromParcel(UUID agentID, UUID parcelID)
