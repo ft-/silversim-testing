@@ -291,7 +291,12 @@ namespace SilverSim.Types.StructuredData.Llsd
                     }
                     {
                         Real r_val;
-                        if(!Real.TryParse(GetTextNode(input), out r_val))
+                        string r_input = GetTextNode(input);
+                        if(r_input == "nan")
+                        {
+                            return new Real(double.NaN);
+                        }
+                        if(!Real.TryParse(r_input, out r_val))
                         {
                             throw new InvalidLlsdXmlSerializationException();
                         }
