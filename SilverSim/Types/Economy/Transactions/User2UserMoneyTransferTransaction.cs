@@ -30,6 +30,6 @@ namespace SilverSim.Types.Economy.Transactions
         {
         }
 
-        public override int TransactionType => 5011;
+        public override int TransactionType => 5001;
     }
 }
