@@ -20,13 +20,12 @@
 // exception statement from your version.
 
 using SilverSim.Types;
-using System.Collections.Generic;
 
 namespace SilverSim.ServiceInterfaces.Friends
 {
-    public interface IFriendsStatusNotifyServiceInterface
+    public interface IFriendsStatusNotifer
     {
-        void NotifyAsOnline(UUI notifier, List<KeyValuePair<UUI, string>> list);
-        void NotifyAsOffline(UUI notifier, List<KeyValuePair<UUI, string>> list);
+        void NotifyAsOnline(UUI notifier);
+        void NotifyAsOffline(UUI notifier);
     }
 }

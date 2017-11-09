@@ -19,14 +19,8 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.Types;
-using System.Collections.Generic;
+using System.Reflection;
 
-namespace SilverSim.ServiceInterfaces.Friends
-{
-    public interface IFriendsStatusNotifyServiceInterface
-    {
-        void NotifyAsOnline(UUI notifier, List<KeyValuePair<UUI, string>> list);
-        void NotifyAsOffline(UUI notifier, List<KeyValuePair<UUI, string>> list);
-    }
-}
+[assembly: AssemblyTitle("Friends Notifications")]
+[assembly: AssemblyDescription("")]
+[assembly: AssemblyConfiguration("")]

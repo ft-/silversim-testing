@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<package>
+	<name>SilverSim.Main.Friends</name>
+	<default-configuration>
+		<source>SilverSim.Main.Friends:PackageConfig.ini</source>
+	</default-configuration>
+	<files>
+		<file name="bin/plugins/SilverSim.Main.Friends.dll" is-version-src="true"/>
+	</files>
+</package>

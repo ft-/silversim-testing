@@ -19,14 +19,15 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.Types;
 using System.Collections.Generic;
 
 namespace SilverSim.ServiceInterfaces.Friends
 {
-    public interface IFriendsStatusNotifyServiceInterface
+    public interface IFriendsStatusNotifyServicePlugin
     {
-        void NotifyAsOnline(UUI notifier, List<KeyValuePair<UUI, string>> list);
-        void NotifyAsOffline(UUI notifier, List<KeyValuePair<UUI, string>> list);
+        IFriendsStatusNotifyServiceInterface Instantiate(string url);
+        string Name { get; }
+        bool IsProtocolSupported(string url);
+        bool IsProtocolSupported(string url, Dictionary<string, string> cachedheaders);
     }
 }
