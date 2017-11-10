@@ -41,12 +41,11 @@ namespace SilverSim.Main.Friends
             foreach(UUI id in list)
             {
                 IAgent agent;
-                SceneInterface scene;
-                if (m_Scenes.TryGetValue(regionid, out scene) && scene.RootAgents.TryGetValue(id.ID, out agent))
+                if(m_Scenes.TryFindRootAgent(regionid, id.ID, out agent))
                 {
                     var offlineNotification = new OfflineNotification();
                     offlineNotification.AgentIDs.Add(notifier.ID);
-                    agent.SendMessageAlways(offlineNotification, scene.ID);
+                    agent.SendMessageAlways(offlineNotification, regionid);
                 }
             }
         }
@@ -56,14 +55,12 @@ namespace SilverSim.Main.Friends
             foreach (KeyValuePair<UUI, string> kvp in list)
             {
                 IAgent agent;
-                foreach (SceneInterface scene in m_Scenes.Values)
+                UUID sceneID;
+                if(m_Scenes.TryFindRootAgent(kvp.Key.ID, out agent, out sceneID))
                 {
-                    if (scene.RootAgents.TryGetValue(kvp.Key.ID, out agent))
-                    {
-                        var offlineNotification = new OfflineNotification();
-                        offlineNotification.AgentIDs.Add(notifier.ID);
-                        agent.SendMessageAlways(offlineNotification, scene.ID);
-                    }
+                    var offlineNotification = new OfflineNotification();
+                    offlineNotification.AgentIDs.Add(notifier.ID);
+                    agent.SendMessageAlways(offlineNotification, sceneID);
                 }
             }
         }
@@ -74,11 +71,11 @@ namespace SilverSim.Main.Friends
             {
                 IAgent agent;
                 SceneInterface scene;
-                if (m_Scenes.TryGetValue(regionid, out scene) && scene.RootAgents.TryGetValue(id.ID, out agent))
+                if (m_Scenes.TryFindRootAgent(regionid, id.ID, out agent))
                 {
                     var onlineNotification = new OnlineNotification();
                     onlineNotification.AgentIDs.Add(notifier.ID);
-                    agent.SendMessageAlways(onlineNotification, scene.ID);
+                    agent.SendMessageAlways(onlineNotification, regionid);
                 }
             }
         }
@@ -88,14 +85,12 @@ namespace SilverSim.Main.Friends
             foreach (KeyValuePair<UUI, string> kvp in list)
             {
                 IAgent agent;
-                foreach (SceneInterface scene in m_Scenes.Values)
+                UUID sceneID;
+                if (m_Scenes.TryFindRootAgent(kvp.Key.ID, out agent, out sceneID))
                 {
-                    if (scene.RootAgents.TryGetValue(kvp.Key.ID, out agent))
-                    {
-                        var onlineNotification = new OnlineNotification();
-                        onlineNotification.AgentIDs.Add(notifier.ID);
-                        agent.SendMessageAlways(onlineNotification, scene.ID);
-                    }
+                    var onlineNotification = new OnlineNotification();
+                    onlineNotification.AgentIDs.Add(notifier.ID);
+                    agent.SendMessageAlways(onlineNotification, sceneID);
                 }
             }
         }

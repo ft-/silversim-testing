@@ -401,11 +401,11 @@ namespace SilverSim.Main.Common
             IPlugin module;
             if(!PluginInstances.TryGetValue(serviceName, out module))
             {
-                throw new ServiceNotFoundException(string.Format("Service {0} not found", serviceName));
+                throw new ServiceNotFoundException($"Service {serviceName} not found");
             }
             if(!typeof(T).IsAssignableFrom(module.GetType()))
             {
-                throw new InvalidOperationException("Unexpected module configured for service " + serviceName);
+                throw new InvalidOperationException($"Unexpected module configured for service \"{serviceName}\": Expected={typeof(T).FullName} Got={module.GetType().FullName}");
             }
             return (T)module;
         }
