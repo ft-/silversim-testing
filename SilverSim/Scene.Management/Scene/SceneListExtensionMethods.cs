@@ -22,6 +22,8 @@
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
+using SilverSim.Types.IM;
+using SilverSim.Viewer.Messages.Economy;
 
 namespace SilverSim.Scene.Management.Scene
 {
@@ -47,6 +49,32 @@ namespace SilverSim.Scene.Management.Scene
                 }
             }
             return false;
+        }
+
+        public static void SendMoneyBalance(this SceneList list, UUID agentId, int moneyBalance)
+        {
+            IAgent agent;
+            UUID sceneID;
+            if(list.TryFindRootAgent(agentId, out agent, out sceneID))
+            {
+                agent.SendMessageIfRootAgent(new MoneyBalanceReply
+                {
+                    AgentID = agentId,
+                    MoneyBalance = moneyBalance
+                }, sceneID);
+            }
+        }
+
+        public static bool SendIM(this SceneList list, GridInstantMessage gim)
+        {
+            IAgent agent;
+            UUID sceneID;
+            bool result = false;
+            if(list.TryFindRootAgent(gim.ToAgent.ID, out agent, out sceneID))
+            {
+                result = agent.IMSend(gim);
+            }
+            return result;
         }
     }
 }
