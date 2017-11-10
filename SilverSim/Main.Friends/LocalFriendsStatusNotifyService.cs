@@ -42,8 +42,8 @@ namespace SilverSim.Main.Friends
 
         public LocalFriendsStatusNotifyService(IConfig section)
         {
-            m_PresenceStorageName = section.GetString("PresenceStorage");
-            m_FriendsSimStatusNotifyServiceName = section.GetString("FriendsSimStatusNotifyService");
+            m_PresenceStorageName = section.GetString("PresenceStorage", "PresenceStorage");
+            m_FriendsSimStatusNotifyServiceName = section.GetString("FriendsSimStatusNotifyService", "FriendsSimStatusNotifyService");
         }
 
         public void NotifyAsOffline(UUI notifier, List<KeyValuePair<UUI, string>> list) => InnerNotify(notifier, list, false);

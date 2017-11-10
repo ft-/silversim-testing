@@ -21,6 +21,10 @@
   <Reference name="System.Core"/>
   <Reference name="SilverSim.Types" localCopy="false"/>
   <Reference name="SilverSim.ServiceInterfaces" localCopy="false"/>
+  <Reference name="SilverSim.Scene.ServiceInterfaces" localCopy="false"/>
+  <Reference name="SilverSim.Scene.Types" localCopy="false"/>
+  <Reference name="SilverSim.Viewer.Messages" localCopy="false" path="../../bin"/>
+  <Reference name="SilverSim.Scene.Management" localCopy="false" path="../../bin"/>
   <Reference name="SilverSim.Main.Common" localCopy="false"/>
   <Reference name="Nini" localCopy="false"/>
   <Reference name="SilverSim.Threading" localCopy="false"/>
