@@ -48,23 +48,39 @@ namespace SilverSim.Main.Friends
 
         public ShutdownOrder ShutdownOrder => ShutdownOrder.LogoutDatabase;
 
+        private class FriendsStatusRequest
+        {
+            public readonly UUI Notifier;
+            public readonly bool IsOnline;
+            public readonly FriendsServiceInterface FriendsService;
+
+            public FriendsStatusRequest(UUI notifier, bool isOnline, FriendsServiceInterface friendsService)
+            {
+                Notifier = notifier;
+                IsOnline = isOnline;
+                FriendsService = friendsService;
+            }
+        }
+
         public FriendsStatusNotifier(IConfig config)
         {
             m_FriendsServiceName = config.GetString("FriendsService", string.Empty);
             m_LocalFriendsStatusNotifyServiceName = config.GetString("LocalFriendsNotifyService", string.Empty);
         }
 
-        public void NotifyAsOffline(UUI notifier) => m_NotificationQueue.Enqueue(new KeyValuePair<UUI, bool>(notifier, false));
+        public void NotifyAsOffline(UUI notifier, FriendsServiceInterface friendsService = null) =>
+            m_NotificationQueue.Enqueue(new FriendsStatusRequest(notifier, false, friendsService ?? m_FriendsService));
 
-        public void NotifyAsOnline(UUI notifier) => m_NotificationQueue.Enqueue(new KeyValuePair<UUI, bool>(notifier, true));
+        public void NotifyAsOnline(UUI notifier, FriendsServiceInterface friendsService = null) =>
+            m_NotificationQueue.Enqueue(new FriendsStatusRequest(notifier, true, friendsService ?? m_FriendsService));
 
-        private readonly BlockingQueue<KeyValuePair<UUI, bool>> m_NotificationQueue = new BlockingQueue<KeyValuePair<UUI, bool>>();
+        private readonly BlockingQueue<FriendsStatusRequest> m_NotificationQueue = new BlockingQueue<FriendsStatusRequest>();
         private bool m_ShutdownThread;
 
         private void NotifyThread()
         {
             Thread.CurrentThread.Name = "Friend status notifier";
-            KeyValuePair<UUI, bool> notifyReq;
+            FriendsStatusRequest notifyReq;
 
             while(!m_ShutdownThread)
             {
@@ -79,7 +95,7 @@ namespace SilverSim.Main.Friends
 
                 try
                 {
-                    Notify(notifyReq.Key, notifyReq.Value);
+                    Notify(notifyReq.Notifier, notifyReq.IsOnline, notifyReq.FriendsService);
                 }
                 catch(Exception e)
                 {
@@ -88,13 +104,13 @@ namespace SilverSim.Main.Friends
             }
         }
 
-        private void Notify(UUI notifier, bool isOnline)
+        private void Notify(UUI notifier, bool isOnline, FriendsServiceInterface friendsService)
         {
             var friendsPerHomeUri = new Dictionary<Uri, List<KeyValuePair<UUI, string>>>();
 
-            if(m_FriendsService != null)
+            if(friendsService != null)
             {
-                foreach(FriendInfo fi in m_FriendsService[notifier])
+                foreach(FriendInfo fi in friendsService[notifier])
                 {
                     if((fi.UserGivenFlags & FriendRightFlags.SeeOnline) != 0)
                     {
