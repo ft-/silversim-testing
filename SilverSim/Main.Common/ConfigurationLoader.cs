@@ -64,6 +64,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Runtime.Serialization;
+using System.Text;
 using System.Threading;
 using System.Timers;
 
@@ -173,6 +174,7 @@ namespace SilverSim.Main.Common
         private readonly ILog m_UpdaterLog;
         private readonly Queue<ICFG_Source> m_Sources = new Queue<ICFG_Source>();
         private readonly RwLockedDictionary<string, IPlugin> PluginInstances = new RwLockedDictionary<string, IPlugin>();
+        public readonly List<string> PluginIsLink = new List<string>();
         private readonly ManualResetEvent m_ShutdownEvent;
         static public readonly Dictionary<Type, string> FeaturesTable = new Dictionary<Type, string>();
         private readonly RwLockedDictionary<string, string> m_HeloResponseHeaders = new RwLockedDictionary<string, string>();
@@ -1033,9 +1035,61 @@ namespace SilverSim.Main.Common
             PluginInstances.Add("JSON2.0RpcServer", new HttpJson20RpcHandler());
             PluginInstances.Add("CapsRedirector", new CapsHttpRedirector());
 
-            m_Log.Info("Initing extra modules");
-            foreach (IPlugin instance in PluginInstances.Values)
+            m_Log.Info("Add module links");
+            var linkto = new Dictionary<string, string>();
+            foreach(IConfig config in Config.Configs)
             {
+                if(config.Contains("LinkTo") && !config.Contains("IsTemplate"))
+                {
+                    string modulelink = config.GetString("LinkTo");
+                    if(modulelink != config.Name)
+                    {
+                        linkto.Add(modulelink, config.Name);
+                    }
+                }
+            }
+
+            while(linkto.Count != 0)
+            {
+                bool anyresolved = false;
+                foreach (string modulelink in linkto.Keys.ToArray())
+                {
+                    IPlugin moduletarget;
+                    if (PluginInstances.ContainsKey(modulelink))
+                    {
+                        linkto.Remove(modulelink);
+                    }
+                    else
+                    {
+                        string moduledest = linkto[modulelink];
+                        if (PluginInstances.TryGetValue(linkto[modulelink], out moduletarget))
+                        {
+                            PluginIsLink.Add(modulelink);
+                            PluginInstances.Add(modulelink, moduletarget);
+                            linkto.Remove(modulelink);
+                            anyresolved = true;
+                        }
+                    }
+                }
+                if (!anyresolved)
+                {
+                    var sb = new StringBuilder("Unresolved modules:");
+                    foreach (string modulelink in linkto.Keys)
+                    {
+                        sb.AppendFormat("{0}", modulelink);
+                    }
+                    throw new ConfigurationErrorException(sb.ToString());
+                }
+            }
+
+            m_Log.Info("Initing extra modules");
+            foreach (KeyValuePair<string, IPlugin> kvp in PluginInstances)
+            {
+                if(PluginIsLink.Contains(kvp.Key))
+                {
+                    continue;
+                }
+                IPlugin instance = kvp.Value;
                 if(instance.GetType().GetInterfaces().Contains(typeof(IPluginSubFactory)))
                 {
                     var subfact = (IPluginSubFactory)instance;
@@ -1044,8 +1098,13 @@ namespace SilverSim.Main.Common
             }
 
             m_Log.Info("Starting modules");
-            foreach(IPlugin instance in PluginInstances.Values)
+            foreach(KeyValuePair<string, IPlugin> kvp in PluginInstances)
             {
+                if (PluginIsLink.Contains(kvp.Key))
+                {
+                    continue;
+                }
+                IPlugin instance = kvp.Value;
                 if (instance != httpServer)
                 {
                     instance.Startup(this);
@@ -1072,6 +1131,10 @@ namespace SilverSim.Main.Common
 
                 foreach (KeyValuePair<string, IPlugin> kvp in plugins)
                 {
+                    if (PluginIsLink.Contains(kvp.Key))
+                    {
+                        continue;
+                    }
                     LoadServerParamsForPlugin(kvp.Key, kvp.Value, cachedResults);
                 }
 
@@ -1079,7 +1142,15 @@ namespace SilverSim.Main.Common
                 Scenes.OnRegionAdd += LoadParamsOnAddedScene;
             }
 
-            ICollection<IRegionLoaderInterface> regionLoaders = GetServices<IRegionLoaderInterface>().Values;
+            var regionLoaders = new List<IRegionLoaderInterface>();
+            foreach(KeyValuePair<string, IRegionLoaderInterface> kvp in GetServices<IRegionLoaderInterface>())
+            {
+                if (PluginIsLink.Contains(kvp.Key))
+                {
+                    continue;
+                }
+                regionLoaders.Add(kvp.Value);
+            }
             if (regionLoaders.Count != 0)
             {
                 /* we have to bypass the circular issue we would get when trying to do it via using */
@@ -1111,12 +1182,17 @@ namespace SilverSim.Main.Common
                 }
             }
 
-            ICollection<IPostLoadStep> postLoadSteps = GetServices<IPostLoadStep>().Values;
+            Dictionary<string, IPostLoadStep> postLoadSteps = GetServices<IPostLoadStep>();
             if (postLoadSteps.Count != 0)
             {
                 m_Log.Info("Running post loading steps");
-                foreach (IPostLoadStep postLoadStep in postLoadSteps)
+                foreach (KeyValuePair<string, IPostLoadStep> kvp in postLoadSteps)
                 {
+                    if (PluginIsLink.Contains(kvp.Key))
+                    {
+                        continue;
+                    }
+                    IPostLoadStep postLoadStep = kvp.Value;
                     postLoadStep.PostLoad();
                 }
             }
