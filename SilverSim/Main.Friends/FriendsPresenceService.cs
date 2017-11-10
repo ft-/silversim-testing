@@ -19,18 +19,14 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using Nini.Config;
 using SilverSim.Main.Common;
+using SilverSim.ServiceInterfaces.Friends;
 using SilverSim.ServiceInterfaces.Presence;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SilverSim.Types;
 using SilverSim.Types.Presence;
-using SilverSim.ServiceInterfaces.Friends;
-using Nini.Config;
+using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace SilverSim.Main.Friends
 {
