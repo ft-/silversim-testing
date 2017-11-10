@@ -45,8 +45,8 @@ namespace SilverSim.Main.Friends
 
         public FriendsPresenceService(IConfig config)
         {
-            m_FriendsStatusNotifierServiceName = config.GetString("FriendsStatusNotifier");
-            m_PresenceServiceName = config.GetString("PresenceService");
+            m_FriendsStatusNotifierServiceName = config.GetString("FriendsStatusNotifier", "FriendsStatusNotifier");
+            m_PresenceServiceName = config.GetString("PresenceService", "PresenceStorage");
         }
 
         public override List<PresenceInfo> this[UUID userID] => m_PresenceService[userID];
