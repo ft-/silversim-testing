@@ -22,7 +22,6 @@
 using SilverSim.Main.Common;
 using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.Types.Agent;
-using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Friends;
 using SilverSim.Types;
 using SilverSim.Viewer.Messages.Friend;
@@ -70,7 +69,6 @@ namespace SilverSim.Main.Friends
             foreach (UUI id in list)
             {
                 IAgent agent;
-                SceneInterface scene;
                 if (m_Scenes.TryFindRootAgent(regionid, id.ID, out agent))
                 {
                     var onlineNotification = new OnlineNotification();

@@ -21,6 +21,7 @@
 
 using Nini.Config;
 using SilverSim.Main.Common;
+using SilverSim.Main.Common.CmdIO;
 using SilverSim.ServiceInterfaces.Friends;
 using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.Types;
@@ -92,6 +93,48 @@ namespace SilverSim.Main.Friends
         {
             m_PresenceService = loader.GetService<PresenceServiceInterface>(m_PresenceServiceName);
             m_FriendsStatusNotifierService = loader.GetService<IFriendsStatusNotifer>(m_FriendsStatusNotifierServiceName);
+#if DEBUG
+            loader.CommandRegistry.CheckAddCommandType("debug").Add("send-online-status", SendOnlineCmd);
+            loader.CommandRegistry.CheckAddCommandType("debug").Add("send-offline-status", SendOfflineCmd);
+#endif
         }
+
+#if DEBUG
+        private void SendOnlineCmd(List<string> args, TTY io, UUID limitedToScene)
+        {
+            UUI id;
+            if (limitedToScene != UUID.Zero)
+            {
+                io.Write("Command not allowed");
+            }
+            else if (args.Count < 3 || args[0] == "help" || !UUI.TryParse(args[2], out id))
+            {
+                io.Write("debug send-online-status <uui>");
+            }
+            else
+            {
+                m_FriendsStatusNotifierService.NotifyAsOnline(id);
+                io.Write("Notification send");
+            }
+        }
+
+        private void SendOfflineCmd(List<string> args, TTY io, UUID limitedToScene)
+        {
+            UUI id;
+            if (limitedToScene != UUID.Zero)
+            {
+                io.Write("Command not allowed");
+            }
+            else if (args.Count < 3 || args[0] == "help" || !UUI.TryParse(args[2], out id))
+            {
+                io.Write("debug send-offline-status <uui>");
+            }
+            else
+            {
+                m_FriendsStatusNotifierService.NotifyAsOffline(id);
+                io.Write("Notification send");
+            }
+        }
+#endif
     }
 }

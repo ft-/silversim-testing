@@ -110,9 +110,12 @@ namespace SilverSim.Main.Friends
 
             if(friendsService != null)
             {
+#if DEBUG
+                m_Log.DebugFormat("Signaling {0} to friends for {1}", isOnline ? "online" : "offline", notifier.FullName);
+#endif
                 foreach(FriendInfo fi in friendsService[notifier])
                 {
-                    if((fi.UserGivenFlags & FriendRightFlags.SeeOnline) != 0)
+                    if((fi.FriendGivenFlags & FriendRightFlags.SeeOnline) != 0)
                     {
                         Uri homeURI = fi.Friend.HomeURI;
                         List <KeyValuePair<UUI, string>> list;
@@ -188,6 +191,7 @@ namespace SilverSim.Main.Friends
             {
                 m_LocalFriendsStatusNotifyService = loader.GetService<IFriendsStatusNotifyServiceInterface>(m_LocalFriendsStatusNotifyServiceName);
             }
+            ThreadManager.CreateThread(NotifyThread).Start();
         }
 
         public void Shutdown()
