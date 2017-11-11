@@ -146,7 +146,7 @@ namespace SilverSim.Main.Friends
 
         private void InnerNotify(UUI notifier, Uri uri, List<KeyValuePair<UUI, string>> list, bool isOnline)
         {
-            string url = uri.ToString();
+            string url = uri?.ToString() ?? m_HomeURI;
             if (url.Equals(m_HomeURI, StringComparison.InvariantCultureIgnoreCase))
             {
                 if (isOnline)
