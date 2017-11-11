@@ -38,6 +38,7 @@ using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Avatar;
 using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Database;
+using SilverSim.ServiceInterfaces.Economy;
 using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.ServiceInterfaces.Experience;
 using SilverSim.ServiceInterfaces.Friends;
@@ -361,6 +362,7 @@ namespace SilverSim.Main.Common
             FeaturesTable[typeof(IFriendsStatusNotifer)] = "Friends Status Notifier";
             FeaturesTable[typeof(IFriendsStatusNotifyServicePlugin)] = "Friends status notify service HELO Instantiator";
             FeaturesTable[typeof(IFriendsStatusNotifyServiceInterface)] = "Friends status notify service";
+            FeaturesTable[typeof(EconomyServiceInterface)] = "Economy service";
 
             FeaturesTable[typeof(IPluginShutdown)] = "Shutdown Handler";
             FeaturesTable[typeof(IDBServiceInterface)] = "DataBase Service";
