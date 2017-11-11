@@ -916,6 +916,14 @@ namespace SilverSim.Viewer.Core
                 m_Log.Warn("Contacting economy service failed", e);
             }
             Agent.DetachAllAttachments();
+            try
+            {
+                Agent.PresenceService.Logout(SessionID, AgentID);
+            }
+            catch(Exception e)
+            {
+                m_Log.Warn("Contacting presence service failed", e);
+            }
         }
 
         protected override void LogMsgOnLogoutCompletion()
