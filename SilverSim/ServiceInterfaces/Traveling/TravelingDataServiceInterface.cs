@@ -32,7 +32,18 @@ namespace SilverSim.ServiceInterfaces.Traveling
         public abstract List<TravelingDataInfo> GetTravelingDatasByAgentUUID(UUID agentID);
         public abstract TravelingDataInfo GetTravelingDatabyAgentUUIDAndNotHomeURI(UUID agentID, string homeURI);
         public abstract void Store(TravelingDataInfo data);
-        public abstract bool Remove(UUID sessionID);
-        public abstract bool RemoveByAgentUUID(UUID agentID);
+        public bool Remove(UUID sessionID)
+        {
+            TravelingDataInfo info;
+            return Remove(sessionID, out info);
+        }
+        public bool RemoveByAgentUUID(UUID agentID)
+        {
+            TravelingDataInfo info;
+            return RemoveByAgentUUID(agentID, out info);
+        }
+
+        public abstract bool Remove(UUID sessionID, out TravelingDataInfo info);
+        public abstract bool RemoveByAgentUUID(UUID agentID, out TravelingDataInfo info);
     }
 }

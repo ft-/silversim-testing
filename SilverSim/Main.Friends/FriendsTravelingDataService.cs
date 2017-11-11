@@ -22,77 +22,39 @@
 using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.CmdIO;
+using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Friends;
-using SilverSim.ServiceInterfaces.Presence;
+using SilverSim.ServiceInterfaces.Traveling;
 using SilverSim.Types;
-using SilverSim.Types.Presence;
+using SilverSim.Types.TravelingData;
 using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace SilverSim.Main.Friends
 {
-    [PluginName("FriendsPresenceStatus")]
-    [Description("Friends presence intermediate service")]
-    public sealed class FriendsPresenceService : PresenceServiceInterface, IPlugin
+    [PluginName("FriendsTravelingStatus")]
+    [Description("Friends status intercepting traveling data handler")]
+    public sealed class FriendsTravelingDataService : TravelingDataServiceInterface, IPlugin
     {
-        private PresenceServiceInterface m_PresenceService;
+        private TravelingDataServiceInterface m_TravelingDataService;
         private IFriendsStatusNotifer m_FriendsStatusNotifierService;
-        private readonly string m_PresenceServiceName;
+        private AvatarNameServiceInterface m_AvatarNameService;
+        private readonly string m_TravelingDataServiceName;
         private readonly string m_FriendsStatusNotifierServiceName;
+        private readonly string m_AvatarNameServiceName;
 
-        public FriendsPresenceService(IConfig config)
+        public FriendsTravelingDataService(IConfig config)
         {
             m_FriendsStatusNotifierServiceName = config.GetString("FriendsStatusNotifier", "FriendsStatusNotifier");
-            m_PresenceServiceName = config.GetString("PresenceService", "PresenceStorage");
+            m_TravelingDataServiceName = config.GetString("TravelingDataService", "TravelingDataStorage");
+            m_AvatarNameServiceName = config.GetString("AvatarNameService", "UserAccountNameService");
         }
-
-        public override List<PresenceInfo> this[UUID userID] => m_PresenceService[userID];
-
-        public override PresenceInfo this[UUID sessionID, UUID userID] => m_PresenceService[sessionID, userID];
-
-        public override List<PresenceInfo> GetPresencesInRegion(UUID regionId) => m_PresenceService.GetPresencesInRegion(regionId);
-
-        public override void Login(PresenceInfo pInfo)
-        {
-            m_PresenceService.Login(pInfo);
-            m_FriendsStatusNotifierService.NotifyAsOnline(pInfo.UserID);
-        }
-
-        public override void Logout(UUID sessionID, UUID userID)
-        {
-            List<PresenceInfo> presences = this[userID];
-            if (presences.Count == 1)
-            {
-                m_FriendsStatusNotifierService.NotifyAsOffline(presences[0].UserID);
-            }
-            m_PresenceService.Logout(sessionID, userID);
-        }
-
-        public override void LogoutRegion(UUID regionID)
-        {
-            foreach(PresenceInfo pinfo in GetPresencesInRegion(regionID))
-            {
-                try
-                {
-                    Logout(pinfo.SessionID, pinfo.UserID.ID);
-                }
-                catch
-                {
-                    /* intentionally ignored */
-                }
-            }
-
-            m_PresenceService.LogoutRegion(regionID);
-        }
-
-        public override void Remove(UUID scopeID, UUID accountID) => m_PresenceService.Remove(scopeID, accountID);
-
-        public override void Report(PresenceInfo pInfo) => m_PresenceService.Report(pInfo);
 
         public void Startup(ConfigurationLoader loader)
         {
-            m_PresenceService = loader.GetService<PresenceServiceInterface>(m_PresenceServiceName);
+            m_TravelingDataService = loader.GetService<TravelingDataServiceInterface>(m_TravelingDataServiceName);
             m_FriendsStatusNotifierService = loader.GetService<IFriendsStatusNotifer>(m_FriendsStatusNotifierServiceName);
+            m_AvatarNameService = loader.GetService<AvatarNameServiceInterface>(m_AvatarNameServiceName);
 #if DEBUG
             loader.CommandRegistry.CheckAddCommandType("debug").Add("send-online-status", SendOnlineCmd);
             loader.CommandRegistry.CheckAddCommandType("debug").Add("send-offline-status", SendOfflineCmd);
@@ -136,5 +98,63 @@ namespace SilverSim.Main.Friends
             }
         }
 #endif
+
+        public override TravelingDataInfo GetTravelingData(UUID sessionID)
+        {
+            return m_TravelingDataService.GetTravelingData(sessionID);
+        }
+
+        public override TravelingDataInfo GetTravelingDataByAgentUUIDAndIPAddress(UUID agentID, string ipAddress)
+        {
+            return m_TravelingDataService.GetTravelingDataByAgentUUIDAndIPAddress(agentID, ipAddress);
+        }
+
+        public override List<TravelingDataInfo> GetTravelingDatasByAgentUUID(UUID agentID)
+        {
+            return m_TravelingDataService.GetTravelingDatasByAgentUUID(agentID);
+        }
+
+        public override TravelingDataInfo GetTravelingDatabyAgentUUIDAndNotHomeURI(UUID agentID, string homeURI)
+        {
+            return m_TravelingDataService.GetTravelingDatabyAgentUUIDAndNotHomeURI(agentID, homeURI);
+        }
+
+        public override void Store(TravelingDataInfo data)
+        {
+            m_TravelingDataService.Store(data);
+            UUI uui;
+            if(m_AvatarNameService.TryGetValue(data.UserID, out uui))
+            {
+                m_FriendsStatusNotifierService.NotifyAsOnline(uui);
+            }
+        }
+
+        public override bool Remove(UUID sessionID, out TravelingDataInfo info)
+        {
+            if(!m_TravelingDataService.Remove(sessionID, out info))
+            {
+                return false;
+            }
+            UUI uui;
+            if (m_AvatarNameService.TryGetValue(info.UserID, out uui))
+            {
+                m_FriendsStatusNotifierService.NotifyAsOffline(uui);
+            }
+            return true;
+        }
+
+        public override bool RemoveByAgentUUID(UUID agentID, out TravelingDataInfo info)
+        {
+            if(!m_TravelingDataService.RemoveByAgentUUID(agentID, out info))
+            {
+                return false;
+            }
+            UUI uui;
+            if (m_AvatarNameService.TryGetValue(info.UserID, out uui))
+            {
+                m_FriendsStatusNotifierService.NotifyAsOffline(uui);
+            }
+            return true;
+        }
     }
 }

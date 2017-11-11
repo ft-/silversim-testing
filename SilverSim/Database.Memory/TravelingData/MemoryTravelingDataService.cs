@@ -76,16 +76,17 @@ namespace SilverSim.Database.Memory.TravelingData
             return hgds;
         }
 
-        public override bool Remove(UUID sessionID) =>
-            m_HGTravelingDatas.Remove(sessionID);
+        public override bool Remove(UUID sessionID, out TravelingDataInfo info) =>
+            m_HGTravelingDatas.Remove(sessionID, out info);
 
         public void Remove(UUID scopeID, UUID accountID)
         {
             RemoveByAgentUUID(accountID);
         }
 
-        public override bool RemoveByAgentUUID(UUID agentID)
+        public override bool RemoveByAgentUUID(UUID agentID, out TravelingDataInfo info)
         {
+            info = default(TravelingDataInfo);
             var sessionIds = new List<UUID>();
             foreach(var kvp in m_HGTravelingDatas)
             {
@@ -98,7 +99,7 @@ namespace SilverSim.Database.Memory.TravelingData
             bool f = false;
             foreach(var id in sessionIds)
             {
-                if(m_HGTravelingDatas.Remove(id))
+                if(m_HGTravelingDatas.Remove(id, out info))
                 {
                     f = true;
                 }
