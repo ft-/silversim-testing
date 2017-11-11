@@ -21,7 +21,6 @@
 
 using SilverSim.Http.Client;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 namespace SilverSim.ServiceInterfaces

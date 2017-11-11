@@ -27,6 +27,7 @@ using SilverSim.ServiceInterfaces.Friends;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Friends;
+using SilverSim.Types.ServerURIs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -160,7 +161,10 @@ namespace SilverSim.Main.Friends
             }
             else
             {
-                Dictionary<string, string> cachedheaders = ServicePluginHelo.HeloRequest(url);
+                var serverurls = new ServerURIs();
+                serverurls.GetServerURLs(UUI.Unknown, url);
+
+                Dictionary<string, string> cachedheaders = ServicePluginHelo.HeloRequest(serverurls.FriendsServerURI);
                 foreach (IFriendsStatusNotifyServicePlugin plugin in m_Plugins)
                 {
                     if (plugin.IsProtocolSupported(url, cachedheaders))
