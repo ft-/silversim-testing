@@ -35,14 +35,14 @@ namespace SilverSim.Main.Friends
     [Description("Local friends status notification")]
     public sealed class LocalFriendsStatusNotifyService : IFriendsStatusNotifyServiceInterface, IPlugin
     {
-        private PresenceServiceInterface m_PresenceStorage;
-        private readonly string m_PresenceStorageName;
+        private PresenceServiceInterface m_PresenceService;
+        private readonly string m_PresenceServiceName;
         private IFriendsSimStatusNotifyService m_FriendsSimStatusNotifyService;
         private readonly string m_FriendsSimStatusNotifyServiceName;
 
         public LocalFriendsStatusNotifyService(IConfig section)
         {
-            m_PresenceStorageName = section.GetString("PresenceStorage", "PresenceStorage");
+            m_PresenceServiceName = section.GetString("PresenceService", "PresenceService");
             m_FriendsSimStatusNotifyServiceName = section.GetString("FriendsSimStatusNotifyService", "FriendsSimStatusNotifyService");
         }
 
@@ -66,7 +66,7 @@ namespace SilverSim.Main.Friends
 
             foreach(KeyValuePair<UUI, string> kvp in list)
             {
-                List<PresenceInfo> presences = m_PresenceStorage[kvp.Key.ID];
+                List<PresenceInfo> presences = m_PresenceService[kvp.Key.ID];
 
                 List<UUI> notifiedInRegion;
                 foreach (PresenceInfo pinfo in presences)
@@ -88,7 +88,7 @@ namespace SilverSim.Main.Friends
 
         public void Startup(ConfigurationLoader loader)
         {
-            m_PresenceStorage = loader.GetService<PresenceServiceInterface>(m_PresenceStorageName);
+            m_PresenceService = loader.GetService<PresenceServiceInterface>(m_PresenceServiceName);
             m_FriendsSimStatusNotifyService = loader.GetService<IFriendsSimStatusNotifyService>(m_FriendsSimStatusNotifyServiceName);
         }
     }
