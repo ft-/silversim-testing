@@ -72,7 +72,7 @@ namespace SilverSim.Main.Common
                     {
                         foreach (UnicastIPAddressInformation ip in ni.GetIPProperties().UnicastAddresses)
                         {
-                            if (ip.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork && 
+                            if (ip.Address.AddressFamily == AddressFamily.InterNetwork && 
                                 address.Equals(ip.Address) && !IPAddress.IsLoopback(ip.Address))
                             {
                                 return true;
@@ -80,7 +80,7 @@ namespace SilverSim.Main.Common
                         }
                     }
                 }
-                return false;
+                return IPAddress.IsLoopback(address);
             }
 
             public static bool IsPrivateIPAddress(IPAddress address)
