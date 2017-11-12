@@ -51,11 +51,15 @@ namespace SilverSim.Main.Common
                         {
                             foreach (UnicastIPAddressInformation ip in ni.GetIPProperties().UnicastAddresses)
                             {
-                                if (ip.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork && !IPAddress.IsLoopback(ip.Address))
+                                if (ip.Address.AddressFamily == AddressFamily.InterNetwork && !IPAddress.IsLoopback(ip.Address))
                                 {
-                                    m_IPv4Cached = ip.Address.ToString();
-                                    m_IPv4LastCached = Environment.TickCount;
-                                    return m_IPv4Cached;
+                                    byte[] addr = ip.Address.GetAddressBytes();
+                                    if (addr[0] != 169 || addr[1] != 254)
+                                    {
+                                        m_IPv4Cached = ip.Address.ToString();
+                                        m_IPv4LastCached = Environment.TickCount;
+                                        return m_IPv4Cached;
+                                    }
                                 }
                             }
                         }

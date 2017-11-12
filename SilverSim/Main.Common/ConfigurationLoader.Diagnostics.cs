@@ -369,15 +369,15 @@ namespace SilverSim.Main.Common
                     sb.Append("\nNAT=False");
                     if (SystemIPv4Service.IsPrivateIPAddress(address) || IPAddress.IsLoopback(address))
                     {
-                        io.Write("NAT=False\nPublicIP=False\nExternallyAccessible=False");
+                        sb.Append("\nPublicIP=False\nExternallyAccessible=False");
                     }
                     else if(SystemIPv4Service.IsCGNAT(address))
                     {
-                        io.Write("NAT=True\nCGNAT=True\nPublicIP=False\nExternallyAccessible=False");
+                        sb.Append("\nCGNAT=True\nPublicIP=False\nExternallyAccessible=False");
                     }
                     else
                     {
-                        io.Write("NAT=False\nPublicIP=True\nExternallyAccessible=True");
+                        sb.Append("\nPublicIP=True\nExternallyAccessible=True");
                     }
                 }
                 else
