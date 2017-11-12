@@ -31,7 +31,7 @@ namespace SilverSim.Main.Common
 {
     public partial class ConfigurationLoader
     {
-        private sealed class SystemIPv4Service : ExternalHostNameServiceInterface
+        public sealed class SystemIPv4Service : ExternalHostNameServiceInterface
         {
             private string m_IPv4Cached = string.Empty;
             private int m_IPv4LastCached;

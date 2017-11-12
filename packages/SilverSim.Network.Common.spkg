@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<package>
+	<name>SilverSim.Network.Common</name>
+	<default-configuration>
+		<source>SilverSim.Network.Common:PackageConfig.ini</source>
+	</default-configuration>
+	<files>
+		<file name="bin/plugins/SilverSim.Network.Common.dll" is-version-src="true"/>
+	</files>
+</package>

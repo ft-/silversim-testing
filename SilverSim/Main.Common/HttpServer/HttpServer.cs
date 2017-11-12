@@ -316,6 +316,14 @@ namespace SilverSim.Main.Common.HttpServer
                 try
                 {
                     var ep = (IPEndPoint)socket.RemoteEndPoint;
+                    foreach(IPortControlServiceInterface service in m_PortControlServices)
+                    {
+                        EndPoint newEp;
+                        if(service.TryMapAddressToPublic(ep, out newEp))
+                        {
+                            ep = (IPEndPoint)newEp;
+                        }
+                    }
                     string remoteAddr = AddressToString(ep.Address);
                     Thread.CurrentThread.Name = Scheme.ToUpper() + " Server for " + remoteAddr + " at " + Port.ToString();
 
@@ -349,6 +357,14 @@ namespace SilverSim.Main.Common.HttpServer
                 try
                 {
                     var ep = (IPEndPoint)socket.RemoteEndPoint;
+                    foreach (IPortControlServiceInterface service in m_PortControlServices)
+                    {
+                        EndPoint newEp;
+                        if (service.TryMapAddressToPublic(ep, out newEp))
+                        {
+                            ep = (IPEndPoint)newEp;
+                        }
+                    }
                     string remoteAddr = AddressToString(ep.Address);
                     Thread.CurrentThread.Name = Scheme.ToUpper() + " Server for " + remoteAddr + " at " + Port.ToString();
 
