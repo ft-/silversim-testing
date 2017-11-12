@@ -95,7 +95,21 @@ namespace SilverSim.Main.Common
                     byte[] addr = address.GetAddressBytes();
                     if((addr[0] == 10) ||
                         (addr[0] == 192 && addr[1] == 168) ||
-                        (addr[0] == 172 && addr[1] >= 16 && addr[1] <= 31))
+                        (addr[0] == 172 && addr[1] >= 16 && addr[1] <= 31) ||
+                        (addr[0] == 169 && addr[1] == 254))
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            public static bool IsCGNAT(IPAddress address)
+            {
+                if(address.AddressFamily == AddressFamily.InterNetwork)
+                {
+                    byte[] addr = address.GetAddressBytes();
+                    if(addr[0] == 100 || (addr[1] >= 64 && addr[1] <= 127))
                     {
                         return true;
                     }

@@ -368,11 +368,15 @@ namespace SilverSim.Main.Common
                     sb.Append("\nNAT=False");
                     if (SystemIPv4Service.IsPrivateIPAddress(address))
                     {
-                        io.Write("NAT=False\nPrivateIP=True\nExternallyAccessible=False");
+                        io.Write("NAT=False\nPublicIP=False\nExternallyAccessible=False");
+                    }
+                    else if(SystemIPv4Service.IsCGNAT(address))
+                    {
+                        io.Write("NAT=True\nCGNAT=True\nPublicIP=False\nExternallyAccessible=False");
                     }
                     else
                     {
-                        io.Write("NAT=False\nPrivateIP=False\nExternallyAccessible=True");
+                        io.Write("NAT=False\nPublicIP=True\nExternallyAccessible=True");
                     }
                 }
                 else
@@ -388,6 +392,12 @@ namespace SilverSim.Main.Common
                     else
                     {
                         sb.Append("\nPublicIP=True");
+                    }
+
+                    if(SystemIPv4Service.IsCGNAT(address))
+                    {
+                        sb.Append("\nCGNAT=True");
+                        overallsuccess = false;
                     }
 
                     try
