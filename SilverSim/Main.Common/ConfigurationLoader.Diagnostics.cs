@@ -366,7 +366,7 @@ namespace SilverSim.Main.Common
                 if(SystemIPv4Service.IsAddressOnInterface(address))
                 {
                     sb.Append("\nNAT=False");
-                    if (SystemIPv4Service.IsPrivateIPAddress(address))
+                    if (SystemIPv4Service.IsPrivateIPAddress(address) || IPAddress.IsLoopback(address))
                     {
                         io.Write("NAT=False\nPublicIP=False\nExternallyAccessible=False");
                     }
@@ -384,14 +384,14 @@ namespace SilverSim.Main.Common
                     bool success;
                     sb.Append("\nNAT=True");
 
-                    if (SystemIPv4Service.IsCGNAT(address))
-                    {
-                        sb.Append("\nCGNAT=True\nPublicIP=False");
-                        overallsuccess = false;
-                    }
-                    else if (SystemIPv4Service.IsPrivateIPAddress(address))
+                    if (SystemIPv4Service.IsPrivateIPAddress(address) || IPAddress.IsLoopback(address))
                     {
                         sb.Append("\nPublicIP=False");
+                        overallsuccess = false;
+                    }
+                    else if (SystemIPv4Service.IsCGNAT(address))
+                    {
+                        sb.Append("\nCGNAT=True\nPublicIP=False");
                         overallsuccess = false;
                     }
                     else

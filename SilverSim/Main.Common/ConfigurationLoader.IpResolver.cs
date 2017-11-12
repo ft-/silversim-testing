@@ -104,6 +104,7 @@ namespace SilverSim.Main.Common
                 return false;
             }
 
+            /** <summary>Determines carrier grade NAT implementation as per RFC6598</summary> */
             public static bool IsCGNAT(IPAddress address)
             {
                 if(address.AddressFamily == AddressFamily.InterNetwork)
