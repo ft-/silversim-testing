@@ -19,31 +19,22 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.Viewer.Messages;
-using SilverSim.Types;
-using SilverSim.Scene.Types.Object;
-using System.Net;
-using System;
-
-namespace SilverSim.Scene.Types.Scene
+namespace SilverSim.Viewer.Messages.Test
 {
-    public interface IUDPCircuitsManager
+    [UDPMessage(MessageType.NetTest)]
+    [NotTrusted]
+    public sealed class NetTest : Message
     {
-        void SendMessageToAgent(UUID agentID, Message m);
-        void ScheduleUpdate(ObjectUpdateInfo info);
-        ICircuit UseSimCircuit(
-            IPEndPoint ep,
-            UUID sessionID,
-            SceneInterface thisScene,
-            UUID remoteSceneID,
-            uint circuitcode,
-            GridVector remoteLocation,
-            Vector3 remoteOffset);
+        public ushort Port;
 
-        #region UDP comms test support
-        void SendNetTest(IPAddress address);
-        event Action<IPAddress, int> OnNetTest;
-        int LocalPort { get; }
-        #endregion
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteUInt16(Port);
+        }
+
+        public static Message Decode(UDPPacket p) => new NetTest
+        {
+            Port = p.ReadUInt16(),
+        };
     }
 }

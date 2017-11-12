@@ -22,6 +22,7 @@
 using SilverSim.Http.Client;
 using SilverSim.Main.Common.Caps;
 using SilverSim.Main.Common.HttpServer;
+using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.Statistics;
 using SilverSim.Threading;
@@ -489,10 +490,63 @@ namespace SilverSim.Main.Common
                         overallsuccess = overallsuccess && success;
                     }
 
+                    lock (m_NetTestLock)
+                    {
+                        var circuits = new Dictionary<int, IUDPCircuitsManager>();
+                        m_ReceivedAddressesOnUDP.Clear();
+                        foreach (SceneInterface scene in Scenes.Values)
+                        {
+                            IUDPCircuitsManager circuit = scene.UDPServer;
+                            circuits.Add(circuit.LocalPort, circuit);
+                            circuit.OnNetTest += NetTestResponse;
+                        }
+
+                        foreach (IUDPCircuitsManager circuit in circuits.Values)
+                        {
+                            circuit.SendNetTest(address);
+                        }
+
+                        Thread.Sleep(1000);
+
+                        foreach(IUDPCircuitsManager circuit in circuits.Values)
+                        {
+                            circuit.OnNetTest -= NetTestResponse;
+                        }
+
+                        foreach(IUDPCircuitsManager circuit in circuits.Values)
+                        {
+                            IPAddress detectedSender;
+                            if(m_ReceivedAddressesOnUDP.TryGetValue(circuit.LocalPort, out detectedSender))
+                            {
+                                if(detectedSender.Equals(address))
+                                {
+                                    sb.Append("\nUDP").Append(circuit.LocalPort).Append("=True");
+                                }
+                                else
+                                {
+                                    sb.Append("\nUDP").Append(circuit.LocalPort).Append("=False\nUDP").Append(circuit.LocalPort).Append("DetectedAddress=").Append(detectedSender);
+                                }
+                            }
+                            else
+                            {
+                                sb.Append("\nUDP").Append(circuit.LocalPort).Append("=False");
+                                overallsuccess = false;
+                            }
+                        }
+                    }
+
                     sb.Append("\nExternallyAccessible=").Append(overallsuccess);
                 }
                 io.Write(sb.ToString());
             }
+        }
+
+        private readonly object m_NetTestLock = new object();
+        private readonly RwLockedDictionary<int, IPAddress> m_ReceivedAddressesOnUDP = new RwLockedDictionary<int, IPAddress>();
+
+        private void NetTestResponse(IPAddress address, int port)
+        {
+            m_ReceivedAddressesOnUDP[port] = address;
         }
 
         private string m_DetectedCallerIP;

@@ -36,6 +36,7 @@ using SilverSim.Types.IM;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Circuit;
 using SilverSim.Viewer.Messages.Region;
+using SilverSim.Viewer.Messages.Test;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -260,6 +261,23 @@ namespace SilverSim.Viewer.Core
             return false;
         }
 
+        public event Action<IPAddress, int> OnNetTest;
+        private int m_NetTestSeqNumber;
+
+        public void SendNetTest(IPAddress address)
+        {
+            var p = new UDPPacket
+            {
+                OutQueue = Message.QueueOutType.High,
+                IsZeroEncoded = false,
+                SequenceNumber = (uint)Interlocked.Increment(ref m_NetTestSeqNumber)
+            };
+            p.WriteMessageNumber(MessageType.NetTest);
+            new NetTest { Port = (ushort)LocalPort }.Serialize(p);
+            p.Flush();
+            SendPacketTo(p, new IPEndPoint(address, LocalPort));
+        }
+
         private void UdpReceiveEndHandler(IAsyncResult ar)
         {
             Circuit circuit;
@@ -384,6 +402,12 @@ namespace SilverSim.Viewer.Core
                                 m_Log.DebugFormat("UseCircuitCode received for unknown circuit {0}", circuitcode);
                             }
                         }
+                    }
+                    else if(MessageType.NetTest == mType && (uint)m_NetTestSeqNumber == pck.SequenceNumber ||
+                        pck.ReadUInt16() == (ushort)LocalPort)
+                    {
+                        OnNetTest?.Invoke(((IPEndPoint)pck.RemoteEndPoint).Address, LocalPort);
+                        return;
                     }
                 }
                 catch
