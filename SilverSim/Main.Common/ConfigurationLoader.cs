@@ -1204,6 +1204,7 @@ namespace SilverSim.Main.Common
                     IPostLoadStep postLoadStep = kvp.Value;
                     postLoadStep.PostLoad();
                 }
+                m_Log.Info("Running post loading steps completed");
             }
         }
         #endregion

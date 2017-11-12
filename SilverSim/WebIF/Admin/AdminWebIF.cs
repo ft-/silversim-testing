@@ -331,6 +331,7 @@ namespace SilverSim.WebIF.Admin
 
         public void PostLoad()
         {
+            m_Log.Info("Checking AdminWebIF data");
             string res;
             if (!m_ServerParams.TryGetValue(UUID.Zero, AdminUserReference + "PassCode", out res))
             {

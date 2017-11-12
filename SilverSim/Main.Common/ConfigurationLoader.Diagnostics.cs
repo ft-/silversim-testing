@@ -392,7 +392,10 @@ namespace SilverSim.Main.Common
 
                     try
                     {
-                        new HttpClient.Head($"http://{address}:{HttpServer.Port}/diag-ping-external").ExecuteRequest();
+                        new HttpClient.Head($"http://{address}:{HttpServer.Port}/diag-ping-external")
+                        {
+                            ConnectionMode = HttpClient.ConnectionModeEnum.SingleRequest
+                        }.ExecuteRequest();
                         success = true;
                         if (m_DetectedCallerIP != address.ToString())
                         {
@@ -410,7 +413,10 @@ namespace SilverSim.Main.Common
 
                     try
                     {
-                        new HttpClient.Head($"http://{HttpServer.ExternalHostName}:{HttpServer.Port}/diag-ping-external").ExecuteRequest();
+                        new HttpClient.Head($"http://{HttpServer.ExternalHostName}:{HttpServer.Port}/diag-ping-external")
+                        {
+                            ConnectionMode = HttpClient.ConnectionModeEnum.SingleRequest
+                        }.ExecuteRequest();
                         success = true;
                         if (m_DetectedCallerIP != address.ToString())
                         {
@@ -431,7 +437,10 @@ namespace SilverSim.Main.Common
                     {
                         try
                         {
-                            new HttpClient.Head($"https://{address}:{https.Port}/diag-ping-external").ExecuteRequest();
+                            new HttpClient.Head($"https://{address}:{https.Port}/diag-ping-external")
+                            {
+                                ConnectionMode = HttpClient.ConnectionModeEnum.SingleRequest
+                            }.ExecuteRequest();
                             success = true;
                             if (m_DetectedCallerIP != address.ToString())
                             {
@@ -450,7 +459,10 @@ namespace SilverSim.Main.Common
 
                         try
                         {
-                            new HttpClient.Head($"https://{https.ExternalHostName}:{https.Port}/diag-ping-external").ExecuteRequest();
+                            new HttpClient.Head($"https://{https.ExternalHostName}:{https.Port}/diag-ping-external")
+                            {
+                                ConnectionMode = HttpClient.ConnectionModeEnum.SingleRequest
+                            }.ExecuteRequest();
                             success = true;
                             if (m_DetectedCallerIP != address.ToString())
                             {
