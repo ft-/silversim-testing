@@ -875,7 +875,8 @@ namespace SilverSim.Viewer.Core
                     mtype == MessageType.GodlikeMessage ||
                     mtype == MessageType.EstateOwnerMessage ||
                     mtype == MessageType.UseCircuitCode ||
-                    mtype == MessageType.ScriptDialogReply)
+                    mtype == MessageType.ScriptDialogReply ||
+                    mtype == MessageType.NetTest)
                 {
                     continue;
                 }
