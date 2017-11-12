@@ -382,12 +382,12 @@ namespace SilverSim.Main.Common
 
                     if(SystemIPv4Service.IsPrivateIPAddress(address))
                     {
-                        sb.Append("\nPrivateIP=True");
+                        sb.Append("\nPublicIP=False");
                         overallsuccess = false;
                     }
                     else
                     {
-                        sb.Append("\nPrivateIP=False");
+                        sb.Append("\nPublicIP=True");
                     }
 
                     try
