@@ -502,7 +502,6 @@ namespace SilverSim.Main.Common.HttpServer
                     }
 
                     ProcessHttpRequest(req);
-                    httpstream.ReadTimeout = 10000;
                 }
             }
             catch (HttpStream.TimeoutException)

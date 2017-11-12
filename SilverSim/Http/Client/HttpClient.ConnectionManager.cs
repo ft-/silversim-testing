@@ -228,10 +228,11 @@ namespace SilverSim.Http.Client
             bool checkCertificateRevocation,
             bool enableReuseConnection)
         {
-            var sslstream = new SslStream(new NetworkStream(ConnectToTcp(host, port)));
+            var sslstream = new SslStream(new NetworkStream(ConnectToTcp(host, port), true));
             sslstream.AuthenticateAsClient(host, clientCertificates, enabledSslProtocols, checkCertificateRevocation);
             if (!sslstream.IsEncrypted)
             {
+                sslstream.Dispose();
                 throw new AuthenticationException("Encryption not available");
             }
             return new HttpsStream(sslstream) { IsReusable = enableReuseConnection };

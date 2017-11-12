@@ -23,7 +23,9 @@ using Nini.Config;
 using SilverSim.ServiceInterfaces;
 using System;
 using System.IO;
+using System.Net;
 using System.Net.NetworkInformation;
+using System.Net.Sockets;
 
 namespace SilverSim.Main.Common
 {
@@ -45,11 +47,11 @@ namespace SilverSim.Main.Common
 
                     foreach (NetworkInterface ni in NetworkInterface.GetAllNetworkInterfaces())
                     {
-                        if (ni.NetworkInterfaceType == NetworkInterfaceType.Wireless80211 || ni.NetworkInterfaceType == NetworkInterfaceType.Ethernet)
+                        if (ni.NetworkInterfaceType != NetworkInterfaceType.Loopback)
                         {
                             foreach (UnicastIPAddressInformation ip in ni.GetIPProperties().UnicastAddresses)
                             {
-                                if (ip.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                                if (ip.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork && !IPAddress.IsLoopback(ip.Address))
                                 {
                                     m_IPv4Cached = ip.Address.ToString();
                                     m_IPv4LastCached = Environment.TickCount;
@@ -60,6 +62,45 @@ namespace SilverSim.Main.Common
                     }
                     throw new InvalidDataException("No IPv4 address found");
                 }
+            }
+
+            public static bool IsAddressOnInterface(IPAddress address)
+            {
+                foreach (NetworkInterface ni in NetworkInterface.GetAllNetworkInterfaces())
+                {
+                    if (ni.NetworkInterfaceType != NetworkInterfaceType.Loopback)
+                    {
+                        foreach (UnicastIPAddressInformation ip in ni.GetIPProperties().UnicastAddresses)
+                        {
+                            if (ip.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork && 
+                                address.Equals(ip.Address) && !IPAddress.IsLoopback(ip.Address))
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
+                return false;
+            }
+
+            public static bool IsPrivateIPAddress(IPAddress address)
+            {
+                if(address.IsIPv6SiteLocal || address.IsIPv6LinkLocal)
+                {
+                    return true;
+                }
+
+                if(address.AddressFamily == AddressFamily.InterNetwork)
+                {
+                    byte[] addr = address.GetAddressBytes();
+                    if((addr[0] == 10) ||
+                        (addr[0] == 192 && addr[1] == 168) ||
+                        (addr[0] == 172 && addr[1] >= 16 && addr[1] <= 31))
+                    {
+                        return true;
+                    }
+                }
+                return false;
             }
         }
 

@@ -739,6 +739,7 @@ namespace SilverSim.Main.Common
             CommandRegistry.AddDeleteCommand("cacheddns", RemoveCachedDnsCommand);
             CommandRegistry.AddShowCommand("ports", ShowPortAllocationsCommand);
             CommandRegistry.AddShowCommand("time-sources", ShowTimeSourcesCommand);
+            CommandRegistry.AddShowCommand("connectivity", ShowConnectivity);
 #if DEBUG
             CommandRegistry.AddShowCommand("http-handlers", ShowHttpHandlersCommand);
             CommandRegistry.AddShowCommand("xmlrpc-handlers", ShowXmlRpcHandlersCommand);
@@ -1013,6 +1014,7 @@ namespace SilverSim.Main.Common
             PluginInstances.Add("HttpServer", httpServer);
             httpServer.StartsWithUriHandlers.Add("/helo", HeloResponseHandler);
             httpServer.UriHandlers.Add("/robots.txt", HandleRobotsTxt);
+            httpServer.UriHandlers.Add("/diag-ping-external", HandleDiagPingExternal);
 
             IConfig httpsConfig = Config.Configs["HTTPS"];
             if(httpsConfig != null)
@@ -1021,6 +1023,7 @@ namespace SilverSim.Main.Common
                 PluginInstances.Add("HttpsServer", httpsServer);
                 httpsServer.UriHandlers.Add("/helo", HeloResponseHandler);
                 httpsServer.UriHandlers.Add("/robots.txt", HandleRobotsTxt);
+                httpsServer.UriHandlers.Add("/diag-ping-external", HandleDiagPingExternal);
             }
             else
             {

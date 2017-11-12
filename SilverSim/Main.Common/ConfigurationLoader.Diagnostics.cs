@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Http.Client;
 using SilverSim.Main.Common.Caps;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.ServiceInterfaces.Grid;
@@ -31,7 +32,9 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading;
 
@@ -333,6 +336,150 @@ namespace SilverSim.Main.Common
                 }
                 io.Write(sb.ToString());
             }
+        }
+
+        private void ShowConnectivity(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        {
+            if(args[0] == "help")
+            {
+                io.Write("Show network connectivity");
+            }
+            else
+            {
+                string hostname = ExternalHostNameService.ExternalHostName;
+                IPAddress address;
+
+                var sb = new StringBuilder($"Hostname={hostname}");
+                try
+                {
+                    address = DnsNameCache.GetHostAddresses(hostname, true)[0];
+                    sb.Append("\nIP=").Append(address);
+                }
+                catch
+                {
+                    sb.Append("\nExternallyAccessible=False");
+                    io.Write(sb.ToString());
+                    return;
+                }
+
+                bool overallsuccess = true;
+                if(SystemIPv4Service.IsAddressOnInterface(address))
+                {
+                    sb.Append("\nNAT=False");
+                    if (SystemIPv4Service.IsPrivateIPAddress(address))
+                    {
+                        io.Write("NAT=False\nPrivateIP=True\nExternallyAccessible=False");
+                    }
+                    else
+                    {
+                        io.Write("NAT=False\nPrivateIP=False\nExternallyAccessible=True");
+                    }
+                }
+                else
+                {
+                    bool success;
+                    sb.Append("\nNAT=True");
+
+                    if(SystemIPv4Service.IsPrivateIPAddress(address))
+                    {
+                        sb.Append("\nPrivateIP=True");
+                        overallsuccess = false;
+                    }
+                    else
+                    {
+                        sb.Append("\nPrivateIP=False");
+                    }
+
+                    try
+                    {
+                        new HttpClient.Head($"http://{address}:{HttpServer.Port}/diag-ping-external").ExecuteRequest();
+                        success = true;
+                        if (m_DetectedCallerIP != address.ToString())
+                        {
+                            sb.Append("\nHTTPOnAddressDetectedCaller=").Append(m_DetectedCallerIP);
+                            success = false;
+                        }
+                    }
+                    catch
+                    {
+                        success = false;
+                    }
+
+                    sb.Append("\nHTTPOnAddress=").Append(success);
+                    overallsuccess = overallsuccess && success;
+
+                    try
+                    {
+                        new HttpClient.Head($"http://{HttpServer.ExternalHostName}:{HttpServer.Port}/diag-ping-external").ExecuteRequest();
+                        success = true;
+                        if (m_DetectedCallerIP != address.ToString())
+                        {
+                            sb.Append("\nHTTPOnHostnameDetectedCaller=").Append(m_DetectedCallerIP);
+                            success = false;
+                        }
+                    }
+                    catch
+                    {
+                        success = false;
+                    }
+
+                    sb.Append("\nHTTPOnHostname=").Append(success);
+                    overallsuccess = overallsuccess && success;
+
+                    BaseHttpServer https;
+                    if(TryGetHttpsServer(out https))
+                    {
+                        try
+                        {
+                            new HttpClient.Head($"https://{address}:{https.Port}/diag-ping-external").ExecuteRequest();
+                            success = true;
+                            if (m_DetectedCallerIP != address.ToString())
+                            {
+                                sb.Append("\nHTTPSOnAddressDetectedCaller=").Append(m_DetectedCallerIP);
+                                success = false;
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            success = false;
+                            sb.Append("\nHTTPSOnAddressError=").Append(e.Message);
+                        }
+
+                        sb.Append("\nHTTPSOnAddress=").Append(success);
+                        overallsuccess = overallsuccess && success;
+
+                        try
+                        {
+                            new HttpClient.Head($"https://{https.ExternalHostName}:{https.Port}/diag-ping-external").ExecuteRequest();
+                            success = true;
+                            if (m_DetectedCallerIP != address.ToString())
+                            {
+                                sb.Append("\nHTTPSOnHostnameDetectedCaller=").Append(m_DetectedCallerIP);
+                                success = false;
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            success = false;
+                            sb.Append("\nHTTPSOnHostnameError=").Append(e.Message);
+                        }
+
+                        sb.Append("\nHTTPSOnHostname=").Append(success);
+                        overallsuccess = overallsuccess && success;
+                    }
+
+                    sb.Append("\nExternallyAccessible=").Append(overallsuccess);
+                }
+                io.Write(sb.ToString());
+            }
+        }
+
+        private string m_DetectedCallerIP;
+
+        private void HandleDiagPingExternal(HttpRequest req)
+        {
+            m_DetectedCallerIP = req.CallerIP;
+            req.EmptyResponse();
         }
     }
 }

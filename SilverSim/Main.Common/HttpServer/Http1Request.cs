@@ -115,6 +115,7 @@ namespace SilverSim.Main.Common.HttpServer
             m_HttpStream = httpStream;
             m_Body = null;
             string headerLine;
+            m_HttpStream.ReadTimeout = 10000;
             string requestInfo = ReadHeaderLine();
 
             /* Parse request line */
