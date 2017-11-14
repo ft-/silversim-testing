@@ -102,8 +102,15 @@ namespace SilverSim.Viewer.MuteList
 
         private void HandleMuteListRequest(AgentCircuit circuit, Message m)
         {
+            var req = (MuteListRequest)m;
+            if(req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
             ViewerAgent agent = circuit.Agent;
             MuteListServiceInterface muteListService = agent.MuteListService;
+            bool useCached = false;
 
             if(muteListService == null)
             {
@@ -121,10 +128,25 @@ namespace SilverSim.Viewer.MuteList
                         writer.WriteLine("{0} {1} {2}|{3}", (int)entry.Type, entry.MuteID.ToString(), entry.MuteName, (uint)entry.Flags);
                     }
                 }
-                agent.AddNewFile(filename, ms.ToArray());
+                byte[] data = ms.ToArray();
+                if (new Crc32().Compute(data) == req.MuteCRC)
+                {
+                    useCached = true;
+                }
+                else
+                {
+                    agent.AddNewFile(filename, data);
+                }
             }
 
-            circuit.SendMessage(new MuteListUpdate { AgentID = agent.ID, Filename = filename });
+            if (useCached)
+            {
+                circuit.SendMessage(new UseCachedMuteList { AgentID = agent.ID });
+            }
+            else
+            {
+                circuit.SendMessage(new MuteListUpdate { AgentID = agent.ID, Filename = filename });
+            }
         }
 
         private void HandleUpdateMuteListEntry(AgentCircuit circuit, Message m)
