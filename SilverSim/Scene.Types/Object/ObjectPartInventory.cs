@@ -47,7 +47,24 @@ namespace SilverSim.Scene.Types.Object
 
         public int InventorySerial = 1;
 
-        public UUID PartID { get; internal set; }
+        private UUID m_PartID;
+        public UUID PartID
+        {
+            get
+            {
+                return m_PartID;
+            }
+            internal set
+            {
+                m_PartID = value;
+                foreach(ObjectPartInventoryItem item in ValuesByKey1)
+                {
+                    item.ParentFolderID = value;
+                    item.UpdateInfo.UpdateIDs();
+                }
+            }
+        }
+
         private readonly object m_DataLock = new object();
 
         private int m_SuspendCount;
@@ -180,8 +197,6 @@ namespace SilverSim.Scene.Types.Object
                     }
                     item.Name = name;
                 }
-                item.ParentFolderID = PartID;
-                item.UpdateInfo.UpdateIDs();
                 Add(item.ID, item.Name, item);
             }
         }
@@ -189,6 +204,8 @@ namespace SilverSim.Scene.Types.Object
         #region Overrides
         public new void Add(UUID key1, string key2, ObjectPartInventoryItem item)
         {
+            item.ParentFolderID = PartID;
+            item.UpdateInfo.UpdateIDs();
             base.Add(key1, key2, item);
             Interlocked.Increment(ref InventorySerial);
 
