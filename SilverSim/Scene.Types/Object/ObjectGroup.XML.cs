@@ -294,7 +294,7 @@ namespace SilverSim.Scene.Types.Object
         }
 
         public static ObjectGroup FromXml(XmlTextReader reader, UUI currentOwner, XmlDeserializationOptions options) =>
-            FromXml(reader, currentOwner, options: options);
+            FromXml(reader, currentOwner, inRootPart: false, options: options);
 
         public static ObjectGroup FromXml(XmlTextReader reader, UUI currentOwner, bool inRootPart = false, XmlDeserializationOptions options = XmlDeserializationOptions.None)
         {
