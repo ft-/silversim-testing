@@ -262,5 +262,7 @@ namespace SilverSim.Scene.Types.Agent
         void DetachAllAttachments();
 
         void ScheduleUpdate(AgentUpdateInfo info, UUID fromSceneID);
+
+        bool IsAvatarFreezed { get; set; }
     }
 }

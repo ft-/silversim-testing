@@ -22,12 +22,14 @@
 #pragma warning disable IDE0018
 #pragma warning disable RCS1029
 
+using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using SilverSim.Types.Experience;
 using SilverSim.Types.Parcel;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Parcel;
+using SilverSim.Viewer.Messages.User;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -122,6 +124,32 @@ namespace SilverSim.Viewer.Core
                 }
 
                 SendMessage(rep);
+            }
+        }
+
+        [PacketHandler(MessageType.FreezeUser)]
+        public void HandleFreezeUser(Message m)
+        {
+            var req = (FreezeUser)m;
+            if (req.AgentID != req.CircuitAgentID ||
+                req.SessionID != req.CircuitSessionID)
+            {
+                return;
+            }
+
+            ParcelInfo pInfo;
+            IAgent agent;
+            if (Scene.RootAgents.TryGetValue(req.TargetID, out agent) && 
+                Scene.CanEjectFromParcel(Agent.Owner, agent.GlobalPosition, out pInfo))
+            {
+                if((req.Flags & KickFlags.Freeze) != 0)
+                {
+                    agent.IsAvatarFreezed = true;
+                }
+                else if((req.Flags & KickFlags.Unfreeze) != 0)
+                {
+                    agent.IsAvatarFreezed = false;
+                }
             }
         }
 

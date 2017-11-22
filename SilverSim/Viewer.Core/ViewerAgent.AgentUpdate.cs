@@ -247,6 +247,10 @@ namespace SilverSim.Viewer.Core
             {
                 agentMovementDirection *= 1.6f;
             }
+            if(IsAvatarFreezed)
+            {
+                agentMovementDirection = Vector3.Zero;
+            }
             ((IAgentPhysicsObject)PhysicsActor).SetControlDirectionalInput(agentMovementDirection);
             ((IAgentPhysicsObject)PhysicsActor).SetControlFlags(agentControlFlags);
         }

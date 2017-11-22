@@ -1185,5 +1185,7 @@ namespace SilverSim.Scene.Agent
         {
             /* intentionally left empty */
         }
+
+        public bool IsAvatarFreezed { get; set; }
     }
 }
