@@ -1070,6 +1070,7 @@ namespace SilverSim.Viewer.Core
                             m.CircuitAgentOwner = Agent.Owner;
                             m.CircuitSessionID = new UUID(SessionID);
                             m.CircuitSceneID = new UUID(Scene.ID);
+                            m.CircuitSequenceNumber = p.SequenceNumber;
                         }
                         catch
                         {

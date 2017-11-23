@@ -431,6 +431,7 @@ namespace SilverSim.Viewer.Core
                                 ko = new KillObject();
                             }
 
+                            RemoveObjectImageUpdateLock(ui.ID);
                             ko.LocalIDs.Add(ui.LocalID);
                             LastObjSerialNo.Remove(ui.LocalID);
                             if (ko.LocalIDs.Count > 250)

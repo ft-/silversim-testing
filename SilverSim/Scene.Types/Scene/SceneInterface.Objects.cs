@@ -987,42 +987,6 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        [PacketHandler(MessageType.ObjectImage)]
-        public void HandleObjectImage(Message m)
-        {
-            var req = (ObjectImage)m;
-            if (req.CircuitSessionID != req.SessionID ||
-                req.CircuitAgentID != req.AgentID)
-            {
-                return;
-            }
-            IAgent agent;
-            if (!Agents.TryGetValue(req.AgentID, out agent))
-            {
-                return;
-            }
-
-            foreach (ObjectImage.ObjectDataEntry data in req.ObjectData)
-            {
-#if DEBUG
-                m_Log.DebugFormat("ObjectImage localid={0}", data.ObjectLocalID);
-#endif
-
-                ObjectPart part;
-                if (!Primitives.TryGetValue(data.ObjectLocalID, out part))
-                {
-                    continue;
-                }
-                if (!CanEdit(agent, part.ObjectGroup, part.ObjectGroup.GlobalPosition))
-                {
-                    continue;
-                }
-
-                part.TextureEntryBytes = data.TextureEntry;
-                part.MediaURL = data.MediaURL;
-            }
-        }
-
         [PacketHandler(MessageType.ObjectExportSelected)]
         public void HandleObjectExportSelected(Message m)
         {
