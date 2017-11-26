@@ -21,13 +21,28 @@
 
 namespace SilverSim.Types.TravelingData
 {
-    public struct TravelingDataInfo
+    public class TravelingDataInfo
     {
         public UUID SessionID;
         public UUID UserID;
-        public string GridExternalName;
-        public string ServiceToken;
-        public string ClientIPAddress;
-        public Date Timestamp;
+        public string GridExternalName = string.Empty;
+        public string ServiceToken = string.Empty;
+        public string ClientIPAddress = string.Empty;
+        public Date Timestamp = Date.Now;
+
+        public TravelingDataInfo()
+        {
+
+        }
+
+        public TravelingDataInfo(TravelingDataInfo src)
+        {
+            SessionID = src.SessionID;
+            UserID = src.UserID;
+            GridExternalName = src.GridExternalName;
+            ServiceToken = src.ServiceToken;
+            ClientIPAddress = src.ClientIPAddress;
+            Timestamp = src.Timestamp;
+        }
     }
 }

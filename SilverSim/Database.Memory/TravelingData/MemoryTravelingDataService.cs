@@ -45,7 +45,7 @@ namespace SilverSim.Database.Memory.TravelingData
             {
                 if(hgd.ClientIPAddress == ipAddress && hgd.UserID == agentID)
                 {
-                    return hgd;
+                    return new TravelingDataInfo(hgd);
                 }
             }
             throw new KeyNotFoundException();
@@ -57,7 +57,7 @@ namespace SilverSim.Database.Memory.TravelingData
             {
                 if (hgd.GridExternalName != homeURI && hgd.UserID == agentID)
                 {
-                    return hgd;
+                    return new TravelingDataInfo(hgd);
                 }
             }
             throw new KeyNotFoundException();
@@ -70,7 +70,7 @@ namespace SilverSim.Database.Memory.TravelingData
             {
                 if(hgd.UserID == agentID)
                 {
-                    hgds.Add(hgd);
+                    hgds.Add(new TravelingDataInfo(hgd));
                 }
             }
             return hgds;
@@ -114,7 +114,7 @@ namespace SilverSim.Database.Memory.TravelingData
 
         public override void Store(TravelingDataInfo data)
         {
-            m_HGTravelingDatas[data.SessionID] = data;
+            m_HGTravelingDatas[data.SessionID] = new TravelingDataInfo(data);
         }
     }
 }
