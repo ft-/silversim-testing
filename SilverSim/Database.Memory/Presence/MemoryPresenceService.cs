@@ -55,7 +55,12 @@ namespace SilverSim.Database.Memory.Presence
             {
                 try
                 {
-                    return new PresenceInfo(m_Data[sessionID]);
+                    PresenceInfo pinfo = m_Data[sessionID];
+                    if(pinfo.UserID.ID != userID && userID != UUID.Zero)
+                    {
+                        throw new PresenceNotFoundException();
+                    }
+                    return new PresenceInfo(pinfo);
                 }
                 catch(KeyNotFoundException)
                 {
@@ -66,10 +71,7 @@ namespace SilverSim.Database.Memory.Presence
 
         public override void Login(PresenceInfo value)
         {
-            m_Data[value.SessionID] = new PresenceInfo(value)
-            {
-                RegionID = UUID.Zero
-            };
+            m_Data[value.SessionID] = new PresenceInfo(value);
         }
 
         public override void Report(PresenceInfo value)
