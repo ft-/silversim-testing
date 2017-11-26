@@ -25,7 +25,6 @@ using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Presence;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -54,7 +53,14 @@ namespace SilverSim.Database.Memory.Presence
         {
             get
             {
-                return new PresenceInfo(m_Data[sessionID]);
+                try
+                {
+                    return new PresenceInfo(m_Data[sessionID]);
+                }
+                catch(KeyNotFoundException)
+                {
+                    throw new PresenceNotFoundException();
+                }
             }
         }
 
@@ -77,7 +83,10 @@ namespace SilverSim.Database.Memory.Presence
 
         public override void Logout(UUID sessionID, UUID userID)
         {
-            m_Data.Remove(sessionID);
+            if(!m_Data.Remove(sessionID))
+            {
+                throw new PresenceUpdateFailedException();
+            }
         }
 
         public override void LogoutRegion(UUID regionID)

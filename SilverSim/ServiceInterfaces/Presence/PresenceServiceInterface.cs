@@ -51,7 +51,7 @@ namespace SilverSim.ServiceInterfaces.Presence
     }
 
     [Serializable]
-    public sealed class PresenceNotFoundException : Exception
+    public sealed class PresenceNotFoundException : KeyNotFoundException
     {
         public PresenceNotFoundException()
         {
