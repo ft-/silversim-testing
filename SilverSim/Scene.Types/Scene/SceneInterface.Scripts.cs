@@ -24,11 +24,15 @@ using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.ServiceInterfaces.Experience;
 using SilverSim.Types;
+using SilverSim.Types.Parcel;
 using SilverSim.Types.Script;
+using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Viewer.Messages;
+using SilverSim.Viewer.Messages.Generic;
 using SilverSim.Viewer.Messages.Land;
 using SilverSim.Viewer.Messages.Script;
 using System;
+using System.IO;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -129,6 +133,46 @@ namespace SilverSim.Scene.Types.Scene
                 IsRunning = instance?.IsRunning ?? false
             };
             agent.SendMessageAlways(reply, ID);
+        }
+
+        public enum ExperienceLogType
+        {
+            TakeControl = 1,
+            TriggerAnimation = 3,
+            Attach = 4,
+            TrackCamera = 9,
+            ControlCamera = 10,
+            Teleport = 11,
+            AutoAccept = 12
+        }
+
+        public void SendExperienceLog(IAgent agent, ObjectGroup grp, ExperienceLogType permissions, UUID experienceID)
+        {
+            var gm = new GenericMessage
+            {
+                Method = "ExperienceEvent",
+                Invoice = experienceID,
+                SessionID = UUID.Zero,
+                AgentID = agent.ID
+            };
+            var llsd = new Map
+            {
+                { "OwnerID", grp.Owner.ID },
+                { "Permission", (int)permissions },
+                { "IsAttachment", grp.IsAttached }
+            };
+            using (var ms = new MemoryStream())
+            {
+                LlsdXml.Serialize(llsd, ms);
+                gm.ParamList.Add(ms.ToArray());
+            }
+            gm.ParamList.Add((grp.Name + "\0").ToUTF8Bytes());
+            ParcelInfo pInfo;
+            if (!grp.IsAttached && Parcels.TryGetValue(grp.GlobalPosition, out pInfo))
+            {
+                gm.ParamList.Add((pInfo.Name + "\0").ToUTF8Bytes());
+            }
+            agent.SendMessageAlways(gm, ID);
         }
 
         [PacketHandler(MessageType.ScriptAnswerYes)]
