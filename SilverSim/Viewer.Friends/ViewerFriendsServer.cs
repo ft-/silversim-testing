@@ -43,6 +43,7 @@ using SilverSim.Viewer.Core;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.CallingCard;
 using SilverSim.Viewer.Messages.Friend;
+using SilverSim.Viewer.Messages.Generic;
 using SilverSim.Viewer.Messages.IM;
 using System;
 using System.Collections.Generic;
@@ -69,12 +70,14 @@ namespace SilverSim.Viewer.Friends
         [PacketHandler(MessageType.AcceptCallingCard)]
         [PacketHandler(MessageType.DeclineCallingCard)]
         [PacketHandler(MessageType.OfferCallingCard)]
+        [GenericMessageHandler("requestonlinenotification")]
         private readonly BlockingQueue<KeyValuePair<AgentCircuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
 
         private IMServiceInterface m_IMService;
         private readonly string m_IMServiceName;
         private List<IFriendsServicePlugin> m_FriendsPlugins;
         private List<IUserAgentServicePlugin> m_UserAgentPlugins;
+        private List<IFriendsStatusNotifyServicePlugin> m_FriendsStatusNotifyPlugins;
         private SceneList m_Scenes;
 
         private bool m_ShutdownFriends;
@@ -90,6 +93,7 @@ namespace SilverSim.Viewer.Friends
             m_IMService = loader.GetService<IMServiceInterface>(m_IMServiceName);
             m_FriendsPlugins = loader.GetServicesByValue<IFriendsServicePlugin>();
             m_UserAgentPlugins = loader.GetServicesByValue<IUserAgentServicePlugin>();
+            m_FriendsStatusNotifyPlugins = loader.GetServicesByValue<IFriendsStatusNotifyServicePlugin>();
             ThreadManager.CreateThread(HandlerThread).Start();
         }
 
@@ -154,6 +158,18 @@ namespace SilverSim.Viewer.Friends
                             }
                             break;
 
+                        case MessageType.GenericMessage:
+                            {
+                                var gm = (GenericMessage)m;
+                                switch(gm.Method)
+                                {
+                                    case "requestonlinenotification":
+                                        HandleRequestOnlineNotification(gm);
+                                        break;
+                                }
+                            }
+                            break;
+
                         default:
                             break;
                     }
@@ -162,6 +178,57 @@ namespace SilverSim.Viewer.Friends
                 {
                     m_Log.ErrorFormat("Exception during friendship handling: {0}: {1}\n{2}", e.GetType().FullName, e.Message, e.StackTrace);
                 }
+            }
+        }
+
+        private void HandleRequestOnlineNotification(GenericMessage m)
+        {
+            if (m.AgentID != m.CircuitAgentID ||
+                m.SessionID != m.CircuitSessionID ||
+                m.ParamList.Count < 1)
+            {
+                return;
+            }
+
+            SceneInterface scene;
+            if (!m_Scenes.TryGetValue(m.CircuitSceneID, out scene))
+            {
+                return;
+            }
+
+            UUID destid;
+            if(!UUID.TryParse(m.ParamList[0].FromUTF8Bytes(), out destid))
+            {
+                return;
+            }
+
+            IAgent agent;
+            if (!scene.Agents.TryGetValue(m.AgentID, out agent))
+            {
+                return;
+            }
+
+            IAgent testagent;
+            UUI destagent;
+            FriendInfo friendInfo;
+            IFriendsStatusNotifyServiceInterface otherFriendsStatusNotifyService;
+            if (scene.Agents.TryGetValue(destid, out testagent))
+            {
+                var outmsg = new OnlineNotification();
+                outmsg.AgentIDs.Add(destid);
+                agent.SendMessageAlways(outmsg, m.CircuitSceneID);
+            }
+            else if (!scene.AvatarNameService.TryGetValue(m.ParamList[0].FromUTF8Bytes(), out destagent))
+            {
+                return;
+            }
+            else if(!TryGetFriendsStatusNotifyService(destagent, out otherFriendsStatusNotifyService))
+            {
+                return;
+            }
+            else if(agent.FriendsService.TryGetValue(agent.Owner, destagent, out friendInfo) && (friendInfo.FriendGivenFlags & FriendRightFlags.SeeOnline) != 0)
+            {
+                otherFriendsStatusNotifyService.NotifyAsOnline(agent.Owner, new List<KeyValuePair<UUI, string>> { new KeyValuePair<UUI, string>(destagent, friendInfo.Secret) });
             }
         }
 
@@ -695,6 +762,78 @@ namespace SilverSim.Viewer.Friends
             }
 
             foreach (var service in m_FriendsPlugins)
+            {
+                if (handlerType.Contains(service.Name))
+                {
+                    friendsService = service.Instantiate(friendsUri);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public bool TryGetFriendsStatusNotifyService(UUI agent, out IFriendsStatusNotifyServiceInterface friendsService)
+        {
+            friendsService = null;
+            if (agent.HomeURI == null)
+            {
+                return false;
+            }
+
+            string[] handlerType;
+            var homeURI = agent.HomeURI.ToString();
+            try
+            {
+                handlerType = ServicePluginHelo.HeloRequest_HandleType(homeURI);
+            }
+            catch
+            {
+                return false;
+            }
+
+            UserAgentServiceInterface userAgentService = null;
+
+            foreach (var service in m_UserAgentPlugins)
+            {
+                if (handlerType.Contains(service.Name))
+                {
+                    userAgentService = service.Instantiate(homeURI);
+                    break;
+                }
+            }
+
+            if (userAgentService == null)
+            {
+                return false;
+            }
+
+            string friendsUri;
+            Dictionary<string, string> serviceurls;
+            try
+            {
+                serviceurls = userAgentService.GetServerURLs(agent);
+            }
+            catch
+            {
+                return false;
+            }
+
+            if (!serviceurls.TryGetValue("FriendsServerURI", out friendsUri))
+            {
+                return false;
+            }
+
+            try
+            {
+                handlerType = ServicePluginHelo.HeloRequest_HandleType(friendsUri);
+            }
+            catch
+            {
+                return false;
+            }
+
+            foreach (var service in m_FriendsStatusNotifyPlugins)
             {
                 if (handlerType.Contains(service.Name))
                 {
