@@ -26,6 +26,7 @@ using SilverSim.Types;
 using SilverSim.Types.MuteList;
 using SilverSim.Viewer.Core;
 using SilverSim.Viewer.Messages;
+using SilverSim.Viewer.Messages.Generic;
 using SilverSim.Viewer.Messages.MuteList;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -111,6 +112,7 @@ namespace SilverSim.Viewer.MuteList
             ViewerAgent agent = circuit.Agent;
             MuteListServiceInterface muteListService = agent.MuteListService;
             bool useCached = false;
+            bool useEmpty = true;
 
             if(muteListService == null)
             {
@@ -126,6 +128,7 @@ namespace SilverSim.Viewer.MuteList
                     foreach (MuteListEntry entry in muteListService.GetList(agent.ID))
                     {
                         writer.WriteLine("{0} {1} {2}|{3}", (int)entry.Type, entry.MuteID.ToString(), entry.MuteName, (uint)entry.Flags);
+                        useEmpty = false;
                     }
                 }
                 byte[] data = ms.ToArray();
@@ -133,7 +136,7 @@ namespace SilverSim.Viewer.MuteList
                 {
                     useCached = true;
                 }
-                else
+                else if(!useEmpty)
                 {
                     agent.AddNewFile(filename, data);
                 }
@@ -142,6 +145,10 @@ namespace SilverSim.Viewer.MuteList
             if (useCached)
             {
                 circuit.SendMessage(new UseCachedMuteList { AgentID = agent.ID });
+            }
+            else if (useEmpty)
+            {
+                circuit.SendMessage(new GenericMessage { Method = "emptymutelist" });
             }
             else
             {
