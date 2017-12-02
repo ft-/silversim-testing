@@ -61,10 +61,7 @@ namespace SilverSim.Database.Memory.Maptile
 
         public override void Store(MaptileData data)
         {
-            m_Maptiles[GetKey(data)] = new MaptileData(data)
-            {
-                LastUpdate = Date.Now
-            };
+            m_Maptiles[GetKey(data)] = new MaptileData(data);
         }
 
         public override bool Remove(UUID scopeid, GridVector location, int zoomlevel) =>
