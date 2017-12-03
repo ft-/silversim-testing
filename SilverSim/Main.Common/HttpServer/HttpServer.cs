@@ -191,6 +191,24 @@ namespace SilverSim.Main.Common.HttpServer
             }
         }
 
+        public void ReloadCertificate()
+        {
+            if(Scheme != Uri.UriSchemeHttps)
+            {
+                throw new InvalidOperationException();
+            }
+
+            try
+            {
+                m_ServerCertificate = new X509Certificate2(m_CertificateFileName);
+            }
+            catch (Exception e)
+            {
+                m_Log.Error("Reloading certificate failed", e);
+                throw;
+            }
+        }
+
         public ShutdownOrder ShutdownOrder => ShutdownOrder.Any;
 
         public void Shutdown()
