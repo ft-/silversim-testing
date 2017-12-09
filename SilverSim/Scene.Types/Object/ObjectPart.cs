@@ -84,6 +84,7 @@ namespace SilverSim.Scene.Types.Object
         private string m_TouchText = string.Empty;
         private bool m_IsSitTargetActive;
         private Vector3 m_SitTargetOffset = Vector3.Zero;
+        private string m_SitAnimation = string.Empty;
         private Quaternion m_SitTargetOrientation = Quaternion.Identity;
         private bool m_IsAllowedDrop;
         private ClickActionType m_ClickAction;
@@ -1228,6 +1229,26 @@ namespace SilverSim.Scene.Types.Object
                 lock(m_DataLock)
                 {
                     m_IsSitTargetActive = value;
+                }
+                IsChanged = m_IsChangedEnabled;
+                TriggerOnUpdate(0);
+            }
+        }
+
+        public string SitAnimation
+        {
+            get
+            {
+                lock(m_DataLock)
+                {
+                    return m_SitAnimation;
+                }
+            }
+            set
+            {
+                lock(m_DataLock)
+                {
+                    m_SitAnimation = value;
                 }
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
