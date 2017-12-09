@@ -1180,8 +1180,7 @@ namespace SilverSim.Scene.Types.Object
                 }
                 agent.AllowUnsit = sitOnTarget.AllowUnsit;
 
-                if(!sitOnTarget.SitTargetOffset.ApproxEquals(Vector3.Zero, double.Epsilon) ||
-                    !sitOnTarget.SitTargetOrientation.ApproxEquals(Quaternion.Identity, double.Epsilon))
+                if(sitOnTarget.IsSitTargetActive)
                 {
                     agent.LocalPosition = sitOnTarget.SitTargetOffset - SIT_TARGET_OFFSET;
                     agent.LocalRotation = sitOnTarget.SitTargetOrientation;
