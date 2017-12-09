@@ -1146,8 +1146,9 @@ namespace SilverSim.Scene.Types.Object
                 if (UUID.TryParse(sitanim, out animid))
                 {
                 }
-                else if (sitOnTarget.Inventory.TryGetValue(sitanim, out item) && item.AssetType == SilverSim.Types.Asset.AssetType.Animation)
+                else if (sitOnTarget.Inventory.TryGetValue(sitanim, out item) && item.AssetType == AssetType.Animation)
                 {
+                    animid = item.AssetID;
                 }
                 else
                 {
