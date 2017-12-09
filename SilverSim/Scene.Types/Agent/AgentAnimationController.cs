@@ -258,6 +258,22 @@ namespace SilverSim.Scene.Types.Agent
             SendAnimations();
         }
 
+        public void StopAllAnimations(UUID sourceid)
+        {
+            lock (m_Lock)
+            {
+                for (int i = 0; i < m_ActiveAnimations.Count; ++i)
+                {
+                    if (m_ActiveAnimations[i].SourceID == sourceid)
+                    {
+                        m_ActiveAnimations.RemoveAt(i);
+                        break;
+                    }
+                }
+            }
+            SendAnimations();
+        }
+
         public List<UUID> GetPlayingAnimations()
         {
             var res = new List<UUID>();

@@ -75,6 +75,11 @@ namespace SilverSim.Scene.Agent
             m_AnimationController.StopAnimation(animid, objectid);
         }
 
+        public void StopAllAnimations(UUID sourceid)
+        {
+            m_AnimationController.StopAllAnimations(sourceid);
+        }
+
         public string GetDefaultAnimation() => m_AnimationController.GetDefaultAnimation();
 
         public List<UUID> GetPlayingAnimations() => m_AnimationController.GetPlayingAnimations();

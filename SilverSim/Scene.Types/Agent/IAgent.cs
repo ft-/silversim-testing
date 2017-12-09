@@ -228,6 +228,7 @@ namespace SilverSim.Scene.Types.Agent
         string GetAnimationOverride(string anim_state);
         void PlayAnimation(UUID anim, UUID objectid);
         void StopAnimation(UUID anim, UUID objectid);
+        void StopAllAnimations(UUID sourceid);
         string GetDefaultAnimation(); /* locomotion */
         List<UUID> GetPlayingAnimations();
 

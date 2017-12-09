@@ -153,6 +153,23 @@ namespace SilverSim.Threading
             return false;
         });
 
+        public bool Remove(TKey1 key1, out TKey2 key2)
+        {
+            var rkey2 = default(TKey2);
+            bool res = m_RwLock.AcquireWriterLock(() =>
+            {
+                if (m_Dictionary_K1.TryGetValue(key1, out rkey2))
+                {
+                    m_Dictionary_K1.Remove(key1);
+                    m_Dictionary_K2.Remove(rkey2);
+                    return true;
+                }
+                return false;
+            });
+            key2 = rkey2;
+            return res;
+        }
+
         public bool Remove(TKey2 key2) => m_RwLock.AcquireWriterLock(() =>
         {
             TKey1 kvp;
@@ -164,6 +181,23 @@ namespace SilverSim.Threading
             }
             return false;
         });
+
+        public bool Remove(TKey2 key2, out TKey1 key1)
+        {
+            var rkey1 = default(TKey1);
+            bool res = m_RwLock.AcquireWriterLock(() =>
+            {
+                if (m_Dictionary_K2.TryGetValue(key2, out rkey1))
+                {
+                    m_Dictionary_K1.Remove(rkey1);
+                    m_Dictionary_K2.Remove(key2);
+                    return true;
+                }
+                return false;
+            });
+            key1 = rkey1;
+            return res;
+        }
 
         public void Clear() => m_RwLock.AcquireWriterLock(() =>
         {

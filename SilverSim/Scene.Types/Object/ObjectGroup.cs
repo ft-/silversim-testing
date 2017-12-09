@@ -29,6 +29,7 @@ using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
+using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using SilverSim.Types.Primitive;
 using System;
@@ -1137,9 +1138,32 @@ namespace SilverSim.Scene.Types.Object
                 Sit(agent, Vector3.Zero, preferedLinkNumber);
             }
 
+            private bool TryGetAnimation(ObjectPart sitOnTarget, string sitanim, out UUID animid)
+            {
+                animid = UUID.Zero;
+                AssetMetadata metadata = null;
+                ObjectPartInventoryItem item = null;
+                if (UUID.TryParse(sitanim, out animid))
+                {
+                }
+                else if (sitOnTarget.Inventory.TryGetValue(sitanim, out item) && item.AssetType == SilverSim.Types.Asset.AssetType.Animation)
+                {
+                }
+                else
+                {
+                    return false;
+                }
+
+                if (sitOnTarget.ObjectGroup?.Scene?.AssetService.Metadata.TryGetValue(animid, out metadata) ?? false)
+                {
+                    return metadata.Type == AssetType.Animation;
+                }
+                return false;
+            }
+
             public void Sit(IAgent agent, Vector3 preferedOffset, int preferedLinkNumber = -1)
             {
-                var sitOn = (ObjectGroup)agent.SittingOnObject;
+                ObjectGroup sitOn = agent.SittingOnObject;
                 if(sitOn != null)
                 {
                     sitOn.m_SittingAgents.Remove(agent);
@@ -1174,16 +1198,10 @@ namespace SilverSim.Scene.Types.Object
                 if(sitanim?.Length != 0)
                 {
                     UUID animid;
-                    ObjectPartInventoryItem item = null;
-                    if (UUID.TryParse(sitanim, out animid))
+                    if(TryGetAnimation(sitOnTarget, sitanim, out animid))
                     {
                         agent.StopAnimation(agent.GetDefaultAnimation(), sitOnTarget.ID);
                         agent.PlayAnimation(animid, sitOnTarget.ID);
-                    }
-                    else if(sitOnTarget.Inventory.TryGetValue(sitanim, out item) && item.AssetType == SilverSim.Types.Asset.AssetType.Animation)
-                    {
-                        agent.StopAnimation(agent.GetDefaultAnimation(), sitOnTarget.ID);
-                        agent.PlayAnimation(item.AssetID, sitOnTarget.ID);
                     }
                 }
 
@@ -1254,9 +1272,10 @@ namespace SilverSim.Scene.Types.Object
             {
                 bool res;
                 IObject satOn = null;
+                ObjectPart satOnTarget;
                 lock (m_SitLock)
                 {
-                    res = m_Group.m_SittingAgents.Remove(agent);
+                    res = m_Group.m_SittingAgents.Remove(agent, out satOnTarget);
                     if (res)
                     {
                         satOn = agent.SittingOnObject;
@@ -1266,6 +1285,10 @@ namespace SilverSim.Scene.Types.Object
 
                 satOn?.PostEvent(new ChangedEvent(ChangedEvent.ChangedFlags.Link));
 
+                if(satOnTarget != null)
+                {
+                    agent.StopAllAnimations(satOnTarget.ID);
+                }
                 if (res)
                 {
                     SceneInterface scene = m_Group.Scene;
