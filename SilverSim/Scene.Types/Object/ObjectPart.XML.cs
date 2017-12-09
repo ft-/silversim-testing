@@ -162,6 +162,11 @@ namespace SilverSim.Scene.Types.Object
                     writer.WriteNamedValue("SitTargetPosition", SitTargetOffset);
                     writer.WriteNamedValue("SitTargetPositionLL", SitTargetOffset);
                     writer.WriteNamedValue("SitTargetOrientationLL", SitTargetOrientation);
+                    string sitanim = SitAnimation;
+                    if(sitanim?.Length != 0)
+                    {
+                        writer.WriteNamedValue("SitAnimation", sitanim);
+                    }
                     writer.WriteNamedValue("ParentID", ObjectGroup.RootPart.ID);
                     writer.WriteNamedValue("CreationDate", CreationDate.AsULong.ToString());
                     if ((options & XmlSerializationOptions.WriteRezDate) != XmlSerializationOptions.None)
@@ -1355,6 +1360,10 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     part.IsSitTargetActive = true;
                                 }
+                                break;
+
+                            case "SitAnimation":
+                                part.SitAnimation = reader.ReadElementValueAsString();
                                 break;
 
                             case "ParentID":

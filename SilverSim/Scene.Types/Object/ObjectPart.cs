@@ -1248,7 +1248,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 lock(m_DataLock)
                 {
-                    m_SitAnimation = value;
+                    m_SitAnimation = value ?? string.Empty;
                 }
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);

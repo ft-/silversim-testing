@@ -1170,6 +1170,22 @@ namespace SilverSim.Scene.Types.Object
                 }
 
                 agent.SetDefaultAnimation("sitting");
+                string sitanim = sitOnTarget.SitAnimation;
+                if(sitanim?.Length != 0)
+                {
+                    UUID animid;
+                    ObjectPartInventoryItem item = null;
+                    if (UUID.TryParse(sitanim, out animid))
+                    {
+                        agent.StopAnimation(agent.GetDefaultAnimation(), sitOnTarget.ID);
+                        agent.PlayAnimation(animid, sitOnTarget.ID);
+                    }
+                    else if(sitOnTarget.Inventory.TryGetValue(sitanim, out item) && item.AssetType == SilverSim.Types.Asset.AssetType.Animation)
+                    {
+                        agent.StopAnimation(agent.GetDefaultAnimation(), sitOnTarget.ID);
+                        agent.PlayAnimation(item.AssetID, sitOnTarget.ID);
+                    }
+                }
 
                 var scene = m_Group.Scene;
                 if (scene != null)
