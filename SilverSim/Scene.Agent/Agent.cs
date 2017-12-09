@@ -62,7 +62,7 @@ namespace SilverSim.Scene.Agent
         private static readonly ILog m_Log = LogManager.GetLogger("AGENT");
         protected readonly object m_DataLock = new object();
 
-#region Agent fields
+        #region Agent fields
         private double m_Health = 100f;
         #endregion
 

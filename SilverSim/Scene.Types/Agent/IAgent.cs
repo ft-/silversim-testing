@@ -61,6 +61,8 @@ namespace SilverSim.Scene.Types.Agent
         string LastName { get; set; }
         UUID SceneID { get; set; }
 
+        event Action<IAgent> OnAppearanceUpdate;
+
         AgentUpdateInfo GetUpdateInfo(UUID sceneID);
 
         void SendKillObject(UUID sceneID);

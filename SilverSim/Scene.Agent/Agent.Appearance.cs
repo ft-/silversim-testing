@@ -90,7 +90,7 @@ namespace SilverSim.Scene.Agent
 
         public static UUID IMG_DEFAULT_AVATAR => new UUID("c228d1cf-4b5d-4ba8-84f4-899a0796aa97");
 
-        public Action<IAgent> OnAppearanceUpdate;
+        public event Action<IAgent> OnAppearanceUpdate;
 
         public int AppearanceSerial
         {
