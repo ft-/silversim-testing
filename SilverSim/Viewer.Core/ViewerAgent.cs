@@ -862,7 +862,11 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            if(Circuits.TryGetValue(sitreq.CircuitSceneID, out circuit))
+#if DEBUG
+            m_Log.DebugFormat("Process AgentRequestSit for {0} at {1}", sitreq.AgentID, sitreq.TargetID);
+#endif
+
+            if (Circuits.TryGetValue(sitreq.CircuitSceneID, out circuit))
             {
                 var scene = circuit.Scene;
                 if(scene == null || scene.ID != SceneID)
@@ -894,6 +898,8 @@ namespace SilverSim.Viewer.Core
                             m_AgentRequestedSitOffset = sitOffset;
                         }
 
+                        grp.AgentSitting.Sit(this, m_AgentRequestedSitOffset, grp.RootPart != part ? part.LinkNumber : -1);
+
                         var sitres = new AvatarSitResponse
                         {
                             SitObject = sitOnLink.ID,
@@ -920,6 +926,10 @@ namespace SilverSim.Viewer.Core
             {
                 return;
             }
+
+#if DEBUG
+            m_Log.DebugFormat("Process AgentSit for {0}", sitreq.AgentID);
+#endif
 
             if (Circuits.TryGetValue(sitreq.CircuitSceneID, out circuit))
             {

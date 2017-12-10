@@ -238,15 +238,15 @@ namespace SilverSim.Scene.Physics.Common
                 {
                     Agent.SetDefaultAnimation("flying");
                 }
-                else if (horizontalVelocity > 0.1)
+                else if (horizontalVelocity > 0.2)
                 {
                     Agent.SetDefaultAnimation("flyingslow");
                 }
-                else if(Agent.Velocity.Z > 0.1)
+                else if(Agent.Velocity.Z > 0.2)
                 {
                     Agent.SetDefaultAnimation("hovering up");
                 }
-                else if(Agent.Velocity.Z < -0.1)
+                else if(Agent.Velocity.Z < -0.2)
                 {
                     Agent.SetDefaultAnimation("hovering down");
                 }
