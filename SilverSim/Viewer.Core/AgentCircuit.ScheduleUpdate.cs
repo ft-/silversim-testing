@@ -313,6 +313,16 @@ namespace SilverSim.Viewer.Core
             var nonPhysicalOutQueue = new Queue<IObjUpdateInfo>();
             queues[0] = physicalOutQueue;
             queues[1] = nonPhysicalOutQueue;
+
+            /* guard for a certain type of race condition here */
+            while(Scene == null)
+            {
+                Thread.Sleep(100);
+                if(!m_ObjectUpdateThreadRunning)
+                {
+                    return;
+                }
+            }
             regionHandle = Scene.GridPosition.RegionHandle;
             IObjUpdateInfo objinfo;
 
