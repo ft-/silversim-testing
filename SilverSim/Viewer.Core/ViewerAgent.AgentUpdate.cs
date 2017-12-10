@@ -178,6 +178,7 @@ namespace SilverSim.Viewer.Core
             var agentMovementDirection = Vector3.Zero;
 
             m_IsFlying = agentControlFlags.HasFly() && ((IAgentPhysicsObject)PhysicsActor).IsPhysicsActive;
+            m_Log.DebugFormat("Fly {0} {1}", agentControlFlags.HasFly(), ((IAgentPhysicsObject)PhysicsActor).IsPhysicsActive);
 
             if (SittingOnObject != null)
             {

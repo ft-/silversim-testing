@@ -321,7 +321,7 @@ namespace SilverSim.Scene.Types.Agent
 #if DEBUG
                         m_Log.DebugFormat("Changed default animation to {0} for agent {1}", anim_state, m_AgentID);
 #endif
-                        ReplaceAnimation(anim_state, m_AnimationOverride[m_CurrentDefaultAnimation], UUID.Zero);
+                        ReplaceAnimation(m_AnimationOverride[anim_state], m_AnimationOverride[m_CurrentDefaultAnimation], UUID.Zero);
                         m_CurrentDefaultAnimation = anim_state;
                     }
                 }
