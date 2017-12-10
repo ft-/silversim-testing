@@ -63,10 +63,7 @@ namespace SilverSim.Scene.Physics.Common
         {
             lock (m_Lock)
             {
-                bool saveState = IsPhysicsActive;
-                IsPhysicsActive = false;
                 target.ReceiveState(m_StateData, positionOffset);
-                IsPhysicsActive = saveState;
             }
         }
 
@@ -74,15 +71,12 @@ namespace SilverSim.Scene.Physics.Common
         {
             lock (m_Lock)
             {
-                bool saveState = IsPhysicsActive;
-                IsPhysicsActive = false;
                 m_StateData.Position = data.Position + positionOffset;
                 m_StateData.Rotation = data.Rotation;
                 m_StateData.Velocity = data.Velocity;
                 m_StateData.AngularVelocity = data.AngularVelocity;
                 m_StateData.Acceleration = data.Acceleration;
                 m_StateData.AngularAcceleration = data.AngularAcceleration;
-                IsPhysicsActive = saveState;
             }
         }
 
