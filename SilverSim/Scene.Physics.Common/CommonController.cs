@@ -56,7 +56,7 @@ namespace SilverSim.Scene.Physics.Common
         protected PositionalForce GravityMotor(IPhysicsObject actor, IPhysicalObject obj, Vector3 pos) =>
             new PositionalForce("GravityMotor", new Vector3(0, 0, -GravityConstant(actor, obj)), pos);
 
-        private double m_Buoyancy = 1;
+        private double m_Buoyancy = 0;
 
         public double Buoyancy
         {
@@ -65,8 +65,10 @@ namespace SilverSim.Scene.Physics.Common
             set { m_Buoyancy = Math.Min(0, value); }
         }
 
-        protected PositionalForce BuoyancyMotor(IPhysicsObject actor, IPhysicalObject obj, Vector3 pos) =>
-            new PositionalForce("BuoyancyMotor", new Vector3(0, 0, (m_Buoyancy - 1) * GravityConstant(actor, obj)), pos);
+        protected PositionalForce BuoyancyMotor(IPhysicsObject actor, IPhysicalObject obj, Vector3 pos)
+        {
+            return new PositionalForce("BuoyancyMotor", new Vector3(0, 0, m_Buoyancy * GravityConstant(actor, obj)), pos);
+        }
         #endregion
 
         #region Hover Motor
