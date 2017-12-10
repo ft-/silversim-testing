@@ -129,8 +129,8 @@ namespace SilverSim.Scene.Types.Object
                 }
                 ++m_NextAnimSeqNumber;
                 m_ActiveAnimations.Add(new AnimationInfo(animid, m_NextAnimSeqNumber));
-                SendAnimations();
             }
+            SendAnimations();
         }
 
         public void StopAnimation(UUID animid)
@@ -145,6 +145,24 @@ namespace SilverSim.Scene.Types.Object
                         break;
                     }
                 }
+            }
+            SendAnimations();
+        }
+
+        public void ReplaceAnimation(UUID animid, UUID oldanimid)
+        {
+            lock (m_Lock)
+            {
+                for (int i = 0; i < m_ActiveAnimations.Count; ++i)
+                {
+                    if (m_ActiveAnimations[i].AnimID == oldanimid)
+                    {
+                        m_ActiveAnimations.RemoveAt(i);
+                        break;
+                    }
+                }
+                ++m_NextAnimSeqNumber;
+                m_ActiveAnimations.Add(new AnimationInfo(animid, m_NextAnimSeqNumber));
             }
             SendAnimations();
         }

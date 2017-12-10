@@ -186,13 +186,9 @@ namespace SilverSim.Scene.Types.Agent
                 {
                     if (m_CurrentDefaultAnimation == anim_state)
                     {
-                        StopAnimation(m_AnimationOverride[anim_state], UUID.Zero);
+                        ReplaceAnimation(m_DefaultAnimationOverride[anim_state], m_AnimationOverride[anim_state], UUID.Zero);
                     }
                     m_AnimationOverride[anim_state] = m_DefaultAnimationOverride[anim_state];
-                    if (m_CurrentDefaultAnimation == anim_state)
-                    {
-                        PlayAnimation(m_AnimationOverride[anim_state], UUID.Zero);
-                    }
                 }
             }
         }
@@ -203,6 +199,10 @@ namespace SilverSim.Scene.Types.Agent
             {
                 lock (m_Lock)
                 {
+                    if(anim_state == m_CurrentDefaultAnimation)
+                    {
+                        ReplaceAnimation(anim_id, m_AnimationOverride[anim_state], UUID.Zero);
+                    }
                     m_AnimationOverride[anim_state] = anim_id;
                 }
             }
@@ -238,8 +238,8 @@ namespace SilverSim.Scene.Types.Agent
                 }
                 ++m_NextAnimSeqNumber;
                 m_ActiveAnimations.Add(new AnimationInfo(animid, m_NextAnimSeqNumber, objectid));
-                SendAnimations();
             }
+            SendAnimations();
         }
 
         public void StopAnimation(UUID animid, UUID objectid)
@@ -254,6 +254,29 @@ namespace SilverSim.Scene.Types.Agent
                         break;
                     }
                 }
+            }
+            SendAnimations();
+        }
+
+        public void ReplaceAnimation(UUID animid, UUID oldanimid, UUID objectid)
+        {
+            if (objectid == UUID.Zero)
+            {
+                objectid = m_AgentID;
+            }
+
+            lock (m_Lock)
+            {
+                for (int i = 0; i < m_ActiveAnimations.Count; ++i)
+                {
+                    if (m_ActiveAnimations[i].AnimID == oldanimid)
+                    {
+                        m_ActiveAnimations.RemoveAt(i);
+                        break;
+                    }
+                }
+                ++m_NextAnimSeqNumber;
+                m_ActiveAnimations.Add(new AnimationInfo(animid, m_NextAnimSeqNumber, objectid));
             }
             SendAnimations();
         }
@@ -298,9 +321,8 @@ namespace SilverSim.Scene.Types.Agent
 #if DEBUG
                         m_Log.DebugFormat("Changed default animation to {0} for agent {1}", anim_state, m_AgentID);
 #endif
-                        StopAnimation(m_AnimationOverride[m_CurrentDefaultAnimation], UUID.Zero);
+                        ReplaceAnimation(anim_state, m_AnimationOverride[m_CurrentDefaultAnimation], UUID.Zero);
                         m_CurrentDefaultAnimation = anim_state;
-                        PlayAnimation(m_AnimationOverride[anim_state], UUID.Zero);
                     }
                 }
             }

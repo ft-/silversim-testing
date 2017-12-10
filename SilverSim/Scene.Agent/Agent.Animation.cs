@@ -75,6 +75,11 @@ namespace SilverSim.Scene.Agent
             m_AnimationController.StopAnimation(animid, objectid);
         }
 
+        public void ReplaceAnimation(UUID animid, UUID oldanimid, UUID objectid)
+        {
+            m_AnimationController.ReplaceAnimation(animid, oldanimid, objectid);
+        }
+
         public void StopAllAnimations(UUID sourceid)
         {
             m_AnimationController.StopAllAnimations(sourceid);
