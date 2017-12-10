@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using System;
@@ -49,23 +50,23 @@ namespace SilverSim.Scene.Physics.Common
         }
 
         #region Gravity and Buoyancy
-        protected double GravityConstant(IPhysicalObject obj) =>
-            obj.PhysicsActor.Mass * CombinedGravityAccelerationConstant * obj.PhysicsGravityMultiplier;
+        protected double GravityConstant(IPhysicsObject actor, IPhysicalObject obj) =>
+            CombinedGravityAccelerationConstant * obj.PhysicsGravityMultiplier / actor.Mass;
 
-        protected PositionalForce GravityMotor(IPhysicalObject obj, Vector3 pos) =>
-            new PositionalForce("GravityMotor", new Vector3(0, 0, -GravityConstant(obj)), pos);
+        protected PositionalForce GravityMotor(IPhysicsObject actor, IPhysicalObject obj, Vector3 pos) =>
+            new PositionalForce("GravityMotor", new Vector3(0, 0, -GravityConstant(actor, obj)), pos);
 
-        private double m_Buoyancy;
+        private double m_Buoyancy = 1;
 
         public double Buoyancy
         {
             get { return m_Buoyancy; }
 
-            set { m_Buoyancy = (value < 0) ? 0 : value; }
+            set { m_Buoyancy = Math.Min(0, value); }
         }
 
-        protected PositionalForce BuoyancyMotor(IPhysicalObject obj, Vector3 pos) =>
-            new PositionalForce("BuoyancyMotor", new Vector3(0, 0, (m_Buoyancy - 1) * GravityConstant(obj)), pos);
+        protected PositionalForce BuoyancyMotor(IPhysicsObject actor, IPhysicalObject obj, Vector3 pos) =>
+            new PositionalForce("BuoyancyMotor", new Vector3(0, 0, (m_Buoyancy - 1) * GravityConstant(actor, obj)), pos);
         #endregion
 
         #region Hover Motor
@@ -74,13 +75,13 @@ namespace SilverSim.Scene.Physics.Common
         private bool m_AboveWater;
         private double m_HoverTau;
         private readonly object m_HoverParamsLock = new object();
-        protected PositionalForce HoverMotor(IPhysicalObject obj, Vector3 pos)
+        protected PositionalForce HoverMotor(IPhysicsObject actor, IPhysicalObject obj, Vector3 pos)
         {
             lock (m_HoverParamsLock)
             {
                 if (m_HoverEnabled)
                 {
-                    var v = new Vector3(0, 0, (m_Buoyancy - 1) * GravityConstant(obj));
+                    var v = new Vector3(0, 0, (m_Buoyancy - 1) * GravityConstant(actor, obj));
                     double targetHoverHeight;
                     SceneInterface.LocationInfo locInfo = LocationInfoProvider.At(obj.GlobalPosition);
                     targetHoverHeight = locInfo.GroundHeight;
@@ -165,7 +166,7 @@ namespace SilverSim.Scene.Physics.Common
 
         #region Restitution Motor
         protected PositionalForce LinearRestitutionMotor(IPhysicalObject obj, double factor, Vector3 pos) =>
-            new PositionalForce("LinearResitutionMotor", -obj.Velocity * factor, pos);
+            new PositionalForce("LinearRestitutionMotor", -obj.Velocity * factor, pos);
         #endregion
 
         #region Target Velocity Motor

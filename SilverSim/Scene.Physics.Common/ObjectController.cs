@@ -204,9 +204,9 @@ namespace SilverSim.Scene.Physics.Common
                 return forces;
             }
 
-            forces.Add(BuoyancyMotor(m_Part, Vector3.Zero));
-            forces.Add(GravityMotor(m_Part, Vector3.Zero));
-            forces.Add(HoverMotor(m_Part, Vector3.Zero));
+            forces.Add(BuoyancyMotor(this, m_Part, Vector3.Zero));
+            forces.Add(GravityMotor(this, m_Part, Vector3.Zero));
+            forces.Add(HoverMotor(this, m_Part, Vector3.Zero));
 
             foreach (KeyValuePair<UUID, Vector3> kvp in grp.AttachedForces)
             {

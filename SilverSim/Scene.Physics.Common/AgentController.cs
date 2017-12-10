@@ -301,12 +301,12 @@ namespace SilverSim.Scene.Physics.Common
 
             m_LastKnownBodyRotation = Agent.BodyRotation;
 
-            forces.Add(BuoyancyMotor(Agent, Vector3.Zero));
+            forces.Add(BuoyancyMotor(this, Agent, Vector3.Zero));
             if (!Agent.IsFlying)
             {
-                forces.Add(GravityMotor(Agent, Vector3.Zero));
+                forces.Add(GravityMotor(this, Agent, Vector3.Zero));
             }
-            forces.Add(HoverMotor(Agent, Vector3.Zero));
+            forces.Add(HoverMotor(this, Agent, Vector3.Zero));
             forces.Add(new PositionalForce("ControlInput", ControlLinearInput * ControlLinearInputFactor * SpeedFactor, Vector3.Zero));
             forces.Add(LinearRestitutionMotor(Agent, RestitutionInputFactor, Vector3.Zero));
 

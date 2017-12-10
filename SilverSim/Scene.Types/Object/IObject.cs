@@ -286,12 +286,8 @@ namespace SilverSim.Scene.Types.Object
     #region Params Helper
     public static class ParamsHelper
     {
-        sealed class NlsAnchor
+        private sealed class NlsAnchor
         {
-            public NlsAnchor()
-            {
-
-            }
         }
         static readonly NlsAnchor m_NlsAnchor = new NlsAnchor();
 
