@@ -1177,7 +1177,7 @@ namespace SilverSim.Scene.Types.Object
                 {
                     CheckSittable(agent, out sitPosition, out sitTarget, out sitOnTarget, preferedOffset, preferedLinkNumber);
                     m_Group.m_SittingAgents.Add(agent, sitOnTarget);
-                    agent.SittingOnObject = sitOn;
+                    agent.SittingOnObject = sitOnTarget.ObjectGroup;
                 }
                 agent.AllowUnsit = sitOnTarget.AllowUnsit;
 
