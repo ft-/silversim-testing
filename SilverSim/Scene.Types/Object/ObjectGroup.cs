@@ -1193,6 +1193,12 @@ namespace SilverSim.Scene.Types.Object
 #warning Implement Unscripted sit here
                 }
 
+                /* we have to set those to zero */
+                agent.Velocity = Vector3.Zero;
+                agent.AngularVelocity = Vector3.Zero;
+                agent.AngularAcceleration = Vector3.Zero;
+                agent.Acceleration = Vector3.Zero;
+
                 agent.SetDefaultAnimation("sitting");
                 string sitanim = sitOnTarget.SitAnimation;
                 if(sitanim?.Length != 0)
