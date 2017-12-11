@@ -1170,8 +1170,11 @@ namespace SilverSim.Scene.Types.Object
                 ObjectPart sitOnTarget;
                 lock (m_SitLock)
                 {
-                    if (CheckSittable(agent, out sitPosition, out sitTarget, out sitOnTarget, preferedOffset, preferedLinkNumber))
+                    if (!CheckSittable(agent, out sitPosition, out sitTarget, out sitOnTarget, preferedOffset, preferedLinkNumber))
                     {
+#if DEBUG
+                        m_Log.DebugFormat("Not possible to sit avatar {0} on target", agent.Owner.FullName);
+#endif
                         return;
                     }
 
@@ -1231,11 +1234,17 @@ namespace SilverSim.Scene.Types.Object
                     if (preferedLinkNumber > 0)
                     {
                         ObjectPart part;
+#if DEBUG
+                        m_Log.DebugFormat("Agent {0} prefers link {1}", agent.Owner.FullName, preferedLinkNumber);
+#endif
                         if (m_Group.TryGetValue(preferedLinkNumber, out part) &&
                             !m_Group.m_SittingAgents.ContainsKey(part))
                         {
                             /* select prim */
                             sitOnTarget = part;
+#if DEBUG
+                            m_Log.DebugFormat("Agent {0} preferring link {1} is satisfied", agent.Owner.FullName, preferedLinkNumber);
+#endif
                         }
                     }
 
@@ -1243,11 +1252,18 @@ namespace SilverSim.Scene.Types.Object
                     {
                         foreach (ObjectPart part in m_Group.ValuesByKey1)
                         {
+#if DEBUG
+                            m_Log.DebugFormat("Agent {0} testing sit target at {1}: sittarget={2} scriptedsitonly={3}",agent.Owner.FullName, part.ID, part.IsSitTargetActive, part.IsScriptedSitOnly);
+#endif
+
                             if (part.IsSitTargetActive &&
                                 !m_Group.m_SittingAgents.ContainsKey(part) && (!part.IsScriptedSitOnly))
                             {
                                 /* select prim */
                                 sitOnTarget = part;
+#if DEBUG
+                                m_Log.DebugFormat("Agent {0} testing sit target at {1}: sittarget={2} scriptedsitonly={3} satisfied", agent.Owner.FullName, part.ID, part.IsSitTargetActive, part.IsScriptedSitOnly);
+#endif
                             }
                         }
                     }
@@ -1256,11 +1272,18 @@ namespace SilverSim.Scene.Types.Object
                     {
                         if(m_Group.RootPart.IsScriptedSitOnly)
                         {
+#if DEBUG
+                            m_Log.DebugFormat("Agent {0} testing sit target at root {1}: sittarget={2} scriptedsitonly={3} not satisfied", agent.Owner.FullName, m_Group.RootPart.ID, m_Group.RootPart.IsSitTargetActive, m_Group.RootPart.IsScriptedSitOnly);
+#endif
+
                             sitPosition = Vector3.Zero;
                             sitRotation = Quaternion.Identity;
                             return false;
                         }
                         sitOnTarget = m_Group.RootPart;
+#if DEBUG
+                        m_Log.DebugFormat("Agent {0} testing sit target at root {1}: sittarget={2} scriptedsitonly={3} satisfied", agent.Owner.FullName, m_Group.RootPart.ID, m_Group.RootPart.IsSitTargetActive, m_Group.RootPart.IsScriptedSitOnly);
+#endif
                     }
                 }
                 if (sitOnTarget.IsSitTargetActive)

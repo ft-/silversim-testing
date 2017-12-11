@@ -215,17 +215,13 @@ namespace SilverSim.Scene.Agent
             {
                 lock (m_DataLock)
                 {
-                    Vector3 eulers = LocalRotation.GetEulerAngles();
+                    Vector3 eulers = GlobalRotation.GetEulerAngles();
                     Vector3 l = GlobalPosition;
                     l.Z += Size.Z / 2;
                     Quaternion q = Quaternion.CreateFromEulers(0, 0, eulers.Z);
-                    bool unsit = false;
-                    if (m_SittingOnObject != null && value == null)
-                    {
-                        unsit = true;
-                    }
+                    bool isUnsit = m_SittingOnObject != null && value == null;
                     m_SittingOnObject = value;
-                    if(unsit)
+                    if(isUnsit)
                     {
                         GlobalRotation = q;
                         GlobalPosition = l;
