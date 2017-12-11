@@ -1165,17 +1165,21 @@ namespace SilverSim.Scene.Types.Object
             public void Sit(IAgent agent, Vector3 preferedOffset, int preferedLinkNumber = -1)
             {
                 ObjectGroup sitOn = agent.SittingOnObject;
-                if(sitOn != null)
-                {
-                    sitOn.m_SittingAgents.Remove(agent);
-                }
-
                 Vector3 sitPosition;
                 Quaternion sitTarget;
                 ObjectPart sitOnTarget;
                 lock (m_SitLock)
                 {
-                    CheckSittable(agent, out sitPosition, out sitTarget, out sitOnTarget, preferedOffset, preferedLinkNumber);
+                    if (CheckSittable(agent, out sitPosition, out sitTarget, out sitOnTarget, preferedOffset, preferedLinkNumber))
+                    {
+                        return;
+                    }
+
+                    if (sitOn != null)
+                    {
+                        sitOn.m_SittingAgents.Remove(agent);
+                    }
+
                     m_Group.m_SittingAgents.Add(agent, sitOnTarget);
                     agent.SittingOnObject = sitOnTarget.ObjectGroup;
                 }
