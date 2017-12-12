@@ -318,10 +318,13 @@ namespace SilverSim.Scene.Types.Agent
                 {
                     if (m_CurrentDefaultAnimation != anim_state)
                     {
+                        if (!m_IsSitting)
+                        {
 #if DEBUG
-                        m_Log.DebugFormat("Changed default animation to {0} for agent {1}", anim_state, m_AgentID);
+                            m_Log.DebugFormat("Changed default animation to {0} for agent {1}", anim_state, m_AgentID);
 #endif
-                        ReplaceAnimation(m_AnimationOverride[anim_state], m_AnimationOverride[m_CurrentDefaultAnimation], UUID.Zero);
+                            ReplaceAnimation(m_AnimationOverride[anim_state], m_AnimationOverride[m_CurrentDefaultAnimation], UUID.Zero);
+                        }
                         m_CurrentDefaultAnimation = anim_state;
                     }
                 }
@@ -332,11 +335,65 @@ namespace SilverSim.Scene.Types.Agent
             }
         }
 
+        public UUID GetDefaultAnimationID()
+        {
+            lock(m_Lock)
+            {
+                return m_AnimationOverride[m_IsSitting ? m_CurrentSitDefaultAnimation : m_CurrentDefaultAnimation];
+            }
+        }
+
         public string GetDefaultAnimation()
         {
             lock (m_Lock)
             {
-                return m_CurrentDefaultAnimation;
+                return m_IsSitting ? m_CurrentSitDefaultAnimation : m_CurrentDefaultAnimation;
+            }
+        }
+
+        bool m_IsSitting;
+        public bool IsSitting => m_IsSitting;
+        private string m_CurrentSitDefaultAnimation = string.Empty;
+
+        private void Sit(string anim)
+        {
+            lock (m_Lock)
+            {
+                if (!m_IsSitting)
+                {
+                    if (m_CurrentDefaultAnimation != "sitting")
+                    {
+#if DEBUG
+                        m_Log.DebugFormat("Changed default animation to {0} for agent {1}", anim, m_AgentID);
+#endif
+                        ReplaceAnimation(m_AnimationOverride[anim], m_AnimationOverride[m_CurrentDefaultAnimation], UUID.Zero);
+                    }
+                    m_CurrentSitDefaultAnimation = anim;
+                    m_IsSitting = true;
+                }
+                else if(m_CurrentSitDefaultAnimation != anim)
+                {
+#if DEBUG
+                    m_Log.DebugFormat("Changed default animation to {0} for agent {1}", anim, m_AgentID);
+#endif
+                    ReplaceAnimation(m_AnimationOverride[anim], m_AnimationOverride[m_CurrentDefaultAnimation], UUID.Zero);
+                    m_CurrentSitDefaultAnimation = anim;
+                }
+            }
+        }
+
+        public void Sit() => Sit("sitting");
+        public void SitOnGround() => Sit("sitting on ground");
+
+        public void UnSit()
+        {
+            lock(m_Lock)
+            {
+                if (m_IsSitting)
+                {
+                    ReplaceAnimation(m_AnimationOverride[m_CurrentDefaultAnimation], m_AnimationOverride[m_CurrentSitDefaultAnimation], UUID.Zero);
+                }
+                m_IsSitting = false;
             }
         }
     }

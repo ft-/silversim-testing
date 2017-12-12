@@ -1205,15 +1205,14 @@ namespace SilverSim.Scene.Types.Object
                 agent.AngularVelocity = Vector3.Zero;
                 agent.AngularAcceleration = Vector3.Zero;
                 agent.Acceleration = Vector3.Zero;
-
-                agent.SetDefaultAnimation("sitting");
+                agent.BeginSitAnimation();
                 string sitanim = sitOnTarget.SitAnimation;
                 if(sitanim?.Length != 0)
                 {
                     UUID animid;
                     if(TryGetAnimation(sitOnTarget, sitanim, out animid))
                     {
-                        agent.StopAnimation(agent.GetDefaultAnimation(), sitOnTarget.ID);
+                        agent.StopAnimation(agent.GetDefaultAnimationID(), sitOnTarget.ID);
                         agent.PlayAnimation(animid, sitOnTarget.ID);
                     }
                 }
@@ -1318,15 +1317,13 @@ namespace SilverSim.Scene.Types.Object
 
                 satOn?.PostEvent(new ChangedEvent(ChangedEvent.ChangedFlags.Link));
 
-                if(satOnTarget != null)
-                {
-                    agent.StopAllAnimations(satOnTarget.ID);
-                }
                 if (res)
                 {
+                    agent.StopAllAnimations(satOnTarget.ID);
+
                     SceneInterface scene = m_Group.Scene;
                     scene?.SendAgentObjectToAllAgents(agent);
-                    agent.SetDefaultAnimation("standing");
+                    agent.EndSitAnimation();
                 }
                 return res;
             }

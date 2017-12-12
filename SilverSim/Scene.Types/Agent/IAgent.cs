@@ -232,7 +232,11 @@ namespace SilverSim.Scene.Types.Agent
         void StopAnimation(UUID anim, UUID objectid);
         void StopAllAnimations(UUID sourceid);
         string GetDefaultAnimation(); /* locomotion */
+        UUID GetDefaultAnimationID();
         List<UUID> GetPlayingAnimations();
+        void BeginSitAnimation();
+        void BeginSitOnGroundAnimation();
+        void EndSitAnimation();
 
         ScriptPermissions RequestPermissions(ObjectPart part, UUID itemID, ScriptPermissions permissions);
         ScriptPermissions RequestPermissions(ObjectPart part, UUID itemID, ScriptPermissions permissions, UUID experienceID);

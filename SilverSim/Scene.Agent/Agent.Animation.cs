@@ -31,61 +31,39 @@ namespace SilverSim.Scene.Agent
     {
         protected abstract void SendAnimations(AvatarAnimation m);
 
-        public void SetDefaultAnimation(string anim_state)
-        {
-            m_AnimationController.SetDefaultAnimation(anim_state);
-        }
+        public void SetDefaultAnimation(string anim_state) => m_AnimationController.SetDefaultAnimation(anim_state);
 
-        protected void SendAnimations()
-        {
-            m_AnimationController.SendAnimations();
-        }
+        protected void SendAnimations() => m_AnimationController.SendAnimations();
 
         private readonly AgentAnimationController m_AnimationController;
 
-        protected void RevokeAnimPermissions(UUID sourceID, ScriptPermissions permissions)
-        {
-            m_AnimationController.RevokePermissions(sourceID, permissions);
-        }
+        protected void RevokeAnimPermissions(UUID sourceID, ScriptPermissions permissions) => m_AnimationController.RevokePermissions(sourceID, permissions);
 
         #region Server-Side Animation Override
-        public void ResetAnimationOverride(string anim_state)
-        {
-            m_AnimationController.ResetAnimationOverride(anim_state);
-        }
+        public void ResetAnimationOverride(string anim_state) => m_AnimationController.ResetAnimationOverride(anim_state);
 
-        public void SetAnimationOverride(string anim_state, UUID anim_id)
-        {
-            m_AnimationController.SetAnimationOverride(anim_state, anim_id);
-        }
+        public void SetAnimationOverride(string anim_state, UUID anim_id) => m_AnimationController.SetAnimationOverride(anim_state, anim_id);
 
-        public string GetAnimationOverride(string anim_state)
-        {
-            return m_AnimationController.GetAnimationOverride(anim_state);
-        }
+        public string GetAnimationOverride(string anim_state) => m_AnimationController.GetAnimationOverride(anim_state);
         #endregion
 
-        public void PlayAnimation(UUID animid, UUID objectid)
-        {
-            m_AnimationController.PlayAnimation(animid, objectid);
-        }
+        public void PlayAnimation(UUID animid, UUID objectid) => m_AnimationController.PlayAnimation(animid, objectid);
 
-        public void StopAnimation(UUID animid, UUID objectid)
-        {
-            m_AnimationController.StopAnimation(animid, objectid);
-        }
+        public void StopAnimation(UUID animid, UUID objectid) => m_AnimationController.StopAnimation(animid, objectid);
 
-        public void ReplaceAnimation(UUID animid, UUID oldanimid, UUID objectid)
-        {
-            m_AnimationController.ReplaceAnimation(animid, oldanimid, objectid);
-        }
+        public void ReplaceAnimation(UUID animid, UUID oldanimid, UUID objectid) => m_AnimationController.ReplaceAnimation(animid, oldanimid, objectid);
 
-        public void StopAllAnimations(UUID sourceid)
-        {
-            m_AnimationController.StopAllAnimations(sourceid);
-        }
+        public void StopAllAnimations(UUID sourceid) => m_AnimationController.StopAllAnimations(sourceid);
+
+        public void BeginSitAnimation() => m_AnimationController.Sit();
+
+        public void BeginSitOnGroundAnimation() => m_AnimationController.SitOnGround();
+
+        public void EndSitAnimation() => m_AnimationController.UnSit();
 
         public string GetDefaultAnimation() => m_AnimationController.GetDefaultAnimation();
+
+        public UUID GetDefaultAnimationID() => m_AnimationController.GetDefaultAnimationID();
 
         public List<UUID> GetPlayingAnimations() => m_AnimationController.GetPlayingAnimations();
     }
