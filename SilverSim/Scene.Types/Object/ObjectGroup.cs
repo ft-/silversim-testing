@@ -1133,10 +1133,8 @@ namespace SilverSim.Scene.Types.Object
 
             private static readonly Vector3 SIT_TARGET_OFFSET = new Vector3(0, 0, 0.4);
 
-            public void Sit(IAgent agent, int preferedLinkNumber = -1)
-            {
-                Sit(agent, Vector3.Zero, preferedLinkNumber);
-            }
+            public bool Sit(IAgent agent, int preferedLinkNumber = -1, bool forceScriptedSitOnly = false) =>
+                Sit(agent, Vector3.Zero, preferedLinkNumber, forceScriptedSitOnly);
 
             private bool TryGetAnimation(ObjectPart sitOnTarget, string sitanim, out UUID animid)
             {
@@ -1162,7 +1160,7 @@ namespace SilverSim.Scene.Types.Object
                 return false;
             }
 
-            public void Sit(IAgent agent, Vector3 preferedOffset, int preferedLinkNumber = -1)
+            public bool Sit(IAgent agent, Vector3 preferedOffset, int preferedLinkNumber = -1, bool forceScriptedSitOnly = false)
             {
                 ObjectGroup sitOn = agent.SittingOnObject;
                 Vector3 sitPosition;
@@ -1170,12 +1168,12 @@ namespace SilverSim.Scene.Types.Object
                 ObjectPart sitOnTarget;
                 lock (m_SitLock)
                 {
-                    if (!CheckSittable(agent, out sitPosition, out sitTarget, out sitOnTarget, preferedOffset, preferedLinkNumber))
+                    if (!CheckSittable(agent, out sitPosition, out sitTarget, out sitOnTarget, preferedOffset, preferedLinkNumber, forceScriptedSitOnly))
                     {
 #if DEBUG
                         m_Log.DebugFormat("Not possible to sit avatar {0} on target", agent.Owner.FullName);
 #endif
-                        return;
+                        return false;
                     }
 
                     if (sitOn != null)
@@ -1223,9 +1221,10 @@ namespace SilverSim.Scene.Types.Object
                     scene.SendAgentObjectToAllAgents(agent);
                     m_Group.PostEvent(new ChangedEvent(ChangedEvent.ChangedFlags.Link));
                 }
+                return true;
             }
 
-            public bool CheckSittable(IAgent agent, out Vector3 sitPosition, out Quaternion sitRotation, out ObjectPart sitOnTarget, Vector3 preferedOffset, int preferedLinkNumber = -1)
+            public bool CheckSittable(IAgent agent, out Vector3 sitPosition, out Quaternion sitRotation, out ObjectPart sitOnTarget, Vector3 preferedOffset, int preferedLinkNumber = -1, bool forceScriptedSitOnly = false)
             {
                 sitOnTarget = null;
                 lock (m_SitLock)
@@ -1269,10 +1268,10 @@ namespace SilverSim.Scene.Types.Object
 
                     if (sitOnTarget == null)
                     {
-                        if(m_Group.RootPart.IsScriptedSitOnly)
+                        if(m_Group.RootPart.IsScriptedSitOnly || forceScriptedSitOnly)
                         {
 #if DEBUG
-                            m_Log.DebugFormat("Agent {0} testing sit target at root {1}: sittarget={2} scriptedsitonly={3} not satisfied", agent.Owner.FullName, m_Group.RootPart.ID, m_Group.RootPart.IsSitTargetActive, m_Group.RootPart.IsScriptedSitOnly);
+                            m_Log.DebugFormat("Agent {0} testing sit target at root {1}: sittarget={2} scriptedsitonly={3} forceScriptedSitOnly={4} not satisfied", agent.Owner.FullName, m_Group.RootPart.ID, m_Group.RootPart.IsSitTargetActive, m_Group.RootPart.IsScriptedSitOnly, forceScriptedSitOnly);
 #endif
 
                             sitPosition = Vector3.Zero;
