@@ -217,6 +217,9 @@ namespace SilverSim.Database.Memory.SimulationData
                 data.Add("IsReturnAtEdge", objpart.IsReturnAtEdge);
                 data.Add("IsBlockGrabObject", objpart.IsBlockGrabObject);
                 data.Add("SandboxOrigin", objpart.SandboxOrigin);
+                data.Add("IsSitTargetActive", objpart.IsSitTargetActive);
+                data.Add("IsScriptedSitOnly", objpart.IsScriptedSitOnly);
+                data.Add("AllowUnsit", objpart.AllowUnsit);
 
                 return data;
             }

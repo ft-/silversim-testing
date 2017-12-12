@@ -218,6 +218,9 @@ namespace SilverSim.Database.Memory.SimulationData
             objpart.IsReturnAtEdge = map["IsReturnAtEdge"].AsBoolean;
             objpart.IsBlockGrabObject = map["IsBlockGrabObject"].AsBoolean;
             objpart.SandboxOrigin = map["SandboxOrigin"].AsVector3;
+            objpart.IsSitTargetActive = map["IsSitTargetActive"].AsBoolean;
+            objpart.IsScriptedSitOnly = map["IsScriptedSitOnly"].AsBoolean;
+            objpart.AllowUnsit = map["AllowUnsit"].AsBoolean;
 
             return objpart;
         }
