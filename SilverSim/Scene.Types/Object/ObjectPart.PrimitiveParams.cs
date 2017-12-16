@@ -1133,9 +1133,15 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.SitTarget:
-                    paramList.Add(SitTargetOffset.ApproxEquals(Vector3.Zero, double.Epsilon) || SitTargetOrientation.ApproxEquals(Quaternion.Identity, double.Epsilon));
+                    paramList.Add(IsSitTargetActive);
                     paramList.Add(SitTargetOffset);
                     paramList.Add(SitTargetOrientation);
+                    break;
+
+                case PrimitiveParamsType.UnSitTarget:
+                    paramList.Add(IsUnSitTargetActive);
+                    paramList.Add(UnSitTargetOffset);
+                    paramList.Add(UnSitTargetOrientation);
                     break;
 
                 case PrimitiveParamsType.Projector:
@@ -1487,6 +1493,26 @@ namespace SilverSim.Scene.Types.Object
                             IsSitTargetActive = false;
                             SitTargetOffset = Vector3.Zero;
                             SitTargetOrientation = Quaternion.Identity;
+                        }
+                    }
+                    break;
+
+                case PrimitiveParamsType.UnSitTarget:
+                    {
+                        bool unsitenabled = ParamsHelper.GetBoolean(enumerator, "PRIM_UNSIT_TARGET");
+                        Vector3 offset = ParamsHelper.GetVector(enumerator, "PRIM_UNSIT_TARGET");
+                        Quaternion q = ParamsHelper.GetRotation(enumerator, "PRIM_UNSIT_TARGET");
+                        if (unsitenabled)
+                        {
+                            IsUnSitTargetActive = true;
+                            UnSitTargetOffset = offset;
+                            UnSitTargetOrientation = q;
+                        }
+                        else
+                        {
+                            IsUnSitTargetActive = false;
+                            UnSitTargetOffset = Vector3.Zero;
+                            UnSitTargetOrientation = Quaternion.Identity;
                         }
                     }
                     break;

@@ -1255,6 +1255,70 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        private Vector3 m_UnSitTargetOffset = Vector3.Zero;
+        private Quaternion m_UnSitTargetOrientation = Quaternion.Identity;
+        private bool m_IsUnSitTargetActive;
+
+        public Vector3 UnSitTargetOffset
+        {
+            get
+            {
+                lock(m_DataLock)
+                {
+                    return m_UnSitTargetOffset;
+                }
+            }
+            set
+            {
+                lock(m_DataLock)
+                {
+                    m_UnSitTargetOffset = value;
+                }
+                IsChanged = m_IsChangedEnabled;
+                TriggerOnUpdate(0);
+            }
+        }
+
+        public Quaternion UnSitTargetOrientation
+        {
+            get
+            {
+                lock(m_DataLock)
+                {
+                    return m_UnSitTargetOrientation;
+                }
+            }
+            set
+            {
+                lock(m_DataLock)
+                {
+                    m_UnSitTargetOrientation = value;
+                }
+                IsChanged = m_IsChangedEnabled;
+                TriggerOnUpdate(0);
+            }
+        }
+
+        public bool IsUnSitTargetActive
+        {
+            get
+            {
+                lock(m_DataLock)
+                {
+                    return m_IsUnSitTargetActive;
+                }
+            }
+            set
+            {
+                lock(m_DataLock)
+                {
+                    m_IsUnSitTargetActive = value;
+                }
+                IsChanged = m_IsChangedEnabled;
+                TriggerOnUpdate(0);
+            }
+        }
+
         public Vector3 SitTargetOffset
         {
             get

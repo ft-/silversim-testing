@@ -1299,7 +1299,10 @@ namespace SilverSim.Scene.Types.Object
                 return sitOnTarget != null;
             }
 
-            public bool UnSit(IAgent agent)
+            public bool UnSit(IAgent agent) => UnSit(agent, Vector3.Zero, Quaternion.Identity, false);
+            public bool UnSit(IAgent agent, Vector3 targetPos, Quaternion targetRot) => UnSit(agent, targetPos, targetRot, true);
+
+            private bool UnSit(IAgent agent, Vector3 targetPos, Quaternion targetRot, bool paramTarget)
             {
                 bool res;
                 IObject satOn = null;
@@ -1310,7 +1313,26 @@ namespace SilverSim.Scene.Types.Object
                     if (res)
                     {
                         satOn = agent.SittingOnObject;
+                        Vector3 formerPos = agent.GlobalPosition;
+                        Quaternion formerRot = agent.GlobalRotation;
                         agent.SittingOnObject = null;
+                        if(paramTarget)
+                        {
+                            agent.GlobalPosition = targetPos * satOnTarget.ObjectGroup.RootPart.GlobalRotation + satOnTarget.ObjectGroup.RootPart.GlobalPosition + agent.Size / 2;
+                            Quaternion q = targetRot * satOnTarget.ObjectGroup.RootPart.GlobalRotation;
+                            agent.GlobalRotation = Quaternion.CreateFromEulers(0, 0, q.GetEulerAngles().Z);
+                        }
+                        else if (satOnTarget.IsUnSitTargetActive)
+                        {
+                            agent.GlobalPosition = satOnTarget.UnSitTargetOffset * satOnTarget.GlobalRotation + satOnTarget.GlobalPosition + agent.Size / 2;
+                            Quaternion q = satOnTarget.UnSitTargetOrientation * satOnTarget.GlobalRotation;
+                            agent.GlobalRotation = Quaternion.CreateFromEulers(0, 0, q.GetEulerAngles().Z);
+                        }
+                        else
+                        {
+                            agent.GlobalPosition = formerPos + agent.Size / 2;
+                            agent.GlobalRotation = Quaternion.CreateFromEulers(0, 0, formerRot.GetEulerAngles().Z);
+                        }
                     }
                 }
 

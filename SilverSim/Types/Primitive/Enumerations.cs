@@ -135,7 +135,9 @@ namespace SilverSim.Types.Primitive
         ProjectorTexture = 11102,
         ProjectorFov = 11103,
         ProjectorFocus = 11104,
-        ProjectorAmbience = 11105
+        ProjectorAmbience = 11105,
+
+        UnSitTarget = 12000,
     }
 
     public enum PrimitivePhysicsShapeType
