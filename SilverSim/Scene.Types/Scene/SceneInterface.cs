@@ -430,6 +430,17 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
+        public bool EstateAllowsVoice
+        {
+            get
+            {
+                lock(m_EstateDataUpdateLock)
+                {
+                    return (m_EstateData.Flags & RegionOptionFlags.AllowVoice) != 0;
+                }
+            }
+        }
+
         public RegionAccess Access { get; set; }
 
         public UUI Owner { get; set; }
