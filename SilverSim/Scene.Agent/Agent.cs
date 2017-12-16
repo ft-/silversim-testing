@@ -1061,6 +1061,17 @@ namespace SilverSim.Scene.Agent
             return grp.AgentSitting.UnSit(this);
         }
 
+        public bool UnSit(Vector3 targetOffset, Quaternion targetOrientation)
+        {
+            IObject obj = SittingOnObject;
+            if (obj == null)
+            {
+                return false;
+            }
+            var grp = (ObjectGroup)obj;
+            return grp.AgentSitting.UnSit(this, targetOffset, targetOrientation);
+        }
+
         public abstract bool IMSend(GridInstantMessage im);
         public abstract void ClearKnownFriends();
         public abstract void EnableSimulator(UUID originSceneID, uint circuitCode, string capsURI, DestinationInfo destinationInfo);

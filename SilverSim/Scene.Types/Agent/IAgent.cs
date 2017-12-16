@@ -200,6 +200,7 @@ namespace SilverSim.Scene.Types.Agent
         void HandleMessage(ChildAgentUpdate m);
         void HandleMessage(ChildAgentPositionUpdate m);
         bool UnSit();
+        bool UnSit(Vector3 targetOffset, Quaternion targetOrientation);
         void AttachObject(ObjectGroup grp, AttachmentPoint attachpoint);
         void AttachObjectTemp(ObjectGroup grp, AttachmentPoint attachpoint);
         void DetachAttachment(UUID fromInventoryID);
