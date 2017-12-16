@@ -221,6 +221,9 @@ namespace SilverSim.Database.Memory.SimulationData
             objpart.IsSitTargetActive = map["IsSitTargetActive"].AsBoolean;
             objpart.IsScriptedSitOnly = map["IsScriptedSitOnly"].AsBoolean;
             objpart.AllowUnsit = map["AllowUnsit"].AsBoolean;
+            objpart.IsUnSitTargetActive = map["IsUnSitTargetActive"].AsBoolean;
+            objpart.UnSitTargetOffset = map["UnSitTargetOffset"].AsVector3;
+            objpart.UnSitTargetOrientation = map["UnSitTargetOrientation"].AsQuaternion;
 
             return objpart;
         }

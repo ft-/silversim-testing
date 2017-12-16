@@ -220,6 +220,9 @@ namespace SilverSim.Database.Memory.SimulationData
                 data.Add("IsSitTargetActive", objpart.IsSitTargetActive);
                 data.Add("IsScriptedSitOnly", objpart.IsScriptedSitOnly);
                 data.Add("AllowUnsit", objpart.AllowUnsit);
+                data.Add("IsUnSitTargetActive", objpart.IsUnSitTargetActive);
+                data.Add("UnSitTargetOffset", objpart.UnSitTargetOffset);
+                data.Add("UnSitTargetOrientation", objpart.UnSitTargetOrientation);
 
                 return data;
             }

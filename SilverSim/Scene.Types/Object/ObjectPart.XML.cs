@@ -167,6 +167,9 @@ namespace SilverSim.Scene.Types.Object
                     {
                         writer.WriteNamedValue("SitAnimation", sitanim);
                     }
+                    writer.WriteNamedValue("UnSitTargetActive", IsUnSitTargetActive);
+                    writer.WriteNamedValue("UnSitTargetOrientation", UnSitTargetOrientation);
+                    writer.WriteNamedValue("UnSitTargetPosition", UnSitTargetOffset);
                     writer.WriteNamedValue("ParentID", ObjectGroup.RootPart.ID);
                     writer.WriteNamedValue("CreationDate", CreationDate.AsULong.ToString());
                     if ((options & XmlSerializationOptions.WriteRezDate) != XmlSerializationOptions.None)
@@ -1360,6 +1363,18 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     part.IsSitTargetActive = true;
                                 }
+                                break;
+
+                            case "UnSitTargetActive":
+                                part.IsUnSitTargetActive = reader.ReadElementValueAsBoolean();
+                                break;
+
+                            case "UnSitTargetOrientation":
+                                part.UnSitTargetOrientation = reader.ReadElementChildsAsQuaternion();
+                                break;
+
+                            case "UnSitTargetPosition":
+                                part.UnSitTargetOffset = reader.ReadElementChildsAsVector3();
                                 break;
 
                             case "SitAnimation":
