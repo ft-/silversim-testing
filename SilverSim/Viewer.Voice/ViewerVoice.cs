@@ -122,7 +122,14 @@ namespace SilverSim.Viewer.Voice
 
                 try
                 {
-                    channelInfo = m_VoiceService.GetParcelChannel(scene, pInfo);
+                    if ((pInfo.Flags & ParcelFlags.UseEstateVoiceChan) != 0)
+                    {
+                        channelInfo = m_VoiceService.GetEstateChannel(scene.EstateService[scene.EstateService.RegionMap[scene.ID]]);
+                    }
+                    else
+                    {
+                        channelInfo = m_VoiceService.GetParcelChannel(scene, pInfo);
+                    }
                     res = new Map { { "channel_uri", channelInfo.ChannelSipUri } };
                 }
                 catch
