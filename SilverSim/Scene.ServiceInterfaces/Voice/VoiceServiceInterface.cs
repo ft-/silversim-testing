@@ -39,10 +39,16 @@ namespace SilverSim.Scene.ServiceInterfaces.Voice
         public string ChannelSipUri;
     }
 
+    public struct UserChannelInfo
+    {
+        public string UserSipUri;
+    }
+
     public abstract class VoiceServiceInterface
     {
         public abstract VoiceAccountInfo ProvisionAccount(UUI agent);
         public abstract VoiceChannelInfo GetParcelChannel(SceneInterface scene, ParcelInfo parcelInfo);
         public abstract VoiceChannelInfo GetEstateChannel(EstateInfo estateInfo);
+        public abstract UserChannelInfo GetUserChannel(UUI agent);
     }
 }
