@@ -138,6 +138,7 @@ namespace SilverSim.Types.Primitive
         ProjectorAmbience = 11105,
 
         UnSitTarget = 12000,
+        SitAnimation = 12001,
     }
 
     public enum PrimitivePhysicsShapeType

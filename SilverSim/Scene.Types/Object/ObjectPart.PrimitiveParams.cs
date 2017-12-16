@@ -1144,6 +1144,10 @@ namespace SilverSim.Scene.Types.Object
                     paramList.Add(UnSitTargetOrientation);
                     break;
 
+                case PrimitiveParamsType.SitAnimation:
+                    paramList.Add(SitAnimation);
+                    break;
+
                 case PrimitiveParamsType.Projector:
                     {
                         var param = Projection;
@@ -1566,6 +1570,10 @@ namespace SilverSim.Scene.Types.Object
                         param.ProjectionAmbience = ParamsHelper.GetDouble(enumerator, "PRIM_PROJECTION_AMBIENCE");
                         Projection = param;
                     }
+                    break;
+
+                case PrimitiveParamsType.SitAnimation:
+                    SitAnimation = ParamsHelper.GetString(enumerator, "PRIM_SIT_ANIMATION");
                     break;
 
                 default:
