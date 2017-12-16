@@ -74,6 +74,8 @@ namespace SilverSim.Types.Agent
 
         public static bool HasFly(this ControlFlags flags) => (flags & ControlFlags.Fly) != ControlFlags.None;
 
+        public static bool HasAway(this ControlFlags flags) => (flags & ControlFlags.Away) != ControlFlags.None;
+
         public static bool HasStop(this ControlFlags flags) => (flags & ControlFlags.Stop) != ControlFlags.None;
 
         #region Controls

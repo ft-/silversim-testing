@@ -39,6 +39,9 @@ namespace SilverSim.Viewer.Core
         private ControlFlags m_IgnoredControls;
         private ControlFlags m_ActiveAgentControlFlags;
         private bool m_IsRunning;
+        private bool m_IsAway;
+
+        public override bool IsAway => m_IsAway;
 
         public class ScriptControlData
         {
@@ -178,6 +181,7 @@ namespace SilverSim.Viewer.Core
             var agentMovementDirection = Vector3.Zero;
 
             m_IsFlying = agentControlFlags.HasFly() && ((IAgentPhysicsObject)PhysicsActor).IsPhysicsActive;
+            m_IsAway = agentControlFlags.HasAway();
 
             if (SittingOnObject != null)
             {

@@ -69,6 +69,8 @@ namespace SilverSim.Scene.Types.Agent
 
         bool AllowUnsit { get; set; }
 
+        bool IsAway { get; }
+
         ClientInfo Client { get; }
         SessionInfo Session { get; }
         UserAccount UntrustedAccountInfo { get; }

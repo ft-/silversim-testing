@@ -173,6 +173,7 @@ namespace SilverSim.Scene.Agent
         public abstract SessionInfo Session { get; }
         public abstract List<GridType> SupportedGridTypes { get; }
         public abstract IAgentTeleportServiceInterface ActiveTeleportService { get; set; }
+        public abstract bool IsAway { get; }
 
         public void GetBoundingBox(out BoundingBox box) => box = new BoundingBox
         {

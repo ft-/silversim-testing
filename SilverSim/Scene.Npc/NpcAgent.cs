@@ -67,6 +67,8 @@ namespace SilverSim.Scene.Npc
 
         public override bool IsFlying => false; /* implement controls */
 
+        public override bool IsAway => false;
+
         private UUID GetMyUUID() => ID;
 
         private Vector3 GetMyPosition() => GlobalPosition;
