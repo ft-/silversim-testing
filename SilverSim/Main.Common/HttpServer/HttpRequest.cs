@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using SilverSim.Http;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -119,6 +120,42 @@ namespace SilverSim.Main.Common.HttpServer
             set { m_Headers["content-type"] = value; }
         }
         #endregion
+
+        public string GetUrlAndQueryParams(List<KeyValuePair<string, string>> query)
+        {
+            if(query == null)
+            {
+                throw new ArgumentNullException(nameof(query));
+            }
+            int qpos = RawUrl.IndexOf('?');
+            query.Clear();
+            if (qpos < 0)
+            {
+                return RawUrl;
+            }
+            else
+            {
+                string url = RawUrl.Substring(0, qpos);
+                foreach(string qp in RawUrl.Substring(qpos + 1).Split('&'))
+                {
+                    string qptrimmed = qp.Trim();
+                    if(qptrimmed.Length == 0)
+                    {
+                        continue;
+                    }
+                    string[] vp = qptrimmed.Split('=');
+                    if (vp.Length < 2)
+                    {
+                        query.Add(new KeyValuePair<string, string>(vp[0], string.Empty));
+                    }
+                    else
+                    {
+                        query.Add(new KeyValuePair<string, string>(vp[0], vp[1]));
+                    }
+                }
+                return url;
+            }
+        }
 
         public abstract void Close();
 
