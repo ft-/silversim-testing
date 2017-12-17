@@ -157,6 +157,35 @@ namespace SilverSim.Main.Common.HttpServer
             }
         }
 
+        public string GetUrlAndQueryParams(Dictionary<string, string> query)
+        {
+            if (query == null)
+            {
+                throw new ArgumentNullException(nameof(query));
+            }
+            int qpos = RawUrl.IndexOf('?');
+            query.Clear();
+            if (qpos < 0)
+            {
+                return RawUrl;
+            }
+            else
+            {
+                string url = RawUrl.Substring(0, qpos);
+                foreach (string qp in RawUrl.Substring(qpos + 1).Split('&'))
+                {
+                    string qptrimmed = qp.Trim();
+                    if (qptrimmed.Length == 0)
+                    {
+                        continue;
+                    }
+                    string[] vp = qptrimmed.Split('=');
+                    query[vp[0]] = vp.Length < 2 ? string.Empty : vp[1];
+                }
+                return url;
+            }
+        }
+
         public abstract void Close();
 
         public abstract void SetConnectionClose();
