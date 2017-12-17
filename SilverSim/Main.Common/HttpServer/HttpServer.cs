@@ -663,12 +663,15 @@ namespace SilverSim.Main.Common.HttpServer
                 throw new HttpResponse.ConnectionCloseException();
             }
 
+            int qpos = req.RawUrl.IndexOf('?');
+            string acturl = qpos >= 0 ? req.RawUrl.Substring(0, qpos) : req.RawUrl;
+
             Action<HttpRequest> del;
             if(req.RawUrl == "*")
             {
                 req.EmptyResponse();
             }
-            else if (req.RawUrl == "/" && RootUriContentTypeHandlers.TryGetValue(req.ContentType, out del))
+            else if (acturl == "/" && RootUriContentTypeHandlers.TryGetValue(req.ContentType, out del))
             {
                 try
                 {
@@ -688,11 +691,11 @@ namespace SilverSim.Main.Common.HttpServer
                 }
                 catch (Exception e)
                 {
-                    m_Log.WarnFormat("(Content Handler): Unexpected exception at {0} {1}: {2}: {3}\n{4}", req.Method, req.RawUrl, e.GetType().Name, e.Message, e.StackTrace);
+                    m_Log.WarnFormat("(Content Handler): Unexpected exception at {0} {1}: {2}: {3}\n{4}", req.Method, acturl, e.GetType().Name, e.Message, e.StackTrace);
                 }
                 req.Close();
             }
-            else if (UriHandlers.TryGetValue(req.RawUrl, out del))
+            else if (UriHandlers.TryGetValue(acturl, out del))
             {
                 try
                 {
@@ -712,7 +715,7 @@ namespace SilverSim.Main.Common.HttpServer
                 }
                 catch (Exception e)
                 {
-                    m_Log.WarnFormat("(Uri Handler): Unexpected exception at {0} {1}: {2}: {3}\n{4}", req.Method, req.RawUrl, e.GetType().Name, e.Message, e.StackTrace);
+                    m_Log.WarnFormat("(Uri Handler): Unexpected exception at {0} {1}: {2}: {3}\n{4}", req.Method, acturl, e.GetType().Name, e.Message, e.StackTrace);
                 }
                 req.Close();
             }
@@ -720,7 +723,7 @@ namespace SilverSim.Main.Common.HttpServer
             {
                 foreach (KeyValuePair<string, Action<HttpRequest>> kvp in StartsWithUriHandlers)
                 {
-                    if (req.RawUrl.StartsWith(kvp.Key))
+                    if (acturl.StartsWith(kvp.Key))
                     {
                         try
                         {
@@ -740,7 +743,7 @@ namespace SilverSim.Main.Common.HttpServer
                         }
                         catch (Exception e)
                         {
-                            m_Log.WarnFormat("(StartUriHandler): Unexpected exception at {0} {1}: {2}: {3}\n{4}", req.Method, req.RawUrl, e.GetType().Name, e.Message, e.StackTrace);
+                            m_Log.WarnFormat("(StartUriHandler): Unexpected exception at {0} {1}: {2}: {3}\n{4}", req.Method, acturl, e.GetType().Name, e.Message, e.StackTrace);
                         }
                         req.Close();
                         return;
