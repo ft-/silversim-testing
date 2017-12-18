@@ -56,6 +56,10 @@ namespace SilverSim.Scene.Types.KeyframedMotion
                         throw new ArgumentException("KeyframedMotion has no keyframes");
                     }
                     m_Program = new KeyframedMotion(value);
+                    if(!m_Program.IsRunning)
+                    {
+                        ObjectGroup.IsMoving = false;
+                    }
                     m_KeyframeTimer.Enabled = m_Program.IsRunning;
                 }
             }
@@ -70,6 +74,7 @@ namespace SilverSim.Scene.Types.KeyframedMotion
         public void Dispose()
         {
             m_KeyframeTimer.Elapsed -= KeyframeTimer;
+            ObjectGroup.IsMoving = false;
             m_KeyframeTimer.Dispose();
         }
 
@@ -80,6 +85,7 @@ namespace SilverSim.Scene.Types.KeyframedMotion
             lock(m_KeyframeLock)
             {
                 wasRunning = m_Program.IsRunning;
+                ObjectGroup.IsMoving = true;
                 m_Program.IsRunning = true;
                 m_KeyframeTimer.Enabled = true;
             }
@@ -97,6 +103,7 @@ namespace SilverSim.Scene.Types.KeyframedMotion
                 ObjectGroup.Velocity = Vector3.Zero;
                 ObjectGroup.AngularVelocity = Vector3.Zero;
                 wasRunning = m_Program.IsRunning;
+                ObjectGroup.IsMoving = false;
                 m_Program.IsRunning = false;
                 m_KeyframeTimer.Enabled = false;
             }
@@ -114,6 +121,7 @@ namespace SilverSim.Scene.Types.KeyframedMotion
                 ObjectGroup.Velocity = Vector3.Zero;
                 ObjectGroup.AngularVelocity = Vector3.Zero;
                 wasRunning = m_Program.IsRunning;
+                ObjectGroup.IsMoving = false;
                 m_Program.IsRunning = false;
                 m_KeyframeTimer.Enabled = false;
                 /* reset program */
@@ -179,6 +187,7 @@ namespace SilverSim.Scene.Types.KeyframedMotion
                                     ObjectGroup.Rotation = curFrame.TargetRotation;
                                 }
                                 m_Program.CurrentFrame = -1;
+                                ObjectGroup.IsMoving = false;
                                 m_Program.IsRunning = false;
                                 m_KeyframeTimer.Enabled = false;
                                 ObjectGroup.PostEvent(new MovingEndEvent());
@@ -204,6 +213,7 @@ namespace SilverSim.Scene.Types.KeyframedMotion
                                         ObjectGroup.Rotation = curFrame.TargetRotation;
                                     }
                                     m_Program.CurrentFrame = -1;
+                                    ObjectGroup.IsMoving = false;
                                     m_Program.IsRunning = false;
                                     m_KeyframeTimer.Enabled = false;
                                     ObjectGroup.PostEvent(new MovingEndEvent());

@@ -115,5 +115,6 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        public bool IsMoving { get; set; }
     }
 }

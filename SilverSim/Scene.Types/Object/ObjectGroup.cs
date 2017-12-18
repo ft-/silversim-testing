@@ -145,6 +145,18 @@ namespace SilverSim.Scene.Types.Object
         }
         #endregion
 
+        public bool IsMoving
+        {
+            get
+            {
+                return RootPart.IsMoving;
+            }
+            set
+            {
+                RootPart.IsMoving = value;
+            }
+        }
+
         public bool IsSandbox
         {
             get

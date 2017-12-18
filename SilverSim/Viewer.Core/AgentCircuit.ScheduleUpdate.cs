@@ -363,7 +363,7 @@ namespace SilverSim.Viewer.Core
                         {
                             /* do not signal private attachments to anyone else than the owner */
                         }
-                        else if (objinfo.IsPhysics && !objinfo.IsKilled && !objinfo.IsAttached)
+                        else if ((objinfo.IsPhysics || objinfo.IsMoving) && !objinfo.IsKilled && !objinfo.IsAttached)
                         {
                             physicalOutQueue.Enqueue(objinfo);
                         }

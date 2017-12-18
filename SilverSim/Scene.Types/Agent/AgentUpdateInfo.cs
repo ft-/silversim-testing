@@ -42,6 +42,8 @@ namespace SilverSim.Scene.Types.Agent
 
         public bool IsAttached => false;
 
+        public bool IsMoving => false;
+
         public bool IsAttachedToPrivate => false;
 
         public int SerialNumber { get; }

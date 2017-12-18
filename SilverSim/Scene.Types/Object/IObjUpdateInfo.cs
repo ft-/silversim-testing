@@ -39,6 +39,8 @@ namespace SilverSim.Scene.Types.Object
 
         bool IsAttached { get; }
 
+        bool IsMoving { get; }
+
         bool IsAttachedToPrivate { get; }
 
         bool IsPhysics { get; }
