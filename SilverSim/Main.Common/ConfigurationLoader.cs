@@ -1295,29 +1295,64 @@ namespace SilverSim.Main.Common
 
             foreach (IPluginShutdown s in shutdownLogoutBeforeAgentsList)
             {
-                s.Shutdown();
+                try
+                {
+                    s.Shutdown();
+                }
+                catch(Exception e)
+                {
+                    m_Log.Error($"Failed to shutdown {s.GetType().FullName}", e);
+                }
             }
 
             foreach (IPluginShutdown s in shutdownLogoutAgentsList)
             {
-                s.Shutdown();
+                try
+                {
+                    s.Shutdown();
+                }
+                catch (Exception e)
+                {
+                    m_Log.Error($"Failed to shutdown {s.GetType().FullName}", e);
+                }
             }
 
             Scenes.RemoveAll();
 
             foreach (IPluginShutdown s in shutdownLogoutRegionsList)
             {
-                s.Shutdown();
+                try
+                {
+                    s.Shutdown();
+                }
+                catch (Exception e)
+                {
+                    m_Log.Error($"Failed to shutdown {s.GetType().FullName}", e);
+                }
             }
 
             foreach (IPluginShutdown s in shutdownAnyList)
             {
-                s.Shutdown();
+                try
+                {
+                    s.Shutdown();
+                }
+                catch (Exception e)
+                {
+                    m_Log.Error($"Failed to shutdown {s.GetType().FullName}", e);
+                }
             }
 
-            foreach(IPluginShutdown s in shutdownLogoutDatabaseList)
+            foreach (IPluginShutdown s in shutdownLogoutDatabaseList)
             {
-                s.Shutdown();
+                try
+                {
+                    s.Shutdown();
+                }
+                catch (Exception e)
+                {
+                    m_Log.Error($"Failed to shutdown {s.GetType().FullName}", e);
+                }
             }
         }
         #endregion
