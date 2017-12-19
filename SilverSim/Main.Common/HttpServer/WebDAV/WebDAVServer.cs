@@ -70,7 +70,7 @@ namespace SilverSim.Main.Common.HttpServer.WebDAV
             return res;
         }
 
-        private void HandleWebDAV(HttpRequest req)
+        public void HandleWebDAVRequest(HttpRequest req)
         {
             string url = req.RawUrl;
             if(!url.StartsWith(m_BasePath))
@@ -342,13 +342,19 @@ namespace SilverSim.Main.Common.HttpServer.WebDAV
             var resDoc = new XmlDocument();
             XmlElement elem = resDoc.CreateElement("DAV", "multistatus");
             resDoc.AppendChild(elem);
-            elem.AppendChild(PropFindProcess(resource, resDoc, prop));
+            elem.AppendChild(PropFindProcess(req.RawUrl, resource, resDoc, prop));
 
             if(depth > 0 && resource is WebDAVCollection)
             {
-                foreach(WebDAVResource child in ((WebDAVCollection)resource).Children)
+                string childUrl = req.RawUrl;
+                if(!childUrl.EndsWith("/"))
                 {
-                    elem.AppendChild(PropFindProcess(resource, resDoc, prop));
+                    childUrl += "/";
+                }
+
+                foreach (WebDAVResource child in ((WebDAVCollection)resource).Children)
+                {
+                    elem.AppendChild(PropFindProcess(childUrl + Uri.EscapeDataString(child.ResourceName), resource, resDoc, prop));
                 }
             }
 
@@ -360,11 +366,11 @@ namespace SilverSim.Main.Common.HttpServer.WebDAV
             }
         }
 
-        private XmlElement PropFindProcess(WebDAVResource resource, XmlDocument resDoc, XmlElement reqprop)
+        private XmlElement PropFindProcess(string rawurl, WebDAVResource resource, XmlDocument resDoc, XmlElement reqprop)
         {
             XmlElement responseElem = resDoc.CreateElement("DAV", "response");
             XmlElement hrefElem = resDoc.CreateElement("DAV", "href");
-            hrefElem.InnerText = resource.Href;
+            hrefElem.InnerText = rawurl;
             responseElem.AppendChild(hrefElem);
             XmlElement propStatElem = resDoc.CreateElement("DAV", "propstat");
             responseElem.AppendChild(propStatElem);

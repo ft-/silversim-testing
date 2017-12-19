@@ -28,11 +28,11 @@ namespace SilverSim.Main.Common.HttpServer.WebDAV
 {
     public abstract class WebDAVFile : WebDAVResource
     {
-        public WebDAVFile(string href)
+        public WebDAVFile(string resourcename)
         {
-            Href = href;
+            ResourceName = resourcename;
         }
-        public string Href { get; }
+        public string ResourceName { get; }
 
         public abstract string DisplayName { get; }
 

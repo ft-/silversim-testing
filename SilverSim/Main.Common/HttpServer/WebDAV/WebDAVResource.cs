@@ -25,7 +25,7 @@ namespace SilverSim.Main.Common.HttpServer.WebDAV
 {
     public interface WebDAVResource
     {
-        string Href { get; }
+        string ResourceName { get; }
         void HandleGetHead(HttpRequest req);
         void HandlePut(HttpRequest req);
         void HandlePut(HttpRequest req, string name);
