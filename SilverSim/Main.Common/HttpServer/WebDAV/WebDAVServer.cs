@@ -331,7 +331,7 @@ namespace SilverSim.Main.Common.HttpServer.WebDAV
             string depthstr;
             if (req.TryGetHeader("depth", out depthstr))
             {
-                depth = int.Parse(depthstr);
+                depth = depthstr == "infinity" ? int.MaxValue : int.Parse(depthstr);
             }
             else
             {
@@ -415,13 +415,14 @@ namespace SilverSim.Main.Common.HttpServer.WebDAV
                 doc.Load(s);
             }
 
-            if (doc.DocumentElement.Name != "propfind")
+            if (doc.DocumentElement.LocalName != "propertyupdate")
             {
                 req.ErrorResponse(HttpStatusCode.BadRequest);
                 return;
             }
 
-            var prop = (XmlElement)doc.DocumentElement.GetElementsByTagName("prop")[0];
+            var prop = (XmlElement)doc.DocumentElement.GetElementsByTagName("set")[0];
+            prop = (XmlElement)prop.GetElementsByTagName("prop")[0];
             var resDoc = new XmlDocument();
             XmlElement elem = resDoc.CreateElement("DAV", "multistatus");
             resDoc.AppendChild(elem);
