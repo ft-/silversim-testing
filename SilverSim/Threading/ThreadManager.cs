@@ -19,6 +19,8 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using log4net;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 
@@ -26,6 +28,7 @@ namespace SilverSim.Threading
 {
     public static class ThreadManager
     {
+        private static readonly ILog m_Log = LogManager.GetLogger("THREAD MANAGER");
         private static readonly RwLockedList<Thread> m_Threads = new RwLockedList<Thread>();
 
         public static IList<Thread> Threads => new List<Thread>(m_Threads);
@@ -53,6 +56,10 @@ namespace SilverSim.Threading
                     m_Threads.Add(Thread);
                     m_Start();
                 }
+                catch(Exception e)
+                {
+                    m_Log.Error($"UNCAUGHT EXCEPTION in {Thread.Name}: {e.GetType().FullName}: {e.Message}\n{e.Data}", e);
+                }
                 finally
                 {
                     m_Threads.Remove(Thread);
@@ -65,6 +72,10 @@ namespace SilverSim.Threading
                 {
                     m_Threads.Add(Thread);
                     m_ParameterizedStart(o);
+                }
+                catch (Exception e)
+                {
+                    m_Log.Error($"UNCAUGHT EXCEPTION in {Thread.Name}: {e.GetType().FullName}: {e.Message}\n{e.Data}", e);
                 }
                 finally
                 {
