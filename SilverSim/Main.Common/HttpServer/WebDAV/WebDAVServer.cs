@@ -52,7 +52,7 @@ namespace SilverSim.Main.Common.HttpServer.WebDAV
             WebDAVResource res = m_RootFolder;
             foreach(string pathcomp in pathcomps)
             {
-                res = res.GetResource(pathcomp);
+                res = res.GetResource(Uri.UnescapeDataString(pathcomp));
             }
 
             return res;
@@ -61,10 +61,10 @@ namespace SilverSim.Main.Common.HttpServer.WebDAV
         private WebDAVResource GetResourceTo(string[] pathcomps, out string last)
         {
             WebDAVResource res = m_RootFolder;
-            last = pathcomps[pathcomps.Length - 1];
+            last = Uri.UnescapeDataString(pathcomps[pathcomps.Length - 1]);
             for(int i = 0; i < pathcomps.Length - 1; ++i)
             {
-                res = res.GetResource(pathcomps[i]);
+                res = res.GetResource(Uri.UnescapeDataString(pathcomps[i]));
             }
 
             return res;
@@ -115,7 +115,7 @@ namespace SilverSim.Main.Common.HttpServer.WebDAV
                         {
                             try
                             {
-                                resource = GetResourceTo(url.Split('/'), out name);
+                                resource = GetResourceTo(url.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries), out name);
                             }
                             catch (WebDAVResourceNotFoundException)
                             {
@@ -159,7 +159,7 @@ namespace SilverSim.Main.Common.HttpServer.WebDAV
                         {
                             try
                             {
-                                resource = GetResource(url.Split('/'));
+                                resource = GetResource(url.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries));
                             }
                             catch (WebDAVResourceNotFoundException)
                             {
@@ -182,7 +182,7 @@ namespace SilverSim.Main.Common.HttpServer.WebDAV
                         {
                             try
                             {
-                                resource = GetResource(url.Split('/'));
+                                resource = GetResource(url.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries));
                             }
                             catch (WebDAVResourceNotFoundException)
                             {
@@ -207,7 +207,7 @@ namespace SilverSim.Main.Common.HttpServer.WebDAV
                         {
                             try
                             {
-                                resource = GetResourceTo(url.Split('/'), out name);
+                                resource = GetResourceTo(url.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries), out name);
                             }
                             catch (WebDAVResourceNotFoundException)
                             {
@@ -230,7 +230,7 @@ namespace SilverSim.Main.Common.HttpServer.WebDAV
                         {
                             try
                             {
-                                resource = GetResource(url.Split('/'));
+                                resource = GetResource(url.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries));
                             }
                             catch (WebDAVResourceNotFoundException)
                             {
@@ -253,7 +253,7 @@ namespace SilverSim.Main.Common.HttpServer.WebDAV
                         {
                             try
                             {
-                                resource = GetResource(url.Split('/'));
+                                resource = GetResource(url.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries));
                             }
                             catch (WebDAVResourceNotFoundException)
                             {
@@ -275,7 +275,7 @@ namespace SilverSim.Main.Common.HttpServer.WebDAV
                         WebDAVResource resource;
                         try
                         {
-                            resource = GetResource(url.Split('/'));
+                            resource = GetResource(url.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries));
                         }
                         catch (WebDAVResourceNotFoundException)
                         {
@@ -296,7 +296,7 @@ namespace SilverSim.Main.Common.HttpServer.WebDAV
                         WebDAVResource resource;
                         try
                         {
-                            resource = GetResource(url.Split('/'));
+                            resource = GetResource(url.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries));
                         }
                         catch (WebDAVResourceNotFoundException)
                         {
