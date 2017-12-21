@@ -561,7 +561,17 @@ namespace SilverSim.Main.Common.Console
                 {
                     /* no action required */
                 }
-                string cmd = ReadLine(CmdPrompt, true);
+
+                string cmd;
+                try
+                {
+                    cmd = ReadLine(CmdPrompt, true);
+                }
+                catch(ThreadAbortException)
+                {
+                    System.Console.WriteLine();
+                    throw;
+                }
 
                 if (0 == cmd.Length)
                 {
