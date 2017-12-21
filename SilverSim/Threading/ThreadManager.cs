@@ -73,6 +73,10 @@ namespace SilverSim.Threading
                     m_Threads.Add(Thread);
                     m_ParameterizedStart(o);
                 }
+                catch(ThreadAbortException)
+                {
+                    /* do not log this one */
+                }
                 catch (Exception e)
                 {
                     m_Log.Error($"UNCAUGHT EXCEPTION in {Thread.Name}: {e.GetType().FullName}: {e.Message}\n{e.Data}", e);
