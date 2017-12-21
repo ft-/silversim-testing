@@ -569,7 +569,15 @@ namespace SilverSim.Main.Common.Console
                 }
                 catch(ThreadAbortException)
                 {
+                    SetCursorLeft(0);
+                    m_CursorYPosition = SetCursorTop(m_CursorYPosition);
+
                     System.Console.WriteLine();
+
+                    lock (m_CommandLineBuffer)
+                    {
+                        m_CursorYPosition = -1;
+                    }
                     throw;
                 }
 
