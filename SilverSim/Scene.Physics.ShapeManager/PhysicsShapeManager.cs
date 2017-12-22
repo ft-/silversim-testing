@@ -31,7 +31,6 @@ using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Asset.Format.Mesh;
 using SilverSim.Types.Primitive;
-using System;
 using System.ComponentModel;
 using System.Threading;
 
@@ -398,7 +397,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
                         }
                         else
                         {
-                            m_Log.WarnFormat("Physics shape of prim generated a 0 point hull: {0} / {1}", physicsShape, shape.Serialization.ToHexString());
+                            m_Log.WarnFormat("Physics shape of prim generated a 0 point hull: {0} / {1} / {2} / {3}", physicsShape, shape.PCode, shape.Type, shape.Serialization.ToHexString());
                         }
                         physicshaperef = null;
                         return false;
