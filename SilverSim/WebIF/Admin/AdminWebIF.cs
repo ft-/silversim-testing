@@ -365,6 +365,25 @@ namespace SilverSim.WebIF.Admin
         #endregion
 
         #region User Logic
+        private bool VerifyPassword(string user, string pass)
+        {
+            string userRef = "WebIF.Admin.User." + user + ".PassCode";
+            string oldPass;
+            if (m_ServerParams.TryGetValue(UUID.Zero, userRef, out oldPass))
+            {
+                string res;
+                using (var sha1 = SHA1.Create())
+                {
+                    byte[] str = pass.ToUTF8Bytes();
+
+                    res = BitConverter.ToString(sha1.ComputeHash(str)).Replace("-", "").ToLower();
+                }
+
+                return res == oldPass;
+            }
+            return false;
+        }
+
         private bool SetUserPassword(string user, string pass)
         {
             string userRef = "WebIF.Admin.User." + user + ".PassCode";
@@ -1021,10 +1040,11 @@ namespace SilverSim.WebIF.Admin
             var chgpwcmd = string.Empty;
             if(m_EnableSetPasswordCommand)
             {
-                chgpwcmd = "admin-webif change password <user>\nadmin-webif change password <user> <pass>\n";
+                chgpwcmd = "admin-webif set password <user>\nadmin-webif set password <user> <pass>\n";
             }
             io.Write("admin-webif show users\n" +
                 "admin-webif show user <user>\n" +
+                "admin-webif change password <user>\n" +
                 chgpwcmd +
                 "admin-webif delete user <user>\n" +
                 "admin-webif grant <user> <right>\n" +
@@ -1132,9 +1152,39 @@ namespace SilverSim.WebIF.Admin
                         break;
 
                     case "change":
+                        if(args.Count < 4 || args[2] != "password")
+                        {
+                            DisplayAdminWebIFHelp(io);
+                        }
+                        else if(!VerifyPassword(args[3], io.GetPass("Old password")))
+                        {
+                            io.Write("Old password does not match that account.");
+                        }
+                        else
+                        {
+                            string p1 = io.GetPass("New Password");
+                            string p2 = io.GetPass("Repeat");
+                            if(p1 != p2)
+                            {
+                                io.Write("Passwords do not match");
+                            }
+                            else
+                            {
+                                io.Write(SetUserPassword(args[3], p1) ?
+                                    "Password changed." :
+                                    "User does not exist.");
+                            }
+                        }
+                        break;
+
+                    case "set":
                         if(args.Count < 3)
                         {
                             DisplayAdminWebIFHelp(io);
+                            io.Write(SetUserPassword(args[3], io.GetPass("Password")) ?
+                                "Password changed." :
+                                "User does not exist.");
+
                         }
                         else
                         {
