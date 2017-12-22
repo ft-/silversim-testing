@@ -502,6 +502,38 @@ namespace SilverSim.Scene.Types.Object
 
                     return d;
                 }
+
+                set
+                {
+                    SculptType = value.SculptType;
+                    SculptMap = value.SculptMap;
+                    IsSculptInverted = value.IsSculptInverted;
+                    IsSculptMirrored = value.IsSculptMirrored;
+                    ProfileBegin = (ushort)(value.ProfileBegin * 50000).Clamp(0, 50000);
+                    ProfileEnd = (ushort)(value.ProfileEnd * 50000).Clamp(0, 50000);
+                    ProfileCurve = (byte)(((byte)value.ProfileShape) | ((byte)value.HoleShape));
+                    if ((Type != PrimitiveShapeType.Box || Type != PrimitiveShapeType.Tube) &&
+                        value.HoleShape == PrimitiveProfileHollowShape.Square)
+                    {
+                        ProfileHollow = (ushort)(value.ProfileHollow * 50000 / 0.7).Clamp(0, 50000);
+                    }
+                    else
+                    {
+                        ProfileHollow = (ushort)(value.ProfileHollow * 50000).Clamp(0, 50000);
+                    }
+
+                    PathBegin = (ushort)(value.PathBegin * 50000).Clamp(0, 1);
+                    PathEnd = (ushort)(50000 - (ushort)(value.PathEnd * 50000).Clamp(0, 50000));
+                    PathScaleX = (byte)(value.PathScale.X * 100 + 100).Clamp(0, 200);
+                    PathScaleY = (byte)(value.PathScale.Y * 100 + 100).Clamp(0, 200);
+                    PathTwistBegin = (sbyte)(value.TwistBegin * 100).Clamp(-100, 100);
+                    PathTwist = (sbyte)(value.TwistEnd * 100).Clamp(-100, 100);
+                    PathRadiusOffset = (sbyte)(value.RadiusOffset * 100).Clamp(-100, 100);
+                    PathTaperX = (sbyte)(value.Taper.X * 100).Clamp(-100, 100);
+                    PathTaperY = (sbyte)(value.Taper.Y * 100).Clamp(-100, 100);
+                    PathRevolutions = (byte)((value.Revolutions.Clamp(1, 4) - 1) * 100);
+                    PathSkew = (sbyte)(value.Skew * 100).Clamp(-100, 100);
+                }
             }
 
             public void ToPrimitiveParams(AnArray paramList)
