@@ -66,12 +66,17 @@ namespace SilverSim.Database.Memory.SimulationData
                 if (info.IsKilled)
                 {
                     m_Primitives.Remove(info.ID);
+                    m_Objects.Remove(info.ID);
                 }
                 else
                 {
                     m_Objects.Remove(info.ID);
                     m_Primitives[info.ID] = GenerateUpdateObjectPart(info.Part);
                     m_Objects[info.ID] = GenerateUpdateObjectGroup(info.Part.ObjectGroup);
+                    foreach(ObjectPartInventoryItem item in info.Part.Inventory.Values)
+                    {
+                        OnUpdate(item.UpdateInfo);
+                    }
                 }
             }
 
@@ -85,7 +90,7 @@ namespace SilverSim.Database.Memory.SimulationData
                 var grantinfo = item.PermsGranter;
                 return new Map
                 {
-                    { "AssetId", item.AssetID },
+                    { "AssetID", item.AssetID },
                     { "AssetType", (int)item.AssetType },
                     { "CreationDate", item.CreationDate },
                     { "Creator", item.Creator.ToString() },
