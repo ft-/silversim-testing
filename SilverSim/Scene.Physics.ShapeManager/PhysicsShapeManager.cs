@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using log4net;
 using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
@@ -41,6 +42,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
     [PluginName("PhysicsShapeManager")]
     public sealed class PhysicsShapeManager : IPlugin, IPhysicsHacdCleanCache
     {
+        private static readonly ILog m_Log = LogManager.GetLogger("PHYSICS SHAPE MANAGER");
         private AssetServiceInterface m_AssetService;
         private SimulationDataStorageInterface m_SimulationStorage;
 
@@ -327,6 +329,15 @@ namespace SilverSim.Scene.Physics.ShapeManager
                     physicshaperef = null;
                     return false;
                 }
+                foreach (PhysicsConvexShape.ConvexHull hull in physicshape.Hulls)
+                {
+                    if (hull.Vertices.Count == 0)
+                    {
+                        m_Log.WarnFormat("Physics shape of mesh generated a 0 point hull: {0} / {1}", physicsShape, meshId);
+                        physicshaperef = null;
+                        return false;
+                    }
+                }
                 m_SimulationStorage.PhysicsConvexShapes[meshId, physicsShape] = physicshape;
             }
 
@@ -372,6 +383,27 @@ namespace SilverSim.Scene.Physics.ShapeManager
             {
                 /* we may produce additional meshes sometimes but it is better not to lock while generating the mesh */
                 physicshape = ConvertToMesh(physicsShape, shape);
+                if(physicshape == null)
+                {
+                    physicshaperef = null;
+                    return false;
+                }
+                foreach(PhysicsConvexShape.ConvexHull hull in physicshape.Hulls)
+                {
+                    if(hull.Vertices.Count == 0)
+                    {
+                        if (shape.Type == PrimitiveShapeType.Sculpt)
+                        {
+                            m_Log.WarnFormat("Physics shape of sculpt generated a 0 point hull: {0} / {1}", physicsShape, shape.Serialization.ToHexString());
+                        }
+                        else
+                        {
+                            m_Log.WarnFormat("Physics shape of prim generated a 0 point hull: {0} / {1}", physicsShape, shape.Serialization.ToHexString());
+                        }
+                        physicshaperef = null;
+                        return false;
+                    }
+                }
                 m_SimulationStorage.PhysicsConvexShapes[shape] = physicshape;
             }
 
