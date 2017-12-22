@@ -145,6 +145,9 @@ namespace SilverSim.Scene.Types.Object
         }
         #endregion
 
+        public void Add(int link, ObjectPart part) =>
+            Add(link, part.ID, part);
+
         public bool IsMoving
         {
             get
