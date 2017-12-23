@@ -419,6 +419,7 @@ namespace SilverSim.Scene.Types.Object
                 #region Path Params
                 /** <summary>value range 0f to 1f</summary> */
                 public double PathBegin;
+                public PrimitiveExtrusion PathCurve;
                 public bool IsOpen;
                 /** <summary>value range 0f to 1f</summary> */
                 public double PathEnd;
@@ -457,8 +458,10 @@ namespace SilverSim.Scene.Types.Object
                         ProfileEnd = (ProfileEnd / 50000.0).Clamp(0f, 1f),
                         IsOpen = ProfileBegin != 0 || ProfileEnd != 50000,
                         ProfileShape = (PrimitiveProfileShape)(ProfileCurve & (byte)PrimitiveProfileShape.Mask),
-                        HoleShape = (PrimitiveProfileHollowShape)(ProfileCurve & (byte)PrimitiveProfileHollowShape.Mask)
+                        HoleShape = (PrimitiveProfileHollowShape)(ProfileCurve & (byte)PrimitiveProfileHollowShape.Mask),
                         #endregion
+
+                        PathCurve = (PrimitiveExtrusion)PathCurve
                     };
 
                     if(ProfileEnd == 50000)
@@ -509,6 +512,7 @@ namespace SilverSim.Scene.Types.Object
                     SculptMap = value.SculptMap;
                     IsSculptInverted = value.IsSculptInverted;
                     IsSculptMirrored = value.IsSculptMirrored;
+                    PathCurve = (byte)value.PathCurve;
                     ProfileBegin = (ushort)(value.ProfileBegin * 50000).Clamp(0, 50000);
                     ProfileEnd = (ushort)(value.ProfileEnd * 50000).Clamp(0, 50000);
                     ProfileCurve = (byte)(((byte)value.ProfileShape) | ((byte)value.HoleShape));
