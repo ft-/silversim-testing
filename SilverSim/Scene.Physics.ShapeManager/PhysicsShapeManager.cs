@@ -31,6 +31,7 @@ using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Asset.Format.Mesh;
 using SilverSim.Types.Primitive;
+using System;
 using System.ComponentModel;
 using System.Threading;
 
@@ -243,43 +244,81 @@ namespace SilverSim.Scene.Physics.ShapeManager
                 var m = new LLMesh(m_AssetService[shape.SculptMap]);
                 if(physicsShape == PrimitivePhysicsShapeType.Convex)
                 {
+#if DEBUG
+                    m_Log.DebugFormat("Selected convex of {0} {1}", shape.SculptType, shape.SculptMap);
+#endif
                     if (m.HasConvexPhysics())
                     {
                         try
                         {
+#if DEBUG
+                            m_Log.DebugFormat("Using convex of {0} {1}", shape.SculptType, shape.SculptMap);
+#endif
                             convexShape = m.GetConvexPhysics(false);
                             hasHullList = convexShape.HasHullList;
                             return convexShape;
                         }
-                        catch
+                        catch(NoSuchMeshDataException)
                         {
                             /* no shape */
+#if DEBUG
+                            m_Log.DebugFormat("No convex in asset of {0} {1}", shape.SculptType, shape.SculptMap);
+#endif
+                        }
+                        catch (Exception e)
+                        {
+                            m_Log.Warn($"Failed to get convex data of {shape.SculptType} {shape.SculptMap}", e);
                         }
                     }
+#if DEBUG
+                    else
+                    {
+                        m_Log.DebugFormat("No shape in {0} {1}", shape.SculptType, shape.SculptMap);
+                    }
+#endif
                 }
                 else
                 {
+#if DEBUG
+                    m_Log.DebugFormat("Selected detailed physics of {0} {1}", shape.SculptType, shape.SculptMap);
+#endif
                     if (m.HasLOD(LLMesh.LodLevel.Physics))
                     {
                         /* check for physics mesh before giving out the single hull */
+#if DEBUG
+                        m_Log.DebugFormat("Using detailed physics of {0} {1}", shape.SculptType, shape.SculptMap);
+#endif
                         MeshLOD lod = m.GetLOD(LLMesh.LodLevel.Physics);
                         lod.Optimize();
                         convexShape = DecomposeConvex(lod);
                     }
                     else if(m.HasConvexPhysics())
                     {
+#if DEBUG
+                        m_Log.DebugFormat("Using convex of {0} {1}", shape.SculptType, shape.SculptMap);
+#endif
                         try
                         {
                             convexShape = m.GetConvexPhysics(true);
                             hasHullList = convexShape.HasHullList;
                         }
-                        catch
+                        catch(NoSuchMeshDataException)
                         {
                             /* no shape */
+#if DEBUG
+                            m_Log.DebugFormat("No convex in asset of {0} {1}", shape.SculptType, shape.SculptMap);
+#endif
                         }
-                        if(convexShape == null)
+                        catch(Exception e)
+                        {
+                            m_Log.Warn($"Failed to get convex data of {shape.SculptType} {shape.SculptMap}", e);
+                        }
+                        if (convexShape == null)
                         {
                             /* this way we keep convex hull type functional by having it only get active on PrimitivePhysicsShapeType.Prim */
+#if DEBUG
+                            m_Log.DebugFormat("Using decompose to convex for {0} {1}", shape.SculptType, shape.SculptMap);
+#endif
                             MeshLOD lod = m.GetLOD(LLMesh.LodLevel.LOD3);
                             lod.Optimize();
                             convexShape = DecomposeConvex(lod);
@@ -289,6 +328,9 @@ namespace SilverSim.Scene.Physics.ShapeManager
             }
             else
             {
+#if DEBUG
+                m_Log.DebugFormat("Using decompose to convex for {0} {1}", shape.SculptType, shape.SculptMap);
+#endif
                 MeshLOD m = shape.ToMesh(m_AssetService);
                 m.Optimize();
                 convexShape = DecomposeConvex(m);
