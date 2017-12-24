@@ -72,7 +72,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
 
                 outvertex.Y = outvertex.Y * pathscale + (0.5 - pathscale * 0.5) * radiusOffset;
 
-                outvertex = outvertex.Rotate2D_YZ(-angle);
+                outvertex = outvertex.Rotate2D_YZ(angle);
                 outvertex.X += outvertex.Z * shape.TopShear.X;
                 outvertex.Y += outvertex.Z * shape.TopShear.Y;
 

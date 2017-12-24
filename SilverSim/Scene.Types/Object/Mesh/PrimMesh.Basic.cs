@@ -524,22 +524,8 @@ namespace SilverSim.Scene.Types.Object.Mesh
             /* Box has cut start at 0.5,-0.5 */
             var Path = new PathDetails();
 
-            double startangle;
-            double endangle;
-            switch (shape.ShapeType)
-            {
-                case PrimitiveShapeType.Ring:
-                case PrimitiveShapeType.Torus:
-                case PrimitiveShapeType.Tube:
-                    startangle = 2 * Math.PI * shape.PathBegin;
-                    endangle = 2 * Math.PI * shape.PathEnd;
-                    break;
-
-                default:
-                    startangle = 2 * Math.PI * shape.ProfileBegin;
-                    endangle = 2 * Math.PI * shape.ProfileEnd;
-                    break;
-            }
+            double startangle = 2 * Math.PI * shape.ProfileBegin;
+            double endangle = 2 * Math.PI * shape.ProfileEnd;
             double stepangle = (endangle - startangle) / 60;
             List<double> angles = shape.CalcBaseAngles(startangle, endangle, stepangle);
 
@@ -612,22 +598,8 @@ namespace SilverSim.Scene.Types.Object.Mesh
             /* Cylinder has cut start at 0,0.5 */
             var Path = new PathDetails();
 
-            double startangle;
-            double endangle;
-            switch(shape.ShapeType)
-            {
-                case PrimitiveShapeType.Ring:
-                case PrimitiveShapeType.Torus:
-                case PrimitiveShapeType.Tube:
-                    startangle = 2 * Math.PI * shape.PathBegin;
-                    endangle = 2 * Math.PI * shape.PathEnd;
-                    break;
-
-                default:
-                    startangle = 2 * Math.PI * shape.ProfileBegin;
-                    endangle = 2 * Math.PI * shape.ProfileEnd;
-                    break;
-            }
+            double startangle = 2 * Math.PI * shape.ProfileBegin;
+            double endangle = 2 * Math.PI * shape.ProfileEnd;
             double stepangle = (endangle - startangle) / 60;
             var angles = shape.CalcBaseAngles(startangle, endangle, stepangle);
 
@@ -695,22 +667,8 @@ namespace SilverSim.Scene.Types.Object.Mesh
             /* Prism has cut start at 0,0.5 */
             var Path = new PathDetails();
 
-            double startangle;
-            double endangle;
-            switch (shape.ShapeType)
-            {
-                case PrimitiveShapeType.Ring:
-                case PrimitiveShapeType.Torus:
-                case PrimitiveShapeType.Tube:
-                    startangle = 2 * Math.PI * shape.PathBegin;
-                    endangle = 2 * Math.PI * shape.PathEnd;
-                    break;
-
-                default:
-                    startangle = 2 * Math.PI * shape.ProfileBegin;
-                    endangle = 2 * Math.PI * shape.ProfileEnd;
-                    break;
-            }
+            double startangle = 2 * Math.PI * shape.ProfileBegin;
+            double endangle = 2 * Math.PI * shape.ProfileEnd;
             double stepangle = (endangle - startangle) / 60;
             var angles = shape.CalcBaseAngles(startangle, endangle, stepangle);
 
