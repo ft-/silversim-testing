@@ -455,7 +455,7 @@ namespace SilverSim.Scene.Types.Object
 
                         #region Profile Params
                         ProfileBegin = (ProfileBegin/ 50000.0).Clamp(0f, 1f),
-                        ProfileEnd = (ProfileEnd / 50000.0).Clamp(0f, 1f),
+                        ProfileEnd = 1 - (ProfileEnd / 50000.0).Clamp(0f, 1f),
                         IsOpen = ProfileBegin != 0 || ProfileEnd != 50000,
                         ProfileShape = (PrimitiveProfileShape)(ProfileCurve & (byte)PrimitiveProfileShape.Mask),
                         HoleShape = (PrimitiveProfileHollowShape)(ProfileCurve & (byte)PrimitiveProfileHollowShape.Mask),
@@ -514,7 +514,7 @@ namespace SilverSim.Scene.Types.Object
                     IsSculptMirrored = value.IsSculptMirrored;
                     PathCurve = (byte)value.PathCurve;
                     ProfileBegin = (ushort)(value.ProfileBegin * 50000).Clamp(0, 50000);
-                    ProfileEnd = (ushort)(value.ProfileEnd * 50000).Clamp(0, 50000);
+                    ProfileEnd = (ushort)((1 - value.ProfileEnd) * 50000).Clamp(0, 50000);
                     ProfileCurve = (byte)(((byte)value.ProfileShape) | ((byte)value.HoleShape));
                     if ((Type != PrimitiveShapeType.Box || Type != PrimitiveShapeType.Tube) &&
                         value.HoleShape == PrimitiveProfileHollowShape.Square)

@@ -129,9 +129,9 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     throw new NotImplementedException();
             }
 
-            double cut = shape.ProfileBegin;
+            double cut = shape.PathBegin;
             double cutBegin = cut;
-            double cutEnd = 1f - shape.ProfileEnd;
+            double cutEnd = shape.PathEnd;
             double cutStep = (cutEnd - cut) / 10f;
             double twistBegin = shape.TwistBegin * Math.PI;
             double twistEnd = shape.TwistEnd * Math.PI;
@@ -631,13 +631,13 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 case PrimitiveShapeType.Torus:
                 case PrimitiveShapeType.Tube:
                     startangle = 2 * Math.PI * shape.ProfileBegin;
-                    endangle = 2 * Math.PI * (1f - shape.ProfileEnd);
+                    endangle = 2 * Math.PI * shape.ProfileEnd;
                     advanced_shape = true;
                     break;
 
                 default:
-                    startangle = 2 * Math.PI * shape.PathBegin;
-                    endangle = 2 * Math.PI * shape.PathEnd;
+                    startangle = 2 * Math.PI * shape.ProfileBegin;
+                    endangle = 2 * Math.PI * shape.ProfileEnd;
                     break;
             }
             double stepangle = (endangle - startangle) / 60;
@@ -729,8 +729,8 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     break;
 
                 default:
-                    startangle = 2 * Math.PI * shape.PathBegin;
-                    endangle = 2 * Math.PI * shape.PathEnd;
+                    startangle = 2 * Math.PI * shape.ProfileBegin;
+                    endangle = 2 * Math.PI * (1f - shape.ProfileEnd);
                     break;
             }
             double stepangle = (endangle - startangle) / 60;
