@@ -33,6 +33,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
     {
         private static readonly ILog m_Log = LogManager.GetLogger("VHACD");
 
+        [StructLayout(LayoutKind.Sequential)]
         public struct ConvexHull
         {
             public IntPtr Points;
@@ -41,6 +42,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
             public int NumTriangles;
         }
 
+        [StructLayout(LayoutKind.Sequential)]
         public struct Parameters
         {
             public double Concavity;
@@ -63,8 +65,8 @@ namespace SilverSim.Scene.Physics.ShapeManager
             public void Init()
             {
                 Resolution = 100000;
-                Depth = 20;
-                Concavity = 0.0025;
+                Depth = 7;
+                Concavity = 0.001;
                 PlaneDownsampling = 4;
                 ConvexhullDownsampling = 4;
                 Alpha = 0.05;
@@ -72,7 +74,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
                 Gamma = 0.00125;
                 Pca = 0;
                 Mode = 0; // 0: voxel-based (recommended), 1: tetrahedron-based
-                MaxNumVerticesPerCH = 32;
+                MaxNumVerticesPerCH = 64;
                 MinVolumePerCH = 0.0001;
                 Callback = IntPtr.Zero;
                 Logger = IntPtr.Zero;
@@ -153,6 +155,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
             }
 
             var p = new Parameters();
+            p.Init();
             if(!VHacd_Compute(m_VHacd, points, 3, (uint)m.Vertices.Count, tris, 3, (uint)m.Triangles.Count, ref p))
             {
                 throw new InvalidDataException();
