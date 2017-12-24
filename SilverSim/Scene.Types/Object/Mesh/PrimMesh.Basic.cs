@@ -38,12 +38,12 @@ namespace SilverSim.Scene.Types.Object.Mesh
 
             #region cut
             topSize.X = shape.PathScale.X < 0f ?
-                1.0.Lerp(1f + shape.PathScale.X, 1f - cut) :
-                1.0.Lerp(1f - shape.PathScale.X, cut);
+                1.0.Lerp(1f + shape.PathScale.X, cut) :
+                1.0.Lerp(1f - shape.PathScale.X, 1f - cut);
 
             topSize.Y = shape.PathScale.Y < 0f ?
-                1.0.Lerp(1f + shape.PathScale.Y, 1f - cut) :
-                1.0.Lerp(1f - shape.PathScale.Y, cut);
+                1.0.Lerp(1f + shape.PathScale.Y, cut) :
+                1.0.Lerp(1f - shape.PathScale.Y, 1f - cut);
             #endregion
 
             #region top_shear
