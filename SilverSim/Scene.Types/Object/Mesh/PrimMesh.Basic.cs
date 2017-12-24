@@ -135,7 +135,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             double cutStep = (cutEnd - cut) / 10f;
             double twistBegin = shape.TwistBegin * Math.PI;
             double twistEnd = shape.TwistEnd * Math.PI;
-            double neededSteps = Math.Min(1, Math.Ceiling((shape.TwistEnd - shape.TwistBegin) / (5 * Math.PI / 180) * (cutEnd - cut)));
+            double neededSteps = Math.Max(1, Math.Ceiling((shape.TwistEnd - shape.TwistBegin) / (5 * Math.PI / 180) * (cutEnd - cut)));
             cutStep /= neededSteps;
 
             var mesh = new MeshLOD();
@@ -526,20 +526,20 @@ namespace SilverSim.Scene.Types.Object.Mesh
 
             double startangle;
             double endangle;
-            bool advanced_shape = false;
             switch (shape.ShapeType)
             {
                 case PrimitiveShapeType.Ring:
                 case PrimitiveShapeType.Torus:
                 case PrimitiveShapeType.Tube:
-                    advanced_shape = true;
+                    startangle = 2 * Math.PI * shape.PathBegin;
+                    endangle = 2 * Math.PI * shape.PathEnd;
                     break;
 
                 default:
+                    startangle = 2 * Math.PI * shape.ProfileBegin;
+                    endangle = 2 * Math.PI * shape.ProfileEnd;
                     break;
             }
-            startangle = 2 * Math.PI * shape.ProfileBegin;
-            endangle = 2 * Math.PI * shape.ProfileEnd;
             double stepangle = (endangle - startangle) / 60;
             List<double> angles = shape.CalcBaseAngles(startangle, endangle, stepangle);
 
@@ -577,13 +577,6 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     }
 
                     /* inner path is reversed */
-                    if (advanced_shape)
-                    {
-                        outerDirectionalVec.Z = outerDirectionalVec.X;
-                        innerDirectionalVec.Z = innerDirectionalVec.X;
-                        outerDirectionalVec.X = 0;
-                        innerDirectionalVec.X = 0;
-                    }
                     Path.Vertices.Add(outerDirectionalVec);
                     Path.Vertices.Insert(0, innerDirectionalVec);
                 }
@@ -599,11 +592,6 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     Vector3 directionalVec = startPoint.Rotate2D_XY(angle);
                     /* normalize on single component to 0.5, simplifies algorithm */
                     directionalVec = directionalVec.CalcPointToSquareBoundary(1);
-                    if(advanced_shape)
-                    {
-                        directionalVec.Z = directionalVec.X;
-                        directionalVec.X = 0;
-                    }
                     Path.Vertices.Add(directionalVec);
                 }
                 if (shape.IsOpen)
@@ -626,20 +614,20 @@ namespace SilverSim.Scene.Types.Object.Mesh
 
             double startangle;
             double endangle;
-            bool advanced_shape = false;
             switch(shape.ShapeType)
             {
                 case PrimitiveShapeType.Ring:
                 case PrimitiveShapeType.Torus:
                 case PrimitiveShapeType.Tube:
-                    advanced_shape = true;
+                    startangle = 2 * Math.PI * shape.PathBegin;
+                    endangle = 2 * Math.PI * shape.PathEnd;
                     break;
 
                 default:
+                    startangle = 2 * Math.PI * shape.ProfileBegin;
+                    endangle = 2 * Math.PI * shape.ProfileEnd;
                     break;
             }
-            startangle = 2 * Math.PI * shape.ProfileBegin;
-            endangle = 2 * Math.PI * shape.ProfileEnd;
             double stepangle = (endangle - startangle) / 60;
             var angles = shape.CalcBaseAngles(startangle, endangle, stepangle);
 
@@ -673,13 +661,6 @@ namespace SilverSim.Scene.Types.Object.Mesh
                             throw new NotImplementedException();
                     }
 
-                    if(advanced_shape)
-                    {
-                        outerDirectionalVec.Z = outerDirectionalVec.X;
-                        innerDirectionalVec.Z = innerDirectionalVec.X;
-                        outerDirectionalVec.X = 0;
-                        innerDirectionalVec.X = 0;
-                    }
                     /* inner path is reversed */
                     Path.Vertices.Add(outerDirectionalVec);
                     Path.Vertices.Insert(0, innerDirectionalVec);
@@ -694,11 +675,6 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 foreach (var angle in angles)
                 {
                     Vector3 directionalVec = startPoint.Rotate2D_XY(angle);
-                    if(advanced_shape)
-                    {
-                        directionalVec.Z = directionalVec.X;
-                        directionalVec.X = 0;
-                    }
                     Path.Vertices.Add(directionalVec);
                 }
                 if (shape.IsOpen)
@@ -721,20 +697,20 @@ namespace SilverSim.Scene.Types.Object.Mesh
 
             double startangle;
             double endangle;
-            bool advanced_shape = false;
             switch (shape.ShapeType)
             {
                 case PrimitiveShapeType.Ring:
                 case PrimitiveShapeType.Torus:
                 case PrimitiveShapeType.Tube:
-                    advanced_shape = true;
+                    startangle = 2 * Math.PI * shape.PathBegin;
+                    endangle = 2 * Math.PI * shape.PathEnd;
                     break;
 
                 default:
+                    startangle = 2 * Math.PI * shape.ProfileBegin;
+                    endangle = 2 * Math.PI * shape.ProfileEnd;
                     break;
             }
-            startangle = 2 * Math.PI * shape.ProfileBegin;
-            endangle = 2 * Math.PI * (shape.ProfileEnd);
             double stepangle = (endangle - startangle) / 60;
             var angles = shape.CalcBaseAngles(startangle, endangle, stepangle);
 
@@ -768,13 +744,6 @@ namespace SilverSim.Scene.Types.Object.Mesh
                             throw new NotImplementedException();
                     }
 
-                    if (advanced_shape)
-                    {
-                        outerDirectionalVec.Z = outerDirectionalVec.X;
-                        innerDirectionalVec.Z = innerDirectionalVec.X;
-                        outerDirectionalVec.X = 0;
-                        innerDirectionalVec.X = 0;
-                    }
                     /* inner path is reversed */
                     Path.Vertices.Add(outerDirectionalVec);
                     Path.Vertices.Insert(0, innerDirectionalVec);
@@ -788,11 +757,6 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 foreach (var angle in angles)
                 {
                     Vector3 directionalVec = CalcTrianglePoint(angle);
-                    if (advanced_shape)
-                    {
-                        directionalVec.Z = directionalVec.X;
-                        directionalVec.X = 0;
-                    }
                     Path.Vertices.Add(directionalVec);
                 }
                 if (shape.IsOpen)
