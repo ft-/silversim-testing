@@ -59,6 +59,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             /* generate extrusions */
             double pathscale = shape.PathScale.Y;
             double skew = shape.Skew;
+            double innerpathscale = pathscale - 0.5;
             foreach (var vertex in path.Vertices)
             {
                 var outvertex = vertex;
@@ -70,7 +71,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 outvertex.Y *= 1 - Math.Abs(skew);
                 outvertex.Y += skew * (1f - cut);
 
-                outvertex.Y = outvertex.Y * pathscale + (0.5 - pathscale * 0.5) * radiusOffset;
+                outvertex.Y = innerpathscale.Lerp(0.5, outvertex.Y + 0.5) + (1 - innerpathscale) * radiusOffset;
 
                 outvertex = outvertex.Rotate2D_YZ(angle);
                 outvertex.X += outvertex.Z * shape.TopShear.X;
