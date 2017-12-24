@@ -62,25 +62,25 @@ namespace SilverSim.Scene.Physics.ShapeManager
             public bool ConvexhullApproximation;
             public bool OclAcceleration;
 
-            public void Init()
+            public static Parameters Defaults() => new Parameters
             {
-                Resolution = 100000;
-                Depth = 7;
-                Concavity = 0.001;
-                PlaneDownsampling = 4;
-                ConvexhullDownsampling = 4;
-                Alpha = 0.05;
-                Beta = 0.05;
-                Gamma = 0.00125;
-                Pca = 0;
-                Mode = 0; // 0: voxel-based (recommended), 1: tetrahedron-based
-                MaxNumVerticesPerCH = 64;
-                MinVolumePerCH = 0.0001;
-                Callback = IntPtr.Zero;
-                Logger = IntPtr.Zero;
-                ConvexhullApproximation = true;
-                OclAcceleration = true;
-            }
+                Resolution = 100000,
+                Depth = 7,
+                Concavity = 0.001,
+                PlaneDownsampling = 4,
+                ConvexhullDownsampling = 4,
+                Alpha = 0.05,
+                Beta = 0.05,
+                Gamma = 0.00125,
+                Pca = 0,
+                Mode = 0, // 0: voxel-based (recommended), 1: tetrahedron-based
+                MaxNumVerticesPerCH = 64,
+                MinVolumePerCH = 0.0001,
+                Callback = IntPtr.Zero,
+                Logger = IntPtr.Zero,
+                ConvexhullApproximation = true,
+                OclAcceleration = true,
+            };
         }
 
         [DllImport("kernel32.dll")]
@@ -154,8 +154,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
                 tris[idx++] = t.Vertex3;
             }
 
-            var p = new Parameters();
-            p.Init();
+            Parameters p = Parameters.Defaults();
             if(!VHacd_Compute(m_VHacd, points, 3, (uint)m.Vertices.Count, tris, 3, (uint)m.Triangles.Count, ref p))
             {
                 throw new InvalidDataException();
