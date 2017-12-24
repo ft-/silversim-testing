@@ -62,19 +62,19 @@ namespace SilverSim.Scene.Types.Object.Mesh
             foreach (var vertex in path.Vertices)
             {
                 var outvertex = vertex;
-                outvertex.Z *= taper.X;
+                outvertex.X *= taper.X;
                 outvertex.Y *= taper.Y;
-                outvertex = outvertex.Rotate2D_YZ(twist);
+                outvertex = outvertex.Rotate2D_XY(twist);
 
                 outvertex.Z *= shape.PathScale.X;
-                outvertex.Z *= 1 - Math.Abs(skew);
-                outvertex.Z += skew * (1f - cut);
+                outvertex.Y *= 1 - Math.Abs(skew);
+                outvertex.Y += skew * (1f - cut);
 
                 outvertex.Y = outvertex.Y * pathscale + (0.5 - pathscale * 0.5) * radiusOffset;
 
-                outvertex = outvertex.Rotate2D_XY(-angle);
-                outvertex.Z += outvertex.X * shape.TopShear.X;
-                outvertex.Y += outvertex.X * shape.TopShear.Y;
+                outvertex = outvertex.Rotate2D_YZ(-angle);
+                outvertex.X += outvertex.Z * shape.TopShear.X;
+                outvertex.Y += outvertex.Z * shape.TopShear.Y;
 
                 extrusionPath.Add(outvertex);
             }
@@ -160,7 +160,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             double cutStep = (cutEnd - cut) / 36f / shape.Revolutions;
             double twistBegin = shape.TwistBegin * Math.PI * 2;
             double twistEnd = shape.TwistEnd * Math.PI * 2;
-            double neededSteps = Math.Min(1, Math.Ceiling((shape.TwistEnd - shape.TwistBegin) / (5 * Math.PI / 180) * (cutEnd - cut)));
+            double neededSteps = Math.Max(1, Math.Ceiling((shape.TwistEnd - shape.TwistBegin) / (5 * Math.PI / 180) * (cutEnd - cut)));
             cutStep /= neededSteps;
 
             var mesh = new MeshLOD();

@@ -126,7 +126,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             var Path = new PathDetails();
 
             double startangle = Math.PI * shape.ProfileBegin;
-            double endangle = Math.PI * (1f - shape.ProfileEnd);
+            double endangle = Math.PI * shape.ProfileEnd;
             double stepangle = (endangle - startangle) / 60;
 
             if (shape.IsHollow)
@@ -159,11 +159,6 @@ namespace SilverSim.Scene.Types.Object.Mesh
                             throw new NotImplementedException();
                     }
 
-                    outerDirectionalVec.Z = outerDirectionalVec.X;
-                    innerDirectionalVec.Z = innerDirectionalVec.X;
-                    outerDirectionalVec.X = 0;
-                    innerDirectionalVec.X = 0;
-
                     /* inner path is reversed */
                     Path.Vertices.Add(outerDirectionalVec);
                     Path.Vertices.Insert(0, innerDirectionalVec);
@@ -179,8 +174,6 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 for (; startangle < endangle; startangle += stepangle)
                 {
                     Vector3 directionalVec = startPoint.Rotate2D_XY(startangle);
-                    directionalVec.Z = directionalVec.X;
-                    directionalVec.X = 0;
                     Path.Vertices.Add(directionalVec);
                 }
                 if (shape.IsOpen)
