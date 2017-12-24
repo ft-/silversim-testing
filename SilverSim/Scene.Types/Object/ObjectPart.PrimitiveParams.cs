@@ -485,8 +485,8 @@ namespace SilverSim.Scene.Types.Object
                         d.PathEnd = 1;
                     }
                     d.PathScale = new Vector3(
-                        (0 - (PathScaleX / 100.0 - 1)).Clamp(-1, 1),
-                        (0 - (PathScaleY / 100.0 - 1)).Clamp(-1, 1),
+                        (PathScaleX / 100.0 - 1).Clamp(-1, 1),
+                        (PathScaleY / 100.0 - 1).Clamp(-1, 1),
                         0f);
                     d.TopShear = new Vector3(
                         ((sbyte)PathShearX / 100.0).Clamp(-0.5, 0.5),
@@ -528,8 +528,8 @@ namespace SilverSim.Scene.Types.Object
 
                     PathBegin = (ushort)(value.PathBegin * 50000).Clamp(0, 1);
                     PathEnd = (ushort)(50000 - (ushort)(value.PathEnd * 50000).Clamp(0, 50000));
-                    PathScaleX = (byte)((0 - value.PathScale.X) * 100 + 100).Clamp(0, 200);
-                    PathScaleY = (byte)((0 - value.PathScale.Y) * 100 + 100).Clamp(0, 200);
+                    PathScaleX = (byte)(value.PathScale.X * 100 + 100).Clamp(0, 200);
+                    PathScaleY = (byte)(value.PathScale.Y * 100 + 100).Clamp(0, 200);
                     PathTwistBegin = (sbyte)(value.TwistBegin * 100).Clamp(-100, 100);
                     PathTwist = (sbyte)(value.TwistEnd * 100).Clamp(-100, 100);
                     PathRadiusOffset = (sbyte)(value.RadiusOffset * 100).Clamp(-100, 100);
