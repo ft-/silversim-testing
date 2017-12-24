@@ -48,12 +48,12 @@ namespace SilverSim.Scene.Types.Object.Mesh
 
             #region top_shear
             shear.X = shape.TopShear.X < 0f ?
-                0.0.Lerp(shape.TopShear.X, 1f - cut) :
-                0.0.Lerp(shape.TopShear.X, cut);
+                0.0.Lerp(shape.TopShear.X, cut) :
+                0.0.Lerp(shape.TopShear.X, 1f - cut);
 
             shear.Y = shape.TopShear.Y < 0f ?
-                0.0.Lerp(shape.TopShear.Y, 1f - cut) :
-                0.0.Lerp(shape.TopShear.Y, cut);
+                0.0.Lerp(shape.TopShear.Y, cut) :
+                0.0.Lerp(shape.TopShear.Y, 1f - cut);
             #endregion
         }
 
