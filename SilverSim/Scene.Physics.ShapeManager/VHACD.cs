@@ -26,11 +26,32 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
 
 namespace SilverSim.Scene.Physics.ShapeManager
 {
     public class VHACD : IDisposable
     {
+        [Serializable]
+        public class InputDataException : Exception
+        {
+            public InputDataException()
+            {
+            }
+
+            public InputDataException(string message) : base(message)
+            {
+            }
+
+            public InputDataException(string message, Exception innerException) : base(message, innerException)
+            {
+            }
+
+            protected InputDataException(SerializationInfo info, StreamingContext context) : base(info, context)
+            {
+            }
+        }
+
         private static readonly ILog m_Log = LogManager.GetLogger("VHACD");
 
         [StructLayout(LayoutKind.Sequential)]
@@ -62,7 +83,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
             public bool ConvexhullApproximation;
             public bool OclAcceleration;
 
-            public static Parameters Defaults() => new Parameters
+            public static Parameters Defaults => new Parameters
             {
                 Resolution = 100000,
                 Depth = 7,
@@ -139,7 +160,8 @@ namespace SilverSim.Scene.Physics.ShapeManager
             var points = new double[m.Vertices.Count * 3];
             var tris = new int[m.Triangles.Count * 3];
             int idx = 0;
-            foreach(Vector3 v in m.Vertices)
+            int vertices = m.Vertices.Count;
+            foreach (Vector3 v in m.Vertices)
             {
                 points[idx++] = v.X;
                 points[idx++] = v.Y;
@@ -152,12 +174,20 @@ namespace SilverSim.Scene.Physics.ShapeManager
                 tris[idx++] = t.Vertex1;
                 tris[idx++] = t.Vertex2;
                 tris[idx++] = t.Vertex3;
+                if(t.Vertex1 >= vertices || t.Vertex2 >= vertices || t.Vertex3 >= vertices)
+                {
+                    throw new InputDataException("Invalid triangle found");
+                }
+            }
+            if(idx == 0)
+            {
+                throw new InputDataException("No triangles found");
             }
 
-            Parameters p = Parameters.Defaults();
+            Parameters p = Parameters.Defaults;
             if(!VHacd_Compute(m_VHacd, points, 3, (uint)m.Vertices.Count, tris, 3, (uint)m.Triangles.Count, ref p))
             {
-                throw new InvalidDataException();
+                throw new InputDataException("Decompose failed");
             }
 
             var shape = new PhysicsConvexShape();
@@ -187,7 +217,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
                     if(tri >= vCount || tri < 0)
                     {
                         m_Log.ErrorFormat("Tri Index out of range");
-                        throw new InvalidDataException("Tri index out of range");
+                        throw new InputDataException("Tri index out of range");
                     }
                     cHull.Triangles.Add(resTris[triidx]);
                 }
