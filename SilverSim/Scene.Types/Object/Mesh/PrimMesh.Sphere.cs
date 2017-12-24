@@ -123,7 +123,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             /* calculate a half-sphere here 
              * starting from UnitX to -UnitX
              */
-            var Path = new ProfileDetails();
+            var profile = new ProfileDetails();
 
             double startangle = Math.PI * shape.ProfileBegin;
             double endangle = Math.PI * shape.ProfileEnd;
@@ -160,12 +160,12 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     }
 
                     /* inner path is reversed */
-                    Path.Vertices.Add(outerDirectionalVec);
-                    Path.Vertices.Insert(0, innerDirectionalVec);
+                    profile.Vertices.Add(outerDirectionalVec);
+                    profile.Vertices.Insert(0, innerDirectionalVec);
 
                 }
                 /* no center point here, even though we can have path cut */
-                Path.IsOpenHollow = shape.IsOpen;
+                profile.IsOpenHollow = shape.IsOpen;
             }
             else
             {
@@ -174,15 +174,15 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 for (; startangle < endangle; startangle += stepangle)
                 {
                     Vector3 directionalVec = startPoint.Rotate2D_XY(startangle);
-                    Path.Vertices.Add(directionalVec);
+                    profile.Vertices.Add(directionalVec);
                 }
                 if (shape.IsOpen)
                 {
-                    Path.Vertices.Add(new Vector3(0, 0, 0));
+                    profile.Vertices.Add(new Vector3(0, 0, 0));
                 }
             }
 
-            return Path;
+            return profile;
 
         }
         #endregion

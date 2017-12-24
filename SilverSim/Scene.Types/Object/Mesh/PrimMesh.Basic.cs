@@ -522,7 +522,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
         private static ProfileDetails CalcBoxProfile(this ObjectPart.PrimitiveShape.Decoded shape)
         {
             /* Box has cut start at 0.5,-0.5 */
-            var Path = new ProfileDetails();
+            var profile = new ProfileDetails();
 
             double startangle = 2 * Math.PI * shape.ProfileBegin;
             double endangle = 2 * Math.PI * shape.ProfileEnd;
@@ -563,11 +563,11 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     }
 
                     /* inner path is reversed */
-                    Path.Vertices.Add(outerDirectionalVec);
-                    Path.Vertices.Insert(0, innerDirectionalVec);
+                    profile.Vertices.Add(outerDirectionalVec);
+                    profile.Vertices.Insert(0, innerDirectionalVec);
                 }
                 /* no center point here, even though we can have path cut */
-                Path.IsOpenHollow = shape.IsOpen;
+                profile.IsOpenHollow = shape.IsOpen;
             }
             else
             {
@@ -578,25 +578,25 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     Vector3 directionalVec = startPoint.Rotate2D_XY(angle);
                     /* normalize on single component to 0.5, simplifies algorithm */
                     directionalVec = directionalVec.CalcPointToSquareBoundary(1);
-                    Path.Vertices.Add(directionalVec);
+                    profile.Vertices.Add(directionalVec);
                 }
                 if (shape.IsOpen)
                 {
-                    Path.Vertices.Add(new Vector3(0, 0, 0));
+                    profile.Vertices.Add(new Vector3(0, 0, 0));
                 }
                 else
                 {
-                    Path.Vertices.RemoveAt(Path.Vertices.Count - 1);
+                    profile.Vertices.RemoveAt(profile.Vertices.Count - 1);
                 }
             }
 
-            return Path;
+            return profile;
         }
 
         private static ProfileDetails CalcCylinderProfile(this ObjectPart.PrimitiveShape.Decoded shape)
         {
             /* Cylinder has cut start at 0,0.5 */
-            var Path = new ProfileDetails();
+            var profile = new ProfileDetails();
 
             double startangle = 2 * Math.PI * shape.ProfileBegin;
             double endangle = 2 * Math.PI * shape.ProfileEnd;
@@ -634,11 +634,11 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     }
 
                     /* inner path is reversed */
-                    Path.Vertices.Add(outerDirectionalVec);
-                    Path.Vertices.Insert(0, innerDirectionalVec);
+                    profile.Vertices.Add(outerDirectionalVec);
+                    profile.Vertices.Insert(0, innerDirectionalVec);
                 }
                 /* no center point here, even though we can have path cut */
-                Path.IsOpenHollow = shape.IsOpen;
+                profile.IsOpenHollow = shape.IsOpen;
             }
             else
             {
@@ -647,25 +647,25 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 foreach (var angle in angles)
                 {
                     Vector3 directionalVec = startPoint.Rotate2D_XY(angle);
-                    Path.Vertices.Add(directionalVec);
+                    profile.Vertices.Add(directionalVec);
                 }
                 if (shape.IsOpen)
                 {
-                    Path.Vertices.Add(new Vector3(0, 0, 0));
+                    profile.Vertices.Add(new Vector3(0, 0, 0));
                 }
                 else
                 {
-                    Path.Vertices.RemoveAt(Path.Vertices.Count - 1);
+                    profile.Vertices.RemoveAt(profile.Vertices.Count - 1);
                 }
             }
 
-            return Path;
+            return profile;
         }
 
         private static ProfileDetails CalcPrismProfile(this ObjectPart.PrimitiveShape.Decoded shape)
         {
             /* Prism has cut start at 0,0.5 */
-            var Path = new ProfileDetails();
+            var profile = new ProfileDetails();
 
             double startangle = 2 * Math.PI * shape.ProfileBegin;
             double endangle = 2 * Math.PI * shape.ProfileEnd;
@@ -703,11 +703,11 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     }
 
                     /* inner path is reversed */
-                    Path.Vertices.Add(outerDirectionalVec);
-                    Path.Vertices.Insert(0, innerDirectionalVec);
+                    profile.Vertices.Add(outerDirectionalVec);
+                    profile.Vertices.Insert(0, innerDirectionalVec);
                 }
                 /* no center point here, even though we can have path cut */
-                Path.IsOpenHollow = shape.IsOpen;
+                profile.IsOpenHollow = shape.IsOpen;
             }
             else
             {
@@ -715,19 +715,19 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 foreach (var angle in angles)
                 {
                     Vector3 directionalVec = CalcTrianglePoint(angle);
-                    Path.Vertices.Add(directionalVec);
+                    profile.Vertices.Add(directionalVec);
                 }
                 if (shape.IsOpen)
                 {
-                    Path.Vertices.Add(new Vector3(0, 0, 0));
+                    profile.Vertices.Add(new Vector3(0, 0, 0));
                 }
                 else
                 {
-                    Path.Vertices.RemoveAt(Path.Vertices.Count - 1);
+                    profile.Vertices.RemoveAt(profile.Vertices.Count - 1);
                 }
             }
 
-            return Path;
+            return profile;
         }
         #endregion
     }

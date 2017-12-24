@@ -132,23 +132,23 @@ namespace SilverSim.Scene.Types.Object.Mesh
         #region advanced mesh generator
         private static MeshLOD AdvancedToMesh(this ObjectPart.PrimitiveShape.Decoded shape)
         {
-            ProfileDetails path;
+            ProfileDetails profile;
             switch (shape.ShapeType)
             {
                 case PrimitiveShapeType.Ring:
-                    path = CalcPrismProfile(shape);
+                    profile = CalcPrismProfile(shape);
                     break;
 
                 case PrimitiveShapeType.Torus:
-                    path = CalcCylinderProfile(shape);
+                    profile = CalcCylinderProfile(shape);
                     break;
 
                 case PrimitiveShapeType.Tube:
-                    path = CalcBoxProfile(shape);
+                    profile = CalcBoxProfile(shape);
                     break;
 
                 case PrimitiveShapeType.Sphere:
-                    path = CalcSphereProfile(shape);
+                    profile = CalcSphereProfile(shape);
                     break;
 
                 default:
@@ -167,11 +167,11 @@ namespace SilverSim.Scene.Types.Object.Mesh
             var mesh = new MeshLOD();
             for (; cut < cutEnd; cut += cutStep)
             {
-                mesh.Vertices.AddRange(path.ExtrudeAdvanced(shape, twistBegin, twistEnd, cut));
+                mesh.Vertices.AddRange(profile.ExtrudeAdvanced(shape, twistBegin, twistEnd, cut));
             }
-            mesh.Vertices.AddRange(path.ExtrudeAdvanced(shape, twistBegin, twistEnd, cutEnd));
+            mesh.Vertices.AddRange(profile.ExtrudeAdvanced(shape, twistBegin, twistEnd, cutEnd));
 
-            shape.BuildAdvancedTriangles(mesh, path, cutBegin, cutEnd);
+            shape.BuildAdvancedTriangles(mesh, profile, cutBegin, cutEnd);
 
             return mesh;
         }
