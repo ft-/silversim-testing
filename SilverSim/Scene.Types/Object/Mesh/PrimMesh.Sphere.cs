@@ -118,12 +118,12 @@ namespace SilverSim.Scene.Types.Object.Mesh
             return new Vector3(x_above_div / below_div, y_above_div / below_div, 0);
         }
 
-        private static PathDetails CalcSpherePath(this ObjectPart.PrimitiveShape.Decoded shape)
+        private static ProfileDetails CalcSphereProfile(this ObjectPart.PrimitiveShape.Decoded shape)
         {
             /* calculate a half-sphere here 
              * starting from UnitX to -UnitX
              */
-            var Path = new PathDetails();
+            var Path = new ProfileDetails();
 
             double startangle = Math.PI * shape.ProfileBegin;
             double endangle = Math.PI * shape.ProfileEnd;

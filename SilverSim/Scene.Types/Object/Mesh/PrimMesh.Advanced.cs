@@ -30,7 +30,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
     public static partial class PrimMesh
     {
         #region extrude advanced
-        private static List<Vector3> ExtrudeAdvanced(this PathDetails path, ObjectPart.PrimitiveShape.Decoded shape, double twistBegin, double twistEnd, double cut)
+        private static List<Vector3> ExtrudeAdvanced(this ProfileDetails path, ObjectPart.PrimitiveShape.Decoded shape, double twistBegin, double twistEnd, double cut)
         {
             var extrusionPath = new List<Vector3>();
             double twist;
@@ -131,23 +131,23 @@ namespace SilverSim.Scene.Types.Object.Mesh
         #region advanced mesh generator
         private static MeshLOD AdvancedToMesh(this ObjectPart.PrimitiveShape.Decoded shape)
         {
-            PathDetails path;
+            ProfileDetails path;
             switch (shape.ShapeType)
             {
                 case PrimitiveShapeType.Ring:
-                    path = CalcPrismPath(shape);
+                    path = CalcPrismProfile(shape);
                     break;
 
                 case PrimitiveShapeType.Torus:
-                    path = CalcCylinderPath(shape);
+                    path = CalcCylinderProfile(shape);
                     break;
 
                 case PrimitiveShapeType.Tube:
-                    path = CalcBoxPath(shape);
+                    path = CalcBoxProfile(shape);
                     break;
 
                 case PrimitiveShapeType.Sphere:
-                    path = CalcSpherePath(shape);
+                    path = CalcSphereProfile(shape);
                     break;
 
                 default:
@@ -175,7 +175,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             return mesh;
         }
 
-        private static void BuildAdvancedTriangles(this ObjectPart.PrimitiveShape.Decoded shape, MeshLOD mesh, PathDetails path, double cutBegin, double cutEnd)
+        private static void BuildAdvancedTriangles(this ObjectPart.PrimitiveShape.Decoded shape, MeshLOD mesh, ProfileDetails path, double cutBegin, double cutEnd)
         {
             double twistBegin = shape.TwistBegin * Math.PI;
             double twistEnd = shape.TwistEnd * Math.PI;

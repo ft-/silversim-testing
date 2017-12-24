@@ -86,7 +86,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             return outvertex;
         }
 
-        private static List<Vector3> ExtrudeBasic(this PathDetails path, ObjectPart.PrimitiveShape.Decoded shape, double twistBegin, double twistEnd, double cut)
+        private static List<Vector3> ExtrudeBasic(this ProfileDetails path, ObjectPart.PrimitiveShape.Decoded shape, double twistBegin, double twistEnd, double cut)
         {
             var extrusionPath = new List<Vector3>();
             double twist;
@@ -110,19 +110,19 @@ namespace SilverSim.Scene.Types.Object.Mesh
 
         private static MeshLOD BoxCylPrismToMesh(this ObjectPart.PrimitiveShape.Decoded shape)
         {
-            PathDetails path;
+            ProfileDetails path;
             switch(shape.ShapeType)
             {
                 case PrimitiveShapeType.Box:
-                    path = CalcBoxPath(shape);
+                    path = CalcBoxProfile(shape);
                     break;
 
                 case PrimitiveShapeType.Cylinder:
-                    path = CalcCylinderPath(shape);
+                    path = CalcCylinderProfile(shape);
                     break;
 
                 case PrimitiveShapeType.Prism:
-                    path = CalcPrismPath(shape);
+                    path = CalcPrismProfile(shape);
                     break;
 
                 default:
@@ -156,7 +156,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             return mesh;
         }
 
-        private static void BuildBasicTriangles(this ObjectPart.PrimitiveShape.Decoded shape, MeshLOD mesh, PathDetails path, double cutBegin, double cutEnd)
+        private static void BuildBasicTriangles(this ObjectPart.PrimitiveShape.Decoded shape, MeshLOD mesh, ProfileDetails path, double cutBegin, double cutEnd)
         {
             double twistBegin = shape.TwistBegin * Math.PI;
             double twistEnd = shape.TwistEnd * Math.PI;
@@ -431,7 +431,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             return new Vector3(x, y, 0);
         }
 
-        private sealed class PathDetails
+        private sealed class ProfileDetails
         {
             public List<Vector3> Vertices = new List<Vector3>();
             public bool IsOpenHollow;
@@ -519,10 +519,10 @@ namespace SilverSim.Scene.Types.Object.Mesh
             return angles;
         }
 
-        private static PathDetails CalcBoxPath(this ObjectPart.PrimitiveShape.Decoded shape)
+        private static ProfileDetails CalcBoxProfile(this ObjectPart.PrimitiveShape.Decoded shape)
         {
             /* Box has cut start at 0.5,-0.5 */
-            var Path = new PathDetails();
+            var Path = new ProfileDetails();
 
             double startangle = 2 * Math.PI * shape.ProfileBegin;
             double endangle = 2 * Math.PI * shape.ProfileEnd;
@@ -593,10 +593,10 @@ namespace SilverSim.Scene.Types.Object.Mesh
             return Path;
         }
 
-        private static PathDetails CalcCylinderPath(this ObjectPart.PrimitiveShape.Decoded shape)
+        private static ProfileDetails CalcCylinderProfile(this ObjectPart.PrimitiveShape.Decoded shape)
         {
             /* Cylinder has cut start at 0,0.5 */
-            var Path = new PathDetails();
+            var Path = new ProfileDetails();
 
             double startangle = 2 * Math.PI * shape.ProfileBegin;
             double endangle = 2 * Math.PI * shape.ProfileEnd;
@@ -662,10 +662,10 @@ namespace SilverSim.Scene.Types.Object.Mesh
             return Path;
         }
 
-        private static PathDetails CalcPrismPath(this ObjectPart.PrimitiveShape.Decoded shape)
+        private static ProfileDetails CalcPrismProfile(this ObjectPart.PrimitiveShape.Decoded shape)
         {
             /* Prism has cut start at 0,0.5 */
-            var Path = new PathDetails();
+            var Path = new ProfileDetails();
 
             double startangle = 2 * Math.PI * shape.ProfileBegin;
             double endangle = 2 * Math.PI * shape.ProfileEnd;
