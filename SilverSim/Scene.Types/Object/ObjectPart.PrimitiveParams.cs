@@ -456,7 +456,7 @@ namespace SilverSim.Scene.Types.Object
                         #region Profile Params
                         ProfileBegin = (ProfileBegin/ 50000.0).Clamp(0f, 1f),
                         ProfileEnd = 1 - (ProfileEnd / 50000.0).Clamp(0f, 1f),
-                        IsOpen = ProfileBegin != 0 || ProfileEnd != 50000,
+                        IsOpen = ProfileBegin != 0 || ProfileEnd != 0,
                         ProfileShape = (PrimitiveProfileShape)(ProfileCurve & (byte)PrimitiveProfileShape.Mask),
                         HoleShape = (PrimitiveProfileHollowShape)(ProfileCurve & (byte)PrimitiveProfileHollowShape.Mask),
                         #endregion
