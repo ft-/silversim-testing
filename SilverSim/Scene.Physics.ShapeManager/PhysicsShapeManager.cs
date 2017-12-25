@@ -190,11 +190,11 @@ namespace SilverSim.Scene.Physics.ShapeManager
             DefaultAvatarConvexShape = new PhysicsShapeDefaultAvatarReference(this, GenerateDefaultAvatarShape());
         }
 
-        private static PhysicsConvexShape DecomposeConvex(MeshLOD lod)
+        private static PhysicsConvexShape DecomposeConvex(MeshLOD lod, bool useSingleConvex = false)
         {
             using (var vhacd = new VHACD())
             {
-                return vhacd.Compute(lod);
+                return vhacd.Compute(lod, useSingleConvex);
             }
         }
 
@@ -273,9 +273,18 @@ namespace SilverSim.Scene.Physics.ShapeManager
 #if DEBUG
                     else
                     {
-                        m_Log.DebugFormat("No shape in {0}/{1}/{2}", shape.Type, shape.SculptType, shape.SculptMap);
+                        m_Log.DebugFormat("No convex shape in {0}/{1}/{2}", shape.Type, shape.SculptType, shape.SculptMap);
                     }
 #endif
+                    if (convexShape == null)
+                    {
+#if DEBUG
+                        m_Log.DebugFormat("Using decompose to single convex for {0}/{1}/{2}", shape.Type, shape.SculptType, shape.SculptMap);
+#endif
+                        MeshLOD lod = m.GetLOD(LLMesh.LodLevel.LOD3);
+                        lod.Optimize();
+                        convexShape = DecomposeConvex(lod, true);
+                    }
                 }
                 else
                 {
@@ -333,7 +342,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
 #endif
                 MeshLOD m = shape.ToMesh(m_AssetService);
                 m.Optimize();
-                convexShape = DecomposeConvex(m);
+                convexShape = DecomposeConvex(m, physicsShape == PrimitivePhysicsShapeType.Convex);
             }
 
             return convexShape;

@@ -151,7 +151,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
             }
         }
 
-        public PhysicsConvexShape Compute(MeshLOD m)
+        public PhysicsConvexShape Compute(MeshLOD m, bool useSingleConvex = false)
         {
             if(m_VHacd == IntPtr.Zero)
             {
@@ -185,6 +185,10 @@ namespace SilverSim.Scene.Physics.ShapeManager
             }
 
             Parameters p = Parameters.Defaults;
+            if(useSingleConvex)
+            {
+                p.Depth = 0;
+            }
             if(!VHacd_Compute(m_VHacd, points, 3, (uint)m.Vertices.Count, tris, 3, (uint)m.Triangles.Count, ref p))
             {
                 throw new InputDataException("Decompose failed");
