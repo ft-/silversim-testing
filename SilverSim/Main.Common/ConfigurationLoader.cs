@@ -1106,6 +1106,7 @@ namespace SilverSim.Main.Common
                 }
             }
 
+            bool isSuccessfullyStarted = false;
             try
             {
                 m_Log.Info("Starting modules");
@@ -1208,11 +1209,14 @@ namespace SilverSim.Main.Common
                     }
                     m_Log.Info("Running post loading steps completed");
                 }
+                isSuccessfullyStarted = true;
             }
-            catch
+            finally
             {
-                Shutdown();
-                throw;
+                if (!isSuccessfullyStarted)
+                {
+                    Shutdown();
+                }
             }
         }
         #endregion
