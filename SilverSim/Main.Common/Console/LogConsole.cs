@@ -166,7 +166,7 @@ namespace SilverSim.Main.Common.Console
         private void LogThread()
         {
             Thread.CurrentThread.Name = "Local Console Log Thread";
-            for (; !m_Shutdown; )
+            while (!m_Shutdown)
             {
                 try
                 {

@@ -513,13 +513,13 @@ namespace SilverSim.Main.Common.Console
         private void LogThread()
         {
             Thread.CurrentThread.Name = "Local Console Log Thread";
-            for (; !m_Shutdown; )
+            while (!m_Shutdown)
             {
                 try
                 {
                     LogWrite(m_LogQueue.Dequeue(1000));
                 }
-                catch(TimeoutException)
+                catch (TimeoutException)
                 {
                     continue;
                 }
