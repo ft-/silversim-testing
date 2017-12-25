@@ -57,27 +57,9 @@ namespace SilverSim.Scene.Types.Object.Mesh
             #endregion
 
             /* generate extrusions */
-            double pathscale = shape.PathScale.Y;
-            double skew = shape.Skew;
-            double innerpathscale = pathscale - 0.5;
             foreach (var vertex in path.Vertices)
             {
-                var outvertex = vertex;
-                outvertex.X *= taper.X;
-                outvertex.Y *= taper.Y;
-                outvertex = outvertex.Rotate2D_XY(twist);
-
-                outvertex.Z *= shape.PathScale.X;
-                outvertex.Y *= 1 - Math.Abs(skew);
-                outvertex.Y += skew * (1f - cut);
-
-                outvertex.Y = innerpathscale.Lerp(0.5, outvertex.Y + 0.5) + (1 - innerpathscale) * radiusOffset;
-
-                outvertex = outvertex.Rotate2D_YZ(angle);
-                outvertex.X += outvertex.Z * shape.TopShear.X;
-                outvertex.Y += outvertex.Z * shape.TopShear.Y;
-
-                extrusionPath.Add(outvertex);
+                extrusionPath.Add(shape.CalcAdvVertex(vertex, angle, twist, cut, taper, radiusOffset));
             }
             return extrusionPath;
         }
@@ -108,23 +90,29 @@ namespace SilverSim.Scene.Types.Object.Mesh
             #endregion
 
             /* generate extrusions */
+            return shape.CalcAdvVertex(Vector3.Zero, angle, twist, cut, taper, radiusOffset);
+        }
+
+        private static Vector3 CalcAdvVertex(this ObjectPart.PrimitiveShape.Decoded shape, Vector3 vertex, double angle, double twist, double cut, Vector3 taper, double radiusOffset)
+        {
             double pathscale = shape.PathScale.Y;
             double skew = shape.Skew;
-            var outvertex = Vector3.Zero;
-            outvertex.Z *= taper.X;
+            double innerpathscale = pathscale - 0.5;
+
+            var outvertex = vertex;
+            outvertex.X *= taper.X;
             outvertex.Y *= taper.Y;
-            outvertex = outvertex.Rotate2D_YZ(twist);
+            outvertex = outvertex.Rotate2D_XY(twist);
 
             outvertex.Z *= shape.PathScale.X;
-            outvertex.Z *= 1 - Math.Abs(skew);
-            outvertex.Z += skew * (1f - cut);
+            outvertex.Y *= 1 - Math.Abs(skew);
+            outvertex.Y += skew * (1f - cut);
 
-            outvertex.Y = outvertex.Y * pathscale + (0.5 - pathscale * 0.5) * radiusOffset;
+            outvertex.Y = innerpathscale.Lerp(0.5, outvertex.Y + 0.5);
 
-            outvertex = outvertex.Rotate2D_XY(-angle);
-            outvertex.Z += outvertex.X * shape.TopShear.X;
-            outvertex.Y += outvertex.X * shape.TopShear.Y;
-
+            outvertex = outvertex.Rotate2D_YZ(angle);
+            outvertex.X += outvertex.Z * shape.TopShear.X;
+            outvertex.Y += outvertex.Z * shape.TopShear.Y;
             return outvertex;
         }
         #endregion
@@ -267,7 +255,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     mesh.Triangles.Add(tri);
                 }
             }
-            else if(shape.ProfileBegin != shape.ProfileEnd)
+            else if(shape.IsOpen)
             {
                 /* build a center point and connect all vertices with triangles */
                 int centerpointTop = mesh.Vertices.Count;
