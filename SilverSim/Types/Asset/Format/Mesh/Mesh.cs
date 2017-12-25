@@ -155,7 +155,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
             var VertexMap = new Dictionary<int, int>();
             var NewTriangles = new List<Triangle>();
 
-            /* identify all duplicate meshes */
+            /* identify all duplicate vertices */
             for (int i = 0; i < Vertices.Count; ++i)
             {
                 var v = Vertices[i];
