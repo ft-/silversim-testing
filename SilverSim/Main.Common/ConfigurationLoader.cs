@@ -1106,105 +1106,113 @@ namespace SilverSim.Main.Common
                 }
             }
 
-            m_Log.Info("Starting modules");
-            foreach(KeyValuePair<string, IPlugin> kvp in PluginInstances)
+            try
             {
-                if (PluginIsLink.Contains(kvp.Key))
-                {
-                    continue;
-                }
-                IPlugin instance = kvp.Value;
-                if (instance != httpServer)
-                {
-                    instance.Startup(this);
-                }
-            }
-
-            IConfig configLoader = Config.Configs["ConfigurationLoader"];
-            if(configLoader != null)
-            {
-                m_RegionStorage = configLoader.Contains("RegionStorage") ?
-                    GetService<GridServiceInterface>(configLoader.GetString("RegionStorage")) :
-                    null;
-            }
-
-            if(PluginInstances.ContainsKey("ServerParamStorage"))
-            {
-                ServerParamServiceInterface serverParams = GetServerParamStorage();
-                var cachedResults = new Dictionary<string, List<KeyValuePair<UUID, string>>>();
-
-                m_Log.Info("Distribute Server Params");
-                var plugins = new Dictionary<string, IPlugin>(PluginInstances);
-
-                m_ServerParamInitialLoadProcessed = true;
-
-                foreach (KeyValuePair<string, IPlugin> kvp in plugins)
+                m_Log.Info("Starting modules");
+                foreach (KeyValuePair<string, IPlugin> kvp in PluginInstances)
                 {
                     if (PluginIsLink.Contains(kvp.Key))
                     {
                         continue;
                     }
-                    LoadServerParamsForPlugin(kvp.Key, kvp.Value, cachedResults);
+                    IPlugin instance = kvp.Value;
+                    if (instance != httpServer)
+                    {
+                        instance.Startup(this);
+                    }
                 }
 
-                serverParams.AnyServerParamListeners.Add(this);
-                Scenes.OnRegionAdd += LoadParamsOnAddedScene;
-            }
-
-            var regionLoaders = new List<IRegionLoaderInterface>();
-            foreach(KeyValuePair<string, IRegionLoaderInterface> kvp in GetServices<IRegionLoaderInterface>())
-            {
-                if (PluginIsLink.Contains(kvp.Key))
+                IConfig configLoader = Config.Configs["ConfigurationLoader"];
+                if (configLoader != null)
                 {
-                    continue;
-                }
-                regionLoaders.Add(kvp.Value);
-            }
-            if (regionLoaders.Count != 0)
-            {
-                /* we have to bypass the circular issue we would get when trying to do it via using */
-                Assembly assembly = Assembly.Load("SilverSim.Viewer.Core");
-                Type t = assembly.GetType("SilverSim.Viewer.Core.SimCircuitEstablishService");
-                MethodInfo m = t.GetMethod("HandleSimCircuitRequest");
-                m_SimCircuitRequest = (Action<HttpRequest, ConfigurationLoader>)Delegate.CreateDelegate(typeof(Action<HttpRequest, ConfigurationLoader>), m);
-                httpServer.StartsWithUriHandlers.Add("/circuit", SimCircuitRequest);
-                if(httpsServer != null)
-                {
-                    httpsServer.StartsWithUriHandlers.Add("/circuit", SimCircuitRequest);
+                    m_RegionStorage = configLoader.Contains("RegionStorage") ?
+                        GetService<GridServiceInterface>(configLoader.GetString("RegionStorage")) :
+                        null;
                 }
 
-                m_Log.Info("Loading regions");
-                if (startup.Contains("skipregions"))
+                if (PluginInstances.ContainsKey("ServerParamStorage"))
                 {
-                    m_Log.Warn("Skipping loading of regions");
+                    ServerParamServiceInterface serverParams = GetServerParamStorage();
+                    var cachedResults = new Dictionary<string, List<KeyValuePair<UUID, string>>>();
+
+                    m_Log.Info("Distribute Server Params");
+                    var plugins = new Dictionary<string, IPlugin>(PluginInstances);
+
+                    m_ServerParamInitialLoadProcessed = true;
+
+                    foreach (KeyValuePair<string, IPlugin> kvp in plugins)
+                    {
+                        if (PluginIsLink.Contains(kvp.Key))
+                        {
+                            continue;
+                        }
+                        LoadServerParamsForPlugin(kvp.Key, kvp.Value, cachedResults);
+                    }
+
+                    serverParams.AnyServerParamListeners.Add(this);
+                    Scenes.OnRegionAdd += LoadParamsOnAddedScene;
                 }
-                else
+
+                var regionLoaders = new List<IRegionLoaderInterface>();
+                foreach (KeyValuePair<string, IRegionLoaderInterface> kvp in GetServices<IRegionLoaderInterface>())
                 {
+                    if (PluginIsLink.Contains(kvp.Key))
+                    {
+                        continue;
+                    }
+                    regionLoaders.Add(kvp.Value);
+                }
+                if (regionLoaders.Count != 0)
+                {
+                    /* we have to bypass the circular issue we would get when trying to do it via using */
+                    Assembly assembly = Assembly.Load("SilverSim.Viewer.Core");
+                    Type t = assembly.GetType("SilverSim.Viewer.Core.SimCircuitEstablishService");
+                    MethodInfo m = t.GetMethod("HandleSimCircuitRequest");
+                    m_SimCircuitRequest = (Action<HttpRequest, ConfigurationLoader>)Delegate.CreateDelegate(typeof(Action<HttpRequest, ConfigurationLoader>), m);
+                    httpServer.StartsWithUriHandlers.Add("/circuit", SimCircuitRequest);
+                    if (httpsServer != null)
+                    {
+                        httpsServer.StartsWithUriHandlers.Add("/circuit", SimCircuitRequest);
+                    }
+
+                    m_Log.Info("Loading regions");
+                    if (startup.Contains("skipregions"))
+                    {
+                        m_Log.Warn("Skipping loading of regions");
+                    }
+                    else
+                    {
+                        foreach (IRegionLoaderInterface regionLoader in regionLoaders)
+                        {
+                            regionLoader.LoadRegions();
+                        }
+                    }
                     foreach (IRegionLoaderInterface regionLoader in regionLoaders)
                     {
-                        regionLoader.LoadRegions();
+                        regionLoader.AllRegionsLoaded();
                     }
                 }
-                foreach (IRegionLoaderInterface regionLoader in regionLoaders)
+
+                Dictionary<string, IPostLoadStep> postLoadSteps = GetServices<IPostLoadStep>();
+                if (postLoadSteps.Count != 0)
                 {
-                    regionLoader.AllRegionsLoaded();
+                    m_Log.Info("Running post loading steps");
+                    foreach (KeyValuePair<string, IPostLoadStep> kvp in postLoadSteps)
+                    {
+                        if (PluginIsLink.Contains(kvp.Key))
+                        {
+                            continue;
+                        }
+                        IPostLoadStep postLoadStep = kvp.Value;
+                        postLoadStep.PostLoad();
+                    }
+                    m_Log.Info("Running post loading steps completed");
                 }
             }
-
-            Dictionary<string, IPostLoadStep> postLoadSteps = GetServices<IPostLoadStep>();
-            if (postLoadSteps.Count != 0)
+            catch
             {
-                m_Log.Info("Running post loading steps");
-                foreach (KeyValuePair<string, IPostLoadStep> kvp in postLoadSteps)
-                {
-                    if (PluginIsLink.Contains(kvp.Key))
-                    {
-                        continue;
-                    }
-                    IPostLoadStep postLoadStep = kvp.Value;
-                    postLoadStep.PostLoad();
-                }
-                m_Log.Info("Running post loading steps completed");
+                Shutdown();
+                throw;
             }
         }
         #endregion
