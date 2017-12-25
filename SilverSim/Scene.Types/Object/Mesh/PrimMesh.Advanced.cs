@@ -108,7 +108,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             outvertex.Y *= 1 - Math.Abs(skew);
             outvertex.Y += skew * (1f - cut);
 
-            outvertex.Y = innerpathscale.Lerp(0.5, outvertex.Y + 0.5);
+            outvertex.Y = innerpathscale.Lerp(0.5, outvertex.Y + 0.5) * radiusOffset;
 
             outvertex = outvertex.Rotate2D_YZ(angle);
             outvertex.X += outvertex.Z * shape.TopShear.X;
