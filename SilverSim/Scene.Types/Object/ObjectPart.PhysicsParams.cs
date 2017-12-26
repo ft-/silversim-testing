@@ -56,13 +56,18 @@ namespace SilverSim.Scene.Types.Object
                 }
                 set
                 {
-                    if(value.Length < 17)
+                    if (value.Length < 17)
                     {
-                        throw new ArgumentException(nameof(value));
+                        Type = CollisionFilterEnum.Accept;
+                        ID = UUID.Zero;
+                        Name = string.Empty;
                     }
-                    Type = (CollisionFilterEnum)value[0];
-                    ID = new UUID(value, 1);
-                    Name = value.FromUTF8Bytes(17, value.Length - 17);
+                    else
+                    {
+                        Type = (CollisionFilterEnum)value[0];
+                        ID = new UUID(value, 1);
+                        Name = value.FromUTF8Bytes(17, value.Length - 17);
+                    }
                 }
             }
         }
