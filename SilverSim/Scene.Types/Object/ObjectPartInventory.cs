@@ -371,6 +371,58 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region XML Deserialization
+        private static void CollisionFilterFromXml(ObjectPartInventoryItem item, XmlTextReader reader)
+        {
+            for (; ; )
+            {
+                if (!reader.Read())
+                {
+                    throw new InvalidObjectXmlException();
+                }
+
+                switch (reader.NodeType)
+                {
+                    case XmlNodeType.Element:
+                        if (reader.Name == "Name")
+                        {
+                            ObjectPartInventoryItem.CollisionFilterParam p = item.CollisionFilter;
+                            p.Name = reader.ReadElementValueAsString();
+                            item.CollisionFilter = p;
+                        }
+                        else if (reader.Name == "ID")
+                        {
+                            ObjectPartInventoryItem.CollisionFilterParam p = item.CollisionFilter;
+                            string v = reader.ReadElementValueAsString();
+                            if (!UUID.TryParse(v, out p.ID))
+                            {
+                                p.ID = UUID.Zero;
+                            }
+                            item.CollisionFilter = p;
+                        }
+                        else if (reader.Name == "Type")
+                        {
+                            ObjectPartInventoryItem.CollisionFilterParam p = item.CollisionFilter;
+                            p.Type = (ObjectPartInventoryItem.CollisionFilterEnum)Enum.Parse(typeof(ObjectPartInventoryItem.CollisionFilterEnum), reader.ReadElementContentAsString());
+                            item.CollisionFilter = p;
+                        }
+                        else
+                        {
+                            reader.ReadToEndElement();
+                        }
+                        break;
+
+                    case XmlNodeType.EndElement:
+                        if (reader.Name != "CollisionFilter")
+                        {
+                            throw new InvalidObjectXmlException();
+                        }
+                        return;
+                }
+            }
+            throw new InvalidObjectXmlException();
+        }
+
+
         private ObjectPartInventoryItem FromXML(XmlTextReader reader, UUI currentOwner, XmlDeserializationOptions options, out UUID origid)
         {
             origid = UUID.Zero;
@@ -398,6 +450,10 @@ namespace SilverSim.Scene.Types.Object
 
                         switch (reader.Name)
                         {
+                            case "CollisionFilter":
+                                CollisionFilterFromXml(item, reader);
+                                break;
+
                             case "AssetID":
                                 item.AssetID = reader.ReadContentAsUUID();
                                 break;
@@ -646,6 +702,17 @@ namespace SilverSim.Scene.Types.Object
                         if(experienceID != UUID.Zero)
                         {
                             writer.WriteNamedValue("ExperienceID", experienceID);
+                        }
+                        {
+                            ObjectPartInventoryItem.CollisionFilterParam p = item.CollisionFilter;
+                            if (p.ID != UUID.Zero || p.Name?.Length != 0)
+                            {
+                                writer.WriteStartElement("CollisionFilter");
+                                writer.WriteNamedValue("Name", p.Name);
+                                writer.WriteNamedValue("ID", p.ID);
+                                writer.WriteNamedValue("Type", p.Type.ToString());
+                                writer.WriteEndElement();
+                            }
                         }
                     }
                     writer.WriteEndElement();

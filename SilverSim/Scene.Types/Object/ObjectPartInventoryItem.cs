@@ -24,6 +24,7 @@ using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using SilverSim.Types.Script;
+using System;
 
 namespace SilverSim.Scene.Types.Object
 {
@@ -210,6 +211,77 @@ namespace SilverSim.Scene.Types.Object
 
         #region Fields
         private ScriptInstance m_ScriptInstance;
+        #endregion
+
+        #region Collision Filter
+        private readonly object m_CollisionFilterLock = new object();
+        public struct CollisionFilterParam
+        {
+            public string Name;
+            public UUID ID;
+            public CollisionFilterEnum Type;
+
+            public byte[] DbSerialization
+            {
+                get
+                {
+                    byte[] strdata = Name.ToUTF8Bytes();
+                    byte[] sdata = new byte[strdata.Length + 17];
+                    Buffer.BlockCopy(strdata, 0, sdata, 17, strdata.Length);
+                    ID.ToBytes(sdata, 1);
+                    sdata[0] = (byte)Type;
+                    return sdata;
+                }
+                set
+                {
+                    if (value.Length < 17)
+                    {
+                        Type = CollisionFilterEnum.Accept;
+                        ID = UUID.Zero;
+                        Name = string.Empty;
+                    }
+                    else
+                    {
+                        Type = (CollisionFilterEnum)value[0];
+                        ID = new UUID(value, 1);
+                        Name = value.FromUTF8Bytes(17, value.Length - 17);
+                    }
+                }
+            }
+        }
+        private string m_CollisionFilterName = string.Empty;
+        private UUID m_CollisionFilterId = UUID.Zero;
+        public enum CollisionFilterEnum : byte
+        {
+            Reject,
+            Accept
+        }
+        private CollisionFilterEnum m_CollisionFilterType;
+
+        public CollisionFilterParam CollisionFilter
+        {
+            get
+            {
+                lock (m_CollisionFilterLock)
+                {
+                    return new CollisionFilterParam
+                    {
+                        Name = m_CollisionFilterName,
+                        ID = m_CollisionFilterId,
+                        Type = m_CollisionFilterType
+                    };
+                }
+            }
+            set
+            {
+                lock (m_CollisionFilterLock)
+                {
+                    m_CollisionFilterName = value.Name;
+                    m_CollisionFilterId = value.ID;
+                    m_CollisionFilterType = value.Type;
+                }
+            }
+        }
         #endregion
 
         #region Properties
