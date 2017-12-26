@@ -244,7 +244,12 @@ namespace SilverSim.Database.Memory.SimulationData
                 LastOwner = new UUI(map["LastOwner"].ToString()),
                 Name = map["Name"].ToString(),
                 Owner = new UUI(map["Owner"].ToString()),
-                ParentFolderID = map["ParentFolderID"].AsUUID
+                ParentFolderID = map["ParentFolderID"].AsUUID,
+                ExperienceID = map["ExperienceID"].AsUUID,
+                CollisionFilter = new ObjectPartInventoryItem.CollisionFilterParam
+                {
+                    DbSerialization = (BinaryData)map["CollisionFilterData"]
+                }
             };
             item.Permissions.Base = (InventoryPermissionsMask)map["BasePermissions"].AsUInt;
             item.Permissions.Current = (InventoryPermissionsMask)map["CurrentPermissions"].AsUInt;
