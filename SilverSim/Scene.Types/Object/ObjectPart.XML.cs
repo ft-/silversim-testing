@@ -307,6 +307,17 @@ namespace SilverSim.Scene.Types.Object
                     writer.WriteNamedValue("WalkableCoefficientB", WalkableCoefficientB);
                     writer.WriteNamedValue("WalkableCoefficientC", WalkableCoefficientC);
                     writer.WriteNamedValue("WalkableCoefficientD", WalkableCoefficientD);
+                    {
+                        CollisionFilterParam p = CollisionFilter;
+                        if (p.ID != UUID.Zero || p.Name?.Length != 0)
+                        {
+                            writer.WriteStartElement("CollisionFilter");
+                            writer.WriteNamedValue("Name", p.Name);
+                            writer.WriteNamedValue("ID", p.ID);
+                            writer.WriteNamedValue("Type", p.Type.ToString());
+                            writer.WriteEndElement();
+                        }
+                    }
                     if (VehicleType != VehicleType.None)
                     {
                         writer.WriteStartElement("Vehicle");
@@ -382,6 +393,57 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region XML Deserialization
+        private static void CollisionFilterFromXml(ObjectPart part, ObjectGroup rootGroup, XmlTextReader reader)
+        {
+            for (; ; )
+            {
+                if (!reader.Read())
+                {
+                    throw new InvalidObjectXmlException();
+                }
+
+                switch (reader.NodeType)
+                {
+                    case XmlNodeType.Element:
+                        if (reader.Name == "Name")
+                        {
+                            CollisionFilterParam p = part.CollisionFilter;
+                            p.Name = reader.ReadElementValueAsString();
+                            part.CollisionFilter = p;
+                        }
+                        else if(reader.Name == "ID")
+                        {
+                            CollisionFilterParam p = part.CollisionFilter;
+                            string v = reader.ReadElementValueAsString();
+                            if (!UUID.TryParse(v, out p.ID))
+                            {
+                                p.ID = UUID.Zero;
+                            }
+                            part.CollisionFilter = p;
+                        }
+                        else if(reader.Name == "Type")
+                        {
+                            CollisionFilterParam p = part.CollisionFilter;
+                            p.Type = (CollisionFilterEnum)Enum.Parse(typeof(CollisionFilterEnum), reader.ReadElementContentAsString());
+                            part.CollisionFilter = p;
+                        }
+                        else
+                        {
+                            reader.ReadToEndElement();
+                        }
+                        break;
+
+                    case XmlNodeType.EndElement:
+                        if (reader.Name != "CollisionFilter")
+                        {
+                            throw new InvalidObjectXmlException();
+                        }
+                        return;
+                }
+            }
+            throw new InvalidObjectXmlException();
+        }
+
         private static void PayPriceFromXml(ObjectPart part, ObjectGroup rootGroup, XmlTextReader reader)
         {
             int paypriceidx = 0;
@@ -1118,6 +1180,10 @@ namespace SilverSim.Scene.Types.Object
                         {
                             case "PayPrice":
                                 PayPriceFromXml(part, rootGroup, reader);
+                                break;
+
+                            case "CollisionFilter":
+                                CollisionFilterFromXml(part, rootGroup, reader);
                                 break;
 
                             case "AllowedDrop":

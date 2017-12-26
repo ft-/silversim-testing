@@ -36,6 +36,48 @@ namespace SilverSim.Scene.Types.Object
         private double m_PhysicsFriction = 0.6f;
         private double m_PhysicsRestitution = 0.5f;
         private double m_PhysicsGravityMultiplier = 1f;
+        public struct CollisionFilterParam
+        {
+            public string Name;
+            public UUID ID;
+            public CollisionFilterEnum Type;
+        }
+        private string m_CollisionFilterName = string.Empty;
+        private UUID m_CollisionFilterId = UUID.Zero;
+        public enum CollisionFilterEnum
+        {
+            Reject,
+            Accept
+        }
+        private CollisionFilterEnum m_CollisionFilterType;
+
+        public CollisionFilterParam CollisionFilter
+        {
+            get
+            {
+                lock(m_DataLock)
+                {
+                    return new CollisionFilterParam
+                    {
+                        Name = m_CollisionFilterName,
+                        ID = m_CollisionFilterId,
+                        Type = m_CollisionFilterType
+                    };
+                }
+            }
+            set
+            {
+                lock(m_DataLock)
+                {
+                    m_CollisionFilterName = value.Name;
+                    m_CollisionFilterId = value.ID;
+                    m_CollisionFilterType = value.Type;
+                }
+                IsChanged = m_IsChangedEnabled;
+                IncrementPhysicsParameterUpdateSerial();
+                TriggerOnUpdate(0);
+            }
+        }
 
         public double PhysicsDensity
         {

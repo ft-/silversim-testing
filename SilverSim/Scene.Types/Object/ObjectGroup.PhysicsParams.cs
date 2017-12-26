@@ -64,6 +64,12 @@ namespace SilverSim.Scene.Types.Object
 
         private readonly object m_PhysicsLinksetUpdateLock = new object();
 
+        public ObjectPart.CollisionFilterParam CollisionFilter
+        {
+            get { return RootPart.CollisionFilter; }
+            set { RootPart.CollisionFilter = value; }
+        }
+
         public bool IsPhantom
         {
             get { return RootPart.IsPhantom; }
