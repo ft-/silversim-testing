@@ -249,14 +249,17 @@ namespace SilverSim.Scene.Types.Object
                 }
             }
         }
+
         private string m_CollisionFilterName = string.Empty;
         private UUID m_CollisionFilterId = UUID.Zero;
+
         public enum CollisionFilterEnum : byte
         {
             Reject,
             Accept
         }
-        private CollisionFilterEnum m_CollisionFilterType;
+
+        private CollisionFilterEnum m_CollisionFilterType = CollisionFilterEnum.Accept;
 
         public CollisionFilterParam CollisionFilter
         {

@@ -2027,7 +2027,7 @@ namespace SilverSim.Scene.Types.Object
             foreach(ObjectPartInventoryItem item in Inventory.Values)
             {
                 ObjectPartInventoryItem.CollisionFilterParam filter = item.CollisionFilter;
-                if(string.IsNullOrEmpty(filter.Name) && filter.ID == UUID.Zero)
+                if(string.IsNullOrEmpty(filter.Name) && filter.ID == UUID.Zero && filter.Type == ObjectPartInventoryItem.CollisionFilterEnum.Accept)
                 {
                     /* unfiltered so leave it unmodified */
                     item.ScriptInstance?.PostEvent(ev);
