@@ -43,7 +43,7 @@ namespace SilverSim.Scene.Types.Object
             public UUID ID;
             public CollisionFilterEnum Type;
 
-            public byte[] Serialization
+            public byte[] DbSerialization
             {
                 get
                 {
