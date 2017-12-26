@@ -119,6 +119,10 @@ namespace SilverSim.Types
 
         public static string FromUTF8Bytes(this byte[] data, int index, int count)
         {
+            if(count <= 0)
+            {
+                return string.Empty;
+            }
             string s = m_UTF8NoBOM.GetString(data, index, count);
             int pos = s.IndexOf('\0');
             return (pos >= 0) ? s.Substring(0, pos) : s;

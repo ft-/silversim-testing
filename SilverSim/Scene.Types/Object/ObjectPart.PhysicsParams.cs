@@ -24,6 +24,7 @@ using SilverSim.Scene.Types.Physics.Vehicle;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Threading;
 using SilverSim.Types;
+using System;
 
 namespace SilverSim.Scene.Types.Object
 {
@@ -41,10 +42,33 @@ namespace SilverSim.Scene.Types.Object
             public string Name;
             public UUID ID;
             public CollisionFilterEnum Type;
+
+            public byte[] Serialization
+            {
+                get
+                {
+                    byte[] strdata = Name.ToUTF8Bytes();
+                    byte[] sdata = new byte[strdata.Length + 17];
+                    Buffer.BlockCopy(strdata, 0, sdata, 17, strdata.Length);
+                    ID.ToBytes(sdata, 1);
+                    sdata[0] = (byte)Type;
+                    return sdata;
+                }
+                set
+                {
+                    if(value.Length < 17)
+                    {
+                        throw new ArgumentException(nameof(value));
+                    }
+                    Type = (CollisionFilterEnum)value[0];
+                    ID = new UUID(value, 1);
+                    Name = value.FromUTF8Bytes(17, value.Length - 17);
+                }
+            }
         }
         private string m_CollisionFilterName = string.Empty;
         private UUID m_CollisionFilterId = UUID.Zero;
-        public enum CollisionFilterEnum
+        public enum CollisionFilterEnum : byte
         {
             Reject,
             Accept
