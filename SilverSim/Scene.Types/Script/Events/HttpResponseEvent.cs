@@ -28,6 +28,7 @@ namespace SilverSim.Scene.Types.Script.Events
         public UUID RequestID;
         public int Status;
         public AnArray Metadata;
-        public string Body;
+        public byte[] Body;
+        public bool UsesByteArray;
     }
 }

@@ -27,6 +27,7 @@ namespace SilverSim.Scene.Types.Script.Events
     {
         public UUID RequestID;
         public string Method;
-        public string Body;
+        public byte[] Body;
+        public bool UsesByteArray;
     }
 }
