@@ -2022,11 +2022,57 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region Script Events
+        private void PostCollisionEvent(CollisionEvent ev)
+        {
+            foreach(ObjectPartInventoryItem item in Inventory.Values)
+            {
+                ObjectPartInventoryItem.CollisionFilterParam filter = item.CollisionFilter;
+                if(string.IsNullOrEmpty(filter.Name) && filter.ID == UUID.Zero)
+                {
+                    /* unfiltered so leave it unmodified */
+                    item.ScriptInstance?.PostEvent(ev);
+                }
+                else
+                {
+                    /* filtered so we need to check */
+                    CollisionEvent evnew = new CollisionEvent
+                    {
+                        Type = ev.Type
+                    };
+
+                    foreach(DetectInfo info in ev.Detected)
+                    {
+                        bool match = filter.ID == UUID.Zero || info.Key == filter.ID;
+                        match = match && (string.IsNullOrEmpty(filter.Name) || info.Name == filter.Name);
+                        if((filter.Type == ObjectPartInventoryItem.CollisionFilterEnum.Accept && match) ||
+                            (filter.Type == ObjectPartInventoryItem.CollisionFilterEnum.Reject && !match))
+                        {
+                            continue;
+                        }
+                        evnew.Detected.Add(info);
+                    }
+
+                    if(evnew.Detected.Count != 0)
+                    {
+                        /* only post event if at least one passed the filter */
+                        item.ScriptInstance?.PostEvent(evnew);
+                    }
+                }
+            }
+        }
+
         public void PostEvent(IScriptEvent ev)
         {
-            foreach (ObjectPartInventoryItem item in Inventory.Values)
+            if (ev.GetType() == typeof(CollisionEvent))
             {
-                item.ScriptInstance?.PostEvent(ev);
+                PostCollisionEvent((CollisionEvent)ev);
+            }
+            else
+            {
+                foreach (ObjectPartInventoryItem item in Inventory.Values)
+                {
+                    item.ScriptInstance?.PostEvent(ev);
+                }
             }
         }
         #endregion
