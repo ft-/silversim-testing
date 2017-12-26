@@ -183,16 +183,22 @@ namespace SilverSim.Http.Client
             }
         }
 
+        public static byte[] ExecuteBinaryRequest(
+            this Request request)
+        {
+            using (Stream responseStream = ExecuteStreamRequest(request))
+            {
+                return responseStream.ReadToStreamEnd();
+            }
+        }
+
         public static Stream ExecuteStreamRequest(
             this Request request)
         {
-            string postdata = request.RequestBody;
+            byte[] postdata = request.RequestBody;
             if (postdata != null)
             {
-                byte[] buffer;
                 request.RequestContentLength = 0;
-
-                buffer = postdata.ToUTF8Bytes();
 
                 if (request.IsCompressed || request.RequestContentType == "application/x-gzip")
                 {
@@ -200,17 +206,17 @@ namespace SilverSim.Http.Client
                     {
                         using (var comp = new GZipStream(ms, CompressionMode.Compress))
                         {
-                            comp.Write(buffer, 0, buffer.Length);
+                            comp.Write(postdata, 0, postdata.Length);
                             /* The GZIP stream has a CRC-32 and a EOF marker, so we close it first to have it completed */
                         }
-                        buffer = ms.ToArray();
+                        postdata = ms.ToArray();
                     }
                 }
 
-                request.RequestBodyDelegate = (Stream poststream) => poststream.Write(buffer, 0, buffer.Length);
+                request.RequestBodyDelegate = (Stream poststream) => poststream.Write(postdata, 0, postdata.Length);
 
                 /* append request POST data */
-                request.RequestContentLength = buffer.Length;
+                request.RequestContentLength = postdata.Length;
             }
 
             string url = request.Url;

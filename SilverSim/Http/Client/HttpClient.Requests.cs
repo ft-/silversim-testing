@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Types;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -36,7 +37,7 @@ namespace SilverSim.Http.Client
             public IDictionary<string, string> GetValues;
             public string RequestContentType;
             public int RequestContentLength;
-            public string RequestBody;
+            public byte[] RequestBody;
             public Action<Stream> RequestBodyDelegate;
             public bool IsCompressed;
             public int TimeoutMs = 20000;
@@ -68,12 +69,20 @@ namespace SilverSim.Http.Client
             public Post(string url, IDictionary<string, string> postValues)
                 : base(url)
             {
-                RequestBody = BuildQueryString(postValues);
+                RequestBody = BuildQueryString(postValues).ToUTF8Bytes();
                 RequestContentType = "application/x-www-form-urlencoded";
                 Method = "POST";
             }
 
             public Post(string url, string contenttype, string body)
+                : base(url)
+            {
+                RequestBody = body.ToUTF8Bytes();
+                RequestContentType = contenttype;
+                Method = "POST";
+            }
+
+            public Post(string url, string contenttype, byte[] body)
                 : base(url)
             {
                 RequestBody = body;
@@ -142,6 +151,11 @@ namespace SilverSim.Http.Client
                 Method = "PUT";
             }
 
+            public Put(string url, string contenttype, byte[] body) : base(url, contenttype, body)
+            {
+                Method = "PUT";
+            }
+
             public Put(string url, string contenttype, int contentlength, Action<Stream> body) : base(url, contenttype, contentlength, body)
             {
                 Method = "PUT";
@@ -169,6 +183,11 @@ namespace SilverSim.Http.Client
             }
 
             public Patch(string url, string contenttype, string body) : base(url, contenttype, body)
+            {
+                Method = "PATCH";
+            }
+
+            public Patch(string url, string contenttype, byte[] body) : base(url, contenttype, body)
             {
                 Method = "PATCH";
             }
