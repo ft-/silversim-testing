@@ -28,15 +28,43 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
 
 namespace SilverSim.Database.Memory.UserAccounts
 {
     [Description("Memory UserAccount Backend")]
     [PluginName("UserAccounts")]
-    public sealed class MemoryUserAccountService : UserAccountServiceInterface, IPlugin
+    public sealed class MemoryUserAccountService : UserAccountServiceInterface, IPlugin, IUserAccountSerialNoInterface
     {
         private readonly RwLockedDictionary<UUID, UserAccount> m_Data = new RwLockedDictionary<UUID, UserAccount>();
         private Uri m_HomeURI;
+        private long m_SerialNumber;
+
+        public ulong SerialNumber
+        {
+            get
+            {
+                long serno = Interlocked.Read(ref m_SerialNumber);
+                if(serno == 0)
+                {
+                    ++serno;
+                }
+                return (ulong)serno;
+            }
+        }
+
+        public List<UUI> AccountList
+        {
+            get
+            {
+                var list = new List<UUI>();
+                foreach(UserAccount acc in m_Data.Values)
+                {
+                    list.Add(new UUI(acc.Principal.ID, acc.Principal.FirstName, acc.Principal.LastName));
+                }
+                return list;
+            }
+        }
 
         #region Constructor
         public void Startup(ConfigurationLoader loader)
@@ -55,8 +83,10 @@ namespace SilverSim.Database.Memory.UserAccounts
         {
             if(m_Data.TryGetValue(accountID, out account) && (scopeID == UUID.Zero || account.ScopeID == scopeID))
             {
-                account = new UserAccount(account);
-                account.IsLocalToGrid = true;
+                account = new UserAccount(account)
+                {
+                    IsLocalToGrid = true
+                };
                 return true;
             }
             return false;
@@ -71,8 +101,10 @@ namespace SilverSim.Database.Memory.UserAccounts
                 {
                     throw new UserAccountNotFoundException();
                 }
-                account = new UserAccount(account);
-                account.IsLocalToGrid = true;
+                account = new UserAccount(account)
+                {
+                    IsLocalToGrid = true
+                };
                 return account;
             }
         }
@@ -99,8 +131,10 @@ namespace SilverSim.Database.Memory.UserAccounts
                                        select accountdata;
             foreach(UserAccount acc in result)
             {
-                account = new UserAccount(acc);
-                account.IsLocalToGrid = true;
+                account = new UserAccount(acc)
+                {
+                    IsLocalToGrid = true
+                };
                 return true;
             }
             account = default(UserAccount);
@@ -193,6 +227,7 @@ namespace SilverSim.Database.Memory.UserAccounts
             var uac = new UserAccount(userAccount);
             uac.Principal.HomeURI = m_HomeURI;
             m_Data.Add(userAccount.Principal.ID, uac);
+            Interlocked.Increment(ref m_SerialNumber);
         }
 
         public override void Update(UserAccount userAccount)
