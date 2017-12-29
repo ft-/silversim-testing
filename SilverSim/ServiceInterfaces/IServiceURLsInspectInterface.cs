@@ -23,7 +23,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.ServiceInterfaces
 {
-    public interface IServiceURLsHookInterface
+    public interface IServiceURLsInspectInterface
     {
         void InspectServiceURLs(IReadOnlyDictionary<string, string> dict);
     }
