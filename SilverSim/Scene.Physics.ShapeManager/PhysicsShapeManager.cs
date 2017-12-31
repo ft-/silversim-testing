@@ -102,11 +102,14 @@ namespace SilverSim.Scene.Physics.ShapeManager
             }
         }
 
+        private readonly bool m_DisableCache;
+
         public PhysicsShapeManager(
             IConfig ownSection)
         {
             m_AssetServiceName = ownSection.GetString("AssetService");
             m_SimulationDataStorageName = ownSection.GetString("SimulationDataStorage");
+            m_DisableCache = ownSection.GetBoolean("DisableHacdCache", false);
         }
 
         private static PhysicsConvexShape GenerateDefaultAvatarShape()
@@ -368,9 +371,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
                 return true;
             }
 
-#if !DEBUG
-            if (!m_SimulationStorage.PhysicsConvexShapes.TryGetValue(meshId, physicsShape, out physicshape))
-#endif
+            if (m_DisableCache || !m_SimulationStorage.PhysicsConvexShapes.TryGetValue(meshId, physicsShape, out physicshape))
             {
                 /* we may produce additional meshes sometimes but it is better not to lock while generating the mesh */
                 physicshape = ConvertToMesh(physicsShape, shape);
@@ -427,9 +428,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
                 return true;
             }
 
-#if !DEBUG
-            if (!m_SimulationStorage.PhysicsConvexShapes.TryGetValue(shape, out physicshape))
-#endif
+            if (m_DisableCache || !m_SimulationStorage.PhysicsConvexShapes.TryGetValue(shape, out physicshape))
             {
                 /* we may produce additional meshes sometimes but it is better not to lock while generating the mesh */
                 physicshape = ConvertToMesh(physicsShape, shape);
