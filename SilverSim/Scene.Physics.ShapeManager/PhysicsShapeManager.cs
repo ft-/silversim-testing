@@ -188,6 +188,10 @@ namespace SilverSim.Scene.Physics.ShapeManager
 
         public void Startup(ConfigurationLoader loader)
         {
+            if(m_DisableCache)
+            {
+                loader.KnownConfigurationIssues.Add("HACD cache is disabled");
+            }
             m_AssetService = loader.GetService<AssetServiceInterface>(m_AssetServiceName);
             m_SimulationStorage = loader.GetService<SimulationDataStorageInterface>(m_SimulationDataStorageName);
             DefaultAvatarConvexShape = new PhysicsShapeDefaultAvatarReference(this, GenerateDefaultAvatarShape());
