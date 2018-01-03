@@ -60,6 +60,8 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
 
         public abstract class SceneListener : ISceneListener
         {
+            public bool IgnorePhysicsLocationUpdates => false;
+
             protected static readonly ILog m_Log = LogManager.GetLogger("STORAGE SCENE LISTENER");
             protected bool m_StopStorageThread;
             protected readonly BlockingQueue<IUpdateInfo> m_StorageMainRequestQueue = new BlockingQueue<IUpdateInfo>();

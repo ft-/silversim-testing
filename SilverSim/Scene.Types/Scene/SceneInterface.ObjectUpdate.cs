@@ -30,7 +30,7 @@ namespace SilverSim.Scene.Types.Scene
 {
     public abstract partial class SceneInterface
     {
-        public void ScheduleUpdate(ObjectUpdateInfo objinfo)
+        public void ScheduleUpdate(ObjectUpdateInfo objinfo, bool isPhysicsOrigin = false)
         {
             foreach (IAgent a in Agents)
             {
@@ -38,6 +38,10 @@ namespace SilverSim.Scene.Types.Scene
             }
             foreach(ISceneListener l in SceneListeners)
             {
+                if(isPhysicsOrigin && l.IgnorePhysicsLocationUpdates)
+                {
+                    continue;
+                }
                 l.ScheduleUpdate(objinfo, ID);
             }
         }

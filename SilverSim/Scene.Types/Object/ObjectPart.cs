@@ -642,6 +642,41 @@ namespace SilverSim.Scene.Types.Object
             ObjectGroup.Scene?.ScheduleUpdate(UpdateInfo);
         }
 
+        private void TriggerOnPhysicsPositionChange()
+        {
+            /* we have to check the ObjectGroup during setup process before using it here */
+            if (ObjectGroup == null)
+            {
+                return;
+            }
+
+            foreach (Action<ObjectPart, UpdateChangedFlags> del in OnUpdate?.GetInvocationList().OfType<Action<ObjectPart, UpdateChangedFlags>>() ?? new Action<ObjectPart, UpdateChangedFlags>[0])
+            {
+                try
+                {
+                    del(this, 0);
+                }
+                catch (Exception e)
+                {
+                    m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace);
+                }
+            }
+
+            foreach (Action<IObject> del in OnPositionChange?.GetInvocationList().OfType<Action<IObject>>() ?? new Action<IObject>[0])
+            {
+                try
+                {
+                    del(this);
+                }
+                catch (Exception e)
+                {
+                    m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace);
+                }
+            }
+            UpdateData(UpdateDataFlags.Full | UpdateDataFlags.Terse);
+            ObjectGroup.Scene?.ScheduleUpdate(UpdateInfo, true);
+        }
+
         public AssetServiceInterface AssetService
             => ObjectGroup.AssetService; /* specific for attachments usage */
 

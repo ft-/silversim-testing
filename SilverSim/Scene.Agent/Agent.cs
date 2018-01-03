@@ -59,6 +59,8 @@ namespace SilverSim.Scene.Agent
 {
     public abstract partial class Agent : IAgent
     {
+        public bool IgnorePhysicsLocationUpdates => false;
+
         private static readonly ILog m_Log = LogManager.GetLogger("AGENT");
         protected readonly object m_DataLock = new object();
 

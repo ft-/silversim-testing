@@ -28,5 +28,6 @@ namespace SilverSim.Scene.Types.Scene
     {
         void ScheduleUpdate(ObjectUpdateInfo info, UUID fromSceneID);
         void ScheduleUpdate(ObjectInventoryUpdateInfo info, UUID fromSceneID);
+        bool IgnorePhysicsLocationUpdates { get; }
     }
 }

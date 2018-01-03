@@ -184,14 +184,33 @@ namespace SilverSim.Scene.Types.Object
                 {
                     try
                     {
-                        Position = value.Position;
-                        Rotation = value.Rotation;
-                        Velocity = value.Velocity;
-                        AngularVelocity = value.AngularVelocity;
+                        lock (m_DataLock)
+                        {
+                            if (m_IsSandbox &&
+                                ObjectGroup != null && ObjectGroup.RootPart == this &&
+                                HasHitSandboxLimit(value.Position))
+                            {
+                                throw new HitSandboxLimitException();
+                            }
+                            m_LocalPosition = value.Position;
+
+                            m_LocalRotation = value.Rotation;
+                            m_Velocity = value.Velocity;
+                            m_AngularVelocity = value.AngularVelocity;
+                        }
                         Acceleration = value.Acceleration;
                         AngularAcceleration = value.AngularAcceleration;
+                        lock (m_UpdateDataLock)
+                        {
+                            value.Position.ToBytes(m_FullUpdateFixedBlock1, (int)FullFixedBlock1Offset.ObjectData_Position);
+                            value.Rotation.ToBytes(m_FullUpdateFixedBlock1, (int)FullFixedBlock1Offset.ObjectData_Rotation);
+                            value.Velocity.ToBytes(m_FullUpdateFixedBlock1, (int)FullFixedBlock1Offset.ObjectData_Velocity);
+                            value.AngularVelocity.ToBytes(m_FullUpdateFixedBlock1, (int)FullFixedBlock1Offset.ObjectData_AngularVelocity);
+                        }
+                        IsChanged = m_IsChangedEnabled;
+                        TriggerOnPhysicsPositionChange();
                     }
-                    catch(HitSandboxLimitException)
+                    catch (HitSandboxLimitException)
                     {
                         AngularVelocity = Vector3.Zero;
                         Acceleration = Vector3.Zero;
