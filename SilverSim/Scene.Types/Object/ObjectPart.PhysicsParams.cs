@@ -24,7 +24,6 @@ using SilverSim.Scene.Types.Physics.Vehicle;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Threading;
 using SilverSim.Types;
-using System;
 
 namespace SilverSim.Scene.Types.Object
 {
@@ -74,6 +73,9 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_Mass = (value < double.Epsilon) ? double.Epsilon : value;
                 }
+                IsChanged = m_IsChangedEnabled;
+                IncrementPhysicsParameterUpdateSerial();
+                TriggerOnUpdate(0);
             }
         }
 
@@ -135,6 +137,7 @@ namespace SilverSim.Scene.Types.Object
                     m_PhysicsGravityMultiplier = value;
                 }
                 IsChanged = m_IsChangedEnabled;
+                IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(0);
             }
         }
@@ -219,6 +222,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 m_IsRotateXEnabled = value;
                 IsChanged = m_IsChangedEnabled;
+                IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(UpdateChangedFlags.Physics);
             }
         }
@@ -231,6 +235,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 m_IsRotateYEnabled = value;
                 IsChanged = m_IsChangedEnabled;
+                IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(UpdateChangedFlags.Physics);
             }
         }
@@ -243,6 +248,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 m_IsRotateZEnabled = value;
                 IsChanged = m_IsChangedEnabled;
+                IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(UpdateChangedFlags.Physics);
             }
         }
@@ -255,6 +261,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 m_IsPhantom = value;
                 IsChanged = m_IsChangedEnabled;
+                IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(UpdateChangedFlags.Physics);
             }
         }
@@ -268,6 +275,7 @@ namespace SilverSim.Scene.Types.Object
                 m_IsPhysics = value;
                 PhysicsActor.IsPhysicsActive = value;
                 IsChanged = m_IsChangedEnabled;
+                IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(UpdateChangedFlags.Physics);
             }
         }
@@ -279,6 +287,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 m_IsVolumeDetect = value;
                 IsChanged = m_IsChangedEnabled;
+                IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(UpdateChangedFlags.Physics);
             }
         }
@@ -292,6 +301,7 @@ namespace SilverSim.Scene.Types.Object
                 m_Buoyancy = value;
                 PhysicsActor.Buoyancy = value;
                 IsChanged = m_IsChangedEnabled;
+                IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(UpdateChangedFlags.Physics);
             }
         }
@@ -304,6 +314,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 VehicleParams.VehicleType = value;
                 IsChanged = m_IsChangedEnabled;
+                IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(UpdateChangedFlags.Physics);
             }
         }
@@ -316,6 +327,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 VehicleParams.Flags = value;
                 IsChanged = m_IsChangedEnabled;
+                IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(UpdateChangedFlags.Physics);
             }
         }
@@ -324,6 +336,7 @@ namespace SilverSim.Scene.Types.Object
         {
             VehicleParams.SetFlags(value);
             IsChanged = m_IsChangedEnabled;
+            IncrementPhysicsParameterUpdateSerial();
             TriggerOnUpdate(UpdateChangedFlags.Physics);
         }
 
@@ -331,6 +344,7 @@ namespace SilverSim.Scene.Types.Object
         {
             VehicleParams.ClearFlags(value);
             IsChanged = m_IsChangedEnabled;
+            IncrementPhysicsParameterUpdateSerial();
             TriggerOnUpdate(UpdateChangedFlags.Physics);
         }
 
@@ -342,6 +356,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 VehicleParams[id] = value;
                 IsChanged = m_IsChangedEnabled;
+                IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(UpdateChangedFlags.Physics);
             }
         }
@@ -354,6 +369,8 @@ namespace SilverSim.Scene.Types.Object
             {
                 VehicleParams[id] = value;
                 IsChanged = m_IsChangedEnabled;
+                IncrementPhysicsParameterUpdateSerial();
+                IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(UpdateChangedFlags.Physics);
             }
         }
@@ -366,6 +383,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 VehicleParams[id] = value;
                 IsChanged = m_IsChangedEnabled;
+                IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(UpdateChangedFlags.Physics);
             }
         }
