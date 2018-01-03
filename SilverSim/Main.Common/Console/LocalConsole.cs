@@ -87,7 +87,10 @@ namespace SilverSim.Main.Common.Console
 
         public override void Write(string text)
         {
-            System.Console.WriteLine(text);
+            lock (m_CommandLineBuffer)
+            {
+                System.Console.WriteLine(text);
+            }
         }
 
         #region Output logic
