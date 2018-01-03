@@ -124,6 +124,7 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
                         try
                         {
                             OnIdle();
+                            nummessagespending = 0;
                         }
                         catch(Exception e)
                         {
@@ -137,6 +138,7 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
                         try
                         {
                             OnIdle();
+                            nummessagespending = 0;
                         }
                         catch (Exception e)
                         {
