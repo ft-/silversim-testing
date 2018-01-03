@@ -210,7 +210,7 @@ namespace SilverSim.Scene.Types.Object
         public uint m_PhysicsShapeUpdateSerial = 1;
 
         public uint PhysicsParameterUpdateSerial => m_PhysicsParameterUpdateSerial;
-        public uint PhysicsShapeUpdateserial => m_PhysicsShapeUpdateSerial;
+        public uint PhysicsShapeUpdateSerial => m_PhysicsShapeUpdateSerial;
 
         private void IncrementPhysicsParameterUpdateSerial()
         {
