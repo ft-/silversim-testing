@@ -302,7 +302,12 @@ namespace SilverSim.Scene.Physics.Common
             }
             forces.Add(HoverMotor(this, Agent, Vector3.Zero));
             forces.Add(new PositionalForce("ControlInput", ControlLinearInput * ControlLinearInputFactor * SpeedFactor, Vector3.Zero));
-            forces.Add(LinearRestitutionMotor(Agent, RestitutionInputFactor, Vector3.Zero));
+            Vector3 restitutionForce = -Agent.Velocity * RestitutionInputFactor;
+            if(!Agent.IsFlying)
+            {
+                restitutionForce.Z = 0;
+            }
+            forces.Add(new PositionalForce("LinearRestitutionMotor", restitutionForce, Vector3.Zero));
 
             /* let us allow advanced physics force input to be used on agents */
             foreach (ObjectGroup grp in Agent.Attachments.All)
