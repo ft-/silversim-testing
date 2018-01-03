@@ -453,6 +453,7 @@ namespace SilverSim.Viewer.Core
                         else
                         {
                             var dofull = false;
+                            var haveobjprop = false;
                             if(!ui.IsAlwaysFull && LastObjSerialNo.Contains(ui.LocalID))
                             {
                                 int serialno = LastObjSerialNo[ui.LocalID];
@@ -477,6 +478,7 @@ namespace SilverSim.Viewer.Core
                                     }
                                     else if (isSelected && !wasSelected)
                                     {
+                                        haveobjprop = true;
                                         SendSelectedObjects.Add(ui.ID);
                                         if (full_packet_objprop == null)
                                         {
@@ -493,7 +495,7 @@ namespace SilverSim.Viewer.Core
 
                                 if (fullUpdate != null)
                                 {
-                                    if (ui.IsPhysics)
+                                    if (ui.IsPhysics && !haveobjprop)
                                     {
                                         bool foundobject = false;
                                         send_phys_packet:
