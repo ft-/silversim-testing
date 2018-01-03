@@ -207,8 +207,10 @@ namespace SilverSim.Scene.Types.Object
         }
 
         public uint m_PhysicsParameterUpdateSerial = 1;
+        public uint m_PhysicsShapeUpdateSerial = 1;
 
         public uint PhysicsParameterUpdateSerial => m_PhysicsParameterUpdateSerial;
+        public uint PhysicsShapeUpdateserial => m_PhysicsShapeUpdateSerial;
 
         private void IncrementPhysicsParameterUpdateSerial()
         {
@@ -220,6 +222,19 @@ namespace SilverSim.Scene.Types.Object
                     serial = 1;
                 }
                 m_PhysicsParameterUpdateSerial = serial;
+            }
+        }
+
+        private void IncrementPhysicsShapeUpdateSerial()
+        {
+            lock (m_DataLock)
+            {
+                uint serial = m_PhysicsShapeUpdateSerial + 1;
+                if (serial == 0)
+                {
+                    serial = 1;
+                }
+                m_PhysicsShapeUpdateSerial = serial;
             }
         }
 
@@ -1426,6 +1441,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 m_PhysicsShapeType = value;
                 IsChanged = m_IsChangedEnabled;
+                IncrementPhysicsShapeUpdateSerial();
                 IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(UpdateChangedFlags.Shape);
             }
@@ -1508,6 +1524,8 @@ namespace SilverSim.Scene.Types.Object
                     value.ToBytes(m_FullUpdateFixedBlock1, (int)FullFixedBlock1Offset.Scale);
                 }
                 IsChanged = m_IsChangedEnabled;
+                IncrementPhysicsShapeUpdateSerial();
+                IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(UpdateChangedFlags.Scale);
             }
         }
@@ -1528,6 +1546,7 @@ namespace SilverSim.Scene.Types.Object
                     m_Slice = value;
                 }
                 IsChanged = m_IsChangedEnabled;
+                IncrementPhysicsShapeUpdateSerial();
                 IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(UpdateChangedFlags.Shape);
             }

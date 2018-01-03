@@ -275,6 +275,7 @@ namespace SilverSim.Scene.Types.Object
                 m_IsPhysics = value;
                 PhysicsActor.IsPhysicsActive = value;
                 IsChanged = m_IsChangedEnabled;
+                IncrementPhysicsShapeUpdateSerial();
                 IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(UpdateChangedFlags.Physics);
             }
@@ -287,6 +288,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 m_IsVolumeDetect = value;
                 IsChanged = m_IsChangedEnabled;
+                IncrementPhysicsShapeUpdateSerial();
                 IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(UpdateChangedFlags.Physics);
             }
@@ -369,7 +371,6 @@ namespace SilverSim.Scene.Types.Object
             {
                 VehicleParams[id] = value;
                 IsChanged = m_IsChangedEnabled;
-                IncrementPhysicsParameterUpdateSerial();
                 IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(UpdateChangedFlags.Physics);
             }

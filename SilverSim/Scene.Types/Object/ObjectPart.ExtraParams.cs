@@ -877,6 +877,7 @@ namespace SilverSim.Scene.Types.Object
                 }
                 UpdateExtraParams();
                 IsChanged = m_IsChangedEnabled;
+                IncrementPhysicsShapeUpdateSerial();
                 IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(UpdateChangedFlags.Shape);
             }
