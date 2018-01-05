@@ -354,7 +354,6 @@ namespace SilverSim.Viewer.Core
             AddDefCapability("GetTexture", regionSeedID, Cap_GetTexture, capConfig);
             AddDefCapability("GetMesh", regionSeedID, Cap_GetMesh, capConfig);
             AddDefCapability("GetMesh2", regionSeedID, Cap_GetMesh, capConfig);
-            AddDefCapability("CreateInventoryCategory", regionSeedID, Cap_CreateInventoryCategory, capConfig);
             AddDefCapability("GetDisplayNames", regionSeedID, Cap_GetDisplayNames, capConfig);
             AddDefCapability("MeshUploadFlag", regionSeedID, Cap_MeshUploadFlag, capConfig);
             AddDefCapability("GetPhysicsObjectData", regionSeedID, Cap_GetObjectsPhysicsData, capConfig);

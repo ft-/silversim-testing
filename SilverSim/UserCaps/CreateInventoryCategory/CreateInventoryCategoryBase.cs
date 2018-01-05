@@ -19,27 +19,25 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using log4net;
 using SilverSim.Main.Common.HttpServer;
+using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using SilverSim.Types.StructuredData.Llsd;
 using System;
-using System.IO;
 using System.Net;
 
-namespace SilverSim.Viewer.Core
+namespace SilverSim.UserCaps.CreateInventoryCategory
 {
-    public partial class AgentCircuit
+    public abstract class CreateInventoryCategoryBase
     {
-        public void Cap_CreateInventoryCategory(HttpRequest httpreq)
+        private static readonly ILog m_Log = LogManager.GetLogger("CREATEINVENTORYCATEGORY");
+
+        protected static void HandleHttpRequest(HttpRequest httpreq, InventoryServiceInterface inventoryService, UUI agent)
         {
             IValue o;
-            if (httpreq.CallerIP != RemoteIP)
-            {
-                httpreq.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
-                return;
-            }
             if (httpreq.Method != "POST")
             {
                 httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
@@ -58,7 +56,7 @@ namespace SilverSim.Viewer.Core
             }
 
             var reqmap = o as Map;
-            if(reqmap == null)
+            if (reqmap == null)
             {
                 httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML");
                 return;
@@ -67,7 +65,7 @@ namespace SilverSim.Viewer.Core
             var folder = new InventoryFolder
             {
                 ID = reqmap["folder_id"].AsUUID,
-                Owner = Agent.Owner,
+                Owner = agent,
                 ParentFolderID = reqmap["parent_id"].AsUUID,
                 DefaultType = (AssetType)reqmap["type"].AsInt,
                 Name = reqmap["name"].ToString(),
@@ -75,7 +73,7 @@ namespace SilverSim.Viewer.Core
             };
             try
             {
-                Agent.InventoryService.Folder.Add(folder);
+                inventoryService.Folder.Add(folder);
             }
             catch
             {
@@ -91,11 +89,9 @@ namespace SilverSim.Viewer.Core
                 { "name", folder.Name }
             };
             using (var res = httpreq.BeginResponse())
+            using (var stream = res.GetOutputStream())
             {
-                using (var stream = res.GetOutputStream())
-                {
-                    LlsdXml.Serialize(resmap, stream);
-                }
+                LlsdXml.Serialize(resmap, stream);
             }
         }
     }
