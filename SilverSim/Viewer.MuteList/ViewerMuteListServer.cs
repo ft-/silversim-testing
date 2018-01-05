@@ -125,15 +125,17 @@ namespace SilverSim.Viewer.MuteList
             {
                 try
                 {
-                    using (StreamWriter writer = ms.UTF8StreamWriter())
+                    List<MuteListEntry> list = muteListService.GetList(agent.ID, req.MuteCRC);
+                    byte[] data;
+                    if(list.Count != 0)
                     {
-                        foreach (MuteListEntry entry in muteListService.GetList(agent.ID, req.MuteCRC))
-                        {
-                            writer.WriteLine("{0} {1} {2}|{3}", (int)entry.Type, entry.MuteID.ToString(), entry.MuteName, (uint)entry.Flags);
-                            useEmpty = false;
-                        }
+                        useEmpty = false;
+                        data = list.ToBinaryData();
                     }
-                    byte[] data = ms.ToArray();
+                    else
+                    {
+                        data = new byte[0];
+                    }
                     if (new Crc32().Compute(data) == req.MuteCRC)
                     {
                         useCached = true;
