@@ -20,11 +20,12 @@
 // exception statement from your version.
 
 using SilverSim.Types;
+using System.Collections.Generic;
 
 namespace SilverSim.ServiceInterfaces
 {
     public interface ILoginUserCapsGetInterface
     {
-        void GetCaps(UUID agentid, UUID sessionid, Map userCapList);
+        void GetCaps(UUID agentid, UUID sessionid, Dictionary<string, string> userCapList);
     }
 }

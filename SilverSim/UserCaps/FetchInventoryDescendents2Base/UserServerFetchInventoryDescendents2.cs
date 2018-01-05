@@ -28,6 +28,7 @@ using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.ServiceInterfaces.Traveling;
 using SilverSim.Types;
 using SilverSim.Types.TravelingData;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Net;
 
@@ -111,7 +112,7 @@ namespace SilverSim.UserCaps.FetchInventoryDescendents2Base
             HandleHttpRequest(req, m_InventoryService, agent);
         }
 
-        void ILoginUserCapsGetInterface.GetCaps(UUID agentid, UUID sessionid, Map userCapList)
+        void ILoginUserCapsGetInterface.GetCaps(UUID agentid, UUID sessionid, Dictionary<string, string> userCapList)
         {
             string serverURI = m_HttpsServer != null ? m_HttpsServer.ServerURI : m_HttpServer.ServerURI;
             userCapList.Add("FetchInventoryDescendents2", $"{serverURI}/CAPS/FetchInventoryDescendents2/{sessionid}");

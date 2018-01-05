@@ -29,6 +29,7 @@ using SilverSim.ServiceInterfaces.Traveling;
 using SilverSim.Types;
 using SilverSim.Types.Account;
 using SilverSim.Types.TravelingData;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Net;
 
@@ -113,7 +114,7 @@ namespace SilverSim.UserCaps.CreateInventoryCategory
             HandleHttpRequest(req, m_InventoryService, account.Principal);
         }
 
-        void ILoginUserCapsGetInterface.GetCaps(UUID agentid, UUID sessionid, Map userCapList)
+        void ILoginUserCapsGetInterface.GetCaps(UUID agentid, UUID sessionid, Dictionary<string, string> userCapList)
         {
             string serverURI = m_HttpsServer != null ? m_HttpsServer.ServerURI : m_HttpServer.ServerURI;
             userCapList.Add("CreateInventoryCategory", $"{serverURI}/CAPS/CreateInventoryCategory/{sessionid}");

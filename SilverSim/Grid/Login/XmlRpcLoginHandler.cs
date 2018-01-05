@@ -765,15 +765,21 @@ namespace SilverSim.Grid.Login
 
             if(loginData.LoginOptions.Contains(OptionExt_UserCapabilities))
             {
-                var usercapdata = new Map();
-                var usercaparray = new AnArray
-                {
-                    usercapdata
-                };
+                var usercaparray = new AnArray();
+                var userCaps = new Dictionary<string, string>();
 
                 foreach(ILoginUserCapsGetInterface service in m_UserCapsGetters)
                 {
-                    service.GetCaps(loginData.Account.Principal.ID, loginData.SessionInfo.SessionID, usercapdata);
+                    service.GetCaps(loginData.Account.Principal.ID, loginData.SessionInfo.SessionID, userCaps);
+                }
+
+                foreach(KeyValuePair<string, string> kvp in userCaps)
+                {
+                    usercaparray.Add(new Map
+                    {
+                        { "capability", kvp.Key },
+                        {" uri", kvp.Value }
+                    });
                 }
 
                 resStruct.Add("user-capabilities", usercaparray);
