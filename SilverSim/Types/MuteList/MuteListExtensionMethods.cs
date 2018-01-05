@@ -34,11 +34,39 @@ namespace SilverSim.Types.MuteList
                 {
                     foreach (MuteListEntry entry in list)
                     {
-                        writer.WriteLine("{0} {1} {2}|{3}", (int)entry.Type, entry.MuteID.ToString(), entry.MuteName, (uint)entry.Flags);
+                        writer.Write("{0} {1} {2}|{3}\n", (int)entry.Type, entry.MuteID.ToString(), entry.MuteName, (uint)entry.Flags);
                     }
                 }
                 return ms.ToArray();
             }
+        }
+
+        public static List<MuteListEntry> ToMuteList(this byte[] data)
+        {
+            var res = new List<MuteListEntry>();
+            string datastring = data.FromUTF8Bytes();
+            foreach(string elem in datastring.Split('\n'))
+            {
+                string[] outer = elem.Split('|');
+                if(outer.Length != 2)
+                {
+                    continue;
+                }
+
+                string[] inner = outer[0].Split(new char[] { ' ' }, 3);
+                if(inner.Length < 3)
+                {
+                    continue;
+                }
+                res.Add(new MuteListEntry
+                {
+                    Flags = (MuteFlags)uint.Parse(outer[1]),
+                    MuteName = inner[2],
+                    MuteID = UUID.Parse(inner[1]),
+                    Type = (MuteType)int.Parse(inner[0])
+                });
+            }
+            return res;
         }
     }
 }
