@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package>
+	<name>SilverSim.UserCaps</name>
+	<default-configuration>
+		<source>SilverSim.UserCaps:SimulatorConfig.ini</source>
+		<use-if-started-as>bare</use-if-started-as>
+		<use-if-started-as>simulator</use-if-started-as>
+		<use-if-started-as>standalone</use-if-started-as>
+	</default-configuration>
+	<default-configuration>
+		<source>SilverSim.UserCaps:UserServerConfig.ini</source>
+		<use-if-started-as>grid</use-if-started-as>
+		<use-if-started-as>standalone</use-if-started-as>
+	</default-configuration>
+	<files>
+		<file name="bin/plugins/SilverSim.UserCaps.dll" is-version-src="true"/>
+	</files>
+</package>
