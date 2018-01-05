@@ -90,6 +90,7 @@ namespace SilverSim.Grid.Login
         private AvatarServiceInterface m_AvatarService;
         private TravelingDataServiceInterface m_TravelingDataService;
         private ILoginConnectorServiceInterface m_LoginConnectorService;
+        private List<ILoginUserCapsGetInterface> m_UserCapsGetters;
 
         private readonly string m_UserAccountServiceName;
         private readonly string m_GridUserServiceName;
@@ -134,6 +135,7 @@ namespace SilverSim.Grid.Login
 
         public void Startup(ConfigurationLoader loader)
         {
+            m_UserCapsGetters = loader.GetServicesByValue<ILoginUserCapsGetInterface>();
             m_ServiceURLsGetters = loader.GetServicesByValue<IServiceURLsGetInterface>();
             m_GridInfoGetters = loader.GetServicesByValue<IGridInfoServiceInterface>();
             m_LoginResponseGetters = loader.GetServicesByValue<ILoginResponseServiceInterface>();
@@ -761,6 +763,22 @@ namespace SilverSim.Grid.Login
                 resStruct.Add("event_categories", new AnArray());
             }
 
+            if(loginData.LoginOptions.Contains(OptionExt_UserCapabilities))
+            {
+                var usercapdata = new Map();
+                var usercaparray = new AnArray
+                {
+                    usercapdata
+                };
+
+                foreach(ILoginUserCapsGetInterface service in m_UserCapsGetters)
+                {
+                    service.GetCaps(loginData.Account.Principal.ID, loginData.SessionInfo.SessionID, usercapdata);
+                }
+
+                resStruct.Add("user-capabilities", usercaparray);
+            }
+
             if(loginData.LoginOptions.Contains(Option_ClassifiedCategories))
             {
                 var categorylist = new AnArray();
@@ -979,6 +997,7 @@ namespace SilverSim.Grid.Login
         private const string Option_LoginFlags = "login-flags";
         private const string Option_GlobalTextures = "global-textures";
         private const string Option_AdultCompliant = "adult_compliant";
+        private const string OptionExt_UserCapabilities = "user-capabilities";
 
         private readonly string[] RequiredParameters = new string[] { "first", "last", "start", "passwd", "channel", "version", "mac", "id0" };
 
