@@ -62,10 +62,10 @@ namespace SilverSim.UserCaps.FetchInventory2
             m_InventoryService = loader.GetService<InventoryServiceInterface>(m_InventoryServiceName);
             m_UserAccountService = loader.GetService<UserAccountServiceInterface>(m_UserAccountServiceName);
             m_HttpServer = loader.HttpServer;
-            m_HttpServer.StartsWithUriHandlers.Add("/CAPS/FetchInventory2/", CapsHandler);
+            m_HttpServer.StartsWithUriHandlers.Add("/UserCAPS/FetchInventory2/", CapsHandler);
             if (loader.TryGetHttpsServer(out m_HttpsServer))
             {
-                m_HttpsServer.StartsWithUriHandlers.Add("/CAPS/FetchInventory2/", CapsHandler);
+                m_HttpsServer.StartsWithUriHandlers.Add("/UserCAPS/FetchInventory2/", CapsHandler);
             }
         }
 
@@ -115,7 +115,7 @@ namespace SilverSim.UserCaps.FetchInventory2
         void ILoginUserCapsGetInterface.GetCaps(UUID agentid, UUID sessionid, Dictionary<string, string> userCapList)
         {
             string serverURI = m_HttpsServer != null ? m_HttpsServer.ServerURI : m_HttpServer.ServerURI;
-            userCapList.Add("FetchInventory2", $"{serverURI}/CAPS/FetchInventory2/{sessionid}");
+            userCapList.Add("FetchInventory2", $"{serverURI}/UserCAPS/FetchInventory2/{sessionid}");
         }
     }
 }

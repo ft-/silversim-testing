@@ -63,10 +63,10 @@ namespace SilverSim.UserCaps.CreateInventoryCategory
             m_InventoryService = loader.GetService<InventoryServiceInterface>(m_InventoryServiceName);
             m_UserAccountService = loader.GetService<UserAccountServiceInterface>(m_UserAccountServiceName);
             m_HttpServer = loader.HttpServer;
-            m_HttpServer.StartsWithUriHandlers.Add("/CAPS/CreateInventoryCategory/", CapsHandler);
+            m_HttpServer.StartsWithUriHandlers.Add("/UserCAPS/CreateInventoryCategory/", CapsHandler);
             if (loader.TryGetHttpsServer(out m_HttpsServer))
             {
-                m_HttpsServer.StartsWithUriHandlers.Add("/CAPS/CreateInventoryCategory/", CapsHandler);
+                m_HttpsServer.StartsWithUriHandlers.Add("/UserCAPS/CreateInventoryCategory/", CapsHandler);
             }
         }
 
@@ -117,7 +117,7 @@ namespace SilverSim.UserCaps.CreateInventoryCategory
         void ILoginUserCapsGetInterface.GetCaps(UUID agentid, UUID sessionid, Dictionary<string, string> userCapList)
         {
             string serverURI = m_HttpsServer != null ? m_HttpsServer.ServerURI : m_HttpServer.ServerURI;
-            userCapList.Add("CreateInventoryCategory", $"{serverURI}/CAPS/CreateInventoryCategory/{sessionid}");
+            userCapList.Add("CreateInventoryCategory", $"{serverURI}/UserCAPS/CreateInventoryCategory/{sessionid}");
         }
     }
 }
