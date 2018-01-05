@@ -350,10 +350,6 @@ namespace SilverSim.Viewer.Core
             AddDefCapability("EnvironmentSettings", regionSeedID, Cap_EnvironmentSettings, capConfig);
             AddDefCapability("RenderMaterials", regionSeedID, Cap_RenderMaterials, capConfig);
             AddDefCapability("SimConsoleAsync", regionSeedID, Cap_SimConsoleAsyncCap, capConfig);
-            AddDefCapability("FetchInventory2", regionSeedID, Cap_FetchInventory2, capConfig);
-            AddDefCapability("FetchLib2", regionSeedID, Cap_FetchInventory2, capConfig);
-            AddDefCapability("FetchInventoryDescendents2", regionSeedID, Cap_FetchInventoryDescendents2, capConfig);
-            AddDefCapability("FetchLibDescendents2", regionSeedID, Cap_FetchInventoryDescendents2, capConfig);
             AddDefCapability("ViewerAsset", regionSeedID, Cap_ViewerAsset, capConfig);
             AddDefCapability("GetTexture", regionSeedID, Cap_GetTexture, capConfig);
             AddDefCapability("GetMesh", regionSeedID, Cap_GetMesh, capConfig);

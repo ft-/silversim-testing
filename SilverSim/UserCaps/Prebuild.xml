@@ -2,17 +2,17 @@
 <Project frameworkVersion="v4_5" name="SilverSim.UserCaps" path="SilverSim/UserCaps" type="Library">
   <Configuration name="Release">
     <Options>
-      <OutputPath>../../bin</OutputPath>
+      <OutputPath>../../bin/plugins</OutputPath>
     </Options>
   </Configuration>
   <Configuration name="DebugRel">
     <Options>
-      <OutputPath>../../bin</OutputPath>
+      <OutputPath>../../bin/plugins</OutputPath>
     </Options>
   </Configuration>
   <Configuration name="Debug">
     <Options>
-      <OutputPath>../../bin</OutputPath>
+      <OutputPath>../../bin/plugins</OutputPath>
     </Options>
   </Configuration>
   <ReferencePath>../../bin</ReferencePath>
@@ -33,6 +33,7 @@
   <Reference name="SilverSim.Scripting.Common" localCopy="false"/>
   <Reference name="SilverSim.Threading" localCopy="false"/>
   <Reference name="log4net" localCopy="false"/>
+  <Reference name="Nini" localCopy="false"/>
   <Reference name="C5" localCopy="false"/>
   <Reference name="CSJ2K" localCopy="false"/>
   <Files>

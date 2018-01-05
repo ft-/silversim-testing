@@ -19,7 +19,9 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using log4net;
 using SilverSim.Main.Common.HttpServer;
+using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
@@ -29,25 +31,27 @@ using System.Collections.Generic;
 using System.Net;
 using System.Xml;
 
-namespace SilverSim.Viewer.Core
+namespace SilverSim.UserCaps.FetchInventoryDescendents2Base
 {
-    public partial class AgentCircuit
+    public class FetchInventoryDescendents2Base : FetchInventoryCommon
     {
-        private void WriteInventoryFolderContent(XmlTextWriter writer, InventoryFolderContent folder,
+        private static readonly ILog m_Log = LogManager.GetLogger("FETCHINVENTORYDESCENDENTS2");
+
+        private static void WriteInventoryFolderContent(XmlTextWriter writer, InventoryFolderContent folder,
             bool fetch_folders,
-            bool fetch_items, List<InventoryItem> linkeditems)
+            bool fetch_items, List<InventoryItem> linkeditems, UUID agentID)
         {
             writer.WriteStartElement("map");
             writer.WriteKeyValuePair("agent_id", folder.Owner.ID);
             writer.WriteKeyValuePair("descendents", folder.Folders.Count + folder.Items.Count);
             writer.WriteKeyValuePair("folder_id", folder.FolderID);
-            if(fetch_folders)
+            if (fetch_folders)
             {
                 writer.WriteStartElement("key");
                 writer.WriteValue("categories");
                 writer.WriteEndElement();
                 writer.WriteStartElement("array");
-                foreach(var childfolder in folder.Folders)
+                foreach (var childfolder in folder.Folders)
                 {
                     writer.WriteStartElement("map");
                     writer.WriteKeyValuePair("folder_id", childfolder.ID);
@@ -67,25 +71,25 @@ namespace SilverSim.Viewer.Core
                 }
                 writer.WriteEndElement();
             }
-            if(fetch_items)
+            if (fetch_items)
             {
                 writer.WriteStartElement("key");
                 writer.WriteValue("items");
                 writer.WriteEndElement();
                 writer.WriteStartElement("array");
-                if(linkeditems != null)
+                if (linkeditems != null)
                 {
                     foreach (var childitem in linkeditems)
                     {
                         writer.WriteStartElement("map");
-                        WriteInventoryItem(childitem, writer);
+                        WriteInventoryItem(childitem, writer, agentID);
                         writer.WriteEndElement();
                     }
                 }
                 foreach (var childitem in folder.Items)
                 {
                     writer.WriteStartElement("map");
-                    WriteInventoryItem(childitem, writer);
+                    WriteInventoryItem(childitem, writer, agentID);
                     writer.WriteEndElement();
                 }
                 writer.WriteEndElement();
@@ -95,14 +99,9 @@ namespace SilverSim.Viewer.Core
             writer.WriteEndElement();
         }
 
-        private void Cap_FetchInventoryDescendents2(HttpRequest httpreq)
+        protected static void HandleHttpRequest(HttpRequest httpreq, InventoryServiceInterface inventoryService, UUID agentID)
         {
             IValue o;
-            if (httpreq.CallerIP != RemoteIP)
-            {
-                httpreq.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
-                return;
-            }
             if (httpreq.Method != "POST")
             {
                 httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
@@ -174,8 +173,7 @@ namespace SilverSim.Viewer.Core
                         }
                         try
                         {
-                            var folderContentRes = Agent.InventoryService.Folder.Content[AgentID, list.ToArray()];
-                            foreach (var folderContent in folderContentRes)
+                            foreach (var folderContent in inventoryService.Folder.Content[agentID, list.ToArray()])
                             {
                                 if (!folderContents.ContainsKey(req.Key))
                                 {
@@ -228,7 +226,7 @@ namespace SilverSim.Viewer.Core
 
                                 try
                                 {
-                                    linkeditems = Agent.InventoryService.Item[ownerid, linkeditemids];
+                                    linkeditems = inventoryService.Item[ownerid, linkeditemids];
                                 }
                                 catch
                                 {
@@ -241,7 +239,7 @@ namespace SilverSim.Viewer.Core
                                     text.WriteStartElement("array");
                                 }
 
-                                WriteInventoryFolderContent(text, fc, fetch_folders, fetch_items, linkeditems);
+                                WriteInventoryFolderContent(text, fc, fetch_folders, fetch_items, linkeditems, agentID);
                             }
                             else
                             {
