@@ -43,7 +43,7 @@ namespace SilverSim.Database.Memory.MuteList
 
         private string GetKey(UUID muteID, string muteName) => $"{muteID}/${muteName}";
 
-        public override List<MuteListEntry> GetList(UUID muteListOwnerID)
+        public override List<MuteListEntry> GetList(UUID muteListOwnerID, uint crc)
         {
             var res = new List<MuteListEntry>();
             RwLockedDictionary<string, MuteListEntry> list;
