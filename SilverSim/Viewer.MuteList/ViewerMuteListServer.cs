@@ -123,22 +123,29 @@ namespace SilverSim.Viewer.MuteList
             string filename = $"mutes{agent.ID}";
             using (var ms = new MemoryStream())
             {
-                using (StreamWriter writer = ms.UTF8StreamWriter())
+                try
                 {
-                    foreach (MuteListEntry entry in muteListService.GetList(agent.ID))
+                    using (StreamWriter writer = ms.UTF8StreamWriter())
                     {
-                        writer.WriteLine("{0} {1} {2}|{3}", (int)entry.Type, entry.MuteID.ToString(), entry.MuteName, (uint)entry.Flags);
-                        useEmpty = false;
+                        foreach (MuteListEntry entry in muteListService.GetList(agent.ID, req.MuteCRC))
+                        {
+                            writer.WriteLine("{0} {1} {2}|{3}", (int)entry.Type, entry.MuteID.ToString(), entry.MuteName, (uint)entry.Flags);
+                            useEmpty = false;
+                        }
+                    }
+                    byte[] data = ms.ToArray();
+                    if (new Crc32().Compute(data) == req.MuteCRC)
+                    {
+                        useCached = true;
+                    }
+                    else if (!useEmpty)
+                    {
+                        agent.AddNewFile(filename, data);
                     }
                 }
-                byte[] data = ms.ToArray();
-                if (new Crc32().Compute(data) == req.MuteCRC)
+                catch(UseCachedMuteListException)
                 {
                     useCached = true;
-                }
-                else if(!useEmpty)
-                {
-                    agent.AddNewFile(filename, data);
                 }
             }
 

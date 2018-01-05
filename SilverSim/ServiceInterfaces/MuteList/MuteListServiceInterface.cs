@@ -21,14 +21,40 @@
 
 using SilverSim.Types;
 using SilverSim.Types.MuteList;
+using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace SilverSim.ServiceInterfaces.MuteList
 {
     public abstract class MuteListServiceInterface
     {
-        public abstract List<MuteListEntry> GetList(UUID muteListOwnerID);
+        /** <remarks>When crc is matching, the exception UseCachedMuteListException is used</remarks> */
+        public abstract List<MuteListEntry> GetList(UUID muteListOwnerID, uint crc);
         public abstract void Store(UUID muteListOwnerID, MuteListEntry mute);
         public abstract bool Remove(UUID muteListOwnerID, UUID muteID, string muteName);
+    }
+
+    [Serializable]
+    public class UseCachedMuteListException : Exception
+    {
+        public UseCachedMuteListException()
+        {
+        }
+
+        public UseCachedMuteListException(string message)
+            : base(message)
+        {
+        }
+
+        public UseCachedMuteListException(string message, Exception innerException)
+            : base(message, innerException)
+        {
+        }
+
+        protected UseCachedMuteListException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+        }
     }
 }
