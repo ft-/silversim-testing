@@ -29,7 +29,7 @@ namespace SilverSim.ServiceInterfaces.MuteList
 {
     public abstract class MuteListServiceInterface
     {
-        /** <remarks>When crc is matching, the exception UseCachedMuteListException is used</remarks> */
+        /** <remarks>When crc is matching and the list is not empty, the exception UseCachedMuteListException is used</remarks> */
         public abstract List<MuteListEntry> GetList(UUID muteListOwnerID, uint crc);
         public abstract void Store(UUID muteListOwnerID, MuteListEntry mute);
         public abstract bool Remove(UUID muteListOwnerID, UUID muteID, string muteName);
