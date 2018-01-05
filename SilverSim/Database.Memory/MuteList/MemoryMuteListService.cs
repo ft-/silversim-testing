@@ -31,7 +31,7 @@ using System.ComponentModel;
 namespace SilverSim.Database.Memory.MuteList
 {
     [PluginName("MuteList")]
-    [Description("memory MuteList Backend")]
+    [Description("Memory MuteList Backend")]
     public sealed class MemoryMuteListService : MuteListServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
         private readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, MuteListEntry>> m_MuteLists = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, MuteListEntry>>(() => new RwLockedDictionary<string, MuteListEntry>());
