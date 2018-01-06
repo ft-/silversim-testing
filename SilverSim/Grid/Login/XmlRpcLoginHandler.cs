@@ -420,6 +420,9 @@ namespace SilverSim.Grid.Login
                 foreach (IValue ivopt in optarray)
                 {
                     loginData.LoginOptions.Add(ivopt.ToString());
+#if DEBUG
+                    m_Log.DebugFormat("Requested login option {0} for {1} {2} (Scope {3})", ivopt.ToString(), firstName, lastName, scopeId);
+#endif
                 }
             }
 
@@ -768,17 +771,24 @@ namespace SilverSim.Grid.Login
                 var usercaparray = new AnArray();
                 var userCaps = new Dictionary<string, string>();
 
-                foreach(ILoginUserCapsGetInterface service in m_UserCapsGetters)
+#if DEBUG
+                m_Log.DebugFormat("Providing user caps for {0} {1} (Scope {2})", loginData.Account.Principal.FirstName, loginData.Account.Principal.LastName, loginData.Account.ScopeID);
+#endif
+
+                foreach (ILoginUserCapsGetInterface service in m_UserCapsGetters)
                 {
                     service.GetCaps(loginData.Account.Principal.ID, loginData.SessionInfo.SessionID, userCaps);
                 }
 
                 foreach(KeyValuePair<string, string> kvp in userCaps)
                 {
+#if DEBUG
+                    m_Log.DebugFormat("Providing user caps {0} for {1} {2} (Scope {3})", kvp.Key, loginData.Account.Principal.FirstName, loginData.Account.Principal.LastName, loginData.Account.ScopeID);
+#endif
                     usercaparray.Add(new Map
                     {
                         { "capability", kvp.Key },
-                        {" uri", kvp.Value }
+                        { "uri", kvp.Value }
                     });
                 }
 
