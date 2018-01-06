@@ -115,7 +115,7 @@ namespace SilverSim.UserCaps.FetchInventoryDescendents2Base
         void ILoginUserCapsGetInterface.GetCaps(UUID agentid, UUID sessionid, Dictionary<string, string> userCapList)
         {
             string serverURI = m_HttpsServer != null ? m_HttpsServer.ServerURI : m_HttpServer.ServerURI;
-            userCapList.Add("FetchInventoryDescendents2", $"{serverURI}/UserCAPS/FetchInventoryDescendents2/{sessionid}");
+            userCapList.Add("FetchInventoryDescendents2", $"{serverURI}UserCAPS/FetchInventoryDescendents2/{sessionid}");
         }
     }
 }

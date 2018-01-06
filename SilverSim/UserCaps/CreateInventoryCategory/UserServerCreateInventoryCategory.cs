@@ -117,7 +117,7 @@ namespace SilverSim.UserCaps.CreateInventoryCategory
         void ILoginUserCapsGetInterface.GetCaps(UUID agentid, UUID sessionid, Dictionary<string, string> userCapList)
         {
             string serverURI = m_HttpsServer != null ? m_HttpsServer.ServerURI : m_HttpServer.ServerURI;
-            userCapList.Add("CreateInventoryCategory", $"{serverURI}/UserCAPS/CreateInventoryCategory/{sessionid}");
+            userCapList.Add("CreateInventoryCategory", $"{serverURI}UserCAPS/CreateInventoryCategory/{sessionid}");
         }
     }
 }
