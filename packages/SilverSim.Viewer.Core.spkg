@@ -11,6 +11,7 @@
 		<dependency name="SilverSim.Viewer.Search"/>
 		<dependency name="SilverSim.Viewer.Teleport"/>
 		<dependency name="SilverSim.Viewer.TerrainEdit"/>
+		<dependency name="SilverSim.UserCaps"/>
 	</dependencies>
 	<files>
 		<file name="bin/SilverSim.Viewer.Core.dll" is-version-src="true"/>
