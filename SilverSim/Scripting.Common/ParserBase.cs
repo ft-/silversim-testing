@@ -212,6 +212,8 @@ namespace SilverSim.Scripting.Common
 
         public int CurrentLineNumber; /* set to start of line */
 
+        public bool IsIncluded => m_ParserInputs.Count > 1;
+
         public void Push(TextReader stream, string filename, int lineNumber = 1)
         {
             var pi = new ParserInput
