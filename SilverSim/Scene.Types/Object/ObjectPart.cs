@@ -27,10 +27,12 @@ using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
+using SilverSim.Types.Asset.Format;
 using SilverSim.Types.Inventory;
 using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace SilverSim.Scene.Types.Object
@@ -1474,11 +1476,19 @@ namespace SilverSim.Scene.Types.Object
 
             set
             {
-                m_PhysicsShapeType = value;
-                IsChanged = m_IsChangedEnabled;
-                IncrementPhysicsShapeUpdateSerial();
-                IncrementPhysicsParameterUpdateSerial();
-                TriggerOnUpdate(UpdateChangedFlags.Shape);
+                bool valueChanged;
+                lock (m_DataLock)
+                {
+                    valueChanged = value != m_PhysicsShapeType;
+                    m_PhysicsShapeType = value;
+                }
+                if (valueChanged)
+                {
+                    IsChanged = m_IsChangedEnabled;
+                    IncrementPhysicsShapeUpdateSerial();
+                    IncrementPhysicsParameterUpdateSerial();
+                    TriggerOnUpdate(UpdateChangedFlags.Shape);
+                }
             }
         }
 
@@ -2218,5 +2228,28 @@ namespace SilverSim.Scene.Types.Object
             ObjectGroup.StopMoveToTarget();
         }
 
+        public TextReader OpenScriptInclude(string name)
+        {
+            ObjectPartInventoryItem item = Inventory[name];
+            AssetData data;
+            switch(item.AssetType)
+            {
+                case AssetType.Notecard:
+                    if(ObjectGroup.Scene.AssetService.TryGetValue(item.AssetID, out data) && data.Type == item.AssetType)
+                    {
+                        var nc = new Notecard(data);
+                        return new StreamReader(new MemoryStream(nc.Text.ToUTF8Bytes()));
+                    }
+                    break;
+
+                case AssetType.LSLText:
+                    if(ObjectGroup.Scene.AssetService.TryGetValue(item.AssetID, out data) && data.Type == item.AssetType)
+                    {
+                        return new StreamReader(data.InputStream);
+                    }
+                    break;
+            }
+            throw new KeyNotFoundException("Unsupported asset type for include");
+        }
     }
 }

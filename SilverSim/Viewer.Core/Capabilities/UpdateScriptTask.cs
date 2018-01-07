@@ -142,7 +142,7 @@ namespace SilverSim.Viewer.Core.Capabilities
 
                 try
                 {
-                    instance = ScriptLoader.Load(part, item, item.Owner, data, m_Agent.CurrentCulture);
+                    instance = ScriptLoader.Load(part, item, item.Owner, data, m_Agent.CurrentCulture, openInclude: part.OpenScriptInclude);
                     item.ScriptInstance = instance;
                     item.ScriptInstance.IsRunning = kvp.Value.IsScriptRunning;
                     item.ScriptInstance.Reset();

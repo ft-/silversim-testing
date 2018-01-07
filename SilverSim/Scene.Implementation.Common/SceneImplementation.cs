@@ -569,7 +569,7 @@ namespace SilverSim.Scene.Implementation.Common
 #if DEBUG
                                 m_Log.DebugFormat("Instantiating script: HasState={0}", hasState);
 #endif
-                                item.ScriptInstance = ScriptLoader.Load(part, item, item.Owner, assetData, null);
+                                item.ScriptInstance = ScriptLoader.Load(part, item, item.Owner, assetData, null, openInclude: part.OpenScriptInclude);
 #if DEBUG
                                 m_Log.DebugFormat("Instantiated script: IsResetRequired={0} Running={1}", item.ScriptInstance.IsResetRequired, item.ScriptInstance.IsRunning);
 #endif

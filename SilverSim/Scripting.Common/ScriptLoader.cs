@@ -60,7 +60,7 @@ namespace SilverSim.Scripting.Common
             m_LoadedDomains.Add(assetID, appDom);
         }
 
-        public static ScriptInstance Load(ObjectPart part, ObjectPartInventoryItem item, UUI user, AssetData data, CultureInfo currentCulture, byte[] serializedState = null)
+        public static ScriptInstance Load(ObjectPart part, ObjectPartInventoryItem item, UUI user, AssetData data, CultureInfo currentCulture, byte[] serializedState = null, Func<string, TextReader> openInclude = null)
         {
             return m_CompilerLock.AcquireReaderLock(() =>
             {
@@ -68,7 +68,7 @@ namespace SilverSim.Scripting.Common
                 {
                     using (var reader = new StreamReader(data.InputStream))
                     {
-                        return CompilerRegistry.ScriptCompilers.Compile(AppDomain.CurrentDomain, user, data.ID, reader, currentCulture);
+                        return CompilerRegistry.ScriptCompilers.Compile(AppDomain.CurrentDomain, user, data.ID, reader, currentCulture, openInclude);
                     }
                 });
                 m_LoadedAssemblies[data.ID] = assembly;

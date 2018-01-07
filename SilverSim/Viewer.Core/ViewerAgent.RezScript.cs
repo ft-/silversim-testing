@@ -235,7 +235,7 @@ namespace SilverSim.Viewer.Core
             ScriptInstance instance;
             try
             {
-                instance = ScriptLoader.Load(part, item, item.Owner, data, CurrentCulture);
+                instance = ScriptLoader.Load(part, item, item.Owner, data, CurrentCulture, openInclude: part.OpenScriptInclude);
                 item.ScriptInstance = instance;
                 item.ScriptInstance.IsRunning = true;
                 item.ScriptInstance.Reset();
