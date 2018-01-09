@@ -97,12 +97,16 @@ namespace SilverSim.Types.Asset.Format
         {
             var asset = new AssetData();
             string landmarkdata = (v.GatekeeperURI != null) ?
-                string.Format("Landmark version 2\nregion_id {0}\nlocal_pos {1} {2} {3}\nregion_handle {4}\ngatekeeper {5}\n",
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Landmark version 2\nregion_id {0}\nlocal_pos {1} {2} {3}\nregion_handle {4}\ngatekeeper {5}\n",
                     v.RegionID,
                     v.LocalPos.X, v.LocalPos.Y, v.LocalPos.Z,
                     v.Location.RegionHandle,
                     v.GatekeeperURI) :
-                string.Format("Landmark version 2\nregion_id {0}\nlocal_pos {1} {2} {3}\nregion_handle {4}\n",
+                string.Format(
+                    CultureInfo.InvariantCulture, 
+                    "Landmark version 2\nregion_id {0}\nlocal_pos {1} {2} {3}\nregion_handle {4}\n",
                     v.RegionID,
                     v.LocalPos.X, v.LocalPos.Y, v.LocalPos.Z,
                     v.Location.RegionHandle);
