@@ -57,7 +57,7 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            var timeout = 30;
+            var timeout = 31;
             Message m = null;
             while(timeout -- != 0)
             {
