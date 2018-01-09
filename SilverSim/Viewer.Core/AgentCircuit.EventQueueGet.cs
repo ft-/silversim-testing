@@ -24,7 +24,6 @@ using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Viewer.Messages;
-using SilverSim.Viewer.Messages.Inventory;
 using System;
 using System.Net;
 
