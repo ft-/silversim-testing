@@ -876,7 +876,12 @@ namespace SilverSim.Scene.Types.Object
             if(PrimCount < linkTarget)
             {
                 linkTarget -= PrimCount + 1;
-                return m_SittingAgents.Keys1[linkTarget];
+                List<IAgent> agents = m_SittingAgents.Keys1;
+                if(linkTarget >= agents.Count)
+                {
+                    throw new KeyNotFoundException();
+                }
+                return agents[linkTarget];
             }
             else
             {
@@ -1000,10 +1005,6 @@ namespace SilverSim.Scene.Types.Object
                 switch (ParamsHelper.GetPrimParamType(enumerator))
                 {
                     case PrimitiveParamsType.LinkTarget:
-                        if (!enumerator.MoveNext())
-                        {
-                            return;
-                        }
                         linkTarget = ParamsHelper.GetInteger(enumerator, "PRIM_LINK_TARGET");
                         if (0 == linkTarget)
                         {
