@@ -35,7 +35,7 @@ namespace SilverSim.Viewer.Core
         {
             writer.WriteStartElement("map");
 #warning verify expected username handling with viewer source code (GetDisplayNames capability)
-            string utcstring = DateTime.Now.AddDays(1).ToUniversalTime().ToString("yyyy\\-MM\\-dd\\THH\\-mm\\-ss\\Z");
+            string utcstring = DateTime.Now.AddDays(1).ToUniversalTime().ToString("yyyy\\-MM\\-dd\\THH\\:mm\\:ss\\Z");
             writer.WriteKeyValuePair("username", nd.FullName.Replace(' ', '.'));
             writer.WriteKeyValuePair("display_name", nd.FullName);
             writer.WriteKeyValuePair("display_name_next_update", utcstring);
