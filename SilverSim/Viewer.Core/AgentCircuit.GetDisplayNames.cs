@@ -34,10 +34,10 @@ namespace SilverSim.Viewer.Core
         private void WriteAvatarNameData(XmlTextWriter writer, UUI nd)
         {
             writer.WriteStartElement("map");
-#warning verify expected username handling with viewer source code (GetDisplayNames capability)
             writer.WriteKeyValuePair("username", nd.FullName.Replace(' ', '.'));
             writer.WriteKeyValuePair("display_name", nd.FullName);
-            writer.WriteKeyValuePair("display_name_next_update", Date.Now.AddDays(1).Iso8601);
+            writer.WriteKeyValuePair("display_name_next_update", Date.Now.AddDays(1));
+            writer.WriteKeyValuePair("display_name_expires", Date.Now.AddMonths(1));
             writer.WriteKeyValuePair("legacy_first_name", nd.FirstName);
             writer.WriteKeyValuePair("legacy_last_name", nd.LastName);
             writer.WriteKeyValuePair("id", nd.ID);

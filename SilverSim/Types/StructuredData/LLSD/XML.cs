@@ -458,7 +458,7 @@ namespace SilverSim.Types.StructuredData.Llsd
             {
                 var i_d = (Date)input;
                 output.WriteStartElement("date");
-                output.WriteValue(i_d.ToString());
+                output.WriteValue(i_d.Iso8601);
                 output.WriteEndElement();
             }
             else if (t == typeof(Integer))

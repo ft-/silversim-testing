@@ -33,6 +33,12 @@ namespace SilverSim.Types
             writer.WriteNamedValue("string", value);
         }
 
+        public static void WriteKeyValuePair(this XmlTextWriter writer, string key, Date dt)
+        {
+            writer.WriteNamedValue("key", key);
+            writer.WriteNamedValue("string", dt.Iso8601);
+        }
+
         public static void WriteKeyValuePair(this XmlTextWriter writer, string key, uint value)
         {
             writer.WriteNamedValue("key", key);
