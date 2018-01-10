@@ -102,6 +102,16 @@ namespace SilverSim.Types
 
         public ulong DateTimeToUnixTime() => (ulong)((m_Value - Epoch).TotalSeconds);
 
+        public Date Add(TimeSpan value) => new Date(m_Value.Add(value));
+        public Date AddDays(double value) => new Date(m_Value.AddDays(value));
+        public Date AddHours(double value) => new Date(m_Value.AddHours(value));
+        public Date AddMilliseconds(double value) => new Date(m_Value.AddMilliseconds(value));
+        public Date AddMinutes(double value) => new Date(m_Value.AddMinutes(value));
+        public Date AddMonths(int months) => new Date(m_Value.AddMonths(months));
+        public Date AddSeconds(double value) => new Date(m_Value.AddSeconds(value));
+        public Date AddTicks(long value) => new Date(m_Value.AddTicks(value));
+        public Date AddYears(int value) => new Date(m_Value.AddYears(value));
+
         #region Serialization
         public void FromBytes(byte[] byteArray, int pos)
         {
