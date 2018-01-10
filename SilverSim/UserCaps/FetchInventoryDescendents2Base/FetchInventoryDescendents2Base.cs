@@ -99,7 +99,7 @@ namespace SilverSim.UserCaps.FetchInventoryDescendents2Base
             writer.WriteEndElement();
         }
 
-        protected static void HandleHttpRequest(HttpRequest httpreq, InventoryServiceInterface inventoryService, UUID agentID)
+        protected static void HandleHttpRequest(HttpRequest httpreq, InventoryServiceInterface inventoryService, UUID agentID, UUID requestingOwnerID)
         {
             IValue o;
             if (httpreq.Method != "POST")
@@ -173,7 +173,7 @@ namespace SilverSim.UserCaps.FetchInventoryDescendents2Base
                         }
                         try
                         {
-                            foreach (var folderContent in inventoryService.Folder.Content[agentID, list.ToArray()])
+                            foreach (var folderContent in inventoryService.Folder.Content[requestingOwnerID, list.ToArray()])
                             {
                                 if (!folderContents.ContainsKey(req.Key))
                                 {
@@ -218,7 +218,7 @@ namespace SilverSim.UserCaps.FetchInventoryDescendents2Base
 
                                 foreach (var item in fc.Items)
                                 {
-                                    if (item.AssetType == Types.Asset.AssetType.Link)
+                                    if (item.AssetType == AssetType.Link)
                                     {
                                         linkeditemids.Add(item.AssetID);
                                     }

@@ -109,7 +109,7 @@ namespace SilverSim.UserCaps.FetchInventoryDescendents2Base
                 return;
             }
 
-            HandleHttpRequest(req, m_InventoryService, agent);
+            HandleHttpRequest(req, m_InventoryService, agent, agent);
         }
 
         void ILoginUserCapsGetInterface.GetCaps(UUID agentid, UUID sessionid, Dictionary<string, string> userCapList)

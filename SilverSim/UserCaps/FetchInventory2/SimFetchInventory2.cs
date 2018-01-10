@@ -21,6 +21,8 @@
 
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
+using SilverSim.ServiceInterfaces.ServerParam;
+using SilverSim.Types;
 using SilverSim.Viewer.Core;
 using System.ComponentModel;
 using System.Net;
@@ -29,8 +31,12 @@ namespace SilverSim.UserCaps.FetchInventory2
 {
     [PluginName("SimFetchInventory2")]
     [Description("FetchInventory2 support")]
+    [ServerParam("GridLibraryOwner", ParameterType = typeof(UUID), Type = ServerParamType.GlobalOnly, DefaultValue = "11111111-1111-0000-0000-000100bba000")]
     public sealed class SimFetchInventory2 : FetchInventory2Base, IPlugin, ICapabilityExtender
     {
+        private readonly object m_ConfigUpdateLock = new object();
+        private UUID m_GridLibraryOwner = new UUID("11111111-1111-0000-0000-000100bba000");
+
         public void Startup(ConfigurationLoader loader)
         {
             /* intentionally left empty */
@@ -45,7 +51,7 @@ namespace SilverSim.UserCaps.FetchInventory2
                 return;
             }
 
-            HandleHttpRequest(req, agent.InventoryService, agent.Owner.ID);
+            HandleHttpRequest(req, agent.InventoryService, agent.Owner.ID, agent.Owner.ID);
         }
 
         [CapabilityHandler("FetchLib2")]
@@ -57,7 +63,33 @@ namespace SilverSim.UserCaps.FetchInventory2
                 return;
             }
 
-            HandleHttpRequest(req, agent.InventoryService, agent.Owner.ID);
+            UUID libraryOwner;
+            lock(m_ConfigUpdateLock)
+            {
+                libraryOwner = m_GridLibraryOwner;
+            }
+
+            HandleHttpRequest(req, agent.InventoryService, agent.Owner.ID, libraryOwner);
+        }
+
+        [ServerParam("GridLibraryOwner")]
+        public void HandleGridLibraryOwner(UUID regionid, string value)
+        {
+            if (regionid != UUID.Zero)
+            {
+                return;
+            }
+            lock (m_ConfigUpdateLock)
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    m_GridLibraryOwner = new UUID("11111111-1111-0000-0000-000100bba000");
+                }
+                else if (!UUID.TryParse(value, out m_GridLibraryOwner))
+                {
+                    m_GridLibraryOwner = UUID.Zero;
+                }
+            }
         }
     }
 }

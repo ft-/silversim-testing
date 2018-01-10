@@ -35,7 +35,7 @@ namespace SilverSim.UserCaps.FetchInventory2
     {
         private static readonly ILog m_Log = LogManager.GetLogger("FETCHINVENTORY2");
 
-        protected static void HandleHttpRequest(HttpRequest httpreq, InventoryServiceInterface inventoryService, UUID agentID)
+        protected static void HandleHttpRequest(HttpRequest httpreq, InventoryServiceInterface inventoryService, UUID agentID, UUID ownerID)
         {
             IValue o;
             if (httpreq.Method != "POST")
@@ -92,7 +92,7 @@ namespace SilverSim.UserCaps.FetchInventory2
                     }
                     try
                     {
-                        item = inventoryService.Item[agentID, itemid];
+                        item = inventoryService.Item[ownerID, itemid];
                     }
                     catch
                     {
