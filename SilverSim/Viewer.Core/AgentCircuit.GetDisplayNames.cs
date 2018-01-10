@@ -22,7 +22,6 @@
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Types;
-using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Xml;
