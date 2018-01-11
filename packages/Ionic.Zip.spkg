@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<package>
+	<name>Ionic.Zip</name>
+	<files>
+		<file name="bin/Ionic.Zip.dll" is-version-src="true"/>
+	</files>
+</package>

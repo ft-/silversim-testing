@@ -19,12 +19,12 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using Ionic.Zlib;
 using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.IO.Compression;
 
 namespace SilverSim.Types.Asset.Format.Mesh
 {
@@ -162,7 +162,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
             Map physics_convex;
             using (var ms = new MemoryStream(data, physOffset, physSize))
             {
-                using (var gz = new DeflateStream(ms, CompressionMode.Decompress))
+                using (var gz = new ZlibStream(ms, CompressionMode.Decompress))
                 {
                     physics_convex = (Map)LlsdBinary.Deserialize(gz);
                 }

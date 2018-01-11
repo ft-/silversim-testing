@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using Ionic.Zlib;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Threading;
 using SilverSim.Types;
@@ -28,7 +29,6 @@ using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 using System.Threading;
 
 namespace SilverSim.Scene.Types.Scene
@@ -206,7 +206,7 @@ namespace SilverSim.Scene.Types.Scene
                     });
                 }
 
-                using (var gz = new DeflateStream(ms, CompressionMode.Compress))
+                using (var gz = new ZlibStream(ms, CompressionMode.Compress, CompressionLevel.BestCompression))
                 {
                     LlsdBinary.Serialize(matArray, gz);
                 }

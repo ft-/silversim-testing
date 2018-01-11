@@ -239,6 +239,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                                 {
                                     if (mesh_list[idx] is BinaryData)
                                     {
+#warning TODO: add fields that are added by server namely version, creator and date
                                         var bin = (BinaryData)mesh_list[idx];
                                         meshstream.Write(bin, 0, bin.Length);
                                     }

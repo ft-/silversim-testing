@@ -32,6 +32,7 @@
   <Reference name="SilverSim.Scripting.Common" localCopy="false"/>
   <Reference name="SilverSim.Threading" localCopy="false"/>
   <Reference name="log4net" localCopy="false"/>
+  <Reference name="Ionic.Zip" localCopy="false"/>
   <Reference name="C5" localCopy="false"/>
   <Reference name="CSJ2K" localCopy="false"/>
   <Files>

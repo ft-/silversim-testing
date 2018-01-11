@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using Ionic.Zlib;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
@@ -28,7 +29,6 @@ using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 using System.Net;
 using System.Xml;
 
@@ -106,12 +106,7 @@ namespace SilverSim.Viewer.Core
                 {
                     using (var ms = new MemoryStream((BinaryData)reqmap["Zipped"]))
                     {
-                        var skipheader = new byte[2];
-                        if(ms.Read(skipheader, 0, 2) != 2)
-                        {
-                            throw new InvalidDataException("Missing header in materials data");
-                        }
-                        using (var gz = new DeflateStream(ms, CompressionMode.Decompress))
+                        using (var gz = new ZlibStream(ms, CompressionMode.Decompress))
                         {
                             var inp = LlsdBinary.Deserialize(gz);
                             zippedDataArray = inp as AnArray;
@@ -204,9 +199,7 @@ namespace SilverSim.Viewer.Core
             byte[] buf;
             using (var ms = new MemoryStream())
             {
-                var zlibheader = new byte[] { 0x78, 0xDA };
-                ms.Write(zlibheader, 0, 2);
-                using (var gz = new DeflateStream(ms, CompressionMode.Compress))
+                using (var gz = new ZlibStream(ms, CompressionMode.Compress))
                 {
                     var matdata = Scene.MaterialsData;
                     gz.Write(matdata, 0, matdata.Length);

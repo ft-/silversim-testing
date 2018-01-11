@@ -22,6 +22,7 @@
   <Reference name="System.Web"/>
   <Reference name="SilverSim.Threading" localCopy="false"/>
   <Reference name="Nini" localCopy="false"/>
+  <Reference name="Ionic.Zip" localCopy="false"/>
   <Files>
     <Match pattern="*.cs" recurse="true">
       <Exclude pattern="TemporaryGeneratedFile"/>
