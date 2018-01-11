@@ -193,9 +193,6 @@ namespace SilverSim.Scene.Types.Scene
             byte[] buf;
             using (var ms = new MemoryStream())
             {
-                var zlibheader = new byte[2] { 0x78, 0xDA };
-                ms.Write(zlibheader, 0, 2);
-
                 var matArray = new AnArray();
                 foreach(var kvp in m_Materials)
                 {
