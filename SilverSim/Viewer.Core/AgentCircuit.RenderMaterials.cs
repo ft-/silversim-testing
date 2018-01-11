@@ -64,8 +64,17 @@ namespace SilverSim.Viewer.Core
         {
             using (var httpres = httpreq.BeginResponse("application/llsd+xml"))
             {
+#if DEBUG
+                m_Log.DebugFormat("Retrieving RenderMaterials block scene={0}", Scene.ID);
+#endif
                 var matdata = Scene.MaterialsData;
-                httpres.GetOutputStream().Write(matdata, 0, matdata.Length);
+                using (Stream s = httpres.GetOutputStream())
+                {
+#if DEBUG
+                    m_Log.DebugFormat("Sending out RenderMaterials block scene={0} length={1}", Scene.ID, matdata.Length);
+#endif
+                    s.Write(matdata, 0, matdata.Length);
+                }
             }
         }
 
