@@ -217,8 +217,10 @@ namespace SilverSim.Scene.Types.Scene
                 using(var writer = ms.UTF8XmlTextWriter())
                 {
                     writer.WriteStartElement("llsd");
+                    writer.WriteStartElement("map");
                     writer.WriteNamedValue("key", "Zipped");
                     writer.WriteNamedValue("binary", buf);
+                    writer.WriteEndElement();
                     writer.WriteEndElement();
                 }
                 m_MaterialsData = ms.ToArray();
