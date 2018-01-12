@@ -196,25 +196,18 @@ namespace SilverSim.Viewer.Core
                 }
             }
 
-            byte[] buf;
-            using (var ms = new MemoryStream())
-            {
-                using (var gz = new ZlibStream(ms, CompressionMode.Compress))
-                {
-                    var matdata = Scene.MaterialsData;
-                    gz.Write(matdata, 0, matdata.Length);
-                }
-                buf = ms.ToArray();
-            }
-
             using (var httpres = httpreq.BeginResponse("application/llsd+xml"))
             {
-                using (var writer = httpres.GetOutputStream().UTF8XmlTextWriter())
+#if DEBUG
+                m_Log.DebugFormat("Responding RenderMaterials block scene={0}", Scene.ID);
+#endif
+                var matdata = Scene.MaterialsData;
+                using (Stream s = httpres.GetOutputStream())
                 {
-                    writer.WriteStartElement("llsd");
-                    writer.WriteNamedValue("key", "Zipped");
-                    writer.WriteNamedValue("binary", buf);
-                    writer.WriteEndElement();
+#if DEBUG
+                    m_Log.DebugFormat("Sending out RenderMaterials block scene={0} length={1}", Scene.ID, matdata.Length);
+#endif
+                    s.Write(matdata, 0, matdata.Length);
                 }
             }
         }
