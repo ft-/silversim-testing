@@ -115,6 +115,7 @@ namespace SilverSim.Viewer.Core
                 httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
                 return;
             }
+            asset.Sanitize();
 
             ReturnRangeProcessedAsset(httpreq, asset, "application/vnd.ll.mesh", "GetMesh");
         }

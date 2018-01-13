@@ -178,12 +178,14 @@ namespace SilverSim.Database.Memory.Asset
                 if(internalAsset.Flags != AssetFlags.Normal)
                 {
                     internalAsset = new AssetData(asset);
+                    internalAsset.Sanitize();
                     m_Assets[internalAsset.ID] = internalAsset;
                 }
             }
             else
             {
                 internalAsset = new AssetData(asset);
+                internalAsset.Sanitize();
                 m_Assets.Add(internalAsset.ID, internalAsset);
             }
         }
