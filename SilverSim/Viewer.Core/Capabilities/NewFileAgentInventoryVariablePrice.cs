@@ -237,15 +237,14 @@ namespace SilverSim.Viewer.Core.Capabilities
                             {
                                 using (var meshstream = new MemoryStream())
                                 {
-                                    if (mesh_list[idx] is BinaryData)
+                                    Map meshData;
+                                    /* add the version tag */
+                                    using (var inputstream = new MemoryStream((BinaryData)mesh_list[idx]))
                                     {
-#warning TODO: add fields that are added by server namely version, creator and date
-                                        var bin = (BinaryData)mesh_list[idx];
-                                        meshstream.Write(bin, 0, bin.Length);
-                                    }
-                                    else
-                                    {
-                                        LlsdBinary.Serialize(mesh_list[idx], meshstream);
+                                        meshData = (Map)LlsdBinary.Deserialize(inputstream);
+                                        meshData["version"] = new Integer(1);
+                                        LlsdBinary.Serialize(meshData, meshstream);
+                                        inputstream.CopyTo(meshstream);
                                     }
                                     meshstream.Flush();
                                     var newasset = new AssetData
