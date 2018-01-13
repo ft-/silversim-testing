@@ -95,11 +95,19 @@ namespace SilverSim.Viewer.Core
 
         public void ScheduleUpdate(ObjectUpdateInfo info)
         {
+            if((info.IsPhysics || info.IsMoving) && !info.IsKilled && !info.IsAttached && !EnablePhysicalOutQueue)
+            {
+                return;
+            }
             m_TxObjectQueue.Enqueue(info);
         }
 
         public void ScheduleUpdate(AgentUpdateInfo info)
         {
+            if ((info.IsPhysics || info.IsMoving) && !info.IsKilled && !info.IsAttached && !EnablePhysicalOutQueue)
+            {
+                return;
+            }
             m_TxObjectQueue.Enqueue(info);
         }
 
@@ -107,6 +115,7 @@ namespace SilverSim.Viewer.Core
         {
             m_TriggerFirstUpdate = true;
             m_EnableObjectUpdates = true;
+            EnablePhysicalOutQueue = true;
             m_TxObjectQueue.Enqueue(null);
         }
 
@@ -366,7 +375,11 @@ namespace SilverSim.Viewer.Core
                         }
                         else if ((objinfo.IsPhysics || objinfo.IsMoving) && !objinfo.IsKilled && !objinfo.IsAttached)
                         {
-                            physicalOutQueue.Enqueue(objinfo);
+                            if (EnablePhysicalOutQueue)
+                            {
+                                /* only send physical updates on fully enabled circuits */
+                                physicalOutQueue.Enqueue(objinfo);
+                            }
                         }
                         else
                         {

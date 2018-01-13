@@ -136,6 +136,7 @@ namespace SilverSim.Viewer.Core
         protected abstract void CheckForNewDataToSend();
         protected abstract void OnCircuitSpecificPacketReceived(MessageType mType, UDPPacket p);
         protected abstract void LogMsgOnLogoutCompletion();
+        public bool EnablePhysicalOutQueue { get; set; }
 
         public void PacketReceived(EndPoint ep, UDPPacket pck, List<UInt32> acknumbers)
         {
