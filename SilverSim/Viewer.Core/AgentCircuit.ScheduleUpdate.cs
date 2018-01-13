@@ -312,6 +312,116 @@ namespace SilverSim.Viewer.Core
             SendObjectUpdateMsg(full_packet);
         }
 
+        private readonly object m_PhysQueueThrottleLock = new object();
+        private C5.TreeDictionary<uint, uint> m_PhysFullQueueThrottleInflight = new C5.TreeDictionary<uint, uint>();
+        private C5.TreeDictionary<uint, uint> m_PhysTerseQueueThrottleInflight = new C5.TreeDictionary<uint, uint>();
+
+        internal sealed class PhysFullObjectReleaseThrottle : Message
+        {
+            private readonly AgentCircuit m_Circuit;
+            private readonly List<uint> m_ObjectsInFlight = new List<uint>();
+
+            public PhysFullObjectReleaseThrottle(AgentCircuit circ)
+            {
+                m_Circuit = circ;
+                OnSendCompletion += Acked;
+            }
+
+            ~PhysFullObjectReleaseThrottle()
+            {
+                OnSendCompletion -= Acked;
+            }
+
+            public void Add(uint localid)
+            {
+                m_ObjectsInFlight.Add(localid);
+                lock (m_Circuit.m_PhysQueueThrottleLock)
+                {
+                    uint val = 0;
+                    if(m_Circuit.m_PhysFullQueueThrottleInflight.Contains(localid))
+                    {
+                        val = m_Circuit.m_PhysFullQueueThrottleInflight[localid];
+                    }
+                    m_Circuit.m_PhysFullQueueThrottleInflight[localid] = val + 1;
+                }
+            }
+
+            private void Acked(bool success)
+            {
+                foreach(uint localid in m_ObjectsInFlight)
+                {
+                    lock(m_Circuit.m_PhysQueueThrottleLock)
+                    {
+                        if(--m_Circuit.m_PhysFullQueueThrottleInflight[localid] == 0)
+                        {
+                            m_Circuit.m_PhysFullQueueThrottleInflight.Remove(localid);
+                        }
+                    }
+                }
+            }
+        }
+
+        internal sealed class PhysTerseObjectReleaseThrottle : Message
+        {
+            private readonly AgentCircuit m_Circuit;
+            private readonly List<uint> m_ObjectsInFlight = new List<uint>();
+
+            public PhysTerseObjectReleaseThrottle(AgentCircuit circ)
+            {
+                m_Circuit = circ;
+                OnSendCompletion += Acked;
+            }
+
+            ~PhysTerseObjectReleaseThrottle()
+            {
+                OnSendCompletion -= Acked;
+            }
+
+            public void Add(uint localid)
+            {
+                m_ObjectsInFlight.Add(localid);
+                lock (m_Circuit.m_PhysQueueThrottleLock)
+                {
+                    uint val = 0;
+                    if (m_Circuit.m_PhysTerseQueueThrottleInflight.Contains(localid))
+                    {
+                        val = m_Circuit.m_PhysTerseQueueThrottleInflight[localid];
+                    }
+                    m_Circuit.m_PhysTerseQueueThrottleInflight[localid] = val + 1;
+                }
+            }
+
+            private void Acked(bool success)
+            {
+                foreach (uint localid in m_ObjectsInFlight)
+                {
+                    lock (m_Circuit.m_PhysQueueThrottleLock)
+                    {
+                        if (--m_Circuit.m_PhysTerseQueueThrottleInflight[localid] == 0)
+                        {
+                            m_Circuit.m_PhysTerseQueueThrottleInflight.Remove(localid);
+                        }
+                    }
+                }
+            }
+        }
+
+        private bool CanPhysFullBeSent(uint localid)
+        {
+            lock(m_PhysQueueThrottleLock)
+            {
+                return !m_PhysFullQueueThrottleInflight.Contains(localid) || m_PhysFullQueueThrottleInflight[localid] < 10;
+            }
+        }
+
+        private bool CanPhysTerseBeSent(uint localid)
+        {
+            lock (m_PhysQueueThrottleLock)
+            {
+                return !m_PhysTerseQueueThrottleInflight.Contains(localid) || m_PhysTerseQueueThrottleInflight[localid] < 10;
+            }
+        }
+
         private void HandleObjectUpdates()
         {
             Thread.CurrentThread.Name = $"Agent:ObjectUpdateHandler:Agent={AgentID}:Scene={m_Scene.ID}";
@@ -416,6 +526,8 @@ namespace SilverSim.Viewer.Core
                 byte phys_terse_packet_count = 0;
                 List<KeyValuePair<IObjUpdateInfo, byte[]>> phys_full_packet_data = null;
                 int phys_full_packet_data_length = 0;
+                PhysFullObjectReleaseThrottle phys_full_object_release = null;
+                PhysTerseObjectReleaseThrottle phys_terse_object_release = null;
 
                 UDPPacket nonphys_terse_packet = null;
                 byte nonphys_terse_packet_count = 0;
@@ -511,39 +623,46 @@ namespace SilverSim.Viewer.Core
                                 {
                                     if (ui.IsPhysics && !haveobjprop)
                                     {
-                                        bool foundobject = false;
-                                        send_phys_packet:
-                                        if (phys_full_packet_data != null && (fullUpdate.Length + phys_full_packet_data_length > 1400 || foundobject))
+                                        if (CanPhysFullBeSent(ui.LocalID))
                                         {
-                                            var full_packet = new UDPPacket();
-                                            if (full_packet == null)
+                                            bool foundobject = false;
+                                            send_phys_packet:
+                                            if (phys_full_packet_data != null && (fullUpdate.Length + phys_full_packet_data_length > 1400 || foundobject))
                                             {
-                                                break;
-                                            }
-                                            full_packet.IsReliable = false;
-                                            SendFullUpdateMsg(full_packet, phys_full_packet_data);
-                                            phys_full_packet_data = null;
-                                        }
-
-                                        if (phys_full_packet_data == null)
-                                        {
-                                            phys_full_packet_data = new List<KeyValuePair<IObjUpdateInfo, byte[]>>();
-                                            phys_full_packet_data_length = 0;
-                                        }
-                                        else
-                                        {
-                                            foreach (KeyValuePair<IObjUpdateInfo, byte[]> kvp in phys_full_packet_data)
-                                            {
-                                                if (kvp.Key.LocalID == ui.LocalID)
+                                                var full_packet = new UDPPacket();
+                                                if (full_packet == null)
                                                 {
-                                                    foundobject = true;
-                                                    goto send_phys_packet;
+                                                    break;
+                                                }
+                                                full_packet.IsReliable = true;
+                                                full_packet.AckMessage = phys_full_object_release;
+                                                phys_full_object_release = null;
+                                                SendFullUpdateMsg(full_packet, phys_full_packet_data);
+                                                phys_full_packet_data = null;
+                                            }
+
+                                            if (phys_full_packet_data == null)
+                                            {
+                                                phys_full_packet_data = new List<KeyValuePair<IObjUpdateInfo, byte[]>>();
+                                                phys_full_packet_data_length = 0;
+                                                phys_full_object_release = new PhysFullObjectReleaseThrottle(this);
+                                            }
+                                            else
+                                            {
+                                                foreach (KeyValuePair<IObjUpdateInfo, byte[]> kvp in phys_full_packet_data)
+                                                {
+                                                    if (kvp.Key.LocalID == ui.LocalID)
+                                                    {
+                                                        foundobject = true;
+                                                        goto send_phys_packet;
+                                                    }
                                                 }
                                             }
-                                        }
 
-                                        phys_full_packet_data.Add(new KeyValuePair<IObjUpdateInfo, byte[]>(ui, fullUpdate));
-                                        phys_full_packet_data_length += fullUpdate.Length;
+                                            phys_full_object_release.Add(ui.LocalID);
+                                            phys_full_packet_data.Add(new KeyValuePair<IObjUpdateInfo, byte[]>(ui, fullUpdate));
+                                            phys_full_packet_data_length += fullUpdate.Length;
+                                        }
                                     }
                                     else
                                     {
@@ -599,30 +718,36 @@ send_nonphys_packet:
 
                                     if (ui.IsPhysics)
                                     {
-                                        if (phys_terse_packet != null && terseUpdate.Length + phys_terse_packet.DataLength > 1400)
+                                        if (CanPhysTerseBeSent(localID))
                                         {
-                                            phys_terse_packet.Data[17] = phys_terse_packet_count;
-                                            SendObjectUpdateMsg(phys_terse_packet);
-                                            phys_terse_packet = null;
-                                            phys_terse_packet_count = 0;
-                                        }
+                                            if (phys_terse_packet != null && terseUpdate.Length + phys_terse_packet.DataLength > 1400)
+                                            {
+                                                phys_terse_packet.Data[17] = phys_terse_packet_count;
+                                                SendObjectUpdateMsg(phys_terse_packet);
+                                                phys_terse_packet = null;
+                                                phys_terse_packet_count = 0;
+                                            }
 
-                                        if (phys_terse_packet == null)
-                                        {
-                                            phys_terse_packet = new UDPPacket();
                                             if (phys_terse_packet == null)
                                             {
-                                                break;
+                                                phys_terse_packet = new UDPPacket();
+                                                if (phys_terse_packet == null)
+                                                {
+                                                    break;
+                                                }
+                                                phys_terse_object_release = new PhysTerseObjectReleaseThrottle(this);
+                                                phys_terse_packet.IsReliable = true;
+                                                phys_terse_packet.AckMessage = phys_terse_object_release;
+                                                phys_terse_packet.WriteMessageNumber(MessageType.ImprovedTerseObjectUpdate);
+                                                phys_terse_packet.WriteUInt64(regionHandle);
+                                                phys_terse_packet.WriteUInt16(65535); /* dilation */
+                                                phys_terse_packet.WriteUInt8(0);
                                             }
-                                            phys_terse_packet.IsReliable = false;
-                                            phys_terse_packet.WriteMessageNumber(MessageType.ImprovedTerseObjectUpdate);
-                                            phys_terse_packet.WriteUInt64(regionHandle);
-                                            phys_terse_packet.WriteUInt16(65535); /* dilation */
-                                            phys_terse_packet.WriteUInt8(0);
-                                        }
 
-                                        phys_terse_packet.WriteBytes(terseUpdate);
-                                        ++phys_terse_packet_count;
+                                            phys_terse_packet.WriteBytes(terseUpdate);
+                                            phys_terse_object_release.Add(ui.LocalID);
+                                            ++phys_terse_packet_count;
+                                        }
                                     }
                                     else
                                     {
@@ -662,7 +787,9 @@ send_nonphys_packet:
                         {
                             break;
                         }
-                        full_packet.IsReliable = false;
+                        full_packet.IsReliable = true;
+                        full_packet.AckMessage = phys_full_object_release;
+                        phys_full_object_release = null;
                         SendFullUpdateMsg(full_packet, phys_full_packet_data);
                         phys_full_packet_data = null;
                     }
@@ -672,6 +799,7 @@ send_nonphys_packet:
                         phys_terse_packet.Data[17] = phys_terse_packet_count;
                         SendObjectUpdateMsg(phys_terse_packet);
                         phys_terse_packet = null;
+                        phys_terse_object_release = null;
                     }
                 }
 
