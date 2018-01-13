@@ -335,6 +335,7 @@ namespace SilverSim.Viewer.Core
                                 if (Value.ResentCount < 5)
                                 {
                                     Value.TransferredAtTime = Environment.TickCount;
+                                    Value.IsResent = true;
                                     Server.SendPacketTo(Value, RemoteEndPoint);
                                 }
                                 ++Value.ResentCount;

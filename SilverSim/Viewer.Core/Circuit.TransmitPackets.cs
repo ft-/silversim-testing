@@ -386,7 +386,6 @@ namespace SilverSim.Viewer.Core
                                     p.TransferredAtTime = Environment.TickCount;
                                     if (m.IsReliable)
                                     {
-                                        p.IsResent = true;
                                         lock (m_UnackedPacketsHash)
                                         {
                                             m_UnackedPacketsHash.Add(p.SequenceNumber, p);
