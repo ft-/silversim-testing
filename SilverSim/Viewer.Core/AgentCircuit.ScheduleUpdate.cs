@@ -114,24 +114,25 @@ namespace SilverSim.Viewer.Core
         {
             p.OutQueue = Message.QueueOutType.Object;
             p.Flush();
-            p.SequenceNumber = NextSequenceNumber;
 
             Interlocked.Increment(ref m_PacketsSent);
             p.EnqueuedAtTime = Environment.TickCount;
             p.TransferredAtTime = Environment.TickCount;
-            if (p.IsReliable)
+            SendCircuitPacket(p, (pck) =>
             {
-                Interlocked.Increment(ref m_AckThrottlingCount[(int)Message.QueueOutType.Object]);
-                lock (m_UnackedPacketsHash)
+                if (pck.IsReliable)
                 {
-                    m_UnackedPacketsHash.Add(p.SequenceNumber, p);
+                    Interlocked.Increment(ref m_AckThrottlingCount[(int)Message.QueueOutType.Object]);
+                    lock (m_UnackedPacketsHash)
+                    {
+                        m_UnackedPacketsHash.Add(pck.SequenceNumber, pck);
+                    }
+                    lock (m_UnackedBytesLock)
+                    {
+                        m_UnackedBytes += pck.DataLength;
+                    }
                 }
-                lock (m_UnackedBytesLock)
-                {
-                    m_UnackedBytes += p.DataLength;
-                }
-            }
-            Server.SendPacketTo(p, RemoteEndPoint);
+            });
         }
 
         private UDPPacket GetTxObjectPoolPacket()

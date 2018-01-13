@@ -224,7 +224,7 @@ namespace SilverSim.Viewer.Core
                 {
                     case MessageType.CompleteAgentMovement:
                         /* Immediate ack */
-                        Server.SendPacketTo(UDPPacket.PacketAckImmediate(pck.SequenceNumber), RemoteEndPoint);
+                        SendCircuitPacket(UDPPacket.PacketAckImmediate(pck.SequenceNumber));
                         break;
 
                     default:
@@ -314,8 +314,7 @@ namespace SilverSim.Viewer.Core
                     var newpck = new UDPPacket();
                     newpck.WriteMessageNumber(MessageType.CompletePingCheck);
                     newpck.WriteUInt8(pingID);
-                    newpck.SequenceNumber = NextSequenceNumber;
-                    Server.SendPacketTo(newpck, ep);
+                    SendCircuitPacket(newpck);
                     /* check for unacks */
                     try
                     {

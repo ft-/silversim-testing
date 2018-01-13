@@ -384,7 +384,7 @@ namespace SilverSim.Viewer.Core
                                             });
 
                                             /* Immediate Ack */
-                                            SendPacketTo(UDPPacket.PacketAckImmediate(pck.SequenceNumber), ep);
+                                            circuit.SendCircuitPacket(UDPPacket.PacketAckImmediate(pck.SequenceNumber));
 
                                             circuit.SendMessage(rh);
                                             return;

@@ -180,6 +180,26 @@ namespace SilverSim.Viewer.Core
             TerminateCircuit();
         }
 
+        private readonly object m_SendPacketLock = new object();
+        internal void SendCircuitPacket(UDPPacket p)
+        {
+            lock (m_SendPacketLock)
+            {
+                p.SequenceNumber = NextSequenceNumber;
+                Server?.SendPacketTo(p, RemoteEndPoint);
+            }
+        }
+
+        protected void SendCircuitPacket(UDPPacket p, Action<UDPPacket> action)
+        {
+            lock (m_SendPacketLock)
+            {
+                p.SequenceNumber = NextSequenceNumber;
+                action(p);
+                Server?.SendPacketTo(p, RemoteEndPoint);
+            }
+        }
+
         private void TransmitThread(object param)
         {
             Thread.CurrentThread.IsBackground = true;
@@ -336,7 +356,6 @@ namespace SilverSim.Viewer.Core
                                     p.Flush();
                                     p.IsReliable = m.IsReliable;
                                     p.AckMessage = p.IsReliable ? m : null;
-                                    p.SequenceNumber = NextSequenceNumber;
                                     p.FinishZLE();
                                     int savedDataLength = p.DataLength;
                                     if (p.IsReliable)
@@ -360,7 +379,7 @@ namespace SilverSim.Viewer.Core
 
                                         Interlocked.Increment(ref m_AckThrottlingCount[queueidx]);
                                     }
-                                    Server.SendPacketTo(p, RemoteEndPoint);
+                                    SendCircuitPacket(p);
 
                                     Interlocked.Increment(ref m_PacketsSent);
                                     p.EnqueuedAtTime = Environment.TickCount;
@@ -444,7 +463,7 @@ namespace SilverSim.Viewer.Core
                             p.WriteUInt32(0);
                             try
                             {
-                                Server.SendPacketTo(p, RemoteEndPoint);
+                                SendCircuitPacket(p);
                                 Interlocked.Increment(ref m_PacketsSent);
                             }
                             catch (ObjectDisposedException)
@@ -491,8 +510,7 @@ namespace SilverSim.Viewer.Core
                                 }
                                 c = 0;
                             }
-                            p.SequenceNumber = NextSequenceNumber;
-                            Server.SendPacketTo(p, RemoteEndPoint);
+                            SendCircuitPacket(p);
                             Interlocked.Increment(ref m_PacketsSent);
                         }
                     }
