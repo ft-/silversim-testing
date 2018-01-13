@@ -124,7 +124,14 @@ namespace SilverSim.Viewer.Core
 
             public event Action<UUID> OnCompletionEvent;
 
-            public bool HasActions => OnCompletionEvent?.GetInvocationList().Length != 0;
+            public bool HasActions
+            {
+                get
+                {
+                    var ev = OnCompletionEvent;
+                    return ev != null && ev.GetInvocationList().Length != 0;
+                }
+            }
         }
 
         internal RwLockedDoubleDictionary<UUID, UInt64, AssetUploadTransaction> m_AssetTransactions = new RwLockedDoubleDictionary<UUID, UInt64, AssetUploadTransaction>();
@@ -242,6 +249,9 @@ namespace SilverSim.Viewer.Core
                 if (!m_AssetTransactions.TryGetValue(transactionID, out transaction))
                 {
                     UInt64 XferID = NextXferID;
+#if DEBUG
+                    m_Log.DebugFormat("SetAssetUploadAsCompletionAction(): Add transaction TransactionID={0} XferID={1}", transactionID, XferID);
+#endif
                     transaction = new AssetUploadTransaction { SceneID = sceneID };
                     transaction.Target = AssetUploadTransaction.TargetAsset.Scene;
                     transaction.OnCompletionEvent += action;
@@ -351,6 +361,9 @@ namespace SilverSim.Viewer.Core
                 if (!m_AssetTransactions.TryGetValue(req.TransactionID, out transaction))
                 {
                     UInt64 XferID = NextXferID;
+#if DEBUG
+                    m_Log.DebugFormat("HandleAssetUploadRequest(): Add transaction TransactionID={0} XferID={1}", req.TransactionID, XferID);
+#endif
                     transaction = new AssetUploadTransaction { SceneID = req.CircuitSceneID };
                     m_AssetTransactions.Add(req.TransactionID, XferID, transaction);
                     transaction.XferID = XferID;
@@ -375,7 +388,7 @@ namespace SilverSim.Viewer.Core
             if(req.AssetData.Length > 2)
             {
 #if DEBUG
-                m_Log.DebugFormat("AssetUploadRequest(): Added asset upload transaction {0} for {1}: Single packet", req.TransactionID, Owner.FullName);
+                m_Log.DebugFormat("HandleAssetUploadRequest(): Added asset upload transaction {0} for {1}: Single packet", req.TransactionID, Owner.FullName);
 #endif
                 transaction.DataBlocks.Add(req.AssetData);
                 lock (transaction)
@@ -464,7 +477,12 @@ namespace SilverSim.Viewer.Core
                     success = false;
                 }
             }
+
+#if DEBUG
+            m_Log.DebugFormat("AssetUploadCompleted(): Remove transaction XferID={0}", transaction.XferID);
+#endif
             m_AssetTransactions.Remove(transaction.XferID);
+
             var req = new AssetUploadComplete
             {
                 AssetID = data.ID,
