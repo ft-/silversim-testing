@@ -20,7 +20,6 @@
 // exception statement from your version.
 
 using SilverSim.Types.Asset.Format;
-using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -122,47 +121,5 @@ namespace SilverSim.Types.Asset
             }
         }
         #endregion
-
-        public bool Sanitize()
-        {
-            switch(Type)
-            {
-                case AssetType.Mesh:
-                    return SanitizeMesh();
-
-                default:
-                    return true;
-            }
-        }
-
-        private bool SanitizeMesh()
-        {
-            try
-            {
-                using (Stream inputstream = InputStream)
-                {
-                    var meshData = LlsdBinary.Deserialize(inputstream) as Map;
-                    if (meshData == null)
-                    {
-                        return false;
-                    }
-                    if (meshData.ContainsKey("version"))
-                    {
-                        return true;
-                    }
-                    using (var meshstream = new MemoryStream())
-                    {
-                        LlsdBinary.Serialize(meshData, meshstream);
-                        inputstream.CopyTo(meshstream);
-                        Data = meshstream.ToArray();
-                    }
-                    return true;
-                }
-            }
-            catch
-            {
-                return false;
-            }
-        }
     }
 }
