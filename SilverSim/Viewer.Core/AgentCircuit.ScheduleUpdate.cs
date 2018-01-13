@@ -663,7 +663,6 @@ send_nonphys_packet:
                             break;
                         }
                         full_packet.IsReliable = false;
-                        full_packet.AckMessage = full_packet_objprop;
                         SendFullUpdateMsg(full_packet, phys_full_packet_data);
                         phys_full_packet_data = null;
                     }
