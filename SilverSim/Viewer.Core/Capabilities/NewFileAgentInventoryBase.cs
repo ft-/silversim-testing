@@ -93,7 +93,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 if (kvp.Value.AssetType == AssetType.Object)
                 {
                     /* special upload format for objects */
-                    UploadObject(transactionID, data);
+                    UploadObject(data);
                 }
 
                 m.Add("new_asset", data.ID);
@@ -125,7 +125,7 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
         }
 
-        private void UploadObject(UUID transactionID, AssetData data)
+        private void UploadObject(AssetData data)
         {
             var m = (Map)LlsdXml.Deserialize(data.InputStream);
             var instance_list = (AnArray)m["instance_list"];
