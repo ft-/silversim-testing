@@ -96,7 +96,6 @@ namespace SilverSim.Viewer.Core.Capabilities
                     UploadObject(data);
                 }
 
-                m.Add("new_asset", data.ID);
                 try
                 {
                     m_AssetService.Store(data);
