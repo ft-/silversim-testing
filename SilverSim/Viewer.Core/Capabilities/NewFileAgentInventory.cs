@@ -19,109 +19,15 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-#pragma warning disable IDE0018
-
-using SilverSim.ServiceInterfaces.Asset;
-using SilverSim.ServiceInterfaces.Inventory;
-using SilverSim.Threading;
-using SilverSim.Types;
-using SilverSim.Types.Asset;
-using SilverSim.Types.Inventory;
-using System;
-using System.Collections.Generic;
-
 namespace SilverSim.Viewer.Core.Capabilities
 {
-    public class NewFileAgentInventory : UploadAssetAbstractCapability
+    public class NewFileAgentInventory : NewFileAgentInventoryBase
     {
-        private readonly InventoryServiceInterface m_InventoryService;
-        private readonly AssetServiceInterface m_AssetService;
-        private readonly ViewerAgent m_Agent;
-
-        private readonly RwLockedDictionary<UUID, InventoryItem> m_Transactions = new RwLockedDictionary<UUID, InventoryItem>();
-
         public override string CapabilityName => "NewFileAgentInventory";
 
-        public override int ActiveUploads => m_Transactions.Count;
-
         public NewFileAgentInventory(ViewerAgent agent, string serverURI, string remoteip)
-            : base(agent.Owner, serverURI, remoteip)
+            : base(agent, serverURI, remoteip)
         {
-            m_Agent = agent;
-            m_InventoryService = agent.InventoryService;
-            m_AssetService = agent.AssetService;
         }
-
-        public override UUID GetUploaderID(Map reqmap)
-        {
-            var transaction = UUID.Random;
-            var item = new InventoryItem
-            {
-                Description = reqmap["description"].ToString(),
-                Name = reqmap["name"].ToString(),
-                ParentFolderID = reqmap["folder_id"].AsUUID,
-                AssetTypeName = reqmap["asset_type"].ToString(),
-                InventoryTypeName = reqmap["inventory_type"].ToString(),
-                LastOwner = Creator,
-                Owner = Creator,
-                Creator = Creator
-            };
-            item.Permissions.Base = InventoryPermissionsMask.All;
-            item.Permissions.Current = InventoryPermissionsMask.Every;
-            item.Permissions.EveryOne = (InventoryPermissionsMask)reqmap["everyone_mask"].AsUInt;
-            item.Permissions.Group = (InventoryPermissionsMask)reqmap["group_mask"].AsUInt;
-            item.Permissions.NextOwner = (InventoryPermissionsMask)reqmap["next_owner_mask"].AsUInt;
-            m_Transactions.Add(transaction, item);
-            return transaction;
-        }
-
-        public override Map UploadedData(UUID transactionID, AssetData data)
-        {
-            KeyValuePair<UUID, InventoryItem> kvp;
-            if (m_Transactions.RemoveIf(transactionID, (InventoryItem v) => true, out kvp))
-            {
-                var m = new Map
-                {
-                    { "new_inventory_item", kvp.Value.ID.ToString() }
-                };
-                kvp.Value.AssetID = data.ID;
-                data.Type = kvp.Value.AssetType;
-                data.Name = kvp.Value.Name;
-
-                try
-                {
-                    m_AssetService.Store(data);
-                }
-                catch
-                {
-                    throw new UploadErrorException(this.GetLanguageString(m_Agent.CurrentCulture, "FailedToStoreAsset", "Failed to store asset"));
-                }
-
-                try
-                {
-                    m_InventoryService.Item.Add(kvp.Value);
-                }
-                catch
-#if DEBUG
-                (Exception e)
-#endif
-                {
-                    throw new UploadErrorException(this.GetLanguageString(m_Agent.CurrentCulture, "FailedToStoreNewInventoryItem", "Failed to store new inventory item"));
-                }
-                return m;
-            }
-            else
-            {
-                throw new UrlNotFoundException();
-            }
-        }
-
-        protected override UUID NewAssetID => UUID.Random;
-
-        protected override bool AssetIsLocal => false;
-
-        protected override bool AssetIsTemporary => false;
-
-        protected override AssetType NewAssetType => AssetType.Unknown;
     }
 }
