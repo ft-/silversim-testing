@@ -28,12 +28,8 @@ using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
-using SilverSim.Types.Primitive;
-using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Xml;
 
 namespace SilverSim.Viewer.Core.Capabilities
 {
