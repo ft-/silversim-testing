@@ -90,10 +90,14 @@ namespace SilverSim.Viewer.Core.Capabilities
                 data.Type = kvp.Value.AssetType;
                 data.Name = kvp.Value.Name;
 
-                if (kvp.Value.AssetType == AssetType.Object)
+                if (kvp.Value.AssetType == AssetType.Mesh)
                 {
                     /* special upload format for objects */
                     UploadObject(data);
+                }
+                else if(kvp.Value.AssetType == AssetType.Object)
+                {
+                    throw new UploadErrorException(this.GetLanguageString(m_Agent.CurrentCulture, "FailedToStoreAsset", "Failed to store asset"));
                 }
 
                 try
