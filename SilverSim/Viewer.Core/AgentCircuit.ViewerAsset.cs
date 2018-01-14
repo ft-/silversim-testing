@@ -120,7 +120,7 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            ReturnRangeProcessedAsset(httpreq, asset, asset.ContentType, "ViewerAsset");
+            httpreq.RangeResponse(asset.Data, asset.ContentType, "ViewerAsset");
         }
     }
 }

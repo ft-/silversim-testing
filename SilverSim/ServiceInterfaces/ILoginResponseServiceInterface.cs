@@ -25,6 +25,6 @@ namespace SilverSim.ServiceInterfaces
 {
     public interface ILoginResponseServiceInterface
     {
-        void AppendLoginResponse(Map m);
+        void AppendLoginResponse(string[] options, Map m);
     }
 }

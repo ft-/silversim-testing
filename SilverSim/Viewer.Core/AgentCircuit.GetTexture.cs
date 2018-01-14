@@ -141,7 +141,7 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            ReturnRangeProcessedAsset(httpreq, asset, "image/x-j2c", "GetTexture");
+            httpreq.RangeResponse(asset.Data, "image/x-j2c", "GetTexture");
         }
     }
 }

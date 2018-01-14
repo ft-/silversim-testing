@@ -19,17 +19,17 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.Main.Common.HttpServer;
-using SilverSim.Types.Asset;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Net;
 
-namespace SilverSim.Viewer.Core
+namespace SilverSim.Main.Common.HttpServer
 {
-    partial class AgentCircuit
+    public static class RangeExtensionMethods
     {
-        private void ReturnRangeProcessedAsset(HttpRequest httpreq, AssetData asset, string contentType, string capName)
+        private static readonly ILog m_Log = LogManager.GetLogger("HTTP RANGE");
+        public static void RangeResponse(this HttpRequest httpreq, byte[] data, string contentType, string debug_info)
         {
             if (httpreq.ContainsHeader("Range"))
             {
@@ -41,9 +41,9 @@ namespace SilverSim.Viewer.Core
                 {
                     using (var httpres = httpreq.BeginResponse(contentType))
                     {
-                        using (var o = httpres.GetOutputStream(asset.Data.LongLength))
+                        using (var o = httpres.GetOutputStream(data.LongLength))
                         {
-                            o.Write(asset.Data, 0, asset.Data.Length);
+                            o.Write(data, 0, data.Length);
                         }
                     }
                     return;
@@ -69,9 +69,9 @@ namespace SilverSim.Viewer.Core
                 {
                     using (var httpres = httpreq.BeginResponse(contentType))
                     {
-                        using (var o = httpres.GetOutputStream(asset.Data.LongLength))
+                        using (var o = httpres.GetOutputStream(data.LongLength))
                         {
-                            o.Write(asset.Data, 0, asset.Data.Length);
+                            o.Write(data, 0, data.Length);
                         }
                     }
                     return;
@@ -81,13 +81,13 @@ namespace SilverSim.Viewer.Core
                 {
                     start = int.Parse(v[0]);
                     end = string.IsNullOrEmpty(v[1]) ?
-                        asset.Data.Length - 1 :
+                        data.Length - 1 :
                         int.Parse(v[1]);
 
                     /* The following check is regarding some weirdness of some viewers trying to retrieve data past the file size.
                      * Yet, RFC2616 requires a RequestedRangeNotSatisfiable here but those viewers would not accept it.
                      */
-                    if (start >= asset.Data.Length)
+                    if (start >= data.Length)
                     {
                         using (var httpres = httpreq.BeginResponse(HttpStatusCode.PartialContent, "Partial Content", "application/vnd.ll.mesh"))
                         {
@@ -100,22 +100,22 @@ namespace SilverSim.Viewer.Core
                         httpreq.ErrorResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable");
                         return;
                     }
-                    if (end > asset.Data.Length - 1)
+                    if (end > data.Length - 1)
                     {
-                        end = asset.Data.Length - 1;
+                        end = data.Length - 1;
                     }
-                    if (end >= asset.Data.Length)
+                    if (end >= data.Length)
                     {
                         httpreq.ErrorResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable");
                         return;
                     }
-                    if (start == 0 && end == asset.Data.Length - 1)
+                    if (start == 0 && end == data.Length - 1)
                     {
                         using (var httpres = httpreq.BeginResponse(contentType))
                         {
-                            using (var o = httpres.GetOutputStream(asset.Data.LongLength))
+                            using (var o = httpres.GetOutputStream(data.LongLength))
                             {
-                                o.Write(asset.Data, 0, asset.Data.Length);
+                                o.Write(data, 0, data.Length);
                             }
                         }
                         return;
@@ -124,17 +124,17 @@ namespace SilverSim.Viewer.Core
                 }
                 catch (Exception e)
                 {
-                    m_Log.Debug("Exception when parsing requested range (" + capName + ")", e);
+                    m_Log.Debug("Exception when parsing requested range (" + debug_info + ")", e);
                     httpreq.ErrorResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable");
                     return;
                 }
 
                 using (var httpres = httpreq.BeginResponse(HttpStatusCode.PartialContent, "Partial Content", "application/vnd.ll.mesh"))
                 {
-                    httpres.Headers["Content-Range"] = string.Format("bytes {0}-{1}/{2}", start, end, asset.Data.Length);
+                    httpres.Headers["Content-Range"] = string.Format("bytes {0}-{1}/{2}", start, end, data.Length);
                     using (var o = httpres.GetOutputStream(end - start + 1))
                     {
-                        o.Write(asset.Data, start, end - start + 1);
+                        o.Write(data, start, end - start + 1);
                     }
                 }
             }
@@ -142,9 +142,9 @@ namespace SilverSim.Viewer.Core
             {
                 using (var httpres = httpreq.BeginResponse(contentType))
                 {
-                    using (var o = httpres.GetOutputStream(asset.Data.LongLength))
+                    using (var o = httpres.GetOutputStream(data.LongLength))
                     {
-                        o.Write(asset.Data, 0, asset.Data.Length);
+                        o.Write(data, 0, data.Length);
                     }
                 }
             }

@@ -702,7 +702,7 @@ namespace SilverSim.Grid.Login
 
             foreach(ILoginResponseServiceInterface getter in m_LoginResponseGetters)
             {
-                getter.AppendLoginResponse(resStruct);
+                getter.AppendLoginResponse(loginData.LoginOptions.ToArray(), resStruct);
             }
 
             if (loginData.InventoryRoot != null)

@@ -117,21 +117,6 @@ namespace SilverSim.Types.Asset.Format.Mesh
             return new UVCoord(u, v);
         }
 
-        private static float BytesLEToFloat(byte[] data, int offset)
-        {
-            var buf = data;
-            int offs = offset;
-            if(!BitConverter.IsLittleEndian)
-            {
-                buf = new byte[4];
-                Buffer.BlockCopy(data, offs, buf, 0, 4);
-                Array.Reverse(buf);
-                offs = 0;
-            }
-
-            return BitConverter.ToSingle(data, offs);
-        }
-
         private static ushort BytesLEToU16(byte[] data, int offset)
         {
             var buf = data;

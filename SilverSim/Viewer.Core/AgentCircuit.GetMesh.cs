@@ -116,7 +116,7 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            ReturnRangeProcessedAsset(httpreq, asset, "application/vnd.ll.mesh", "GetMesh");
+            httpreq.RangeResponse(asset.Data, "application/vnd.ll.mesh", "GetMesh");
         }
     }
 }

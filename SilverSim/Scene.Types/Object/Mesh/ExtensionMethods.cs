@@ -42,7 +42,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     switch(shape.SculptType & PrimitiveSculptType.TypeMask)
                     {
                         case PrimitiveSculptType.Mesh:
-                            LLMesh llMesh = new LLMesh(assetService[shape.SculptMap]);
+                            var llMesh = new LLMesh(assetService[shape.SculptMap]);
                             mesh = llMesh.GetLOD(LLMesh.LodLevel.LOD3);
                             break;
 

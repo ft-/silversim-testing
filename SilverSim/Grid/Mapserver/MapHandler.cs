@@ -113,7 +113,7 @@ namespace SilverSim.Grid.Mapserver
             }
         }
 
-        public void AppendLoginResponse(Map m)
+        public void AppendLoginResponse(string[] options, Map m)
         {
             m.Add("map-server-url", m_HttpServer.ServerURI);
         }
