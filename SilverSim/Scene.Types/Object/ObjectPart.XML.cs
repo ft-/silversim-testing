@@ -70,7 +70,7 @@ namespace SilverSim.Scene.Types.Object
                     writer.WriteNamedValue("PassTouchAlways", PassTouchMode == PassEventMode.Always);
                     writer.WriteNamedValue("PassCollisions", PassCollisionMode != PassEventMode.Never);
                     writer.WriteNamedValue("PassCollisionsAlways", PassCollisionMode != PassEventMode.Always);
-                    writer.WriteNamedValue("RegionHandle", ObjectGroup.Scene.GridPosition.RegionHandle);
+                    writer.WriteNamedValue("RegionHandle", ObjectGroup.Scene?.GridPosition.RegionHandle.ToString() ?? "0");
                     writer.WriteNamedValue("ScriptAccessPin", ScriptAccessPin);
                     writer.WriteNamedValue("GroupPosition", GlobalPosition);
                     writer.WriteNamedValue("OffsetPosition", LocalPosition);
