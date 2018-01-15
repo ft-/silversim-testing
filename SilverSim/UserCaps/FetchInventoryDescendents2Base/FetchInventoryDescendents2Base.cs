@@ -39,7 +39,7 @@ namespace SilverSim.UserCaps.FetchInventoryDescendents2Base
 
         private static void WriteInventoryFolderContent(XmlTextWriter writer, InventoryFolderContent folder,
             bool fetch_folders,
-            bool fetch_items, List<InventoryItem> linkeditems, UUID agentID)
+            bool fetch_items, UUID agentID)
         {
             writer.WriteStartElement("map");
             writer.WriteKeyValuePair("agent_id", folder.Owner.ID);
@@ -77,15 +77,6 @@ namespace SilverSim.UserCaps.FetchInventoryDescendents2Base
                 writer.WriteValue("items");
                 writer.WriteEndElement();
                 writer.WriteStartElement("array");
-                if (linkeditems != null)
-                {
-                    foreach (var childitem in linkeditems)
-                    {
-                        writer.WriteStartElement("map");
-                        WriteInventoryItem(childitem, writer, agentID);
-                        writer.WriteEndElement();
-                    }
-                }
                 foreach (var childitem in folder.Items)
                 {
                     writer.WriteStartElement("map");
@@ -213,25 +204,6 @@ namespace SilverSim.UserCaps.FetchInventoryDescendents2Base
                             if (folderContents[ownerid].ContainsKey(folderid))
                             {
                                 var fc = folderContents[ownerid][folderid];
-                                var linkeditems = new List<InventoryItem>();
-                                var linkeditemids = new List<UUID>();
-
-                                foreach (var item in fc.Items)
-                                {
-                                    if (item.AssetType == AssetType.Link)
-                                    {
-                                        linkeditemids.Add(item.AssetID);
-                                    }
-                                }
-
-                                try
-                                {
-                                    linkeditems = inventoryService.Item[ownerid, linkeditemids];
-                                }
-                                catch
-                                {
-                                    /* no action required */
-                                }
                                 if (!wroteheader)
                                 {
                                     wroteheader = true;
@@ -239,7 +211,7 @@ namespace SilverSim.UserCaps.FetchInventoryDescendents2Base
                                     text.WriteStartElement("array");
                                 }
 
-                                WriteInventoryFolderContent(text, fc, fetch_folders, fetch_items, linkeditems, agentID);
+                                WriteInventoryFolderContent(text, fc, fetch_folders, fetch_items, agentID);
                             }
                             else
                             {
