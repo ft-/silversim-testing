@@ -23,6 +23,7 @@
 
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Object.Parameters;
 using SilverSim.Scripting.Common;
 using SilverSim.Threading;
 using SilverSim.Types;
@@ -199,7 +200,7 @@ namespace SilverSim.Viewer.Core
                     m_EnableObjectAnimation = true;
                     foreach(ObjectPart p in Scene.Primitives)
                     {
-                        if ((p.ExtendedMesh.Flags & ObjectPart.ExtendedMeshParams.MeshFlags.AnimatedMeshEnabled) != 0)
+                        if ((p.ExtendedMesh.Flags & ExtendedMeshParams.MeshFlags.AnimatedMeshEnabled) != 0)
                         {
                             p.AnimationController.SendAnimationsToAgent(Agent);
                         }

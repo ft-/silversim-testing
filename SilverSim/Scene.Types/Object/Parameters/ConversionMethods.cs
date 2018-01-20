@@ -19,39 +19,34 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.Scene.Types.Object.Parameters;
-using SilverSim.Types;
 using System;
 
-namespace SilverSim.Scene.Types.Object
+namespace SilverSim.Scene.Types.Object.Parameters
 {
-    public partial class ObjectPart
+    internal static class ConversionMethods
     {
-
-        private readonly TextParam m_Text = new TextParam();
-
-        public TextParam Text
+        public static void Float2LEBytes(float v, byte[] b, int offset)
         {
-            get
+            var i = BitConverter.GetBytes(v);
+            if (!BitConverter.IsLittleEndian)
             {
-                var res = new TextParam();
-                lock (m_Text)
-                {
-                    res.Text = m_Text.Text;
-                    res.TextColor = new ColorAlpha(m_Text.TextColor);
-                }
-                return res;
+                Array.Reverse(i);
             }
-            set
+            Buffer.BlockCopy(i, 0, b, offset, 4);
+        }
+
+        public static float LEBytes2Float(byte[] b, int offset)
+        {
+            if (!BitConverter.IsLittleEndian)
             {
-                lock (m_Text)
-                {
-                    m_Text.Text = value.Text;
-                    m_Text.TextColor = new ColorAlpha(value.TextColor);
-                }
-                UpdateExtraParams();
-                IsChanged = m_IsChangedEnabled;
-                TriggerOnUpdate(0);
+                var i = new byte[4];
+                Buffer.BlockCopy(b, offset, i, 0, 4);
+                Array.Reverse(i);
+                return BitConverter.ToSingle(i, 0);
+            }
+            else
+            {
+                return BitConverter.ToSingle(b, offset);
             }
         }
     }

@@ -21,6 +21,7 @@
 
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Object.Parameters;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Threading;
 using SilverSim.Types;
@@ -936,26 +937,26 @@ namespace SilverSim.Scene.Types.Scene
                     case FlexiEP:
                         if(!data.ParamInUse)
                         {
-                            ObjectPart.FlexibleParam flexi = part.Flexible;
+                            FlexibleParam flexi = part.Flexible;
                             flexi.IsFlexible = false;
                             part.Flexible = flexi;
                         }
                         else
                         {
-                            part.Flexible = ObjectPart.FlexibleParam.FromUdpDataBlock(data.ParamData);
+                            part.Flexible = FlexibleParam.FromUdpDataBlock(data.ParamData);
                         }
                         break;
 
                     case LightEP:
                         if(!data.ParamInUse)
                         {
-                            ObjectPart.PointLightParam light = part.PointLight;
+                            PointLightParam light = part.PointLight;
                             light.IsLight = false;
                             part.PointLight = light;
                         }
                         else
                         {
-                            part.PointLight = ObjectPart.PointLightParam.FromUdpDataBlock(data.ParamData);
+                            part.PointLight = PointLightParam.FromUdpDataBlock(data.ParamData);
                         }
                         break;
 
@@ -974,13 +975,13 @@ namespace SilverSim.Scene.Types.Scene
                     case ProjectionEP:
                         if(!data.ParamInUse)
                         {
-                            ObjectPart.ProjectionParam proj = part.Projection;
+                            ProjectionParam proj = part.Projection;
                             proj.IsProjecting = false;
                             part.Projection = proj;
                         }
                         else
                         {
-                            part.Projection = ObjectPart.ProjectionParam.FromUdpDataBlock(data.ParamData);
+                            part.Projection = ProjectionParam.FromUdpDataBlock(data.ParamData);
                         }
                         break;
                 }

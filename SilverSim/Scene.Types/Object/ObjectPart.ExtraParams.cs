@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Scene.Types.Object.Parameters;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
@@ -126,358 +127,14 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        public class FlexibleParam
-        {
-            #region Fields
-            public bool IsFlexible;
-            public int Softness;
-            public double Gravity;
-            public double Friction;
-            public double Wind;
-            public double Tension;
-            public Vector3 Force = Vector3.Zero;
-            #endregion
-
-            public static FlexibleParam FromUdpDataBlock(byte[] value)
-            {
-                if(value.Length < 16)
-                {
-                    return new FlexibleParam();
-                }
-
-                return new FlexibleParam
-                {
-                    Softness = ((value[0] & 0x80) >> 6) | ((value[1] & 0x80) >> 7),
-                    Tension = (value[0] & 0x7F) / 10.0f,
-                    Friction = (value[1] & 0x7F) / 10.0f,
-                    Gravity = (value[2] / 10.0f) - 10.0f,
-                    Wind = value[3] / 10.0f,
-                    Force = new Vector3(value, 4)
-                };
-            }
-
-            public byte[] DbSerialization
-            {
-                get
-                {
-                    var serialized = new byte[49];
-                    Force.ToBytes(serialized, 0);
-                    Buffer.BlockCopy(BitConverter.GetBytes(Softness), 0, serialized, 12, 4);
-                    Buffer.BlockCopy(BitConverter.GetBytes(Gravity), 0, serialized, 16, 8);
-                    Buffer.BlockCopy(BitConverter.GetBytes(Friction), 0, serialized, 24, 8);
-                    Buffer.BlockCopy(BitConverter.GetBytes(Wind), 0, serialized, 32, 8);
-                    Buffer.BlockCopy(BitConverter.GetBytes(Tension), 0, serialized, 40, 8);
-                    serialized[48] = IsFlexible ? (byte)1 : (byte)0;
-                    if(!BitConverter.IsLittleEndian)
-                    {
-                        Array.Reverse(serialized, 12, 4);
-                        Array.Reverse(serialized, 16, 8);
-                        Array.Reverse(serialized, 24, 8);
-                        Array.Reverse(serialized, 32, 8);
-                        Array.Reverse(serialized, 40, 8);
-                    }
-                    return serialized;
-                }
-                
-                set
-                {
-                    if(value.Length != 49)
-                    {
-                        throw new ArgumentException("Array length must be 49.");
-                    }
-                    if (!BitConverter.IsLittleEndian)
-                    {
-                        Array.Reverse(value, 12, 4);
-                        Array.Reverse(value, 16, 8);
-                        Array.Reverse(value, 24, 8);
-                        Array.Reverse(value, 32, 8);
-                        Array.Reverse(value, 40, 8);
-                    }
-
-                    Force.FromBytes(value, 0);
-                    Softness = BitConverter.ToInt32(value, 12);
-                    Gravity = BitConverter.ToDouble(value, 16);
-                    Friction = BitConverter.ToDouble(value, 24);
-                    Wind = BitConverter.ToDouble(value, 32);
-                    Tension = BitConverter.ToDouble(value, 40);
-                    IsFlexible = value[48] != 0;
-
-                    if (!BitConverter.IsLittleEndian)
-                    {
-                        Array.Reverse(value, 12, 4);
-                        Array.Reverse(value, 16, 8);
-                        Array.Reverse(value, 24, 8);
-                        Array.Reverse(value, 32, 8);
-                        Array.Reverse(value, 40, 8);
-                    }
-                }
-            }
-        }
         private readonly FlexibleParam m_Flexible = new FlexibleParam();
-        public class PointLightParam
-        {
-            #region Fields
-            public bool IsLight;
-            public Color LightColor = new Color();
-            public double Intensity;
-            public double Radius;
-            public double Cutoff;
-            public double Falloff;
-            #endregion
 
-            public static PointLightParam FromUdpDataBlock(byte[] value)
-            {
-                if (value.Length < 16)
-                {
-                    return new PointLightParam();
-                }
-
-                return new PointLightParam
-                {
-                    IsLight = true,
-                    LightColor = new Color { R_AsByte = value[0], G_AsByte = value[1], B_AsByte = value[2] },
-                    Intensity = value[3] / 255f,
-                    Radius = LEBytes2Float(value, 4),
-                    Cutoff = LEBytes2Float(value, 8),
-                    Falloff = LEBytes2Float(value, 12)
-                };
-            }
-
-            public byte[] DbSerialization
-            {
-                get
-                {
-                    var serialized = new byte[36];
-                    serialized[0] = IsLight ? (byte)1: (byte)0;
-                    serialized[1] = LightColor.R_AsByte;
-                    serialized[2] = LightColor.G_AsByte;
-                    serialized[3] = LightColor.B_AsByte;
-                    Buffer.BlockCopy(BitConverter.GetBytes(Intensity), 0, serialized, 4, 8);
-                    Buffer.BlockCopy(BitConverter.GetBytes(Radius), 0, serialized, 12, 8);
-                    Buffer.BlockCopy(BitConverter.GetBytes(Cutoff), 0, serialized, 20, 8);
-                    Buffer.BlockCopy(BitConverter.GetBytes(Falloff), 0, serialized, 28, 8);
-                    if(!BitConverter.IsLittleEndian)
-                    {
-                        Array.Reverse(serialized, 4, 8);
-                        Array.Reverse(serialized, 12, 8);
-                        Array.Reverse(serialized, 20, 8);
-                        Array.Reverse(serialized, 28, 8);
-                    }
-                    return serialized;
-                }
-                set
-                {
-                    if(value.Length != 36)
-                    {
-                        throw new ArgumentException("Array length must be 36.");
-                    }
-                    if (!BitConverter.IsLittleEndian)
-                    {
-                        Array.Reverse(value, 4, 8);
-                        Array.Reverse(value, 12, 8);
-                        Array.Reverse(value, 20, 8);
-                        Array.Reverse(value, 28, 8);
-                    }
-                    IsLight = value[0] != 0;
-                    LightColor.R_AsByte = value[1];
-                    LightColor.G_AsByte = value[2];
-                    LightColor.B_AsByte = value[3];
-                    Intensity = BitConverter.ToDouble(value, 4);
-                    Radius = BitConverter.ToDouble(value, 12);
-                    Cutoff = BitConverter.ToDouble(value, 20);
-                    Falloff = BitConverter.ToDouble(value, 28);
-                    if (!BitConverter.IsLittleEndian)
-                    {
-                        Array.Reverse(value, 4, 8);
-                        Array.Reverse(value, 12, 8);
-                        Array.Reverse(value, 20, 8);
-                        Array.Reverse(value, 28, 8);
-                    }
-
-                }
-            }
-        }
         private readonly PointLightParam m_PointLight = new PointLightParam();
-
-        public class ProjectionParam
-        {
-            #region Fields
-            public bool IsProjecting;
-            public UUID ProjectionTextureID = UUID.Zero;
-            public double ProjectionFOV;
-            public double ProjectionFocus;
-            public double ProjectionAmbience;
-            #endregion
-
-            public static ProjectionParam FromUdpDataBlock(byte[] value)
-            {
-                if (value.Length < 28)
-                {
-                    return new ProjectionParam();
-                }
-                return new ProjectionParam
-                {
-                    IsProjecting = true,
-                    ProjectionTextureID = new UUID(value, 0),
-                    ProjectionFOV = LEBytes2Float(value, 16),
-                    ProjectionFocus = LEBytes2Float(value, 20),
-                    ProjectionAmbience = LEBytes2Float(value, 24)
-                };
-            }
-
-            public byte[] DbSerialization
-            {
-                get
-                {
-                    var serialized = new byte[41];
-                    ProjectionTextureID.ToBytes(serialized, 0);
-                    Buffer.BlockCopy(BitConverter.GetBytes(ProjectionFOV), 0, serialized, 16, 8);
-                    Buffer.BlockCopy(BitConverter.GetBytes(ProjectionFocus), 0, serialized, 24, 8);
-                    Buffer.BlockCopy(BitConverter.GetBytes(ProjectionAmbience), 0, serialized, 32, 8);
-                    serialized[40] = IsProjecting ? (byte)1 : (byte)0;
-                    if(!BitConverter.IsLittleEndian)
-                    {
-                        Array.Reverse(serialized, 16, 8);
-                        Array.Reverse(serialized, 24, 8);
-                        Array.Reverse(serialized, 32, 8);
-                    }
-                    return serialized;
-                }
-                set
-                {
-                    if(value.Length == 0)
-                    {
-                        /* zero-length comes from migration */
-                        IsProjecting = false;
-                        return;
-                    }
-                    if(value.Length != 41)
-                    {
-                        throw new ArgumentException("Array length must be 41.");
-                    }
-                    if (!BitConverter.IsLittleEndian)
-                    {
-                        Array.Reverse(value, 16, 8);
-                        Array.Reverse(value, 24, 8);
-                        Array.Reverse(value, 32, 8);
-                    }
-
-                    ProjectionTextureID.FromBytes(value, 0);
-                    ProjectionFOV = BitConverter.ToDouble(value, 16);
-                    ProjectionFocus = BitConverter.ToDouble(value, 24);
-                    ProjectionAmbience = BitConverter.ToDouble(value, 32);
-
-                    if (!BitConverter.IsLittleEndian)
-                    {
-                        Array.Reverse(value, 16, 8);
-                        Array.Reverse(value, 24, 8);
-                        Array.Reverse(value, 32, 8);
-                    }
-                }
-            }
-        }
 
         private readonly ProjectionParam m_Projection = new ProjectionParam();
 
-        public class ExtendedMeshParams
-        {
-            [Flags]
-            public enum MeshFlags : uint
-            {
-                None = 0,
-                AnimatedMeshEnabled = 1
-            }
-
-            #region Fields
-            public MeshFlags Flags = MeshFlags.None;
-            #endregion
-
-            public static ExtendedMeshParams FromUdpDataBlock(byte[] value)
-            {
-                if (value.Length < 4)
-                {
-                    return new ExtendedMeshParams();
-                }
-                var p = new ExtendedMeshParams();
-                if(!BitConverter.IsLittleEndian)
-                {
-                    var b = new byte[4];
-                    Buffer.BlockCopy(value, 0, b, 0, 4);
-                    Array.Reverse(b);
-                    p.Flags = (MeshFlags)BitConverter.ToUInt32(b, 0);
-                }
-                else
-                {
-                    p.Flags = (MeshFlags)BitConverter.ToUInt32(value, 0);
-                }
-                return p;
-            }
-
-            public byte[] DbSerialization
-            {
-                get
-                {
-                    var serialized = new byte[4];
-                    Buffer.BlockCopy(BitConverter.GetBytes((uint)Flags), 0, serialized, 0, 4);
-                    if (!BitConverter.IsLittleEndian)
-                    {
-                        Array.Reverse(serialized, 0, 4);
-                    }
-                    return serialized;
-                }
-                set
-                {
-                    if(value.Length == 0)
-                    {
-                        /* zero-length comes from migration */
-                        Flags = MeshFlags.None;
-                        return;
-                    }
-                    if (value.Length != 4)
-                    {
-                        throw new ArgumentException("Array length must be 4.");
-                    }
-                    if (!BitConverter.IsLittleEndian)
-                    {
-                        Array.Reverse(value, 0, 4);
-                    }
-
-                    Flags = (MeshFlags)BitConverter.ToUInt32(value, 0);
-
-                    if (!BitConverter.IsLittleEndian)
-                    {
-                        Array.Reverse(value, 0, 4);
-                    }
-                }
-            }
-        }
-
         private readonly ExtendedMeshParams m_ExtendedMesh = new ExtendedMeshParams();
 
-        private static void Float2LEBytes(float v, byte[] b, int offset)
-        {
-            var i = BitConverter.GetBytes(v);
-            if (!BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(i);
-            }
-            Buffer.BlockCopy(i, 0, b, offset, 4);
-        }
-
-        private static float LEBytes2Float(byte[] b, int offset)
-        {
-            if (!BitConverter.IsLittleEndian)
-            {
-                var i = new byte[4];
-                Buffer.BlockCopy(b, offset, i, 0, 4);
-                Array.Reverse(i);
-                return BitConverter.ToSingle(i, 0);
-            }
-            else
-            {
-                return BitConverter.ToSingle(b, offset);
-            }
-        }
 
         private const ushort FlexiEP = 0x10;
         private const ushort LightEP = 0x20;
@@ -572,11 +229,11 @@ namespace SilverSim.Scene.Types.Object
                                     light.LightColor.G_AsByte = value[pos++];
                                     light.LightColor.B_AsByte = value[pos++];
                                     light.Intensity = value[pos++] / 255f;
-                                    light.Radius = LEBytes2Float(value, pos);
+                                    light.Radius = ConversionMethods.LEBytes2Float(value, pos);
                                     pos += 4;
-                                    light.Cutoff = LEBytes2Float(value, pos);
+                                    light.Cutoff = ConversionMethods.LEBytes2Float(value, pos);
                                     pos += 4;
-                                    light.Falloff = LEBytes2Float(value, pos);
+                                    light.Falloff = ConversionMethods.LEBytes2Float(value, pos);
                                     pos += 4;
                                     break;
 
@@ -602,11 +259,11 @@ namespace SilverSim.Scene.Types.Object
                                     proj.IsProjecting = true;
                                     proj.ProjectionTextureID.FromBytes(value, pos);
                                     pos += 16;
-                                    proj.ProjectionFOV = LEBytes2Float(value, pos);
+                                    proj.ProjectionFOV = ConversionMethods.LEBytes2Float(value, pos);
                                     pos += 4;
-                                    proj.ProjectionFocus = LEBytes2Float(value, pos);
+                                    proj.ProjectionFocus = ConversionMethods.LEBytes2Float(value, pos);
                                     pos += 4;
-                                    proj.ProjectionAmbience = LEBytes2Float(value, pos);
+                                    proj.ProjectionAmbience = ConversionMethods.LEBytes2Float(value, pos);
                                     pos += 4;
                                     break;
 
@@ -781,11 +438,11 @@ namespace SilverSim.Scene.Types.Object
 
                 updatebytes[i + 3] = (byte)(intensity * 255f);
                 i += 4;
-                Float2LEBytes((float)light.Radius, updatebytes, i);
+                ConversionMethods.Float2LEBytes((float)light.Radius, updatebytes, i);
                 i += 4;
-                Float2LEBytes((float)light.Cutoff, updatebytes, i);
+                ConversionMethods.Float2LEBytes((float)light.Cutoff, updatebytes, i);
                 i += 4;
-                Float2LEBytes((float)light.Falloff, updatebytes, i);
+                ConversionMethods.Float2LEBytes((float)light.Falloff, updatebytes, i);
                 i += 4;
             }
 
@@ -799,11 +456,11 @@ namespace SilverSim.Scene.Types.Object
                 updatebytes[i++] = 0;
                 proj.ProjectionTextureID.ToBytes(updatebytes, i);
                 i += 16;
-                Float2LEBytes((float)proj.ProjectionFOV, updatebytes, i);
+                ConversionMethods.Float2LEBytes((float)proj.ProjectionFOV, updatebytes, i);
                 i += 4;
-                Float2LEBytes((float)proj.ProjectionFocus, updatebytes, i);
+                ConversionMethods.Float2LEBytes((float)proj.ProjectionFocus, updatebytes, i);
                 i += 4;
-                Float2LEBytes((float)proj.ProjectionAmbience, updatebytes, i);
+                ConversionMethods.Float2LEBytes((float)proj.ProjectionAmbience, updatebytes, i);
             }
 
             if (emeshFlags != ExtendedMeshParams.MeshFlags.None)

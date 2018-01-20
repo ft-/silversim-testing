@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using SilverSim.Scene.Types.Agent;
+using SilverSim.Scene.Types.Object.Parameters;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using SilverSim.Types.Primitive;
@@ -523,6 +524,7 @@ namespace SilverSim.Scene.Types.Object
 
                         var compressedData = new byte[compressedSize];
                         ID.ToBytes(compressedData, 0);
+                        //LocalID integrated later in sender
                         compressedData[16] = 0;//(byte)(LocalID & 0xFF);
                         compressedData[17] = 0;//(byte)((LocalID >> 8) & 0xFF);
                         compressedData[18] = 0;//(byte)((LocalID >> 16) & 0xFF);
@@ -539,7 +541,7 @@ namespace SilverSim.Scene.Types.Object
                         compressedData[27] = (byte)ClickAction;
                         Size.ToBytes(compressedData, 28);
                         Position.ToBytes(compressedData, 40);
-                        // 12 byte rotation at 52
+                        Rotation.ToBytes(compressedData, 52);
                         compressedData[64] = (byte)((uint)compressedflags & 0xFF);
                         compressedData[65] = (byte)(((uint)compressedflags >> 8) & 0xFF);
                         compressedData[66] = (byte)(((uint)compressedflags >> 16) & 0xFF);
@@ -555,11 +557,11 @@ namespace SilverSim.Scene.Types.Object
                             offset += 12;
                         }
 
-                        //Parent
-                        compressedData[offset] = 0;// (byte)(parentID & 0xFF);
-                        compressedData[offset + 1] = 0;// (byte)((parentID >> 8) & 0xFF);
-                        compressedData[offset + 2] = 0;// (byte)((parentID >> 16) & 0xFF);
-                        compressedData[offset + 3] = 0;// (byte)((parentID >> 24) & 0xFF);
+                        //ParentID integrated later in sender
+                        compressedData[offset] = 0;
+                        compressedData[offset + 1] = 0;
+                        compressedData[offset + 2] = 0;
+                        compressedData[offset + 3] = 0;
                         offset += 4;
                         
                         //Hover text

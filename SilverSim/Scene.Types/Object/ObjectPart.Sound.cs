@@ -19,61 +19,14 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Scene.Types.Object.Parameters;
 using SilverSim.Types;
-using SilverSim.Types.Primitive;
 using System;
 
 namespace SilverSim.Scene.Types.Object
 {
     public partial class ObjectPart
     {
-        public class SoundParam
-        {
-            #region Fields
-            public UUID SoundID;
-            public double Gain;
-            public double Radius;
-            public PrimitiveSoundFlags Flags; /* byte */
-            #endregion
-
-            public byte[] Serialization
-            {
-                get
-                {
-                    var serialized = new byte[33];
-                    SoundID.ToBytes(serialized, 0);
-                    Buffer.BlockCopy(BitConverter.GetBytes(Gain), 0, serialized, 16, 8);
-                    Buffer.BlockCopy(BitConverter.GetBytes(Radius), 0, serialized, 24, 8);
-                    serialized[32] = (byte)Flags;
-                    if(!BitConverter.IsLittleEndian)
-                    {
-                        Array.Reverse(serialized, 16, 8);
-                        Array.Reverse(serialized, 24, 8);
-                    }
-                    return serialized;
-                }
-                set
-                {
-                    if(value.Length != 33)
-                    {
-                        throw new ArgumentException("Array length must be 33.");
-                    }
-                    if (!BitConverter.IsLittleEndian)
-                    {
-                        Array.Reverse(value, 16, 8);
-                        Array.Reverse(value, 24, 8);
-                    }
-                    SoundID.FromBytes(value, 0);
-                    Gain = BitConverter.ToDouble(value, 16);
-                    Radius = BitConverter.ToDouble(value, 24);
-                    if (!BitConverter.IsLittleEndian)
-                    {
-                        Array.Reverse(value, 16, 8);
-                        Array.Reverse(value, 24, 8);
-                    }
-                }
-            }
-        }
 
         private readonly SoundParam m_Sound = new SoundParam();
 
@@ -129,47 +82,6 @@ namespace SilverSim.Scene.Types.Object
                 }
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
-            }
-        }
-
-        public class CollisionSoundParam
-        {
-            #region Fields
-            public UUID ImpactSound = UUID.Zero;
-            public double ImpactVolume;
-            #endregion
-
-            public byte[] Serialization
-            {
-                get
-                {
-                    var serialized = new byte[24];
-                    ImpactSound.ToBytes(serialized, 0);
-                    Buffer.BlockCopy(BitConverter.GetBytes(ImpactVolume), 0, serialized, 16, 8);
-                    if(!BitConverter.IsLittleEndian)
-                    {
-                        Array.Reverse(serialized, 16, 8);
-                    }
-                    return serialized;
-                }
-
-                set
-                {
-                    if(value.Length != 24)
-                    {
-                        throw new ArgumentException("Array length must be 24.");
-                    }
-                    if(!BitConverter.IsLittleEndian)
-                    {
-                        Array.Reverse(value, 16, 8);
-                    }
-                    ImpactSound.FromBytes(value, 0);
-                    ImpactVolume = BitConverter.ToDouble(value, 16);
-                    if (!BitConverter.IsLittleEndian)
-                    {
-                        Array.Reverse(value, 16, 8);
-                    }
-                }
             }
         }
 

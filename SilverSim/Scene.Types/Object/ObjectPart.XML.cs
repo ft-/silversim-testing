@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 
+using SilverSim.Scene.Types.Object.Parameters;
 using SilverSim.Scene.Types.Physics.Vehicle;
 using SilverSim.Types;
 using SilverSim.Types.Agent;

@@ -19,39 +19,48 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.Scene.Types.Object.Parameters;
 using SilverSim.Types;
 using System;
 
-namespace SilverSim.Scene.Types.Object
+namespace SilverSim.Scene.Types.Object.Parameters
 {
-    public partial class ObjectPart
+    public class CollisionSoundParam
     {
+        #region Fields
+        public UUID ImpactSound = UUID.Zero;
+        public double ImpactVolume;
+        #endregion
 
-        private readonly TextParam m_Text = new TextParam();
-
-        public TextParam Text
+        public byte[] Serialization
         {
             get
             {
-                var res = new TextParam();
-                lock (m_Text)
+                var serialized = new byte[24];
+                ImpactSound.ToBytes(serialized, 0);
+                Buffer.BlockCopy(BitConverter.GetBytes(ImpactVolume), 0, serialized, 16, 8);
+                if (!BitConverter.IsLittleEndian)
                 {
-                    res.Text = m_Text.Text;
-                    res.TextColor = new ColorAlpha(m_Text.TextColor);
+                    Array.Reverse(serialized, 16, 8);
                 }
-                return res;
+                return serialized;
             }
+
             set
             {
-                lock (m_Text)
+                if (value.Length != 24)
                 {
-                    m_Text.Text = value.Text;
-                    m_Text.TextColor = new ColorAlpha(value.TextColor);
+                    throw new ArgumentException("Array length must be 24.");
                 }
-                UpdateExtraParams();
-                IsChanged = m_IsChangedEnabled;
-                TriggerOnUpdate(0);
+                if (!BitConverter.IsLittleEndian)
+                {
+                    Array.Reverse(value, 16, 8);
+                }
+                ImpactSound.FromBytes(value, 0);
+                ImpactVolume = BitConverter.ToDouble(value, 16);
+                if (!BitConverter.IsLittleEndian)
+                {
+                    Array.Reverse(value, 16, 8);
+                }
             }
         }
     }

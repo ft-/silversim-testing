@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using SilverSim.Scene.Types.Agent;
+using SilverSim.Scene.Types.Object.Parameters;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using SilverSim.Viewer.Messages.Object;
@@ -82,7 +83,7 @@ namespace SilverSim.Scene.Types.Object
                 return;
             }
 
-            if ((m_Part.ExtendedMesh.Flags & ObjectPart.ExtendedMeshParams.MeshFlags.AnimatedMeshEnabled) == 0)
+            if ((m_Part.ExtendedMesh.Flags & ExtendedMeshParams.MeshFlags.AnimatedMeshEnabled) == 0)
             {
                 return;
             }
@@ -103,7 +104,7 @@ namespace SilverSim.Scene.Types.Object
                 return;
             }
 
-            if((m_Part.ExtendedMesh.Flags & ObjectPart.ExtendedMeshParams.MeshFlags.AnimatedMeshEnabled) == 0)
+            if((m_Part.ExtendedMesh.Flags & ExtendedMeshParams.MeshFlags.AnimatedMeshEnabled) == 0)
             {
                 return;
             }

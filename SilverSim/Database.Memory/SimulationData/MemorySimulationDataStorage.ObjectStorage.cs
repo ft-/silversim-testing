@@ -21,6 +21,7 @@
 
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Object.Parameters;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
@@ -130,36 +131,36 @@ namespace SilverSim.Database.Memory.SimulationData
 
                 AngularVelocity = map["AngularVelocity"].AsVector3
             };
-            objpart.PointLight = new ObjectPart.PointLightParam
+            objpart.PointLight = new PointLightParam
             {
                 DbSerialization = (BinaryData)map["LightData"]
             };
-            objpart.Projection = new ObjectPart.ProjectionParam
+            objpart.Projection = new ProjectionParam
             {
                 DbSerialization = (BinaryData)map["ProjectionData"]
             };
 
-            objpart.ExtendedMesh = new ObjectPart.ExtendedMeshParams
+            objpart.ExtendedMesh = new ExtendedMeshParams
             {
                 DbSerialization = (BinaryData)map["ExtendedMeshData"]
             };
 
-            objpart.Text = new ObjectPart.TextParam
+            objpart.Text = new TextParam
             {
                 Serialization = (BinaryData)map["HoverTextData"]
             };
 
-            objpart.Flexible = new ObjectPart.FlexibleParam
+            objpart.Flexible = new FlexibleParam
             {
                 DbSerialization = (BinaryData)map["FlexibleData"]
             };
 
-            objpart.Sound = new ObjectPart.SoundParam
+            objpart.Sound = new SoundParam
             {
                 Serialization = (BinaryData)map["LoopedSoundData"]
             };
 
-            objpart.CollisionSound = new ObjectPart.CollisionSoundParam
+            objpart.CollisionSound = new CollisionSoundParam
             {
                 Serialization = (BinaryData)map["ImpactSoundData"]
             };

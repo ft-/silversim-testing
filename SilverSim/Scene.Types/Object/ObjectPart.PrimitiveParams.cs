@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Scene.Types.Object.Parameters;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Threading;
 using SilverSim.Types;
