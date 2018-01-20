@@ -168,17 +168,11 @@ namespace SilverSim.Scene.Types.Object
             {
                 if (value == null || (value.Flags & TextureAnimationEntry.TextureAnimMode.ANIM_ON) == 0)
                 {
-                    m_TextureAnimationLock.AcquireWriterLock(() =>
-                    {
-                        m_TextureAnimationBytes = new byte[0];
-                    });
+                    m_TextureAnimationLock.AcquireWriterLock(() => m_TextureAnimationBytes = new byte[0]);
                 }
                 else
                 {
-                    m_TextureAnimationLock.AcquireWriterLock(() =>
-                    {
-                        m_TextureAnimationBytes = value.GetBytes();
-                    });
+                    m_TextureAnimationLock.AcquireWriterLock(() => m_TextureAnimationBytes = value.GetBytes());
                 }
                 TriggerOnUpdate(0);
             }
@@ -197,10 +191,7 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
-                m_TextureAnimationLock.AcquireWriterLock(() =>
-                {
-                    m_TextureAnimationBytes = value;
-                });
+                m_TextureAnimationLock.AcquireWriterLock(() => m_TextureAnimationBytes = value);
                 TriggerOnUpdate(0);
             }
         }
