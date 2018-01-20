@@ -456,8 +456,8 @@ namespace SilverSim.Viewer.Core
                 return capability;
             }, capConfig);
             AddDefCapabilityFactory("ParcelNavigateMedia", regionSeedID, (agent) => new ParcelNavigateMedia(agent.Owner, Server.Scene, RemoteIP), capConfig);
-            AddDefCapabilityFactory("ObjectMedia", regionSeedID, (agent) => new ObjectMedia(agent.Owner, Server.Scene, RemoteIP), capConfig);
-            AddDefCapabilityFactory("ObjectMediaNavigate", regionSeedID, (agent) => new ObjectMediaNavigate(agent.Owner, Server.Scene, RemoteIP), capConfig);
+            AddDefCapabilityFactory("ObjectMedia", regionSeedID, (agent) => new ObjectMedia(agent, Server.Scene, RemoteIP), capConfig);
+            AddDefCapabilityFactory("ObjectMediaNavigate", regionSeedID, (agent) => new ObjectMediaNavigate(agent, Server.Scene, RemoteIP), capConfig);
             AddDefCapabilityFactory("UpdateAvatarAppearance", regionSeedID, (agent) => new UpdateAvatarAppearance(agent, Server.Scene, RemoteIP), capConfig);
             AddDefCapabilityFactory("LandResources", regionSeedID, (agent) => new LandResources(agent, Server.Scene, localHostName, RemoteIP), capConfig);
             AddDefCapabilityFactory("AttachmentResources", regionSeedID, (agent) => new AttachmentResources(agent, Server.Scene, RemoteIP), capConfig);

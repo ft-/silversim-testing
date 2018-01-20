@@ -32,11 +32,11 @@ namespace SilverSim.Viewer.Core.Capabilities
 {
     public class ObjectMedia : ICapabilityInterface
     {
-        private readonly UUI m_Agent;
+        private readonly ViewerAgent m_Agent;
         private readonly SceneInterface m_Scene;
         private readonly string m_RemoteIP;
 
-        public ObjectMedia(UUI agent, SceneInterface scene, string remoteip)
+        public ObjectMedia(ViewerAgent agent, SceneInterface scene, string remoteip)
         {
             m_Agent = agent;
             m_Scene = scene;
@@ -180,7 +180,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 }
             }
 
-            if (part.CheckPermissions(m_Agent, part.ObjectGroup.Group, Types.Inventory.InventoryPermissionsMask.Modify))
+            if (part.CheckPermissions(m_Agent.Owner, part.ObjectGroup.Group, Types.Inventory.InventoryPermissionsMask.Modify))
             {
                 part.UpdateMedia(media, m_Agent.ID);
             }

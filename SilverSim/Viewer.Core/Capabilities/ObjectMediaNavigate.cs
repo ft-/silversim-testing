@@ -31,11 +31,11 @@ namespace SilverSim.Viewer.Core.Capabilities
 {
     public class ObjectMediaNavigate : ICapabilityInterface
     {
-        private readonly UUI m_Agent;
+        private readonly ViewerAgent m_Agent;
         private readonly SceneInterface m_Scene;
         private readonly string m_RemoteIP;
 
-        public ObjectMediaNavigate(UUI agent, SceneInterface scene, string remoteip)
+        public ObjectMediaNavigate(ViewerAgent agent, SceneInterface scene, string remoteip)
         {
             m_Agent = agent;
             m_Scene = scene;
@@ -129,7 +129,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                     /* permission is okay when anyone is enabled */
                 }
                 else if(0 != (entry.InteractPermissions & PrimitiveMediaPermission.Owner) &&
-                    part.ObjectGroup.Owner.EqualsGrid(m_Agent) &&
+                    part.ObjectGroup.Owner.EqualsGrid(m_Agent.Owner) &&
                     !part.ObjectGroup.IsGroupOwned)
                 {
                     /* permission is okay when group is allowed and agent is group member */
@@ -144,7 +144,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                     if(groupsService != null)
                     {
                         UGI groupID = part.ObjectGroup.Group;
-                        if(!groupsService.Memberships.ContainsKey(m_Agent, groupID, m_Agent))
+                        if(!groupsService.Memberships.ContainsKey(m_Agent.Owner, groupID, m_Agent.Owner))
                         {
                             entry = null;
                         }
