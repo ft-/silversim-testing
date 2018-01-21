@@ -24,9 +24,11 @@ using SilverSim.Scene.Types.Object.Parameters;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Primitive;
+using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 
 namespace SilverSim.Scene.Types.Object
@@ -68,6 +70,40 @@ namespace SilverSim.Scene.Types.Object
         {
             m_NamedLocalizations.Clear();
             TriggerOnUpdate(UpdateChangedFlags.None);
+        }
+
+        public byte[] LocalizationSerialization
+        {
+            get
+            {
+                var map = new Map();
+                foreach(ObjectPartLocalizedInfo l in NamedLocalizations)
+                {
+                    map.Add(l.LocalizationName, l.MapSerialization);
+                }
+                using (var ms = new MemoryStream())
+                {
+                    LlsdBinary.Serialize(map, ms);
+                    return ms.ToArray();
+                }
+            }
+            set
+            {
+                Map m;
+                using (var ms = new MemoryStream(value))
+                {
+                    m = (Map)LlsdBinary.Deserialize(ms);
+                }
+                RemoveAllLocalizations();
+                foreach(KeyValuePair<string, IValue> kvp in m)
+                {
+                    var ld = kvp.Value as Map;
+                    if (ld != null)
+                    {
+                        GetOrCreateLocalization(kvp.Key).MapSerialization = ld;
+                    }
+                }
+            }
         }
 
         public ObjectPartLocalizedInfo GetLocalization(CultureInfo culture)
