@@ -53,6 +53,7 @@ using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Agent;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace SilverSim.Scene.Agent
@@ -526,6 +527,9 @@ namespace SilverSim.Scene.Agent
         #endregion
 
         #region IObject Methods
+        public void GetPrimitiveParams(AnArray.Enumerator enumerator, AnArray paramList, CultureInfo currentCulture) =>
+            GetPrimitiveParams(enumerator, paramList);
+
         public void GetPrimitiveParams(AnArray.Enumerator enumerator, AnArray paramList)
         {
             switch (ParamsHelper.GetPrimParamType(enumerator))

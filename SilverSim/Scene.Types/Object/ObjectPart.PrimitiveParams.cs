@@ -1123,14 +1123,22 @@ namespace SilverSim.Scene.Types.Object
 
         public void SetPrimitiveParams(AnArray.MarkEnumerator enumerator) => SetPrimitiveParams(enumerator, null);
 
-        public void SetPrimitiveParams(AnArray.MarkEnumerator enumerator, CultureInfo cultureInfo)
+        public void SetPrimitiveParams(AnArray.MarkEnumerator enumerator, string culturename)
         {
-            ObjectPartLocalizedInfo localization = GetLocalization(cultureInfo);
+            ObjectPartLocalizedInfo localization = GetOrCreateLocalization(culturename);
             UpdateChangedFlags flags = 0;
             bool isUpdated = false;
             PrimitiveParamsType paramtype = ParamsHelper.GetPrimParamType(enumerator);
             switch (paramtype)
             {
+                case PrimitiveParamsType.RemoveLanguage:
+                    RemoveLocalization(ParamsHelper.GetString(enumerator, "PRIM_REMOVE_LANGUAGE"));
+                    break;
+
+                case PrimitiveParamsType.RemoveAllLanguages:
+                    RemoveAllLocalizations();
+                    break;
+
                 case PrimitiveParamsType.Name:
                     localization.Name = ParamsHelper.GetString(enumerator, "PRIM_NAME");
                     break;

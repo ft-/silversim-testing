@@ -139,7 +139,9 @@ namespace SilverSim.Types.Primitive
 
         UnSitTarget = 12000,
         SitAnimation = 12001,
-        Language = 12002
+        Language = 12002,
+        RemoveLanguage = 12003,
+        RemoveAllLanguages = 12004
     }
 
     public enum PrimitivePhysicsShapeType

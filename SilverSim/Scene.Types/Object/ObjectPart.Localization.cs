@@ -21,9 +21,13 @@
 
 using SilverSim.Scene.Types.Object.Localization;
 using SilverSim.Scene.Types.Object.Parameters;
+using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Primitive;
+using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 
 namespace SilverSim.Scene.Types.Object
 {
@@ -31,7 +35,56 @@ namespace SilverSim.Scene.Types.Object
     {
         private readonly ObjectPartLocalizedInfo m_DefaultLocalization;
 
-        public ObjectPartLocalizedInfo GetLocalization(CultureInfo culture) => m_DefaultLocalization;
+        private readonly RwLockedDictionary<string, ObjectPartLocalizedInfo> m_NamedLocalizations = new RwLockedDictionary<string, ObjectPartLocalizedInfo>();
+
+        public ObjectPartLocalizedInfo GetOrCreateLocalization(string culturename)
+        {
+            if(string.IsNullOrEmpty(culturename))
+            {
+                throw new ArgumentOutOfRangeException(nameof(culturename));
+            }
+            try
+            {
+                CultureInfo.CreateSpecificCulture(culturename);
+            }
+            catch
+            {
+                throw new ArgumentOutOfRangeException(nameof(culturename));
+            }
+            return m_NamedLocalizations.GetOrAddIfNotExists(culturename, () => new ObjectPartLocalizedInfo(this, m_DefaultLocalization));
+        }
+
+        public string[] GetNamedLocalizationNames() => m_NamedLocalizations.Keys.ToArray();
+
+        public void RemoveLocalization(string culturename)
+        {
+            m_NamedLocalizations.Remove(culturename);
+            TriggerOnUpdate(UpdateChangedFlags.None);
+        }
+
+        public void RemoveAllLocalizations()
+        {
+            m_NamedLocalizations.Clear();
+            TriggerOnUpdate(UpdateChangedFlags.None);
+        }
+
+        public ObjectPartLocalizedInfo GetLocalization(CultureInfo culture)
+        {
+            ObjectPartLocalizedInfo info;
+            if(m_NamedLocalizations.Count == 0)
+            {
+                /* no detail check */
+            }
+            else if(m_NamedLocalizations.TryGetValue(culture.ToString(), out info))
+            {
+                return info;
+            }
+            else if (m_NamedLocalizations.TryGetValue(culture.TwoLetterISOLanguageName, out info))
+            {
+                return info;
+            }
+            return m_DefaultLocalization;
+        }
 
         public byte[] GetFullUpdateData(CultureInfo culture) => GetLocalization(culture).FullUpdateData;
 
@@ -40,6 +93,19 @@ namespace SilverSim.Scene.Types.Object
         public byte[] GetCompressedUpdateData(CultureInfo culture) => GetLocalization(culture).CompressedUpdateData;
 
         public byte[] GetPropertiesUpdateData(CultureInfo culture) => GetLocalization(culture).PropertiesUpdateData;
+
+        internal ObjectPartLocalizedInfo[] Localizations
+        {
+            get
+            {
+                var list = new List<ObjectPartLocalizedInfo>();
+                list.Add(m_DefaultLocalization);
+                list.AddRange(m_NamedLocalizations.Values);
+                return list.ToArray();
+            }
+        }
+
+        public bool HaveMultipleLocalizations => m_NamedLocalizations.Count != 0;
 
         #region Default Localization
         public PrimitiveMedia Media => m_DefaultLocalization.Media;
@@ -195,9 +261,6 @@ namespace SilverSim.Scene.Types.Object
         {
             m_DefaultLocalization.UpdateData(flags, incSerial);
         }
-
-        internal ObjectPartLocalizedInfo[] Localizations => new ObjectPartLocalizedInfo[] { m_DefaultLocalization };
-        public bool HaveMultipleLocalizations => false;
         #endregion
     }
 }

@@ -904,8 +904,12 @@ namespace SilverSim.Scene.Types.Object
         }
 
         #region Primitive Params Methods
-        public void GetPrimitiveParams(int linkThis, int linkTarget, AnArray.Enumerator enumerator, AnArray paramList)
+        public void GetPrimitiveParams(int linkThis, int linkTarget, AnArray.Enumerator enumerator, AnArray paramList) =>
+            GetPrimitiveParams(linkThis, linkTarget, enumerator, paramList, null);
+
+        public void GetPrimitiveParams(int linkThis, int linkTarget, AnArray.Enumerator enumerator, AnArray paramList, CultureInfo initialCulture)
         {
+            CultureInfo currentCulture = initialCulture;
             if(0 == linkTarget)
             {
                 linkTarget = LINK_ROOT;
@@ -923,6 +927,27 @@ namespace SilverSim.Scene.Types.Object
             {
                 switch(ParamsHelper.GetPrimParamType(enumerator))
                 {
+                    case PrimitiveParamsType.Language:
+                        {
+                            string cultureName = ParamsHelper.GetString(enumerator, "PRIM_LANGUAGE");
+                            if (string.IsNullOrEmpty(cultureName))
+                            {
+                                currentCulture = null;
+                            }
+                            else
+                            {
+                                try
+                                {
+                                    currentCulture = new CultureInfo(cultureName);
+                                }
+                                catch
+                                {
+                                    throw new LocalizedScriptErrorException(this, "InvalidLanguageParameter0", "Invalid language parameter '{0}'", cultureName);
+                                }
+                            }
+                        }
+                        break;
+
                     case PrimitiveParamsType.LinkTarget:
                         linkTarget = ParamsHelper.GetInteger(enumerator, "PRIM_LINK_TARGET");
                         if(0 == linkTarget)
@@ -973,7 +998,7 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     throw new LocalizedScriptErrorException(this, "LinkTarget0DoesNotExist", "Link target {0} does not exist", linkTarget);
                                 }
-                                obj.GetPrimitiveParams(enumerator, paramList);
+                                obj.GetPrimitiveParams(enumerator, paramList, currentCulture);
                                 break;
                         }
                         break;
@@ -983,7 +1008,12 @@ namespace SilverSim.Scene.Types.Object
 
         public void GetPrimitiveParams(AnArray.Enumerator enumerator, AnArray paramList)
         {
-            GetPrimitiveParams(LINK_ROOT, LINK_ROOT, enumerator, paramList);
+            GetPrimitiveParams(LINK_ROOT, LINK_ROOT, enumerator, paramList, null);
+        }
+
+        public void GetPrimitiveParams(AnArray.Enumerator enumerator, AnArray paramList, CultureInfo currentCulture)
+        {
+            GetPrimitiveParams(LINK_ROOT, LINK_ROOT, enumerator, paramList, currentCulture);
         }
 
         public void SetPrimitiveParams(int linkThis, int linkTarget, AnArray.MarkEnumerator enumerator)
@@ -1000,7 +1030,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 throw new LocalizedScriptErrorException(this, "InvalidLinkTargetParameterForFunction0Msg1", "Invalid link target parameter for {0}: {1}", "SetPrimitiveParams", linkTarget);
             }
-            CultureInfo cultureInfo = null;
+            string cultureName = null;
 
             while (enumerator.MoveNext())
             {
@@ -1008,16 +1038,16 @@ namespace SilverSim.Scene.Types.Object
                 {
                     case PrimitiveParamsType.Language:
                         {
-                            string cultureName = ParamsHelper.GetString(enumerator, "PRIM_LANGUAGE");
+                            cultureName = ParamsHelper.GetString(enumerator, "PRIM_LANGUAGE");
                             if (string.IsNullOrEmpty(cultureName))
                             {
-                                cultureInfo = null;
+                                cultureName = null;
                             }
                             else
                             {
                                 try
                                 {
-                                    cultureInfo = CultureInfo.GetCultureInfo(cultureName);
+                                    CultureInfo.CreateSpecificCulture(cultureName);
                                 }
                                 catch
                                 {
@@ -1059,7 +1089,7 @@ namespace SilverSim.Scene.Types.Object
                                 foreach(ObjectPart obj in this.ValuesByKey1)
                                 {
                                     enumerator.GoToMarkPosition();
-                                    obj.SetPrimitiveParams(enumerator, cultureInfo);
+                                    obj.SetPrimitiveParams(enumerator, cultureName);
                                 }
                                 foreach(IAgent agent in m_SittingAgents.Keys1)
                                 {
@@ -1075,7 +1105,7 @@ namespace SilverSim.Scene.Types.Object
                                     if (kvp.Key != LINK_ROOT)
                                     {
                                         enumerator.GoToMarkPosition();
-                                        kvp.Value.SetPrimitiveParams(enumerator, cultureInfo);
+                                        kvp.Value.SetPrimitiveParams(enumerator, cultureName);
                                     }
                                 }
                                 foreach(IAgent agent in m_SittingAgents.Keys1)
@@ -1092,7 +1122,7 @@ namespace SilverSim.Scene.Types.Object
                                     if (kvp.Key != linkThis)
                                     {
                                         enumerator.GoToMarkPosition();
-                                        kvp.Value.SetPrimitiveParams(enumerator, cultureInfo);
+                                        kvp.Value.SetPrimitiveParams(enumerator, cultureName);
                                     }
                                 }
                                 foreach(IAgent agent in m_SittingAgents.Keys1)

@@ -28,6 +28,7 @@ using SilverSim.Types;
 using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace SilverSim.Scene.Types.Object
 {
@@ -258,6 +259,7 @@ namespace SilverSim.Scene.Types.Object
         #region Methods
         void GetBoundingBox(out BoundingBox box);
         void GetPrimitiveParams(AnArray.Enumerator enumerator, AnArray paramList);
+        void GetPrimitiveParams(AnArray.Enumerator enumerator, AnArray paramList, CultureInfo cultureInfo);
         void SetPrimitiveParams(AnArray.MarkEnumerator enumerator);
         void GetObjectDetails(AnArray.Enumerator enumerator, AnArray paramList);
         DetectedTypeFlags DetectedType { get; }
