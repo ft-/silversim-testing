@@ -31,6 +31,16 @@ namespace SilverSim.Scene.Types.Object.Parameters
         public ColorAlpha TextColor = new ColorAlpha(0, 0, 0, 0);
         #endregion
 
+        public TextParam()
+        {
+        }
+
+        public TextParam(TextParam src)
+        {
+            Text = src.Text;
+            TextColor = src.TextColor;
+        }
+
         public byte[] Serialization
         {
             get

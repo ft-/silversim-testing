@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Object.Localization;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
 using System.Collections.Generic;
@@ -128,7 +129,7 @@ namespace SilverSim.Scene.Types.Scene
                     targetGrp.AddLink(part);
                     part.LocalPosition = newChildPos[part.ID];
                     part.LocalRotation = newChildRot[part.ID];
-                    part.UpdateData(ObjectPart.UpdateDataFlags.All);
+                    part.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.All);
                     part.Inventory.ResumeScripts();
                 }
             }

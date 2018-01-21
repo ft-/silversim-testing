@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Scene.Types.Object.Localization;
 using SilverSim.Scene.Types.Object.Parameters;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Threading;
@@ -28,6 +29,7 @@ using SilverSim.Types.Asset.Format;
 using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace SilverSim.Scene.Types.Object
 {
@@ -891,80 +893,16 @@ namespace SilverSim.Scene.Types.Object
                         sculptChanged = true;
                     }
                     m_Shape.CopyFrom(value);
-                }
-                lock(m_UpdateDataLock)
-                {
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathBegin] = (byte)(value.PathBegin % 256);
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathBegin + 1] = (byte)(value.PathBegin / 256);
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathEnd] = (byte)(value.PathEnd % 256);
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathEnd + 1] = (byte)(value.PathEnd / 256);
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathCurve] = value.PathCurve;
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathRadiusOffset] = (byte)value.PathRadiusOffset;
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathRevolutions] = value.PathRevolutions;
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathScaleX] = value.PathScaleX;
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathScaleY] = value.PathScaleY;
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathShearX] = value.PathShearX;
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathShearY] = value.PathShearY;
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathSkew] = (byte)value.PathSkew;
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathTaperX] = (byte)value.PathTaperX;
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathTaperY] = (byte)value.PathTaperY;
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathTwist] = (byte)value.PathTwist;
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathTwistBegin] = (byte)value.PathTwistBegin;
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PCode] = (byte)value.PCode;
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileBegin] = (byte)(value.ProfileBegin % 256);
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileBegin + 1] = (byte)(value.ProfileBegin / 256);
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileCurve] = value.ProfileCurve;
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileEnd] = (byte)(value.ProfileEnd % 256);
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileEnd + 1] = (byte)(value.ProfileEnd / 256);
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileHollow] = (byte)(value.ProfileHollow % 256);
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileHollow + 1] = (byte)(value.ProfileHollow / 256);
-
-                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathBegin] = (byte)(value.PathBegin % 256);
-                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathBegin + 1] = (byte)(value.PathBegin / 256);
-                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathEnd] = (byte)(value.PathEnd % 256);
-                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathEnd + 1] = (byte)(value.PathEnd / 256);
-                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathCurve] = value.PathCurve;
-                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathRadiusOffset] = (byte)value.PathRadiusOffset;
-                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathRevolutions] = value.PathRevolutions;
-                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathScaleX] = value.PathScaleX;
-                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathScaleY] = value.PathScaleY;
-                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathShearX] = value.PathShearX;
-                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathShearY] = value.PathShearY;
-                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathSkew] = (byte)value.PathSkew;
-                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathTaperX] = (byte)value.PathTaperX;
-                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathTaperY] = (byte)value.PathTaperY;
-                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathTwist] = (byte)value.PathTwist;
-                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathTwistBegin] = (byte)value.PathTwistBegin;
-                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileBegin] = (byte)(value.ProfileBegin % 256);
-                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileBegin + 1] = (byte)(value.ProfileBegin / 256);
-                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileCurve] = value.ProfileCurve;
-                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileEnd] = (byte)(value.ProfileEnd % 256);
-                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileEnd + 1] = (byte)(value.ProfileEnd / 256);
-                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileHollow] = (byte)(value.ProfileHollow % 256);
-                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileHollow + 1] = (byte)(value.ProfileHollow / 256);
-
-                    if (value.SculptType == PrimitiveSculptType.Mesh)
+                    foreach(ObjectPartLocalizedInfo l in Localizations)
                     {
-                        m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileBegin] = (byte)(12500 % 256);
-                        m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileBegin + 1] = (byte)(12500 / 256);
-                        m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileEnd] = 0;
-                        m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileEnd + 1] = 0;
-                        m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileHollow] = (byte)(27500 % 256);
-                        m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileHollow + 1] = (byte)(27500 / 256);
-
-                        m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileBegin] = (byte)(12500 % 256);
-                        m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileBegin + 1] = (byte)(12500 / 256);
-                        m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileEnd] = 0;
-                        m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileEnd + 1] = 0;
-                        m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileHollow] = (byte)(27500 % 256);
-                        m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileHollow + 1] = (byte)(27500 / 256);
+                        l.SetPrimitiveShape(value);
                     }
                 }
+
                 if (sculptChanged)
                 {
                     UpdateExtraParams();
                 }
-                IsChanged = m_IsChangedEnabled;
                 IncrementPhysicsShapeUpdateSerial();
                 IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(UpdateChangedFlags.Shape);
@@ -972,16 +910,20 @@ namespace SilverSim.Scene.Types.Object
         }
 
         #region Primitive Methods
-        public void GetPrimitiveParams(AnArray.Enumerator enumerator, AnArray paramList)
+        public void GetPrimitiveParams(AnArray.Enumerator enumerator, AnArray paramList) => GetPrimitiveParams(enumerator, paramList, null);
+
+        public void GetPrimitiveParams(AnArray.Enumerator enumerator, AnArray paramList, CultureInfo cultureInfo)
         {
-            switch (ParamsHelper.GetPrimParamType(enumerator))
+            ObjectPartLocalizedInfo localization = GetLocalization(cultureInfo);
+            PrimitiveParamsType paramtype = ParamsHelper.GetPrimParamType(enumerator);
+            switch (paramtype)
             {
                 case PrimitiveParamsType.Name:
-                    paramList.Add(Name);
+                    paramList.Add(localization.Name);
                     break;
 
                 case PrimitiveParamsType.Desc:
-                    paramList.Add(Description);
+                    paramList.Add(localization.Description);
                     break;
 
                 case PrimitiveParamsType.Type:
@@ -1021,48 +963,24 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.AlphaMode:
-                    m_TextureEntryLock.AcquireReaderLock(() =>
-                    {
-                        foreach (var face in GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_ALPHAMODE")))
-                        {
-                            GetTexPrimitiveParams(face, PrimitiveParamsType.AlphaMode, paramList);
-                        }
-                    });
+                    localization.GetTexPrimitiveParams(enumerator, paramtype, paramList, "PRIM_ALPHAMODE");
                     break;
 
                 case PrimitiveParamsType.Normal:
-                    m_TextureEntryLock.AcquireReaderLock(() =>
-                    {
-                        foreach (var face in GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_NORMAL")))
-                        {
-                            GetTexPrimitiveParams(face, PrimitiveParamsType.Normal, paramList);
-                        }
-                    });
+                    localization.GetTexPrimitiveParams(enumerator, paramtype, paramList, "PRIM_NORMAL");
                     break;
 
                 case PrimitiveParamsType.Specular:
-                    m_TextureEntryLock.AcquireReaderLock(() =>
-                    {
-                        foreach (var face in GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_SPECULAR")))
-                        {
-                            GetTexPrimitiveParams(face, PrimitiveParamsType.Specular, paramList);
-                        }
-                    });
+                    localization.GetTexPrimitiveParams(enumerator, paramtype, paramList, "PRIM_SPECULAR");
                     break;
 
                 case PrimitiveParamsType.Texture:
-                    m_TextureEntryLock.AcquireReaderLock(() =>
-                    {
-                        foreach (var face in GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_TEXTURE")))
-                        {
-                            GetTexPrimitiveParams(face, PrimitiveParamsType.Texture, paramList);
-                        }
-                    });
+                    localization.GetTexPrimitiveParams(enumerator, paramtype, paramList, "PRIM_TEXTURE");
                     break;
 
                 case PrimitiveParamsType.Text:
                     {
-                        TextParam text = Text;
+                        TextParam text = localization.Text;
                         paramList.Add(text.Text);
                         paramList.Add(text.TextColor.AsVector3);
                         paramList.Add(text.TextColor.A);
@@ -1070,23 +988,11 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.Color:
-                    m_TextureEntryLock.AcquireReaderLock(() =>
-                    {
-                        foreach (var face in GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_COLOR")))
-                        {
-                            GetTexPrimitiveParams(face, PrimitiveParamsType.Color, paramList);
-                        }
-                    });
+                    localization.GetTexPrimitiveParams(enumerator, paramtype, paramList, "PRIM_COLOR");
                     break;
 
                 case PrimitiveParamsType.BumpShiny:
-                    m_TextureEntryLock.AcquireReaderLock(() =>
-                    {
-                        foreach (var face in GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_BUMP_SHINY")))
-                        {
-                            GetTexPrimitiveParams(face, PrimitiveParamsType.BumpShiny, paramList);
-                        }
-                    });
+                    localization.GetTexPrimitiveParams(enumerator, paramtype, paramList, "PRIM_BUMP_SHINY");
                     break;
 
                 case PrimitiveParamsType.PointLight:
@@ -1101,13 +1007,7 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.FullBright:
-                    m_TextureEntryLock.AcquireReaderLock(() =>
-                    {
-                        foreach (var face in GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_FULLBRIGHT")))
-                        {
-                            GetTexPrimitiveParams(face, PrimitiveParamsType.Texture, paramList);
-                        }
-                    });
+                    localization.GetTexPrimitiveParams(enumerator, paramtype, paramList, "PRIM_FULLBRIGHT");
                     break;
 
                 case PrimitiveParamsType.Flexible:
@@ -1124,23 +1024,11 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.TexGen:
-                    m_TextureEntryLock.AcquireReaderLock(() =>
-                    {
-                        foreach (var face in GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_TEXGEN")))
-                        {
-                            GetTexPrimitiveParams(face, PrimitiveParamsType.Texture, paramList);
-                        }
-                    });
+                    localization.GetTexPrimitiveParams(enumerator, paramtype, paramList, "PRIM_TEXGEN");
                     break;
 
                 case PrimitiveParamsType.Glow:
-                    m_TextureEntryLock.AcquireReaderLock(() =>
-                    {
-                        foreach (var face in GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_GLOW")))
-                        {
-                            GetTexPrimitiveParams(face, PrimitiveParamsType.Texture, paramList);
-                        }
-                    });
+                    localization.GetTexPrimitiveParams(enumerator, paramtype, paramList, "PRIM_GLOW");
                     break;
 
                 case PrimitiveParamsType.Omega:
@@ -1153,13 +1041,7 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.Alpha:
-                    m_TextureEntryLock.AcquireReaderLock(() =>
-                    {
-                        foreach (var face in GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_COLOR")))
-                        {
-                            GetTexPrimitiveParams(face, PrimitiveParamsType.Alpha, paramList);
-                        }
-                    });
+                    localization.GetTexPrimitiveParams(enumerator, paramtype, paramList, "PRIM_ALPHA");
                     break;
 
                 case PrimitiveParamsType.AllowUnsit:
@@ -1188,7 +1070,7 @@ namespace SilverSim.Scene.Types.Object
 
                 case PrimitiveParamsType.Projector:
                     {
-                        var param = Projection;
+                        var param = localization.Projection;
                         paramList.Add(param.IsProjecting ? 1 : 0);
                         paramList.Add(param.ProjectionTextureID);
                         paramList.Add(param.ProjectionFOV);
@@ -1199,35 +1081,35 @@ namespace SilverSim.Scene.Types.Object
 
                 case PrimitiveParamsType.ProjectorEnabled:
                     {
-                        var param = Projection;
+                        var param = localization.Projection;
                         paramList.Add(param.IsProjecting ? 1 : 0);
                     }
                     break;
 
                 case PrimitiveParamsType.ProjectorTexture:
                     {
-                        var param = Projection;
+                        var param = localization.Projection;
                         paramList.Add(param.ProjectionTextureID);
                     }
                     break;
 
                 case PrimitiveParamsType.ProjectorFov:
                     {
-                        var param = Projection;
+                        var param = localization.Projection;
                         paramList.Add(param.ProjectionFOV);
                     }
                     break;
 
                 case PrimitiveParamsType.ProjectorFocus:
                     {
-                        var param = Projection;
+                        var param = localization.Projection;
                         paramList.Add(param.ProjectionFocus);
                     }
                     break;
 
                 case PrimitiveParamsType.ProjectorAmbience:
                     {
-                        var param = Projection;
+                        var param = localization.Projection;
                         paramList.Add(param.ProjectionAmbience);
                     }
                     break;
@@ -1241,38 +1123,22 @@ namespace SilverSim.Scene.Types.Object
 
         public int NumberOfSides => Shape.NumberOfSides;
 
-        public ICollection<TextureEntryFace> GetFaces(int face)
-        {
-            if (face == ALL_SIDES)
-            {
-                var list = new List<TextureEntryFace>();
-                for (uint i = 0; i < NumberOfSides; ++i)
-                {
-                    list.Add(m_TextureEntry[i]);
-                }
-                return list;
-            }
-            else
-            {
-                return new List<TextureEntryFace>
-                {
-                    m_TextureEntry[(uint)face]
-                };
-            }
-        }
+        public void SetPrimitiveParams(AnArray.MarkEnumerator enumerator) => SetPrimitiveParams(enumerator, null);
 
-        public void SetPrimitiveParams(AnArray.MarkEnumerator enumerator)
+        public void SetPrimitiveParams(AnArray.MarkEnumerator enumerator, CultureInfo cultureInfo)
         {
+            ObjectPartLocalizedInfo localization = GetLocalization(cultureInfo);
             UpdateChangedFlags flags = 0;
             bool isUpdated = false;
-            switch (ParamsHelper.GetPrimParamType(enumerator))
+            PrimitiveParamsType paramtype = ParamsHelper.GetPrimParamType(enumerator);
+            switch (paramtype)
             {
                 case PrimitiveParamsType.Name:
-                    Name = ParamsHelper.GetString(enumerator, "PRIM_NAME");
+                    localization.Name = ParamsHelper.GetString(enumerator, "PRIM_NAME");
                     break;
 
                 case PrimitiveParamsType.Desc:
-                    Description = ParamsHelper.GetString(enumerator, "PRIM_DESC");
+                    localization.Description = ParamsHelper.GetString(enumerator, "PRIM_DESC");
                     break;
 
                 case PrimitiveParamsType.Type:
@@ -1312,71 +1178,23 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.AlphaMode:
-                    m_TextureEntryLock.AcquireWriterLock(() =>
-                    {
-                        var faces = GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_ALPHAMODE"));
-                        enumerator.MarkPosition();
-                        foreach (var face in faces)
-                        {
-                            enumerator.GoToMarkPosition();
-                            SetTexPrimitiveParams(face, PrimitiveParamsType.AlphaMode, enumerator);
-                        }
-                        m_TextureEntryBytes = m_TextureEntry.GetBytes();
-                        flags |= UpdateChangedFlags.Texture;
-                        isUpdated = true;
-                    });
+                    localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isUpdated, "PRIM_ALPHAMODE");
                     break;
 
                 case PrimitiveParamsType.Normal:
-                    m_TextureEntryLock.AcquireWriterLock(() =>
-                    {
-                        var faces = GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_NORMAL"));
-                        enumerator.MarkPosition();
-                        foreach (var face in faces)
-                        {
-                            enumerator.GoToMarkPosition();
-                            SetTexPrimitiveParams(face, PrimitiveParamsType.Normal, enumerator);
-                        }
-                        m_TextureEntryBytes = m_TextureEntry.GetBytes();
-                        flags |= UpdateChangedFlags.Texture;
-                        isUpdated = true;
-                    });
+                    localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isUpdated, "PRIM_NORMAL");
                     break;
 
                 case PrimitiveParamsType.Specular:
-                    m_TextureEntryLock.AcquireWriterLock(() =>
-                    {
-                        var faces = GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_SPECULAR"));
-                        enumerator.MarkPosition();
-                        foreach (var face in faces)
-                        {
-                            enumerator.GoToMarkPosition();
-                            SetTexPrimitiveParams(face, PrimitiveParamsType.Specular, enumerator);
-                        }
-                        m_TextureEntryBytes = m_TextureEntry.GetBytes();
-                        flags |= UpdateChangedFlags.Texture;
-                        isUpdated = true;
-                    });
+                    localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isUpdated, "PRIM_SPECULAR");
                     break;
 
                 case PrimitiveParamsType.Texture:
-                    m_TextureEntryLock.AcquireWriterLock(() =>
-                    {
-                        var faces = GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_TEXTURE"));
-                        enumerator.MarkPosition();
-                        foreach (var face in faces)
-                        {
-                            enumerator.GoToMarkPosition();
-                            SetTexPrimitiveParams(face, PrimitiveParamsType.Texture, enumerator);
-                        }
-                        m_TextureEntryBytes = m_TextureEntry.GetBytes();
-                        flags |= UpdateChangedFlags.Texture;
-                        isUpdated = true;
-                    });
+                    localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isUpdated, "PRIM_TEXTURE");
                     break;
 
                 case PrimitiveParamsType.Text:
-                    Text = new TextParam
+                    localization.Text = new TextParam
                     {
                         Text = ParamsHelper.GetString(enumerator, "PRIM_TEXT"),
                         TextColor = new ColorAlpha(
@@ -1386,50 +1204,15 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.Color:
-                    m_TextureEntryLock.AcquireWriterLock(() =>
-                    {
-                        var faces = GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_TEXTURE"));
-                        enumerator.MarkPosition();
-                        foreach (var face in faces)
-                        {
-                            enumerator.GoToMarkPosition();
-                            SetTexPrimitiveParams(face, PrimitiveParamsType.Color, enumerator);
-                        }
-                        m_TextureEntryBytes = m_TextureEntry.GetBytes();
-                        flags |= UpdateChangedFlags.Color;
-                        isUpdated = true;
-                    });
+                    localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isUpdated, "PRIM_COLOR");
                     break;
 
                 case PrimitiveParamsType.Alpha:
-                    m_TextureEntryLock.AcquireWriterLock(() =>
-                    {
-                        var faces = GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_ALPHA"));
-                        enumerator.MarkPosition();
-                        foreach (var face in faces)
-                        {
-                            enumerator.GoToMarkPosition();
-                            SetTexPrimitiveParams(face, PrimitiveParamsType.Alpha, enumerator);
-                        }
-                        m_TextureEntryBytes = m_TextureEntry.GetBytes();
-                        flags |= UpdateChangedFlags.Color;
-                        isUpdated = true;
-                    });
+                    localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isUpdated, "PRIM_ALPHA");
                     break;
 
                 case PrimitiveParamsType.BumpShiny:
-                    m_TextureEntryLock.AcquireWriterLock(() =>
-                    {
-                        var faces = GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_BUMP_SHINY"));
-                        enumerator.MarkPosition();
-                        foreach (var face in faces)
-                        {
-                            enumerator.GoToMarkPosition();
-                            SetTexPrimitiveParams(face, PrimitiveParamsType.BumpShiny, enumerator);
-                        }
-                        m_TextureEntryBytes = m_TextureEntry.GetBytes();
-                        flags |= UpdateChangedFlags.Texture;
-                    });
+                    localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isUpdated, "PRIM_BUMP_SHINY");
                     break;
 
                 case PrimitiveParamsType.PointLight:
@@ -1444,18 +1227,7 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.FullBright:
-                    m_TextureEntryLock.AcquireWriterLock(() =>
-                    {
-                        var faces = GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_FULLBRIGHT"));
-                        enumerator.MarkPosition();
-                        foreach (var face in faces)
-                        {
-                            enumerator.GoToMarkPosition();
-                            SetTexPrimitiveParams(face, PrimitiveParamsType.FullBright, enumerator);
-                        }
-                        m_TextureEntryBytes = m_TextureEntry.GetBytes();
-                        flags |= UpdateChangedFlags.Color;
-                    });
+                    localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isUpdated, "PRIM_FULLBRIGHT");
                     break;
 
                 case PrimitiveParamsType.Flexible:
@@ -1471,35 +1243,11 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.TexGen:
-                    m_TextureEntryLock.AcquireWriterLock(() =>
-                    {
-                        var faces = GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_TEXGEN"));
-                        enumerator.MarkPosition();
-                        foreach (var face in faces)
-                        {
-                            enumerator.GoToMarkPosition();
-                            SetTexPrimitiveParams(face, PrimitiveParamsType.TexGen, enumerator);
-                        }
-                        m_TextureEntryBytes = m_TextureEntry.GetBytes();
-                        flags |= UpdateChangedFlags.Texture;
-                        isUpdated = true;
-                    });
+                    localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isUpdated, "PRIM_TEXGEN");
                     break;
 
                 case PrimitiveParamsType.Glow:
-                    m_TextureEntryLock.AcquireWriterLock(() =>
-                    {
-                        var faces = GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_GLOW"));
-                        enumerator.MarkPosition();
-                        foreach (var face in faces)
-                        {
-                            enumerator.GoToMarkPosition();
-                            SetTexPrimitiveParams(face, PrimitiveParamsType.Glow, enumerator);
-                        }
-                        m_TextureEntryBytes = m_TextureEntry.GetBytes();
-                        flags |= UpdateChangedFlags.Color;
-                        isUpdated = true;
-                    });
+                    localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isUpdated, "PRIM_GLOW");
                     break;
 
                 case PrimitiveParamsType.Omega:
@@ -1560,7 +1308,7 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.Projector:
-                    Projection = new ProjectionParam
+                    localization.Projection = new ProjectionParam
                     {
                         IsProjecting = ParamsHelper.GetBoolean(enumerator, "PRIM_PROJECTOR"),
                         ProjectionTextureID = GetTextureParam(enumerator, "PRIM_PROJECTOR"),
@@ -1572,41 +1320,41 @@ namespace SilverSim.Scene.Types.Object
 
                 case PrimitiveParamsType.ProjectorEnabled:
                     {
-                        var param = Projection;
+                        var param = localization.Projection;
                         param.IsProjecting = ParamsHelper.GetBoolean(enumerator, "PRIM_PROJECTOR_ENABLED");
-                        Projection = param;
+                        localization.Projection = param;
                     }
                     break;
 
                 case PrimitiveParamsType.ProjectorTexture:
                     {
-                        var param = Projection;
+                        var param = localization.Projection;
                         param.ProjectionTextureID = GetTextureParam(enumerator, "PRIM_PROJECTOR_TEXTURE");
-                        Projection = param;
+                        localization.Projection = param;
                     }
                     break;
 
                 case PrimitiveParamsType.ProjectorFov:
                     {
-                        var param = Projection;
+                        var param = localization.Projection;
                         param.ProjectionFOV = ParamsHelper.GetDouble(enumerator, "PRIM_PROJECTOR_FOV");
-                        Projection = param;
+                        localization.Projection = param;
                     }
                     break;
 
                 case PrimitiveParamsType.ProjectorFocus:
                     {
-                        ProjectionParam param = Projection;
+                        ProjectionParam param = localization.Projection;
                         param.ProjectionFocus = ParamsHelper.GetDouble(enumerator, "PRIM_PROJECTOR_FOCUS");
-                        Projection = param;
+                        localization.Projection = param;
                     }
                     break;
 
                 case PrimitiveParamsType.ProjectorAmbience:
                     {
-                        var param = Projection;
+                        var param = localization.Projection;
                         param.ProjectionAmbience = ParamsHelper.GetDouble(enumerator, "PRIM_PROJECTION_AMBIENCE");
-                        Projection = param;
+                        localization.Projection = param;
                     }
                     break;
 
@@ -1626,9 +1374,7 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region TextureEntryFace functions
-        private const int PRIM_ALPHA_MODE_BLEND = 1;
-
-        private string GetTextureInventoryItem(UUID assetID)
+        internal string GetTextureInventoryItem(UUID assetID)
         {
             if (assetID != UUID.Zero)
             {
@@ -1643,139 +1389,7 @@ namespace SilverSim.Scene.Types.Object
             return assetID.ToString();
         }
 
-        public void GetTexPrimitiveParams(TextureEntryFace face, PrimitiveParamsType type, AnArray paramList)
-        {
-            switch (type)
-            {
-                case PrimitiveParamsType.Texture:
-                    paramList.Add(GetTextureInventoryItem(face.TextureID));
-                    paramList.Add(new Vector3(face.RepeatU, face.RepeatV, 0));
-                    paramList.Add(new Vector3(face.OffsetU, face.OffsetV, 0));
-                    paramList.Add(face.Rotation);
-                    break;
-
-                case PrimitiveParamsType.Color:
-                    paramList.Add(face.TextureColor.AsVector3);
-                    paramList.Add(1 - face.TextureColor.A);
-                    break;
-
-                case PrimitiveParamsType.Alpha:
-                    paramList.Add(1 - face.TextureColor.A);
-                    break;
-
-                case PrimitiveParamsType.BumpShiny:
-                    paramList.Add((int)face.Shiny);
-                    paramList.Add((int)face.Bump);
-                    break;
-
-                case PrimitiveParamsType.FullBright:
-                    paramList.Add(face.FullBright);
-                    break;
-
-                case PrimitiveParamsType.TexGen:
-                    paramList.Add((int)face.TexMapType);
-                    break;
-
-                case PrimitiveParamsType.Glow:
-                    paramList.Add(face.Glow);
-                    break;
-
-                case PrimitiveParamsType.AlphaMode:
-                    /* [ PRIM_ALPHA_MODE, integer face, integer alpha_mode, integer mask_cutoff ] */
-                    if (face.MaterialID == UUID.Zero)
-                    {
-                        paramList.Add(PRIM_ALPHA_MODE_BLEND);
-                        paramList.Add(0);
-                    }
-                    else
-                    {
-                        try
-                        {
-                            var mat = ObjectGroup.Scene.GetMaterial(face.MaterialID);
-                            paramList.Add(mat.DiffuseAlphaMode);
-                            paramList.Add(mat.AlphaMaskCutoff);
-                        }
-                        catch
-                        {
-                            paramList.Add(PRIM_ALPHA_MODE_BLEND);
-                            paramList.Add(0);
-                        }
-                    }
-                    break;
-
-                case PrimitiveParamsType.Normal:
-                    /* [ PRIM_NORMAL, integer face, string texture, vector repeats, vector offsets, float rotation_in_radians ] */
-                    if (face.MaterialID == UUID.Zero)
-                    {
-                        paramList.Add(UUID.Zero);
-                        paramList.Add(new Vector3(1, 1, 0));
-                        paramList.Add(Vector3.Zero);
-                        paramList.Add(0f);
-                    }
-                    else
-                    {
-                        try
-                        {
-                            var mat = ObjectGroup.Scene.GetMaterial(face.MaterialID);
-                            paramList.Add(GetTextureInventoryItem(mat.NormMap));
-                            paramList.Add(new Vector3(mat.NormRepeatX, mat.NormRepeatY, 0) / SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER);
-                            paramList.Add(new Vector3(mat.NormOffsetX, mat.NormOffsetY, 0) / SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER);
-                            paramList.Add(mat.NormRotation);
-                        }
-                        catch
-                        {
-                            paramList.Add(UUID.Zero);
-                            paramList.Add(new Vector3(1, 1, 0));
-                            paramList.Add(Vector3.Zero);
-                            paramList.Add(0f);
-                        }
-                    }
-                    break;
-
-                case PrimitiveParamsType.Specular:
-                    /* [ PRIM_SPECULAR, integer face, string texture, vector repeats, vector offsets, float rotation_in_radians, vector color, integer glossiness, integer environment ] */
-                    if (face.MaterialID == UUID.Zero)
-                    {
-                        paramList.Add(UUID.Zero);
-                        paramList.Add(new Vector3(1, 1, 0));
-                        paramList.Add(Vector3.Zero);
-                        paramList.Add(0f);
-                        paramList.Add(Vector3.One);
-                        paramList.Add(0);
-                        paramList.Add(0);
-                    }
-                    else
-                    {
-                        try
-                        {
-                            var mat = ObjectGroup.Scene.GetMaterial(face.MaterialID);
-                            paramList.Add(GetTextureInventoryItem(mat.SpecMap));
-                            paramList.Add(new Vector3(mat.SpecRepeatX, mat.SpecRepeatY, 0) / SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER);
-                            paramList.Add(new Vector3(mat.SpecOffsetX, mat.SpecOffsetY, 0) / SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER);
-                            paramList.Add(mat.SpecRotation / SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER);
-                            paramList.Add(mat.SpecColor.AsVector3);
-                            paramList.Add(mat.SpecExp);
-                            paramList.Add(mat.EnvIntensity);
-                        }
-                        catch
-                        {
-                            paramList.Add(UUID.Zero);
-                            paramList.Add(new Vector3(1, 1, 0));
-                            paramList.Add(Vector3.Zero);
-                            paramList.Add(0f);
-                            paramList.Add(Vector3.One);
-                            paramList.Add(0);
-                            paramList.Add(0);
-                        }
-                    }
-                    break;
-
-                default:
-                    throw new ArgumentException(String.Format("Internal error! Primitive parameter type {0} should not be passed to PrimitiveFace", type));
-            }
-        }
-
-        private UUID GetTextureParam(IEnumerator<IValue> enumerator, string paraName)
+        internal UUID GetTextureParam(IEnumerator<IValue> enumerator, string paraName)
         {
             var texture = ParamsHelper.GetString(enumerator, paraName);
             UUID uuid;
@@ -1791,161 +1405,6 @@ namespace SilverSim.Scene.Types.Object
             }
             throw new ArgumentException("texture does not name either a inventory item or a uuid");
         }
-
-        public void SetTexPrimitiveParams(TextureEntryFace face, PrimitiveParamsType type, AnArray.MarkEnumerator enumerator)
-        {
-            switch (type)
-            {
-                case PrimitiveParamsType.Texture:
-                    {
-                        face.TextureID = GetTextureParam(enumerator, "PRIM_TEXTURE");
-                        Vector3 v = ParamsHelper.GetVector(enumerator, "PRIM_TEXTURE");
-                        face.RepeatU = (float)v.X;
-                        face.RepeatV = (float)v.Y;
-                        v = ParamsHelper.GetVector(enumerator, "PRIM_TEXTURE");
-                        face.OffsetU = (float)v.X;
-                        face.OffsetV = (float)v.Y;
-                        face.Rotation = (float)ParamsHelper.GetDouble(enumerator, "PRIM_TEXTURE");
-                    }
-                    break;
-
-                case PrimitiveParamsType.Color:
-                    {
-                        Vector3 color = ParamsHelper.GetVector(enumerator, "PRIM_COLOR");
-                        double alpha = ParamsHelper.GetDouble(enumerator, "PRIM_COLOR").Clamp(0, 1);
-                        face.TextureColor = new ColorAlpha(color, 1 - alpha);
-                    }
-                    break;
-
-                case PrimitiveParamsType.Alpha:
-                    {
-                        double alpha = ParamsHelper.GetDouble(enumerator, "PRIM_ALPHA").Clamp(0, 1);
-                        ColorAlpha color = face.TextureColor;
-                        color.A = 1 - alpha;
-                        face.TextureColor = color;
-                    }
-                    break;
-
-                case PrimitiveParamsType.BumpShiny:
-                    face.Shiny = (Shininess)ParamsHelper.GetInteger(enumerator, "PRIM_BUMP_SHINY");
-                    face.Bump = (Bumpiness)ParamsHelper.GetInteger(enumerator, "PRIM_BUMP_SHINY");
-                    break;
-
-                case PrimitiveParamsType.FullBright:
-                    face.FullBright = ParamsHelper.GetBoolean(enumerator, "PRIM_FULLBRIGHT");
-                    break;
-
-                case PrimitiveParamsType.TexGen:
-                    face.TexMapType = (MappingType)ParamsHelper.GetInteger(enumerator, "PRIM_TEXGEN");
-                    break;
-
-                case PrimitiveParamsType.Glow:
-                    face.Glow = (float)ParamsHelper.GetDouble(enumerator, "PRIM_GLOW");
-                    break;
-
-                case PrimitiveParamsType.AlphaMode:
-                    /* [ PRIM_ALPHA_MODE, integer face, integer alpha_mode, integer mask_cutoff ] */
-                    {
-                        Material mat;
-                        try
-                        {
-                            mat = ObjectGroup.Scene.GetMaterial(face.MaterialID);
-                        }
-                        catch
-                        {
-                            mat = new Material();
-                        }
-                        mat.DiffuseAlphaMode = ParamsHelper.GetInteger(enumerator, "PRIM_ALPHA_MODE");
-                        mat.AlphaMaskCutoff = ParamsHelper.GetInteger(enumerator, "PRIM_ALPHA_MODE");
-                        mat.DiffuseAlphaMode = mat.DiffuseAlphaMode.Clamp(0, 3);
-                        mat.AlphaMaskCutoff = mat.AlphaMaskCutoff.Clamp(0, 3);
-                        mat.MaterialID = UUID.Random;
-                        ObjectGroup.Scene.StoreMaterial(mat);
-                        face.MaterialID = mat.MaterialID;
-                    }
-                    break;
-
-                case PrimitiveParamsType.Normal:
-                    /* [ PRIM_NORMAL, integer face, string texture, vector repeats, vector offsets, float rotation_in_radians ] */
-                    {
-                        UUID texture = GetTextureParam(enumerator, "PRIM_NORMAL");
-                        Vector3 repeats = ParamsHelper.GetVector(enumerator, "PRIM_NORMAL");
-                        Vector3 offsets = ParamsHelper.GetVector(enumerator, "PRIM_NORMAL");
-                        double rotation = ParamsHelper.GetDouble(enumerator, "PRIM_NORMAL");
-
-                        repeats.X *= SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER;
-                        repeats.Y *= SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER;
-                        offsets.X *= SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER;
-                        offsets.Y *= SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER;
-                        rotation %= Math.PI * 2;
-                        rotation *= SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER;
-
-                        Material mat;
-                        try
-                        {
-                            mat = ObjectGroup.Scene.GetMaterial(face.MaterialID);
-                        }
-                        catch
-                        {
-                            mat = new Material();
-                        }
-                        mat.NormMap = texture;
-                        mat.NormOffsetX = (int)Math.Round(offsets.X);
-                        mat.NormOffsetY = (int)Math.Round(offsets.Y);
-                        mat.NormRepeatX = (int)Math.Round(repeats.X);
-                        mat.NormRepeatY = (int)Math.Round(repeats.Y);
-                        mat.NormRotation = (int)Math.Round(rotation);
-                        mat.MaterialID = UUID.Random;
-                        ObjectGroup.Scene.StoreMaterial(mat);
-                        face.MaterialID = mat.MaterialID;
-                    }
-                    break;
-
-                case PrimitiveParamsType.Specular:
-                    /* [ PRIM_SPECULAR, integer face, string texture, vector repeats, vector offsets, float rotation_in_radians, vector color, integer glossiness, integer environment ] */
-                    {
-                        UUID texture = GetTextureParam(enumerator, "PRIM_NORMAL");
-                        Vector3 repeats = ParamsHelper.GetVector(enumerator, "PRIM_SPECULAR");
-                        Vector3 offsets = ParamsHelper.GetVector(enumerator, "PRIM_SPECULAR");
-                        repeats *= SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER;
-                        offsets *= SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER;
-                        double rotation = ParamsHelper.GetDouble(enumerator, "PRIM_SPECULAR");
-                        rotation %= Math.PI * 2;
-                        rotation *= SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER;
-                        var color = new ColorAlpha(ParamsHelper.GetVector(enumerator, "PRIM_SPECULAR"), 1);
-                        int glossiness = ParamsHelper.GetInteger(enumerator, "PRIM_SPECULAR");
-                        int environment = ParamsHelper.GetInteger(enumerator, "PRIM_SPECULAR");
-                        environment = environment.Clamp(0, 255);
-                        glossiness = glossiness.Clamp(0, 255);
-                        Material mat;
-                        try
-                        {
-                            mat = ObjectGroup.Scene.GetMaterial(face.MaterialID);
-                        }
-                        catch
-                        {
-                            mat = new Material();
-                        }
-                        mat.SpecColor = color;
-                        mat.SpecMap = texture;
-                        mat.SpecOffsetX = (int)Math.Round(offsets.X);
-                        mat.SpecOffsetY = (int)Math.Round(offsets.Y);
-                        mat.SpecRepeatX = (int)Math.Round(repeats.X);
-                        mat.SpecRepeatY = (int)Math.Round(repeats.Y);
-                        mat.SpecRotation = (int)Math.Round(rotation);
-                        mat.EnvIntensity = environment;
-                        mat.SpecExp = glossiness;
-                        mat.MaterialID = UUID.Random;
-                        ObjectGroup.Scene.StoreMaterial(mat);
-                        face.MaterialID = mat.MaterialID;
-                    }
-                    break;
-
-                default:
-                    throw new ArgumentException(String.Format("Internal error! Primitive parameter type {0} should not be passed to PrimitiveFace", type));
-            }
-        }
-
         #endregion
     }
 }

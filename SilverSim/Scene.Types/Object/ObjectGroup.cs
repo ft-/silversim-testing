@@ -34,6 +34,7 @@ using SilverSim.Types.Inventory;
 using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace SilverSim.Scene.Types.Object
@@ -999,11 +1000,33 @@ namespace SilverSim.Scene.Types.Object
             {
                 throw new LocalizedScriptErrorException(this, "InvalidLinkTargetParameterForFunction0Msg1", "Invalid link target parameter for {0}: {1}", "SetPrimitiveParams", linkTarget);
             }
+            CultureInfo cultureInfo = null;
 
             while (enumerator.MoveNext())
             {
                 switch (ParamsHelper.GetPrimParamType(enumerator))
                 {
+                    case PrimitiveParamsType.Language:
+                        {
+                            string cultureName = ParamsHelper.GetString(enumerator, "PRIM_LANGUAGE");
+                            if (string.IsNullOrEmpty(cultureName))
+                            {
+                                cultureInfo = null;
+                            }
+                            else
+                            {
+                                try
+                                {
+                                    cultureInfo = CultureInfo.GetCultureInfo(cultureName);
+                                }
+                                catch
+                                {
+                                    throw new LocalizedScriptErrorException(this, "InvalidLanguageParameter0", "Invalid language parameter '{0}'", cultureName);
+                                }
+                            }
+                        }
+                        break;
+
                     case PrimitiveParamsType.LinkTarget:
                         linkTarget = ParamsHelper.GetInteger(enumerator, "PRIM_LINK_TARGET");
                         if (0 == linkTarget)
@@ -1036,7 +1059,7 @@ namespace SilverSim.Scene.Types.Object
                                 foreach(ObjectPart obj in this.ValuesByKey1)
                                 {
                                     enumerator.GoToMarkPosition();
-                                    obj.SetPrimitiveParams(enumerator);
+                                    obj.SetPrimitiveParams(enumerator, cultureInfo);
                                 }
                                 foreach(IAgent agent in m_SittingAgents.Keys1)
                                 {
@@ -1052,7 +1075,7 @@ namespace SilverSim.Scene.Types.Object
                                     if (kvp.Key != LINK_ROOT)
                                     {
                                         enumerator.GoToMarkPosition();
-                                        kvp.Value.SetPrimitiveParams(enumerator);
+                                        kvp.Value.SetPrimitiveParams(enumerator, cultureInfo);
                                     }
                                 }
                                 foreach(IAgent agent in m_SittingAgents.Keys1)
@@ -1069,7 +1092,7 @@ namespace SilverSim.Scene.Types.Object
                                     if (kvp.Key != linkThis)
                                     {
                                         enumerator.GoToMarkPosition();
-                                        kvp.Value.SetPrimitiveParams(enumerator);
+                                        kvp.Value.SetPrimitiveParams(enumerator, cultureInfo);
                                     }
                                 }
                                 foreach(IAgent agent in m_SittingAgents.Keys1)

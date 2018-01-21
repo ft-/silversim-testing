@@ -21,6 +21,7 @@
 
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Object.Localization;
 using SilverSim.Types;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Object;
@@ -98,7 +99,7 @@ namespace SilverSim.Scene.Types.Scene
             part.Size = Vector3.One / 2f;
 
             /* initial setup of object */
-            part.UpdateData(ObjectPart.UpdateDataFlags.All);
+            part.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.All);
 
             var selectedList = agent.SelectedObjects(ID);
             foreach(UUID old in selectedList.GetAndClear())

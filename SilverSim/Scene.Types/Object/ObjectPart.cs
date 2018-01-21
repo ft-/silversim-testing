@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using log4net;
+using SilverSim.Scene.Types.Object.Localization;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Scene.Types.Script.Events;
@@ -59,22 +60,20 @@ namespace SilverSim.Scene.Types.Object
                 lock (m_DataLock)
                 {
                     incSerial = m_LocalID != 0;
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.LocalID] = (byte)(value & 0xFF);
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.LocalID + 1] = (byte)((value >> 8) & 0xFF);
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.LocalID + 2] = (byte)((value >> 16) & 0xFF);
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.LocalID + 3] = (byte)((value >> 24) & 0xFF);
+                    foreach(ObjectPartLocalizedInfo l in Localizations)
+                    {
+                        l.SetLocalID(value);
+                    }
                     UpdateInfo.LocalID = value;
                     m_LocalID = value;
                 }
-                UpdateData(UpdateDataFlags.All, incSerial);
+                UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.All, incSerial);
             }
         }
 
         public ILocalIDAccessor LocalID => this;
 
         private UUID m_ID = UUID.Zero;
-        private string m_Name = string.Empty;
-        private string m_Description = string.Empty;
         private Vector3 m_LocalPosition = Vector3.Zero;
         private Vector3 m_SandboxOrigin = Vector3.Zero;
         private Quaternion m_LocalRotation = Quaternion.Identity;
@@ -82,8 +81,6 @@ namespace SilverSim.Scene.Types.Object
         private PrimitivePhysicsShapeType m_PhysicsShapeType;
         private PrimitiveMaterial m_Material = PrimitiveMaterial.Wood;
         private Vector3 m_Size = new Vector3(0.5, 0.5, 0.5);
-        private string m_SitText = string.Empty;
-        private string m_TouchText = string.Empty;
         private bool m_IsSitTargetActive;
         private Vector3 m_SitTargetOffset = Vector3.Zero;
         private string m_SitAnimation = string.Empty;
@@ -254,19 +251,16 @@ namespace SilverSim.Scene.Types.Object
         #region Constructor
         public ObjectPart()
         {
+            m_DefaultLocalization = new ObjectPartLocalizedInfo(this);
             m_Permissions.Base = InventoryPermissionsMask.All;
             m_Permissions.Current = InventoryPermissionsMask.All;
             m_Permissions.Group = InventoryPermissionsMask.None;
             m_Permissions.EveryOne = InventoryPermissionsMask.None;
             m_Permissions.NextOwner = InventoryPermissionsMask.All;
-            m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ObjectDataLength] = (byte)60;
 
-            ObjectGroup = null;
-            IsChanged = false;
             Inventory = new ObjectPartInventory();
             Inventory.OnChange += OnInventoryChange;
             Inventory.OnInventoryUpdate += OnInventoryUpdate;
-            m_TextureEntryBytes = m_TextureEntry.GetBytes();
             UpdateInfo = new ObjectUpdateInfo(this);
             AnimationController = new ObjectAnimationController(this);
 
@@ -275,19 +269,16 @@ namespace SilverSim.Scene.Types.Object
 
         public ObjectPart(UUID id)
         {
+            m_DefaultLocalization = new ObjectPartLocalizedInfo(this);
             m_Permissions.Base = InventoryPermissionsMask.All;
             m_Permissions.Current = InventoryPermissionsMask.All;
             m_Permissions.Group = InventoryPermissionsMask.None;
             m_Permissions.EveryOne = InventoryPermissionsMask.None;
             m_Permissions.NextOwner = InventoryPermissionsMask.All;
-            m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ObjectDataLength] = (byte)60;
 
-            ObjectGroup = null;
-            IsChanged = false;
             Inventory = new ObjectPartInventory();
             Inventory.OnChange += OnInventoryChange;
             Inventory.OnInventoryUpdate += OnInventoryUpdate;
-            m_TextureEntryBytes = m_TextureEntry.GetBytes();
             UpdateInfo = new ObjectUpdateInfo(this);
             AnimationController = new ObjectAnimationController(this);
 
@@ -296,14 +287,11 @@ namespace SilverSim.Scene.Types.Object
 
         public ObjectPart(UUID id, ObjectPart fromPart)
         {
-            m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ObjectDataLength] = (byte)60;
+            m_DefaultLocalization = new ObjectPartLocalizedInfo(this, fromPart.m_DefaultLocalization, null);
 
-            ObjectGroup = null;
-            IsChanged = false;
             Inventory = new ObjectPartInventory();
             Inventory.OnChange += OnInventoryChange;
             Inventory.OnInventoryUpdate += OnInventoryUpdate;
-            m_TextureEntryBytes = m_TextureEntry.GetBytes();
             UpdateInfo = new ObjectUpdateInfo(this);
             AnimationController = new ObjectAnimationController(this);
             m_Shape = fromPart.Shape;
@@ -549,23 +537,26 @@ namespace SilverSim.Scene.Types.Object
         {
             if (action == ObjectPartInventory.ChangeAction.NextOwnerAssetID)
             {
-                lock (m_UpdateDataLock)
+                lock (m_DataLock)
                 {
                     int invSerial = Inventory.InventorySerial;
-                    m_PropUpdateFixedBlock[(int)PropertiesFixedBlockOffset.InventorySerial] = (byte)(invSerial % 256);
-                    m_PropUpdateFixedBlock[(int)PropertiesFixedBlockOffset.InventorySerial + 1] = (byte)(invSerial / 256);
+                    foreach (ObjectPartLocalizedInfo l in Localizations)
+                    {
+                        l.SetInventorySerial(invSerial);
+                    }
                 }
                 TriggerOnNextOwnerAssetIDChange();
             }
             else
             {
-                IsChanged = m_IsChangedEnabled;
-                lock (m_UpdateDataLock)
+                lock (m_DataLock)
                 {
                     int invSerial = Inventory.InventorySerial;
-                    m_PropUpdateFixedBlock[(int)PropertiesFixedBlockOffset.InventorySerial] = (byte)(invSerial % 256);
-                    m_PropUpdateFixedBlock[(int)PropertiesFixedBlockOffset.InventorySerial + 1] = (byte)(invSerial / 256);
                     IsScripted = Inventory.CountScripts != 0;
+                    foreach (ObjectPartLocalizedInfo l in Localizations)
+                    {
+                        l.SetInventorySerial(invSerial);
+                    }
                 }
                 TriggerOnUpdate(UpdateChangedFlags.Inventory);
             }
@@ -578,6 +569,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 return;
             }
+            IsChanged = m_IsChangedEnabled;
 
             ObjectGroup.OriginalAssetID = UUID.Zero;
 
@@ -593,7 +585,7 @@ namespace SilverSim.Scene.Types.Object
                 }
             }
 
-            UpdateData(UpdateDataFlags.All);
+            UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.All);
             ObjectGroup.Scene?.ScheduleUpdate(UpdateInfo);
         }
 
@@ -617,7 +609,7 @@ namespace SilverSim.Scene.Types.Object
                 }
             }
 
-            UpdateData(UpdateDataFlags.All);
+            UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.All);
             ObjectGroup.Scene?.ScheduleUpdate(UpdateInfo);
         }
 
@@ -640,7 +632,7 @@ namespace SilverSim.Scene.Types.Object
                     m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace);
                 }
             }
-            UpdateData(UpdateDataFlags.Full | UpdateDataFlags.Terse);
+            UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.Full | ObjectPartLocalizedInfo.UpdateDataFlags.Terse);
             ObjectGroup.Scene?.ScheduleUpdate(UpdateInfo);
         }
 
@@ -675,7 +667,7 @@ namespace SilverSim.Scene.Types.Object
                     m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace);
                 }
             }
-            UpdateData(UpdateDataFlags.Full | UpdateDataFlags.Terse);
+            UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.Full | ObjectPartLocalizedInfo.UpdateDataFlags.Terse);
             ObjectGroup.Scene?.ScheduleUpdate(UpdateInfo, true);
         }
 
@@ -716,18 +708,12 @@ namespace SilverSim.Scene.Types.Object
 
                 const InventoryPermissionsMask lockBits = InventoryPermissionsMask.Move | InventoryPermissionsMask.Modify;
                 m_Permissions.Current = (m_Permissions.Current & lockBits) | (ownerMask & ~lockBits);
+                foreach (ObjectPartLocalizedInfo l in Localizations)
+                {
+                    l.SetBaseMask(value);
+                }
             }
 
-            lock (m_UpdateDataLock)
-            {
-                byte[] b = BitConverter.GetBytes((uint)value);
-                if (!BitConverter.IsLittleEndian)
-                {
-                    Array.Reverse(b);
-                }
-                Buffer.BlockCopy(b, 0, m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.BaseMask, b.Length);
-            }
-            IsChanged = m_IsChangedEnabled;
             TriggerOnUpdate(0);
         }
 
@@ -749,18 +735,12 @@ namespace SilverSim.Scene.Types.Object
 
                     const InventoryPermissionsMask lockBits = InventoryPermissionsMask.Move | InventoryPermissionsMask.Modify;
                     m_Permissions.Current = (m_Permissions.Current & lockBits) | (ownerMask & ~lockBits);
+                    foreach (ObjectPartLocalizedInfo l in Localizations)
+                    {
+                        l.SetBaseMask(value);
+                    }
                 }
 
-                lock(m_UpdateDataLock)
-                {
-                    byte[] b = BitConverter.GetBytes((uint)value);
-                    if(!BitConverter.IsLittleEndian)
-                    {
-                        Array.Reverse(b);
-                    }
-                    Buffer.BlockCopy(b, 0, m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.BaseMask, b.Length);
-                }
-                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -772,17 +752,11 @@ namespace SilverSim.Scene.Types.Object
             {
                 value = (m_Permissions.Current | setflags) & ~clrflags;
                 m_Permissions.Current = value;
-            }
-            lock (m_UpdateDataLock)
-            {
-                byte[] b = BitConverter.GetBytes((uint)value);
-                if (!BitConverter.IsLittleEndian)
+                foreach (ObjectPartLocalizedInfo l in Localizations)
                 {
-                    Array.Reverse(b);
+                    l.SetOwnerMask(value);
                 }
-                Buffer.BlockCopy(b, 0, m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.OwnerMask, b.Length);
             }
-            IsChanged = m_IsChangedEnabled;
             TriggerOnUpdate(0);
         }
 
@@ -800,17 +774,11 @@ namespace SilverSim.Scene.Types.Object
                 lock (m_DataLock)
                 {
                     m_Permissions.Current = value;
-                }
-                lock (m_UpdateDataLock)
-                {
-                    byte[] b = BitConverter.GetBytes((uint)value);
-                    if (!BitConverter.IsLittleEndian)
+                    foreach (ObjectPartLocalizedInfo l in Localizations)
                     {
-                        Array.Reverse(b);
+                        l.SetOwnerMask(value);
                     }
-                    Buffer.BlockCopy(b, 0, m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.OwnerMask, b.Length);
                 }
-                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -822,17 +790,11 @@ namespace SilverSim.Scene.Types.Object
             {
                 value = (m_Permissions.Group | setflags) & ~clrflags;
                 m_Permissions.Group = value;
-            }
-            lock (m_UpdateDataLock)
-            {
-                byte[] b = BitConverter.GetBytes((uint)value);
-                if (!BitConverter.IsLittleEndian)
+                foreach (ObjectPartLocalizedInfo l in Localizations)
                 {
-                    Array.Reverse(b);
+                    l.SetGroupMask(value);
                 }
-                Buffer.BlockCopy(b, 0, m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.GroupMask, b.Length);
             }
-            IsChanged = m_IsChangedEnabled;
             TriggerOnUpdate(0);
         }
 
@@ -850,17 +812,11 @@ namespace SilverSim.Scene.Types.Object
                 lock (m_DataLock)
                 {
                     m_Permissions.Group = value;
-                }
-                lock (m_UpdateDataLock)
-                {
-                    byte[] b = BitConverter.GetBytes((uint)value);
-                    if (!BitConverter.IsLittleEndian)
+                    foreach(ObjectPartLocalizedInfo l in Localizations)
                     {
-                        Array.Reverse(b);
+                        l.SetGroupMask(value);
                     }
-                    Buffer.BlockCopy(b, 0, m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.GroupMask, b.Length);
                 }
-                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -872,17 +828,11 @@ namespace SilverSim.Scene.Types.Object
             {
                 value = (m_Permissions.EveryOne | setflags) & ~clrflags;
                 m_Permissions.EveryOne = value;
-            }
-            lock (m_UpdateDataLock)
-            {
-                byte[] b = BitConverter.GetBytes((uint)value);
-                if (!BitConverter.IsLittleEndian)
+                foreach(ObjectPartLocalizedInfo l in Localizations)
                 {
-                    Array.Reverse(b);
+                    l.SetEveryoneMask(value);
                 }
-                Buffer.BlockCopy(b, 0, m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.EveryoneMask, b.Length);
             }
-            IsChanged = m_IsChangedEnabled;
             TriggerOnUpdate(0);
         }
 
@@ -900,17 +850,11 @@ namespace SilverSim.Scene.Types.Object
                 lock (m_DataLock)
                 {
                     m_Permissions.EveryOne = value;
-                }
-                lock (m_UpdateDataLock)
-                {
-                    byte[] b = BitConverter.GetBytes((uint)value);
-                    if (!BitConverter.IsLittleEndian)
+                    foreach (ObjectPartLocalizedInfo l in Localizations)
                     {
-                        Array.Reverse(b);
+                        l.SetEveryoneMask(value);
                     }
-                    Buffer.BlockCopy(b, 0, m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.EveryoneMask, b.Length);
                 }
-                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -922,17 +866,11 @@ namespace SilverSim.Scene.Types.Object
             {
                 value = (m_Permissions.NextOwner | setflags) & ~clrflags;
                 m_Permissions.NextOwner = value;
-            }
-            lock (m_UpdateDataLock)
-            {
-                byte[] b = BitConverter.GetBytes((uint)value);
-                if (!BitConverter.IsLittleEndian)
+                foreach(ObjectPartLocalizedInfo l in Localizations)
                 {
-                    Array.Reverse(b);
+                    l.SetNextOwnerMask(value);
                 }
-                Buffer.BlockCopy(b, 0, m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.NextOwnerMask, b.Length);
             }
-            IsChanged = m_IsChangedEnabled;
             TriggerOnUpdate(0);
         }
 
@@ -943,7 +881,6 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_IsScriptedSitOnly = value;
-                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -955,7 +892,6 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_AllowUnsit = value;
-                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -974,17 +910,11 @@ namespace SilverSim.Scene.Types.Object
                 lock (m_DataLock)
                 {
                     m_Permissions.NextOwner = value;
-                }
-                lock (m_UpdateDataLock)
-                {
-                    byte[] b = BitConverter.GetBytes((uint)value);
-                    if (!BitConverter.IsLittleEndian)
+                    foreach (ObjectPartLocalizedInfo l in Localizations)
                     {
-                        Array.Reverse(b);
+                        l.SetNextOwnerMask(value);
                     }
-                    Buffer.BlockCopy(b, 0, m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.NextOwnerMask, b.Length);
                 }
-                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -1004,7 +934,6 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_RezDate = new Date(value);
                 }
-                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -1023,17 +952,11 @@ namespace SilverSim.Scene.Types.Object
                 lock (m_DataLock)
                 {
                     m_CreationDate = new Date(value);
+                    foreach(ObjectPartLocalizedInfo l in Localizations)
+                    {
+                        l.SetCreationDate(value);
+                    }
                 }
-                byte[] b = BitConverter.GetBytes(value.DateTimeToUnixTime());
-                if(!BitConverter.IsLittleEndian)
-                {
-                    Array.Reverse(b);
-                }
-                lock(m_UpdateDataLock)
-                {
-                    Buffer.BlockCopy(b, 0, m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.CreationDate, 8);
-                }
-                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -1053,7 +976,6 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_PrimitiveFlags = value;
                 }
-                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -1064,7 +986,6 @@ namespace SilverSim.Scene.Types.Object
             {
                 m_PrimitiveFlags = (m_PrimitiveFlags  & ~clrMask) | setMask;
             }
-            IsChanged = m_IsChangedEnabled;
             TriggerOnUpdate(0);
         }
 
@@ -1082,12 +1003,11 @@ namespace SilverSim.Scene.Types.Object
                 lock (m_DataLock)
                 {
                     m_Creator = value;
+                    foreach (ObjectPartLocalizedInfo l in Localizations)
+                    {
+                        l.SetCreator(value);
+                    }
                 }
-                lock(m_UpdateDataLock)
-                {
-                    value.ID.ToBytes(m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.CreatorID);
-                }
-                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -1112,9 +1032,14 @@ namespace SilverSim.Scene.Types.Object
 
             set
             {
-                m_ClickAction = value;
-                m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ClickAction] = (byte)value;
-                IsChanged = m_IsChangedEnabled;
+                lock (m_DataLock)
+                {
+                    m_ClickAction = value;
+                    foreach(ObjectPartLocalizedInfo l in Localizations)
+                    {
+                        l.SetClickAction(value);
+                    }
+                }
                 TriggerOnUpdate(0);
             }
         }
@@ -1126,7 +1051,6 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_PassCollisionMode = value;
-                IsChanged = m_IsChangedEnabled;
                 IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(0);
             }
@@ -1138,7 +1062,6 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_PassTouchMode = value;
-                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -1152,12 +1075,12 @@ namespace SilverSim.Scene.Types.Object
                 lock (m_DataLock)
                 {
                     m_Velocity = value;
+                    foreach(ObjectPartLocalizedInfo l in Localizations)
+                    {
+                        l.SetVelocity(value);
+                    }
                 }
-                lock (m_UpdateDataLock)
-                {
-                    value.ToBytes(m_FullUpdateFixedBlock1, (int)FullFixedBlock1Offset.ObjectData_Velocity);
-                }
-                UpdateData(UpdateDataFlags.Full);
+                UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.Full);
             }
         }
 
@@ -1175,10 +1098,10 @@ namespace SilverSim.Scene.Types.Object
                 lock (m_DataLock)
                 {
                     m_AngularVelocity = value;
-                }
-                lock (m_UpdateDataLock)
-                {
-                    value.ToBytes(m_FullUpdateFixedBlock1, (int)FullFixedBlock1Offset.ObjectData_AngularVelocity);
+                    foreach(ObjectPartLocalizedInfo l in Localizations)
+                    {
+                        l.SetAngularVelocity(value);
+                    }
                 }
                 TriggerOnUpdate(0);
             }
@@ -1218,6 +1141,9 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+
+        private bool m_IsSoundQueueing;
+
         public bool IsSoundQueueing
         {
             get { return m_IsSoundQueueing; }
@@ -1225,7 +1151,6 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_IsSoundQueueing = value;
-                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -1262,7 +1187,6 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_IsAllowedDrop = value;
-                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(UpdateChangedFlags.AllowedDrop);
             }
         }
@@ -1282,7 +1206,6 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_IsSitTargetActive = value;
                 }
-                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -1302,7 +1225,6 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_SitAnimation = value ?? string.Empty;
                 }
-                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -1326,7 +1248,6 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_UnSitTargetOffset = value;
                 }
-                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -1346,7 +1267,6 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_UnSitTargetOrientation = value;
                 }
-                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -1366,7 +1286,6 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_IsUnSitTargetActive = value;
                 }
-                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -1386,7 +1305,6 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_SitTargetOffset = value;
                 }
-                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -1406,7 +1324,6 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_SitTargetOrientation = value;
                 }
-                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -1415,18 +1332,11 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (m_DataLock)
-                {
-                    return m_SitText;
-                }
+                return m_DefaultLocalization.SitText;
             }
             set
             {
-                lock (m_DataLock)
-                {
-                    m_SitText = value;
-                }
-                IsChanged = m_IsChangedEnabled;
+                m_DefaultLocalization.SitText = value;
                 TriggerOnUpdate(0);
             }
         }
@@ -1454,18 +1364,11 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (m_DataLock)
-                {
-                    return m_TouchText;
-                }
+                return m_DefaultLocalization.TouchText;
             }
             set
             {
-                lock (m_DataLock)
-                {
-                    m_TouchText = value;
-                }
-                IsChanged = m_IsChangedEnabled;
+                m_DefaultLocalization.TouchText = value;
                 TriggerOnUpdate(0);
             }
         }
@@ -1484,7 +1387,6 @@ namespace SilverSim.Scene.Types.Object
                 }
                 if (valueChanged)
                 {
-                    IsChanged = m_IsChangedEnabled;
                     IncrementPhysicsShapeUpdateSerial();
                     IncrementPhysicsParameterUpdateSerial();
                     TriggerOnUpdate(UpdateChangedFlags.Shape);
@@ -1542,8 +1444,13 @@ namespace SilverSim.Scene.Types.Object
                     default:
                         break;
                 }
-                m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.Material] = (byte)value;
-                IsChanged = m_IsChangedEnabled;
+                lock (m_DataLock)
+                {
+                    foreach (ObjectPartLocalizedInfo l in Localizations)
+                    {
+                        l.SetMaterial(value);
+                    }
+                }
                 IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(0);
             }
@@ -1563,12 +1470,11 @@ namespace SilverSim.Scene.Types.Object
                 lock(m_DataLock)
                 {
                     m_Size = value;
+                    foreach(ObjectPartLocalizedInfo l in Localizations)
+                    {
+                        l.SetScale(value);
+                    }
                 }
-                lock(m_UpdateDataLock)
-                {
-                    value.ToBytes(m_FullUpdateFixedBlock1, (int)FullFixedBlock1Offset.Scale);
-                }
-                IsChanged = m_IsChangedEnabled;
                 IncrementPhysicsShapeUpdateSerial();
                 IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(UpdateChangedFlags.Scale);
@@ -1590,7 +1496,6 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_Slice = value;
                 }
-                IsChanged = m_IsChangedEnabled;
                 IncrementPhysicsShapeUpdateSerial();
                 IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(UpdateChangedFlags.Shape);
@@ -1612,8 +1517,6 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 AngularVelocity = value.Axis * value.Spinrate;
-                IsChanged = m_IsChangedEnabled;
-                TriggerOnUpdate(0);
             }
         }
 
@@ -1633,37 +1536,32 @@ namespace SilverSim.Scene.Types.Object
                     m_ID = value;
                     UpdateInfo.ID = value;
                     Inventory.PartID = value;
+                    foreach(ObjectPartLocalizedInfo l in Localizations)
+                    {
+                        l.SetID(value);
+                    }
                 }
-                lock(m_UpdateDataLock)
-                {
-                    value.ToBytes(m_FullUpdateFixedBlock1, (int)FullFixedBlock1Offset.FullID);
-                    value.ToBytes(m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.ObjectID);
-                }
-                UpdateData(UpdateDataFlags.All);
+                UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.All);
             }
         }
 
         public string Name
         {
-            get { return m_Name; }
+            get { return m_DefaultLocalization.Name; }
 
             set
             {
-                m_Name = value.FilterToAscii7Printable().TrimToMaxLength(63);
-                IsChanged = m_IsChangedEnabled;
-                TriggerOnUpdate(0);
+                m_DefaultLocalization.Name = value;
             }
         }
 
         public string Description
         {
-            get { return m_Description; }
+            get { return m_DefaultLocalization.Description; }
 
             set
             {
-                m_Description = value.FilterToNonControlChars().TrimToMaxLength(127);
-                IsChanged = m_IsChangedEnabled;
-                TriggerOnUpdate(0);
+                m_DefaultLocalization.Description = value;
             }
         }
         #endregion
@@ -1711,12 +1609,11 @@ namespace SilverSim.Scene.Types.Object
                         goto hitsandboxlimit;
                     }
                     m_LocalPosition = value;
+                    foreach(ObjectPartLocalizedInfo l in Localizations)
+                    {
+                        l.SetPosition(value);
+                    }
                 }
-                lock(m_UpdateDataLock)
-                {
-                    value.ToBytes(m_FullUpdateFixedBlock1, (int)FullFixedBlock1Offset.ObjectData_Position);
-                }
-                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
                 TriggerOnPositionChange();
                 return;
@@ -1759,13 +1656,12 @@ namespace SilverSim.Scene.Types.Object
                         }
                     }
                     m_LocalPosition = value;
-                }
-                lock (m_UpdateDataLock)
-                {
-                    value.ToBytes(m_FullUpdateFixedBlock1, (int)FullFixedBlock1Offset.ObjectData_Position);
+                    foreach (ObjectPartLocalizedInfo l in Localizations)
+                    {
+                        l.SetPosition(value);
+                    }
                 }
 
-                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
                 TriggerOnPositionChange();
                 return;
@@ -1799,13 +1695,12 @@ namespace SilverSim.Scene.Types.Object
                         goto hitsandboxlimit;
                     }
                     m_LocalPosition = value;
-                }
-                lock (m_UpdateDataLock)
-                {
-                    value.ToBytes(m_FullUpdateFixedBlock1, (int)FullFixedBlock1Offset.ObjectData_Position);
+                    foreach (ObjectPartLocalizedInfo l in Localizations)
+                    {
+                        l.SetPosition(value);
+                    }
                 }
 
-                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
                 TriggerOnPositionChange();
                 return;
@@ -1835,13 +1730,12 @@ namespace SilverSim.Scene.Types.Object
                 lock (m_DataLock)
                 {
                     m_LocalRotation = value;
-                }
-                lock (m_UpdateDataLock)
-                {
-                    value.ToBytes(m_FullUpdateFixedBlock1, (int)FullFixedBlock1Offset.ObjectData_Rotation);
+                    foreach(ObjectPartLocalizedInfo l in Localizations)
+                    {
+                        l.SetRotation(value);
+                    }
                 }
 
-                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
                 TriggerOnPositionChange();
             }
@@ -1867,13 +1761,12 @@ namespace SilverSim.Scene.Types.Object
                         value /= ObjectGroup.RootPart.GlobalRotation;
                     }
                     m_LocalRotation = value;
-                }
-                lock (m_UpdateDataLock)
-                {
-                    value.ToBytes(m_FullUpdateFixedBlock1, (int)FullFixedBlock1Offset.ObjectData_Rotation);
+                    foreach (ObjectPartLocalizedInfo l in Localizations)
+                    {
+                        l.SetRotation(value);
+                    }
                 }
 
-                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
                 TriggerOnPositionChange();
             }
@@ -1893,13 +1786,12 @@ namespace SilverSim.Scene.Types.Object
                 lock (m_DataLock)
                 {
                     m_LocalRotation = value;
-                }
-                lock (m_UpdateDataLock)
-                {
-                    value.ToBytes(m_FullUpdateFixedBlock1, (int)FullFixedBlock1Offset.ObjectData_Rotation);
+                    foreach (ObjectPartLocalizedInfo l in Localizations)
+                    {
+                        l.SetRotation(value);
+                    }
                 }
 
-                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
                 TriggerOnPositionChange();
             }
@@ -1916,7 +1808,7 @@ namespace SilverSim.Scene.Types.Object
                     throw new ArgumentException("ObjectGroup is already set");
                 }
                 ObjectGroup = group;
-                UpdateData(UpdateDataFlags.All);
+                UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.All);
             }
         }
 
@@ -1926,7 +1818,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 ObjectGroup = null;
             }
-            UpdateData(UpdateDataFlags.All);
+            UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.All);
         }
         #endregion
 

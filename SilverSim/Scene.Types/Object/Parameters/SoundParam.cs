@@ -34,6 +34,18 @@ namespace SilverSim.Scene.Types.Object.Parameters
         public PrimitiveSoundFlags Flags; /* byte */
         #endregion
 
+        public SoundParam()
+        {
+        }
+
+        public SoundParam(SoundParam src)
+        {
+            SoundID = src.SoundID;
+            Gain = src.Gain;
+            Radius = src.Radius;
+            Flags = src.Flags;
+        }
+
         public byte[] Serialization
         {
             get

@@ -42,7 +42,6 @@ namespace SilverSim.Scene.Types.Object
                     m_IsSandbox = value;
                     m_SandboxOrigin = LocalPosition;
                 }
-                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(UpdateChangedFlags.None);
             }
         }
@@ -62,7 +61,6 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_SandboxOrigin = value;
                 }
-                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(UpdateChangedFlags.None);
             }
         }
@@ -74,7 +72,6 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_IsBlockGrab = value;
-                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(UpdateChangedFlags.None);
             }
         }
@@ -86,7 +83,6 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_IsDieAtEdge = value;
-                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(UpdateChangedFlags.None);
             }
         }
@@ -98,7 +94,6 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_IsReturnAtEdge = value;
-                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(UpdateChangedFlags.None);
             }
         }
@@ -110,7 +105,6 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_IsBlockGrabObject = value;
-                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(UpdateChangedFlags.None);
             }
         }

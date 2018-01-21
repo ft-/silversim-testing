@@ -22,14 +22,26 @@
 using SilverSim.Types;
 using SilverSim.Types.Primitive;
 
-namespace SilverSim.Scene.Types.Object
+namespace SilverSim.Scene.Types.Object.Localization
 {
-    public partial class ObjectPart
+    public sealed partial class ObjectPartLocalizedInfo
     {
         #region Media Properties
         public PrimitiveMedia m_Media;
 
-        public PrimitiveMedia Media => m_Media;
+        public PrimitiveMedia Media => m_Media ?? m_ParentInfo.m_Media;
+
+        internal void SetMedia(PrimitiveMedia media)
+        {
+            lock (m_DataLock)
+            {
+                m_Media = media;
+                if (m_Media == null)
+                {
+                    m_MediaURL = string.Empty;
+                }
+            }
+        }
 
         public void ClearMedia()
         {
@@ -38,15 +50,15 @@ namespace SilverSim.Scene.Types.Object
                 m_Media = null;
                 m_MediaURL = string.Empty;
             }
-            TriggerOnUpdate(UpdateChangedFlags.Media);
+            m_Part.TriggerOnUpdate(UpdateChangedFlags.Media);
         }
 
         public void UpdateMedia(PrimitiveMedia media, UUID updaterID)
         {
-            lock(m_DataLock)
+            lock (m_DataLock)
             {
                 string mediaURL;
-                if(string.IsNullOrEmpty(m_MediaURL))
+                if (string.IsNullOrEmpty(m_MediaURL))
                 {
                     mediaURL = "x-mv:00000000/" + updaterID.ToString();
                 }
@@ -59,12 +71,12 @@ namespace SilverSim.Scene.Types.Object
                 m_MediaURL = mediaURL;
                 m_Media = media;
             }
-            TriggerOnUpdate(UpdateChangedFlags.Media);
+            m_Part.TriggerOnUpdate(UpdateChangedFlags.Media);
         }
 
         public void UpdateMediaFace(int face, PrimitiveMedia.Entry entry, UUID updaterID)
         {
-            if(face >= 32)
+            if (face >= 32)
             {
                 return;
             }
@@ -81,18 +93,18 @@ namespace SilverSim.Scene.Types.Object
                     int version = int.Parse(rawVersion);
                     mediaURL = string.Format("x-mv:{0:D10}/{1}", ++version, updaterID);
                 }
-                if(null == m_Media)
+                if (null == m_Media)
                 {
                     m_Media = new PrimitiveMedia();
                 }
-                while(m_Media.Count <= face)
+                while (m_Media.Count <= face)
                 {
                     m_Media.Add(null);
                 }
                 m_Media[face] = entry;
                 m_MediaURL = mediaURL;
             }
-            TriggerOnUpdate(UpdateChangedFlags.Media);
+            m_Part.TriggerOnUpdate(UpdateChangedFlags.Media);
         }
         #endregion
     }

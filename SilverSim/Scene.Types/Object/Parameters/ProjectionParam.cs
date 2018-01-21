@@ -34,6 +34,19 @@ namespace SilverSim.Scene.Types.Object.Parameters
         public double ProjectionAmbience;
         #endregion
 
+        public ProjectionParam()
+        {
+        }
+
+        public ProjectionParam(ProjectionParam src)
+        {
+            IsProjecting = src.IsProjecting;
+            ProjectionTextureID = src.ProjectionTextureID;
+            ProjectionFOV = src.ProjectionFOV;
+            ProjectionFocus = src.ProjectionFocus;
+            ProjectionAmbience = src.ProjectionAmbience;
+        }
+
         public static ProjectionParam FromUdpDataBlock(byte[] value)
         {
             if (value.Length < 28)

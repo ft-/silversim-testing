@@ -23,69 +23,73 @@ using SilverSim.Scene.Types.Object.Parameters;
 using SilverSim.Types;
 using System;
 
-namespace SilverSim.Scene.Types.Object
+namespace SilverSim.Scene.Types.Object.Localization
 {
-    public partial class ObjectPart
+    public sealed partial class ObjectPartLocalizedInfo
     {
-
-        private readonly SoundParam m_Sound = new SoundParam();
+        private SoundParam m_Sound;
 
         public SoundParam Sound
         {
             get
             {
-                var p = new SoundParam();
-                lock(m_Sound)
+                SoundParam sp = m_Sound;
+                if(sp == null)
                 {
-                    p.Flags = m_Sound.Flags;
-                    p.Gain = m_Sound.Gain;
-                    p.Radius = m_Sound.Radius;
-                    p.SoundID = m_Sound.SoundID;
+                    return m_ParentInfo.Sound;
                 }
-                return p;
+                else
+                {
+                    return new SoundParam(sp);
+                }
             }
             set
             {
-                lock(m_Sound)
+                if(value == null)
                 {
-                    m_Sound.SoundID = value.SoundID;
-                    m_Sound.Gain = value.Gain;
-                    m_Sound.Radius = value.Radius;
-                    m_Sound.Flags = value.Flags;
+                    if (m_ParentInfo == null)
+                    {
+                        throw new InvalidOperationException();
+                    }
+                    m_Sound = null;
                 }
-                lock(m_UpdateDataLock)
+                else
                 {
-                    value.SoundID.ToBytes(m_FullUpdateFixedBlock2, (int)FullFixedBlock2Offset.LoopedSound);
-                    byte[] val = BitConverter.GetBytes((float)value.Gain);
-                    if(!BitConverter.IsLittleEndian)
+                    m_Sound = new SoundParam(value);
+                }
+                lock (m_UpdateDataLock)
+                {
+                    SoundParam sound = Sound;
+                    sound.SoundID.ToBytes(m_FullUpdateFixedBlock2, (int)FullFixedBlock2Offset.LoopedSound);
+                    byte[] val = BitConverter.GetBytes((float)sound.Gain);
+                    if (!BitConverter.IsLittleEndian)
                     {
                         Array.Reverse(val);
                     }
                     Buffer.BlockCopy(val, 0, m_FullUpdateFixedBlock2, (int)FullFixedBlock2Offset.SoundGain, val.Length);
 
-                    val = BitConverter.GetBytes((float)value.Radius);
-                    if(!BitConverter.IsLittleEndian)
+                    val = BitConverter.GetBytes((float)sound.Radius);
+                    if (!BitConverter.IsLittleEndian)
                     {
                         Array.Reverse(val);
                     }
                     Buffer.BlockCopy(val, 0, m_FullUpdateFixedBlock2, (int)FullFixedBlock2Offset.SoundRadius, val.Length);
 
-                    m_FullUpdateFixedBlock2[(int)FullFixedBlock2Offset.SoundFlags] = (byte)value.Flags;
-                    if(value.SoundID != UUID.Zero)
+                    m_FullUpdateFixedBlock2[(int)FullFixedBlock2Offset.SoundFlags] = (byte)sound.Flags;
+                    if (sound.SoundID != UUID.Zero)
                     {
-                        Owner.ID.ToBytes(m_FullUpdateFixedBlock2, (int)FullFixedBlock2Offset.SoundOwner);
+                        m_Part.Owner.ID.ToBytes(m_FullUpdateFixedBlock2, (int)FullFixedBlock2Offset.SoundOwner);
                     }
                     else
                     {
                         UUID.Zero.ToBytes(m_FullUpdateFixedBlock2, (int)FullFixedBlock2Offset.SoundOwner);
                     }
                 }
-                IsChanged = m_IsChangedEnabled;
-                TriggerOnUpdate(0);
+                m_Part.TriggerOnUpdate(0);
             }
         }
 
-        private readonly CollisionSoundParam m_CollisionSound = new CollisionSoundParam();
+        private CollisionSoundParam m_CollisionSound;
 
         private bool m_IsSoundQueueing;
 
@@ -93,23 +97,31 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                var res = new CollisionSoundParam();
-                lock (m_CollisionSound)
+                CollisionSoundParam csp = m_CollisionSound;
+                if(csp == null)
                 {
-                    res.ImpactSound = m_CollisionSound.ImpactSound;
-                    res.ImpactVolume = m_CollisionSound.ImpactVolume;
+                    return m_ParentInfo.CollisionSound;
                 }
-                return res;
+                else
+                {
+                    return new CollisionSoundParam(csp);
+                }
             }
             set
             {
-                lock (m_CollisionSound)
+                if(value == null)
                 {
-                    m_CollisionSound.ImpactSound = value.ImpactSound;
-                    m_CollisionSound.ImpactVolume = value.ImpactVolume;
+                    if(m_ParentInfo == null)
+                    {
+                        throw new InvalidOperationException();
+                    }
+                    m_CollisionSound = null;
                 }
-                IsChanged = m_IsChangedEnabled;
-                TriggerOnUpdate(0);
+                else
+                {
+                    m_CollisionSound = new CollisionSoundParam(value);
+                }
+                m_Part.TriggerOnUpdate(0);
             }
         }
     }

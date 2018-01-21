@@ -21,6 +21,7 @@
 
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Object.Localization;
 using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Scene.Types.Transfer;
@@ -359,7 +360,7 @@ namespace SilverSim.Scene.Types.Scene
                         ObjectGroup = newgrp
                     };
                     newgrp.Add(part.LinkNumber, newpart.ID, newpart);
-                    newpart.UpdateData(ObjectPart.UpdateDataFlags.All);
+                    newpart.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.All);
 
                     foreach (KeyValuePair<UUID, ObjectPartInventoryItem> kvp in part.Inventory.Key1ValuePairs)
                     {

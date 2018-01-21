@@ -20,38 +20,44 @@
 // exception statement from your version.
 
 using SilverSim.Scene.Types.Object.Parameters;
-using SilverSim.Types;
 using System;
 
-namespace SilverSim.Scene.Types.Object
+namespace SilverSim.Scene.Types.Object.Localization
 {
-    public partial class ObjectPart
+    public sealed partial class ObjectPartLocalizedInfo
     {
-
-        private readonly TextParam m_Text = new TextParam();
+        private TextParam m_Text;
 
         public TextParam Text
         {
             get
             {
-                var res = new TextParam();
-                lock (m_Text)
+                TextParam tp = m_Text;
+                if(tp == null)
                 {
-                    res.Text = m_Text.Text;
-                    res.TextColor = new ColorAlpha(m_Text.TextColor);
+                    return m_ParentInfo.Text;
                 }
-                return res;
+                else
+                {
+                    return new TextParam(tp);
+                }
             }
             set
             {
-                lock (m_Text)
+                if(value == null)
                 {
-                    m_Text.Text = value.Text;
-                    m_Text.TextColor = new ColorAlpha(value.TextColor);
+                    if(m_ParentInfo == null)
+                    {
+                        throw new InvalidOperationException();
+                    }
+                    m_Text = null;
+                }
+                else
+                {
+                    m_Text = new TextParam(value);
                 }
                 UpdateExtraParams();
-                IsChanged = m_IsChangedEnabled;
-                TriggerOnUpdate(0);
+                m_Part.TriggerOnUpdate(0);
             }
         }
     }

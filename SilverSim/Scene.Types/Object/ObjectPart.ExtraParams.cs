@@ -131,8 +131,6 @@ namespace SilverSim.Scene.Types.Object
 
         private readonly PointLightParam m_PointLight = new PointLightParam();
 
-        private readonly ProjectionParam m_Projection = new ProjectionParam();
-
         private readonly ExtendedMeshParams m_ExtendedMesh = new ExtendedMeshParams();
 
 
@@ -147,12 +145,7 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                return m_ExtraParamsLock.AcquireReaderLock(() =>
-                {
-                    var b = new byte[m_ExtraParamsBytes.Length];
-                    Buffer.BlockCopy(m_ExtraParamsBytes, 0, b, 0, m_ExtraParamsBytes.Length);
-                    return b;
-                });
+                return m_DefaultLocalization.ExtraParamsBytes;
             }
             set
             {
@@ -326,159 +319,6 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        private void UpdateExtraParams() => m_ExtraParamsLock.AcquireWriterLock(() =>
-        {
-            int i = 0;
-            uint totalBytesLength = 1;
-            uint extraParamsNum = 0;
-
-            var flexi = Flexible;
-            var light = PointLight;
-            var proj = Projection;
-            var shape = Shape;
-            var emesh = ExtendedMesh;
-            bool isFlexible = flexi.IsFlexible;
-            bool isSculpt = shape.Type == PrimitiveShapeType.Sculpt;
-            bool isLight = light.IsLight &&
-                (!m_IsAttachmentLightsDisabled || !IsPrivateAttachmentOrNone(ObjectGroup.AttachPoint)) &&
-                (!m_IsFacelightDisabled || (ObjectGroup.AttachPoint != AttachmentPoint.LeftHand && ObjectGroup.AttachPoint != SilverSim.Types.Agent.AttachmentPoint.RightHand));
-            bool isProjecting = proj.IsProjecting;
-            ExtendedMeshParams.MeshFlags emeshFlags = emesh.Flags;
-            if (isFlexible)
-            {
-                ++extraParamsNum;
-                totalBytesLength += 16;
-                totalBytesLength += 2 + 4;
-            }
-
-            if (isSculpt)
-            {
-                ++extraParamsNum;
-                totalBytesLength += 17;
-                totalBytesLength += 2 + 4;
-            }
-
-            if (isLight)
-            {
-                ++extraParamsNum;
-                totalBytesLength += 16;
-                totalBytesLength += 2 + 4;
-            }
-
-            if (isProjecting)
-            {
-                ++extraParamsNum;
-                totalBytesLength += 28;
-                totalBytesLength += 2 + 4;
-            }
-
-            if (emeshFlags != ExtendedMeshParams.MeshFlags.None)
-            {
-                ++extraParamsNum;
-                totalBytesLength += 4;
-                totalBytesLength += 2 + 4;
-            }
-
-            var updatebytes = new byte[totalBytesLength];
-            updatebytes[i++] = (byte)extraParamsNum;
-
-            if (isFlexible)
-            {
-                updatebytes[i++] = FlexiEP % 256;
-                updatebytes[i++] = FlexiEP / 256;
-
-                updatebytes[i++] = 16;
-                updatebytes[i++] = 0;
-                updatebytes[i++] = 0;
-                updatebytes[i++] = 0;
-
-                updatebytes[i++] = (byte)((byte)((byte)(flexi.Tension * 10.01f) & 0x7F) | (byte)((flexi.Softness & 2) << 6));
-                updatebytes[i++] = (byte)((byte)((byte)(flexi.Friction * 10.01f) & 0x7F) | (byte)((flexi.Softness & 1) << 7));
-                updatebytes[i++] = (byte)((flexi.Gravity + 10.0f) * 10.01f);
-                updatebytes[i++] = (byte)(flexi.Wind * 10.01f);
-                flexi.Force.ToBytes(updatebytes, i);
-                i += 12;
-            }
-
-            if (isSculpt)
-            {
-                updatebytes[i++] = SculptEP % 256;
-                updatebytes[i++] = SculptEP / 256;
-                updatebytes[i++] = 17;
-                updatebytes[i++] = 0;
-                updatebytes[i++] = 0;
-                updatebytes[i++] = 0;
-                shape.SculptMap.ToBytes(updatebytes, i);
-                i += 16;
-                updatebytes[i++] = (byte)shape.SculptType;
-            }
-
-            if (isLight)
-            {
-                updatebytes[i++] = LightEP % 256;
-                updatebytes[i++] = LightEP / 256;
-                updatebytes[i++] = 16;
-                updatebytes[i++] = 0;
-                updatebytes[i++] = 0;
-                updatebytes[i++] = 0;
-                Buffer.BlockCopy(light.LightColor.AsByte, 0, updatebytes, i, 3);
-
-                double intensity = light.Intensity;
-                if (intensity > m_FacelightLimitIntensity &&
-                    (ObjectGroup.AttachPoint == AttachmentPoint.LeftHand ||
-                    ObjectGroup.AttachPoint == AttachmentPoint.RightHand))
-                {
-                    intensity = m_FacelightLimitIntensity;
-                }
-                else if (intensity > m_AttachmentLightLimitIntensity &&
-                    !IsPrivateAttachmentOrNone(ObjectGroup.AttachPoint))
-                {
-                    intensity = m_AttachmentLightLimitIntensity;
-                }
-
-                updatebytes[i + 3] = (byte)(intensity * 255f);
-                i += 4;
-                ConversionMethods.Float2LEBytes((float)light.Radius, updatebytes, i);
-                i += 4;
-                ConversionMethods.Float2LEBytes((float)light.Cutoff, updatebytes, i);
-                i += 4;
-                ConversionMethods.Float2LEBytes((float)light.Falloff, updatebytes, i);
-                i += 4;
-            }
-
-            if (isProjecting)
-            {
-                updatebytes[i++] = (ProjectionEP % 256);
-                updatebytes[i++] = (ProjectionEP / 256);
-                updatebytes[i++] = 28;
-                updatebytes[i++] = 0;
-                updatebytes[i++] = 0;
-                updatebytes[i++] = 0;
-                proj.ProjectionTextureID.ToBytes(updatebytes, i);
-                i += 16;
-                ConversionMethods.Float2LEBytes((float)proj.ProjectionFOV, updatebytes, i);
-                i += 4;
-                ConversionMethods.Float2LEBytes((float)proj.ProjectionFocus, updatebytes, i);
-                i += 4;
-                ConversionMethods.Float2LEBytes((float)proj.ProjectionAmbience, updatebytes, i);
-            }
-
-            if (emeshFlags != ExtendedMeshParams.MeshFlags.None)
-            {
-                updatebytes[i++] = (ExtendedMeshEP % 256);
-                updatebytes[i++] = (ExtendedMeshEP / 256);
-                updatebytes[i++] = 4;
-                updatebytes[i++] = 0;
-                updatebytes[i++] = 0;
-                updatebytes[i++] = 0;
-                updatebytes[i++] = (byte)(((uint)emeshFlags) & 0xFF);
-                updatebytes[i++] = (byte)((((uint)emeshFlags) >> 8) & 0xFF);
-                updatebytes[i++] = (byte)((((uint)emeshFlags) >> 16) & 0xFF);
-                updatebytes[i++] = (byte)((((uint)emeshFlags) >> 24) & 0xFF);
-            }
-
-            m_ExtraParamsBytes = updatebytes;
-        });
 
         public ExtendedMeshParams ExtendedMesh
         {
@@ -498,7 +338,6 @@ namespace SilverSim.Scene.Types.Object
                     m_ExtendedMesh.Flags = value.Flags;
                 }
                 UpdateExtraParams();
-                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(UpdateChangedFlags.Shape);
             }
         }
@@ -533,41 +372,9 @@ namespace SilverSim.Scene.Types.Object
                     m_Flexible.Wind = value.Wind;
                 }
                 UpdateExtraParams();
-                IsChanged = m_IsChangedEnabled;
                 IncrementPhysicsShapeUpdateSerial();
                 IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(UpdateChangedFlags.Shape);
-            }
-        }
-
-        public ProjectionParam Projection
-        {
-            get
-            {
-                var res = new ProjectionParam();
-                lock (m_Projection)
-                {
-                    res.IsProjecting = m_Projection.IsProjecting;
-                    res.ProjectionTextureID = m_Projection.ProjectionTextureID;
-                    res.ProjectionFocus = m_Projection.ProjectionFocus;
-                    res.ProjectionFOV = m_Projection.ProjectionFOV;
-                    res.ProjectionAmbience = m_Projection.ProjectionAmbience;
-                }
-                return res;
-            }
-            set
-            {
-                lock (m_Projection)
-                {
-                    m_Projection.IsProjecting = value.IsProjecting;
-                    m_Projection.ProjectionTextureID = value.ProjectionTextureID;
-                    m_Projection.ProjectionFocus = value.ProjectionFocus;
-                    m_Projection.ProjectionFOV = value.ProjectionFOV;
-                    m_Projection.ProjectionAmbience = value.ProjectionAmbience;
-                }
-                UpdateExtraParams();
-                IsChanged = m_IsChangedEnabled;
-                TriggerOnUpdate(0);
             }
         }
 
@@ -597,7 +404,6 @@ namespace SilverSim.Scene.Types.Object
                     m_PointLight.Radius = value.Radius;
                 }
                 UpdateExtraParams();
-                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }

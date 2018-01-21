@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Scene.Types.Object.Localization;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Types;
 using System.Collections.Generic;
@@ -422,7 +423,7 @@ namespace SilverSim.Scene.Types.Object
                 part.IsVolumeDetect = rootPart.IsVolumeDetect;
 
                 part.ObjectGroup = this;
-                part.UpdateData(ObjectPart.UpdateDataFlags.All);
+                part.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.All);
             }
         }
 

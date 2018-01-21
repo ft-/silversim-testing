@@ -31,6 +31,16 @@ namespace SilverSim.Scene.Types.Object.Parameters
         public double ImpactVolume;
         #endregion
 
+        public CollisionSoundParam()
+        {
+        }
+
+        public CollisionSoundParam(CollisionSoundParam src)
+        {
+            ImpactSound = src.ImpactSound;
+            ImpactVolume = src.ImpactVolume;
+        }
+
         public byte[] Serialization
         {
             get

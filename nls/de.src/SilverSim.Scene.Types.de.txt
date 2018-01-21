@@ -35,3 +35,4 @@ ExpectingAVectorParameterFor0Got1=Es wird ein vector-Parameter für {0} erwartet
 UnableToBuyInsufficientFunds=Kaufen nicht möglich. Vorhandenes Geld reicht nicht aus.
 UnableToBuyNoEconomyConfigured=Kaufen nicht möglich. Keine Währung konfiguriert.
 YouHaveBeenKickedFromParcel=Du wurdest aus der Parzelle geworfen.
+InvalidLanguageParameter0=Ungültiger Sprachparameter '{0}'

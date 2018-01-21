@@ -21,6 +21,7 @@
 
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Object.Localization;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Inventory;
@@ -207,18 +208,18 @@ namespace SilverSim.Viewer.Core
                     uint parentID = oui.ParentID;
                     uint localID = oui.LocalID;
 
-                    full_packet.Data[offset + (int)ObjectPart.FullFixedBlock1Offset.LocalID] = (byte)(localID & 0xFF);
-                    full_packet.Data[offset + (int)ObjectPart.FullFixedBlock1Offset.LocalID + 1] = (byte)((localID >> 8) & 0xFF);
-                    full_packet.Data[offset + (int)ObjectPart.FullFixedBlock1Offset.LocalID + 2] = (byte)((localID >> 16) & 0xFF);
-                    full_packet.Data[offset + (int)ObjectPart.FullFixedBlock1Offset.LocalID + 3] = (byte)((localID >> 24) & 0xFF);
+                    full_packet.Data[offset + (int)ObjectPartLocalizedInfo.FullFixedBlock1Offset.LocalID] = (byte)(localID & 0xFF);
+                    full_packet.Data[offset + (int)ObjectPartLocalizedInfo.FullFixedBlock1Offset.LocalID + 1] = (byte)((localID >> 8) & 0xFF);
+                    full_packet.Data[offset + (int)ObjectPartLocalizedInfo.FullFixedBlock1Offset.LocalID + 2] = (byte)((localID >> 16) & 0xFF);
+                    full_packet.Data[offset + (int)ObjectPartLocalizedInfo.FullFixedBlock1Offset.LocalID + 3] = (byte)((localID >> 24) & 0xFF);
 
-                    full_packet.Data[offset + (int)ObjectPart.FullFixedBlock1Offset.ParentID] = (byte)(parentID & 0xFF);
-                    full_packet.Data[offset + (int)ObjectPart.FullFixedBlock1Offset.ParentID + 1] = (byte)((parentID >> 8) & 0xFF);
-                    full_packet.Data[offset + (int)ObjectPart.FullFixedBlock1Offset.ParentID + 2] = (byte)((parentID >> 16) & 0xFF);
-                    full_packet.Data[offset + (int)ObjectPart.FullFixedBlock1Offset.ParentID + 3] = (byte)((parentID >> 24) & 0xFF);
+                    full_packet.Data[offset + (int)ObjectPartLocalizedInfo.FullFixedBlock1Offset.ParentID] = (byte)(parentID & 0xFF);
+                    full_packet.Data[offset + (int)ObjectPartLocalizedInfo.FullFixedBlock1Offset.ParentID + 1] = (byte)((parentID >> 8) & 0xFF);
+                    full_packet.Data[offset + (int)ObjectPartLocalizedInfo.FullFixedBlock1Offset.ParentID + 2] = (byte)((parentID >> 16) & 0xFF);
+                    full_packet.Data[offset + (int)ObjectPartLocalizedInfo.FullFixedBlock1Offset.ParentID + 3] = (byte)((parentID >> 24) & 0xFF);
 
                     var b = new byte[4];
-                    Buffer.BlockCopy(full_packet.Data, offset + (int)ObjectPart.FullFixedBlock1Offset.UpdateFlags, b, 0, 4);
+                    Buffer.BlockCopy(full_packet.Data, offset + (int)ObjectPartLocalizedInfo.FullFixedBlock1Offset.UpdateFlags, b, 0, 4);
                     if (!BitConverter.IsLittleEndian)
                     {
                         Array.Reverse(b);
@@ -305,7 +306,7 @@ namespace SilverSim.Viewer.Core
                         Array.Reverse(b);
                     }
 
-                    Buffer.BlockCopy(b, 0, full_packet.Data, offset + (int)ObjectPart.FullFixedBlock1Offset.UpdateFlags, 4);
+                    Buffer.BlockCopy(b, 0, full_packet.Data, offset + (int)ObjectPartLocalizedInfo.FullFixedBlock1Offset.UpdateFlags, 4);
                 }
             }
 

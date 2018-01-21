@@ -19,40 +19,42 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.Threading;
 using SilverSim.Types.Primitive;
 using System;
-using System.Threading;
 
-namespace SilverSim.Scene.Types.Object
+namespace SilverSim.Scene.Types.Object.Localization
 {
-    public partial class ObjectPart
+    public sealed partial class ObjectPartLocalizedInfo
     {
-        private byte[] m_ParticleSystem = new byte[0];
-        private readonly ReaderWriterLock m_ParticleSystemLock = new ReaderWriterLock();
+        private byte[] m_ParticleSystem;
 
         public ParticleSystem ParticleSystem
         {
             get
             {
-                return m_ParticleSystemLock.AcquireReaderLock(() =>
+                byte[] ps = m_ParticleSystem;
+                if(ps == null)
                 {
-                    if (m_ParticleSystem.Length == 0)
-                    {
-                        return null;
-                    }
-                    return new ParticleSystem(m_ParticleSystem, 0);
-                });
+                    return m_ParentInfo.ParticleSystem;
+                }
+                if (ps.Length == 0)
+                {
+                    return null;
+                }
+                return new ParticleSystem(ps, 0);
             }
 
             set
             {
-                m_ParticleSystemLock.AcquireWriterLock(() =>
+                if(value == null)
                 {
-                    m_ParticleSystem = (value == null) ?
-                        new byte[0] :
-                        value.GetBytes();
-                });
+                    m_ParticleSystem = m_ParentInfo == null ? new byte[0] : null;
+                }
+                else
+                {
+                    m_ParticleSystem = value.GetBytes();
+                }
+                m_Part.TriggerOnUpdate(UpdateChangedFlags.None);
             }
         }
 
@@ -60,28 +62,24 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                return m_ParticleSystemLock.AcquireReaderLock(() =>
-                {
-                    var o = new byte[m_ParticleSystem.Length];
-                    Buffer.BlockCopy(m_ParticleSystem, 0, o, 0, m_ParticleSystem.Length);
-                    return o;
-                });
+                var ps = m_ParticleSystem;
+                var o = new byte[ps.Length];
+                Buffer.BlockCopy(ps, 0, o, 0, ps.Length);
+                return o;
             }
 
             set
             {
-                m_ParticleSystemLock.AcquireWriterLock(() =>
+                if (value == null)
                 {
-                    if (value == null)
-                    {
-                        m_ParticleSystem = new byte[0];
-                    }
-                    else
-                    {
-                        m_ParticleSystem = new byte[value.Length];
-                        Buffer.BlockCopy(value, 0, m_ParticleSystem, 0, value.Length);
-                    }
-                });
+                    m_ParticleSystem = m_ParentInfo == null ? new byte[0] : null;
+                }
+                else
+                {
+                    var ps = new byte[value.Length];
+                    Buffer.BlockCopy(value, 0, ps, 0, value.Length);
+                    m_ParticleSystem = ps;
+                }
             }
         }
     }
