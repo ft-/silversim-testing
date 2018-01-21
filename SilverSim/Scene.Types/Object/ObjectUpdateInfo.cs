@@ -22,6 +22,7 @@
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
+using System.Globalization;
 
 namespace SilverSim.Scene.Types.Object
 {
@@ -94,40 +95,31 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        public byte[] FullUpdate
+        public byte[] GetFullUpdate(CultureInfo cultureInfo)
         {
-            get
+            if(Part != null && !m_Killed)
             {
-                if(Part != null && !m_Killed)
-                {
-                    return Part.FullUpdateData;
-                }
-                return null;
+                return Part.GetFullUpdateData(cultureInfo);
             }
+            return null;
         }
 
-        public byte[] TerseUpdate
+        public byte[] GetTerseUpdate(CultureInfo cultureInfo)
         {
-            get
+            if (Part != null && !m_Killed)
             {
-                if (Part != null && !m_Killed)
-                {
-                    return Part.TerseUpdateData;
-                }
-                return null;
+                return Part.GetTerseUpdateData(cultureInfo);
             }
+            return null;
         }
 
-        public byte[] PropertiesUpdate
+        public byte[] GetPropertiesUpdate(CultureInfo cultureInfo)
         {
-            get
+            if (Part != null && !m_Killed)
             {
-                if (Part != null && !m_Killed)
-                {
-                    return Part.PropertiesUpdateData;
-                }
-                return null;
+                return Part.GetPropertiesUpdateData(cultureInfo);
             }
+            return null;
         }
 
         public int SerialNumber => Part.SerialNumber;

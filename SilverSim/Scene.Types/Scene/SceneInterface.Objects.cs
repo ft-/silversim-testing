@@ -54,7 +54,7 @@ namespace SilverSim.Scene.Types.Scene
 
             public void Send(ObjectPart part)
             {
-                var propUpdate = part.PropertiesUpdateData;
+                var propUpdate = part.GetPropertiesUpdateData(m_Agent.CurrentCulture);
                 if (propUpdate == null)
                 {
                     return;

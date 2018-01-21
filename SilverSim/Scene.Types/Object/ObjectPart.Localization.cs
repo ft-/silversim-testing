@@ -31,10 +31,18 @@ namespace SilverSim.Scene.Types.Object
     {
         private readonly ObjectPartLocalizedInfo m_DefaultLocalization;
 
+        public ObjectPartLocalizedInfo GetLocalization(CultureInfo culture) => m_DefaultLocalization;
+
+        public byte[] GetFullUpdateData(CultureInfo culture) => GetLocalization(culture).FullUpdateData;
+
+        public byte[] GetTerseUpdateData(CultureInfo culture) => GetLocalization(culture).TerseUpdateData;
+
+        public byte[] GetCompressedUpdateData(CultureInfo culture) => GetLocalization(culture).CompressedUpdateData;
+
+        public byte[] GetPropertiesUpdateData(CultureInfo culture) => GetLocalization(culture).PropertiesUpdateData;
+
         #region Default Localization
         public PrimitiveMedia Media => m_DefaultLocalization.Media;
-
-        public ObjectPartLocalizedInfo GetLocalization(CultureInfo culture) => m_DefaultLocalization;
 
         public void ClearMedia() => m_DefaultLocalization.ClearMedia();
 

@@ -61,7 +61,7 @@ namespace SilverSim.Viewer.Core
 
                 foreach (var part in ObjectParts)
                 {
-                    byte[] propUpdate = part.PropertiesUpdateData;
+                    byte[] propUpdate = part.GetPropertiesUpdateData(agent.CurrentCulture);
                     if (propUpdate == null)
                     {
                         return;
@@ -591,7 +591,8 @@ namespace SilverSim.Viewer.Core
                                 dofull = true;
                             }
 
-                            if (ui.PropertiesUpdate != null)
+                            byte[] propUpdate = ui.GetPropertiesUpdate(Agent.CurrentCulture);
+                            if (propUpdate != null)
                             {
                                 var oui = ui as ObjectUpdateInfo;
                                 if (oui != null)
@@ -618,7 +619,7 @@ namespace SilverSim.Viewer.Core
 
                             if (dofull)
                             {
-                                byte[] fullUpdate = ui.FullUpdate;
+                                byte[] fullUpdate = ui.GetFullUpdate(Agent.CurrentCulture);
 
                                 if (fullUpdate != null)
                                 {
@@ -707,7 +708,7 @@ send_nonphys_packet:
                             }
                             else
                             {
-                                byte[] terseUpdate = ui.TerseUpdate;
+                                byte[] terseUpdate = ui.GetTerseUpdate(Agent.CurrentCulture);
 
                                 if (terseUpdate != null)
                                 {

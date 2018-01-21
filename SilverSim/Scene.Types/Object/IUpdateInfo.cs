@@ -19,10 +19,6 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.Types;
-using SilverSim.Types.Primitive;
-using System;
-
 namespace SilverSim.Scene.Types.Object
 {
     public interface IUpdateInfo

@@ -23,6 +23,7 @@ using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
 using SilverSim.Types.Primitive;
 using System;
+using System.Globalization;
 
 namespace SilverSim.Scene.Types.Agent
 {
@@ -189,50 +190,47 @@ namespace SilverSim.Scene.Types.Agent
             }
         }
 
-        public byte[] TerseUpdate => null;
+        public byte[] GetTerseUpdate(CultureInfo cultureInfo) => null;
 
-        public byte[] PropertiesUpdate => null;
+        public byte[] GetPropertiesUpdate(CultureInfo cultureInfo) => null;
 
-        public byte[] FullUpdate
+        public byte[] GetFullUpdate(CultureInfo cultureInfo)
         {
-            get
+            if (Agent != null && !m_Killed)
             {
-                if (Agent != null && !m_Killed)
+                byte[] updateDataBlock = m_UpdateDataBlock; /* we use the GC nature here */
+                var newUpdateDataBlock = new byte[updateDataBlock.Length];
+                Buffer.BlockCopy(updateDataBlock, 0, newUpdateDataBlock, 0, updateDataBlock.Length);
+                Agent.Size.ToBytes(newUpdateDataBlock, (int)FullFixedBlock1Offset.Scale);
+                Agent.CollisionPlane.ToBytes(newUpdateDataBlock, (int)FullFixedBlock1Offset.ObjectData_CollisionPlane);
+                Agent.Position.ToBytes(newUpdateDataBlock, (int)FullFixedBlock1Offset.ObjectData_Position);
+                Agent.Velocity.ToBytes(newUpdateDataBlock, (int)FullFixedBlock1Offset.ObjectData_Velocity);
+                Agent.Acceleration.ToBytes(newUpdateDataBlock, (int)FullFixedBlock1Offset.ObjectData_Acceleration);
+                Vector3.Zero.ToBytes(newUpdateDataBlock, (int)FullFixedBlock1Offset.ObjectData_AngularVelocity); /* set to zero as per SL ObjectUpdate definition for the 76 byte format */
+                Quaternion rot = Agent.Rotation;
+                IObject sittingobj = Agent.SittingOnObject;
+                uint parentID;
+                if (sittingobj == null)
                 {
-                    byte[] updateDataBlock = m_UpdateDataBlock; /* we use the GC nature here */
-                    var newUpdateDataBlock = new byte[updateDataBlock.Length];
-                    Buffer.BlockCopy(updateDataBlock, 0, newUpdateDataBlock, 0, updateDataBlock.Length);
-                    Agent.Size.ToBytes(newUpdateDataBlock, (int)FullFixedBlock1Offset.Scale);
-                    Agent.CollisionPlane.ToBytes(newUpdateDataBlock, (int)FullFixedBlock1Offset.ObjectData_CollisionPlane);
-                    Agent.Position.ToBytes(newUpdateDataBlock, (int)FullFixedBlock1Offset.ObjectData_Position);
-                    Agent.Velocity.ToBytes(newUpdateDataBlock, (int)FullFixedBlock1Offset.ObjectData_Velocity);
-                    Agent.Acceleration.ToBytes(newUpdateDataBlock, (int)FullFixedBlock1Offset.ObjectData_Acceleration);
-                    Vector3.Zero.ToBytes(newUpdateDataBlock, (int)FullFixedBlock1Offset.ObjectData_AngularVelocity); /* set to zero as per SL ObjectUpdate definition for the 76 byte format */
-                    Quaternion rot = Agent.Rotation;
-                    IObject sittingobj = Agent.SittingOnObject;
-                    uint parentID;
-                    if (sittingobj == null)
-                    {
-                        rot.X = 0;
-                        rot.Y = 0;
-                        rot.NormalizeSelf();
-                        parentID = 0;
-                    }
-                    else
-                    {
-                        parentID = sittingobj.LocalID[SceneID];
-                    }
-                    newUpdateDataBlock[(int)FullFixedBlock1Offset.ParentID] = (byte)(parentID & 0xFF);
-                    newUpdateDataBlock[(int)FullFixedBlock1Offset.ParentID + 1] = (byte)((parentID >> 8) & 0xFF);
-                    newUpdateDataBlock[(int)FullFixedBlock1Offset.ParentID + 2] = (byte)((parentID >> 16) & 0xFF);
-                    newUpdateDataBlock[(int)FullFixedBlock1Offset.ParentID + 3] = (byte)((parentID >> 24) & 0xFF);
-
-                    rot.ToBytes(newUpdateDataBlock, (int)FullFixedBlock1Offset.ObjectData_Rotation);
-
-                    return newUpdateDataBlock;
+                    rot.X = 0;
+                    rot.Y = 0;
+                    rot.NormalizeSelf();
+                    parentID = 0;
                 }
-                return null;
+                else
+                {
+                    parentID = sittingobj.LocalID[SceneID];
+                }
+                newUpdateDataBlock[(int)FullFixedBlock1Offset.ParentID] = (byte)(parentID & 0xFF);
+                newUpdateDataBlock[(int)FullFixedBlock1Offset.ParentID + 1] = (byte)((parentID >> 8) & 0xFF);
+                newUpdateDataBlock[(int)FullFixedBlock1Offset.ParentID + 2] = (byte)((parentID >> 16) & 0xFF);
+                newUpdateDataBlock[(int)FullFixedBlock1Offset.ParentID + 3] = (byte)((parentID >> 24) & 0xFF);
+
+                rot.ToBytes(newUpdateDataBlock, (int)FullFixedBlock1Offset.ObjectData_Rotation);
+
+                return newUpdateDataBlock;
             }
+            return null;
         }
     }
 }

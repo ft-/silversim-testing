@@ -22,10 +22,8 @@
 using SilverSim.Scene.Types.Object.Localization;
 using SilverSim.Scene.Types.Object.Parameters;
 using SilverSim.Scene.Types.Script;
-using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
-using SilverSim.Types.Asset.Format;
 using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;

@@ -44,6 +44,10 @@ namespace SilverSim.Scene.Types.Object
 
         private readonly object m_DataLock = new object();
 
+        private int m_ObjectSerial;
+
+        public int SerialNumber => m_ObjectSerial;
+
         #region Events
         public event Action<ObjectPart, UpdateChangedFlags> OnUpdate;
         public event Action<IObject> OnPositionChange;

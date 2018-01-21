@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using SilverSim.Types;
+using System.Globalization;
 
 namespace SilverSim.Scene.Types.Object
 {
@@ -45,11 +46,11 @@ namespace SilverSim.Scene.Types.Object
 
         bool IsPhysics { get; }
 
-        byte[] FullUpdate { get; }
+        byte[] GetFullUpdate(CultureInfo cultureInfo);
 
-        byte[] TerseUpdate { get; }
+        byte[] GetTerseUpdate(CultureInfo cultureInfo);
 
-        byte[] PropertiesUpdate { get; }
+        byte[] GetPropertiesUpdate(CultureInfo cultureInfo);
 
         int SerialNumber { get; }
     }
