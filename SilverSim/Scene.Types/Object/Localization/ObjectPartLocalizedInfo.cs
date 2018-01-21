@@ -24,8 +24,11 @@ using SilverSim.Scene.Types.Physics;
 using SilverSim.Types;
 using SilverSim.Types.Inventory;
 using SilverSim.Types.Primitive;
+using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Viewer.Messages.Object;
 using System;
+using System.IO;
+using System.Xml;
 
 namespace SilverSim.Scene.Types.Object.Localization
 {
@@ -39,6 +42,132 @@ namespace SilverSim.Scene.Types.Object.Localization
         private string m_TouchText;
         private string m_SitText;
         public string LocalizationName { get; }
+
+        public byte[] Serialization
+        {
+            get
+            {
+                var m = new Map();
+                string s = m_Name;
+                if(s != null)
+                {
+                    m.Add("name", s);
+                }
+                s = m_Description;
+                if(s != null)
+                {
+                    m.Add("desc", s);
+                }
+                s = m_TouchText;
+                if(s != null)
+                {
+                    m.Add("touchtext", s);
+                }
+                s = m_SitText;
+                if(s != null)
+                {
+                    m.Add("sittext", s);
+                }
+                s = m_MediaURL;
+                if(s != null)
+                {
+                    m.Add("mediaurl", s);
+                }
+                byte[] ps = m_ParticleSystem;
+                if(ps != null)
+                {
+                    m.Add("particlesystem", new BinaryData(ps));
+                }
+
+                byte[] te = m_TextureEntryBytes;
+                if(te != null)
+                {
+                    m.Add("textureentry", new BinaryData(te));
+                }
+                PrimitiveMedia media = m_Media;
+                if(media != null)
+                {
+                    using (var ms = new MemoryStream())
+                    {
+                        using (XmlTextWriter w = ms.UTF8XmlTextWriter())
+                        {
+                            media.ToXml(w);
+                        }
+                        m.Add("media", new BinaryData(ms.ToArray()));
+                    }
+                }
+                CollisionSoundParam csp = m_CollisionSound;
+                if(csp != null)
+                {
+                    m.Add("collisionsound", new BinaryData(csp.Serialization));
+                }
+                SoundParam sp = m_Sound;
+                if(sp != null)
+                {
+                    m.Add("sound", new BinaryData(sp.Serialization));
+                }
+                ProjectionParam p = m_Projection;
+                if(p != null)
+                {
+                    m.Add("projection", new BinaryData(p.DbSerialization));
+                }
+                byte[] ta = m_TextureAnimationBytes;
+                if(ta != null)
+                {
+                    m.Add("texanim", new BinaryData(ta));
+                }
+                TextParam tp = m_Text;
+                if(tp != null)
+                {
+                    m.Add("text", new BinaryData(tp.Serialization));
+                }
+                using (var ms = new MemoryStream())
+                {
+                    LlsdBinary.Serialize(m, ms);
+                    return ms.ToArray();
+                }
+            }
+            set
+            {
+                Map m;
+                using (var ms = new MemoryStream(value))
+                {
+                    m = (Map)LlsdBinary.Deserialize(ms);
+                }
+                m.TryGetValue("name", out m_Name);
+                m.TryGetValue("desc", out m_Description);
+                m.TryGetValue("touchtext", out m_TouchText);
+                m.TryGetValue("sittext", out m_SitText);
+                m.TryGetValue("mediaurl", out m_MediaURL);
+                BinaryData d;
+                m_ParticleSystem = m.TryGetValue("particlesystem", out d) ? d : null;
+                if (m.TryGetValue("textureentry", out d))
+                {
+                    TextureEntryBytes = d;
+                }
+                else
+                {
+                    TextureEntryBytes = null;
+                }
+                if (m.TryGetValue("media", out d))
+                {
+                    using (var ms = new MemoryStream(d))
+                    using (var r = new XmlTextReader(ms))
+                    {
+                        m_Media = PrimitiveMedia.FromXml(r);
+                    }
+                }
+                else
+                {
+                    m_Media = null;
+                }
+                m_CollisionSound = m.TryGetValue("collisionsound", out d) ? new CollisionSoundParam { Serialization = d } : null;
+                m_Sound = m.TryGetValue("sound", out d) ? new SoundParam { Serialization = d } : null;
+                m_Projection = m.TryGetValue("projection", out d) ? new ProjectionParam { DbSerialization = d } : null;
+                m_TextureAnimationBytes = m.TryGetValue("texanim", out d) ? d : null;
+                m_Text = m.TryGetValue("text", out d) ? new TextParam { Serialization = d } : null;
+            }
+        }
 
         public ObjectPartLocalizedInfo(string localizationName, ObjectPart part, ObjectPartLocalizedInfo src, ObjectPartLocalizedInfo parentInfo)
         {
@@ -67,6 +196,7 @@ namespace SilverSim.Scene.Types.Object.Localization
             m_Sound = src.Sound;
             m_TextureAnimationBytes = src.TextureAnimationBytes;
             m_TouchText = src.TouchText;
+            m_Text = src.Text;
         }
 
         public ObjectPartLocalizedInfo(string localizationName, ObjectPart part, ObjectPartLocalizedInfo parentInfo)
