@@ -47,45 +47,64 @@ namespace SilverSim.Scene.Types.Object.Localization
         {
             get
             {
+                using (var ms = new MemoryStream())
+                {
+                    LlsdBinary.Serialize(MapSerialization, ms);
+                    return ms.ToArray();
+                }
+            }
+            set
+            {
+                using (var ms = new MemoryStream(value))
+                {
+                    MapSerialization = (Map)LlsdBinary.Deserialize(ms);
+                }
+            }
+        }
+
+        public Map MapSerialization
+        {
+            get
+            {
                 var m = new Map();
                 string s = m_Name;
-                if(s != null)
+                if (s != null)
                 {
                     m.Add("name", s);
                 }
                 s = m_Description;
-                if(s != null)
+                if (s != null)
                 {
                     m.Add("desc", s);
                 }
                 s = m_TouchText;
-                if(s != null)
+                if (s != null)
                 {
                     m.Add("touchtext", s);
                 }
                 s = m_SitText;
-                if(s != null)
+                if (s != null)
                 {
                     m.Add("sittext", s);
                 }
                 s = m_MediaURL;
-                if(s != null)
+                if (s != null)
                 {
                     m.Add("mediaurl", s);
                 }
                 byte[] ps = m_ParticleSystem;
-                if(ps != null)
+                if (ps != null)
                 {
                     m.Add("particlesystem", new BinaryData(ps));
                 }
 
                 byte[] te = m_TextureEntryBytes;
-                if(te != null)
+                if (te != null)
                 {
                     m.Add("textureentry", new BinaryData(te));
                 }
                 PrimitiveMedia media = m_Media;
-                if(media != null)
+                if (media != null)
                 {
                     using (var ms = new MemoryStream())
                     {
@@ -97,51 +116,48 @@ namespace SilverSim.Scene.Types.Object.Localization
                     }
                 }
                 CollisionSoundParam csp = m_CollisionSound;
-                if(csp != null)
+                if (csp != null)
                 {
                     m.Add("collisionsound", new BinaryData(csp.Serialization));
                 }
                 SoundParam sp = m_Sound;
-                if(sp != null)
+                if (sp != null)
                 {
                     m.Add("sound", new BinaryData(sp.Serialization));
                 }
                 ProjectionParam p = m_Projection;
-                if(p != null)
+                if (p != null)
                 {
                     m.Add("projection", new BinaryData(p.DbSerialization));
                 }
                 byte[] ta = m_TextureAnimationBytes;
-                if(ta != null)
+                if (ta != null)
                 {
                     m.Add("texanim", new BinaryData(ta));
                 }
                 TextParam tp = m_Text;
-                if(tp != null)
+                if (tp != null)
                 {
                     m.Add("text", new BinaryData(tp.Serialization));
                 }
-                using (var ms = new MemoryStream())
-                {
-                    LlsdBinary.Serialize(m, ms);
-                    return ms.ToArray();
-                }
+                return m;
             }
             set
             {
-                Map m;
-                using (var ms = new MemoryStream(value))
-                {
-                    m = (Map)LlsdBinary.Deserialize(ms);
-                }
-                m.TryGetValue("name", out m_Name);
-                m.TryGetValue("desc", out m_Description);
-                m.TryGetValue("touchtext", out m_TouchText);
-                m.TryGetValue("sittext", out m_SitText);
-                m.TryGetValue("mediaurl", out m_MediaURL);
+                string s;
+                value.TryGetValue("name", out s);
+                Name = s;
+                value.TryGetValue("desc", out s);
+                Description = s;
+                value.TryGetValue("touchtext", out s);
+                TouchText = s;
+                value.TryGetValue("sittext", out s);
+                SitText = s;
+                value.TryGetValue("mediaurl", out s);
+                MediaURL = s;
                 BinaryData d;
-                m_ParticleSystem = m.TryGetValue("particlesystem", out d) ? d : null;
-                if (m.TryGetValue("textureentry", out d))
+                ParticleSystemBytes = value.TryGetValue("particlesystem", out d) ? d : null;
+                if (value.TryGetValue("textureentry", out d))
                 {
                     TextureEntryBytes = d;
                 }
@@ -149,23 +165,26 @@ namespace SilverSim.Scene.Types.Object.Localization
                 {
                     TextureEntryBytes = null;
                 }
-                if (m.TryGetValue("media", out d))
+                lock (m_DataLock)
                 {
-                    using (var ms = new MemoryStream(d))
-                    using (var r = new XmlTextReader(ms))
+                    if (value.TryGetValue("media", out d))
                     {
-                        m_Media = PrimitiveMedia.FromXml(r);
+                        using (var ms = new MemoryStream(d))
+                        using (var r = new XmlTextReader(ms))
+                        {
+                            m_Media = PrimitiveMedia.FromXml(r);
+                        }
+                    }
+                    else
+                    {
+                        m_Media = null;
                     }
                 }
-                else
-                {
-                    m_Media = null;
-                }
-                m_CollisionSound = m.TryGetValue("collisionsound", out d) ? new CollisionSoundParam { Serialization = d } : null;
-                m_Sound = m.TryGetValue("sound", out d) ? new SoundParam { Serialization = d } : null;
-                m_Projection = m.TryGetValue("projection", out d) ? new ProjectionParam { DbSerialization = d } : null;
-                m_TextureAnimationBytes = m.TryGetValue("texanim", out d) ? d : null;
-                m_Text = m.TryGetValue("text", out d) ? new TextParam { Serialization = d } : null;
+                CollisionSound = value.TryGetValue("collisionsound", out d) ? new CollisionSoundParam { Serialization = d } : null;
+                Sound = value.TryGetValue("sound", out d) ? new SoundParam { Serialization = d } : null;
+                Projection = value.TryGetValue("projection", out d) ? new ProjectionParam { DbSerialization = d } : null;
+                TextureAnimationBytes = value.TryGetValue("texanim", out d) ? d : null;
+                Text = value.TryGetValue("text", out d) ? new TextParam { Serialization = d } : null;
             }
         }
 
