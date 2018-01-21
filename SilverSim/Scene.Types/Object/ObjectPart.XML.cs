@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 
+using SilverSim.Scene.Types.Object.Localization;
 using SilverSim.Scene.Types.Object.Parameters;
 using SilverSim.Scene.Types.Physics.Vehicle;
 using SilverSim.Types;
@@ -308,6 +309,14 @@ namespace SilverSim.Scene.Types.Object
                     writer.WriteNamedValue("WalkableCoefficientB", WalkableCoefficientB);
                     writer.WriteNamedValue("WalkableCoefficientC", WalkableCoefficientC);
                     writer.WriteNamedValue("WalkableCoefficientD", WalkableCoefficientD);
+                    foreach(ObjectPartLocalizedInfo l in NamedLocalizations)
+                    {
+                        writer.WriteStartElement("LocalizationData");
+                        writer.WriteAttributeString("name", l.LocalizationName);
+                        byte[] serialization = l.Serialization;
+                        writer.WriteBase64(serialization, 0, serialization.Length);
+                        writer.WriteEndElement();
+                    }
                     if (VehicleType != VehicleType.None)
                     {
                         writer.WriteStartElement("Vehicle");
@@ -1719,6 +1728,33 @@ namespace SilverSim.Scene.Types.Object
 
                             case "WalkableCoefficientD":
                                 part.WalkableCoefficientD = reader.ReadElementValueAsDouble();
+                                break;
+
+                            case "LocalizationData":
+                                {
+                                    string localizationName = string.Empty;
+                                    if (reader.MoveToFirstAttribute())
+                                    {
+                                        do
+                                        {
+                                            switch (reader.Name)
+                                            {
+                                                case "name":
+                                                    localizationName = reader.Value;
+                                                    break;
+
+                                                default:
+                                                    break;
+                                            }
+                                        }
+                                        while (reader.MoveToNextAttribute());
+                                    }
+                                    if(!string.IsNullOrEmpty(localizationName))
+                                    {
+                                        part.GetOrCreateLocalization(localizationName).Serialization =
+                                            Convert.FromBase64String(reader.ReadElementValueAsString("LocalizationData"));
+                                    }
+                                }
                                 break;
 
                             default:
