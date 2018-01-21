@@ -94,16 +94,11 @@ namespace SilverSim.Viewer.Core
         private readonly BlockingQueue<IObjUpdateInfo> m_TxObjectQueue = new BlockingQueue<IObjUpdateInfo>();
         private bool m_TriggerFirstUpdate;
 
-        public void ScheduleUpdate(ObjectUpdateInfo info)
-        {
-            if((info.IsPhysics || info.IsMoving) && !info.IsKilled && !info.IsAttached && !EnablePhysicalOutQueue)
-            {
-                return;
-            }
-            m_TxObjectQueue.Enqueue(info);
-        }
+        public void ScheduleUpdate(ObjectUpdateInfo info) => ScheduleObjUpdate(info);
 
-        public void ScheduleUpdate(AgentUpdateInfo info)
+        public void ScheduleUpdate(AgentUpdateInfo info) => ScheduleObjUpdate(info);
+
+        private void ScheduleObjUpdate(IObjUpdateInfo info)
         {
             if ((info.IsPhysics || info.IsMoving) && !info.IsKilled && !info.IsAttached && !EnablePhysicalOutQueue)
             {

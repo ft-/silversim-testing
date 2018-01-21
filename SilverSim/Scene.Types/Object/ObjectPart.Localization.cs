@@ -197,6 +197,7 @@ namespace SilverSim.Scene.Types.Object
         }
 
         internal ObjectPartLocalizedInfo[] Localizations => new ObjectPartLocalizedInfo[] { m_DefaultLocalization };
+        public bool HaveMultipleLocalizations => false;
         #endregion
     }
 }

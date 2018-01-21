@@ -20,10 +20,10 @@
 // exception statement from your version.
 
 using SilverSim.Main.Common.HttpServer;
+using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
 using SilverSim.Types.StructuredData.Llsd;
 using System;
-using System.IO;
 using System.Net;
 
 namespace SilverSim.Viewer.Core
@@ -65,6 +65,13 @@ namespace SilverSim.Viewer.Core
             string agentLanguage = reqmap["language"].ToString();
             bool isPublic = reqmap["language_is_public"].AsBoolean;
             Agent.AgentLanguage = isPublic ? agentLanguage : string.Empty;
+            foreach(ObjectPart p in Scene.Primitives)
+            {
+                if(p.HaveMultipleLocalizations)
+                {
+                    ScheduleObjUpdate(new ForceObjectUpdateInfo(p.UpdateInfo));
+                }
+            }
 
             using (var res = httpreq.BeginResponse("application/llsd+xml"))
             {

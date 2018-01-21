@@ -26,7 +26,7 @@ using System.Globalization;
 
 namespace SilverSim.Scene.Types.Object
 {
-    public sealed class ObjectUpdateInfo : IObjUpdateInfo
+    public class ObjectUpdateInfo : IObjUpdateInfo
     {
         private bool m_Killed;
         public uint LocalID { get; internal set; }
@@ -34,7 +34,7 @@ namespace SilverSim.Scene.Types.Object
         public UUID ID { get; internal set; }
         public UUID SceneID { get; internal set; }
 
-        public ObjectUpdateInfo(ObjectPart part)
+        internal ObjectUpdateInfo(ObjectPart part)
         {
             Part = part;
             ID = part.ID;
@@ -47,7 +47,7 @@ namespace SilverSim.Scene.Types.Object
 
         public UUI Owner => Part.ObjectGroup.Owner;
 
-        public bool IsAlwaysFull => false;
+        public virtual bool IsAlwaysFull => false;
 
         public bool IsKilled => m_Killed;
 
