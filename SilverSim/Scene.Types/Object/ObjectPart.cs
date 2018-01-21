@@ -291,7 +291,11 @@ namespace SilverSim.Scene.Types.Object
 
         public ObjectPart(UUID id, ObjectPart fromPart)
         {
-            m_DefaultLocalization = new ObjectPartLocalizedInfo(this, fromPart.m_DefaultLocalization, null);
+            m_DefaultLocalization = new ObjectPartLocalizedInfo(this, fromPart.m_DefaultLocalization);
+            foreach(ObjectPartLocalizedInfo l in fromPart.m_NamedLocalizations.Values)
+            {
+                m_NamedLocalizations.Add(l.LocalizationName, new ObjectPartLocalizedInfo(l.LocalizationName, this, l, m_DefaultLocalization));
+            }
 
             Inventory = new ObjectPartInventory();
             Inventory.OnChange += OnInventoryChange;

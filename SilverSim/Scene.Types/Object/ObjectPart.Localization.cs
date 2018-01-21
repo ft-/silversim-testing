@@ -51,10 +51,12 @@ namespace SilverSim.Scene.Types.Object
             {
                 throw new ArgumentOutOfRangeException(nameof(culturename));
             }
-            return m_NamedLocalizations.GetOrAddIfNotExists(culturename, () => new ObjectPartLocalizedInfo(this, m_DefaultLocalization));
+            return m_NamedLocalizations.GetOrAddIfNotExists(culturename, () => new ObjectPartLocalizedInfo(culturename, this, m_DefaultLocalization));
         }
 
         public string[] GetNamedLocalizationNames() => m_NamedLocalizations.Keys.ToArray();
+
+        public ObjectPartLocalizedInfo[] NamedLocalizations => m_NamedLocalizations.Values.ToArray();
 
         public void RemoveLocalization(string culturename)
         {

@@ -38,33 +38,20 @@ namespace SilverSim.Scene.Types.Object.Localization
         private string m_Description;
         private string m_TouchText;
         private string m_SitText;
+        public string LocalizationName { get; }
 
-        private void InitRootInfo()
+        public ObjectPartLocalizedInfo(string localizationName, ObjectPart part, ObjectPartLocalizedInfo src, ObjectPartLocalizedInfo parentInfo)
         {
-            m_Projection = new ProjectionParam();
-            m_Sound = new SoundParam();
-            m_Name = string.Empty;
-            m_Description = string.Empty;
-            m_ParticleSystem = new byte[0];
-            m_TextureAnimationBytes = new byte[0];
-            m_TextureEntry = new TextureEntry();
-            m_TextureEntryBytes = new byte[0];
-            m_CollisionSound = new CollisionSoundParam();
-            m_TouchText = string.Empty;
-            m_SitText = string.Empty;
-            m_MediaURL = string.Empty;
-            m_TextureAnimationBytes = new byte[0];
-            m_Text = new TextParam();
-        }
-
-        public ObjectPartLocalizedInfo(ObjectPart part, ObjectPartLocalizedInfo src, ObjectPartLocalizedInfo parentInfo)
-        {
-            m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ObjectDataLength] = (byte)60;
-
+            if (string.IsNullOrEmpty(localizationName))
+            {
+                throw new ArgumentOutOfRangeException(nameof(localizationName));
+            }
             if (parentInfo == null)
             {
-                InitRootInfo();
+                throw new ArgumentNullException(nameof(parentInfo));
             }
+            LocalizationName = localizationName;
+            m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ObjectDataLength] = 60;
 
             m_Part = part;
             m_ParentInfo = parentInfo;
@@ -82,17 +69,65 @@ namespace SilverSim.Scene.Types.Object.Localization
             m_TouchText = src.TouchText;
         }
 
-        public ObjectPartLocalizedInfo(ObjectPart part, ObjectPartLocalizedInfo parentInfo = null)
+        public ObjectPartLocalizedInfo(string localizationName, ObjectPart part, ObjectPartLocalizedInfo parentInfo)
         {
-            m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ObjectDataLength] = (byte)60;
-
+            if (string.IsNullOrEmpty(localizationName))
+            {
+                throw new ArgumentOutOfRangeException(nameof(localizationName));
+            }
             if (parentInfo == null)
             {
-                InitRootInfo();
+                throw new ArgumentNullException(nameof(parentInfo));
             }
+
+            LocalizationName = localizationName;
+            m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ObjectDataLength] = 60;
 
             m_Part = part;
             m_ParentInfo = parentInfo;
+        }
+
+        public ObjectPartLocalizedInfo(ObjectPart part)
+        {
+            LocalizationName = string.Empty;
+            m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ObjectDataLength] = 60;
+
+            m_Projection = new ProjectionParam();
+            m_Sound = new SoundParam();
+            m_Name = string.Empty;
+            m_Description = string.Empty;
+            m_ParticleSystem = new byte[0];
+            m_TextureAnimationBytes = new byte[0];
+            m_TextureEntry = new TextureEntry();
+            m_TextureEntryBytes = new byte[0];
+            m_CollisionSound = new CollisionSoundParam();
+            m_TouchText = string.Empty;
+            m_SitText = string.Empty;
+            m_MediaURL = string.Empty;
+            m_TextureAnimationBytes = new byte[0];
+            m_Text = new TextParam();
+
+            m_Part = part;
+        }
+
+        public ObjectPartLocalizedInfo(ObjectPart part, ObjectPartLocalizedInfo src)
+        {
+            LocalizationName = string.Empty;
+            m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ObjectDataLength] = 60;
+
+            m_Part = part;
+            m_TextureEntry = src.TextureEntry;
+            m_TextureEntryBytes = m_TextureEntry?.GetBytes();
+            m_CollisionSound = src.CollisionSound;
+            m_Name = src.Name;
+            m_Description = src.Description;
+            UpdateMedia(src.Media, UUID.Zero);
+            m_MediaURL = src.MediaURL;
+            m_ParticleSystem = src.ParticleSystemBytes;
+            m_SitText = src.SitText;
+            m_Sound = src.Sound;
+            m_TextureAnimationBytes = src.TextureAnimationBytes;
+            m_TouchText = src.TouchText;
         }
 
         internal void SetBaseMask(InventoryPermissionsMask perms)
