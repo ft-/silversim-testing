@@ -226,6 +226,8 @@ namespace SilverSim.Database.Memory.SimulationData
             objpart.UnSitTargetOffset = map["UnSitTargetOffset"].AsVector3;
             objpart.UnSitTargetOrientation = map["UnSitTargetOrientation"].AsQuaternion;
 
+            objpart.LocalizationSerialization = (BinaryData)map["LocalizationData"];
+
             return objpart;
         }
 

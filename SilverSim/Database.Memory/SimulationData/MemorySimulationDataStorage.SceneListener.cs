@@ -195,7 +195,8 @@ namespace SilverSim.Database.Memory.SimulationData
                     { "EveryOnePermissions", (int)objpart.EveryoneMask },
                     { "GroupPermissions", (int)objpart.GroupMask },
                     { "NextOwnerPermissions", (int)objpart.NextOwnerMask },
-                    { "ClickAction", (int)objpart.ClickAction }
+                    { "ClickAction", (int)objpart.ClickAction },
+                    { "LocalizationData", new BinaryData(objpart.LocalizationSerialization) }
                 };
                 using (var ms = new MemoryStream())
                 {
