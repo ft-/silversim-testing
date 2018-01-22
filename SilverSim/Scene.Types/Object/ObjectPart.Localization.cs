@@ -43,7 +43,7 @@ namespace SilverSim.Scene.Types.Object
         {
             if(string.IsNullOrEmpty(culturename))
             {
-                throw new ArgumentOutOfRangeException(nameof(culturename));
+                return m_DefaultLocalization;
             }
             try
             {
