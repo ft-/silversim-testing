@@ -89,6 +89,11 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
+                if(value == null || value.Length == 0)
+                {
+                    RemoveAllLocalizations();
+                    return;
+                }
                 Map m;
                 using (var ms = new MemoryStream(value))
                 {
