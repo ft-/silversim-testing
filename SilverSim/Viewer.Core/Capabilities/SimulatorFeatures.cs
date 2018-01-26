@@ -53,13 +53,16 @@ namespace SilverSim.Viewer.Core.Capabilities
             Features.Add("MaxMaterialsPerTransaction", 50);
             Features.Add("DynamicPathfindingEnabled", scene.PathfindingService?.IsDynamicEnabled ?? false);
             Features.Add("AvatarHoverHeightEnabled", true);
-            var typesMap = new Map
+            Features.Add("PhysicsShapeTypes", new Map
             {
                 { "convex", true },
                 { "none", true },
                 { "prim", true }
-            };
-            Features.Add("PhysicsShapeTypes", typesMap);
+            });
+            Features.Add("AnimatedObjects", new Map
+            {
+                { "AnimatedObjectMaxTris", 20000 }
+            });
             var extrasMap = new Map();
             if (!string.IsNullOrEmpty(scene.GatekeeperURI))
             {

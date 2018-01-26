@@ -267,7 +267,7 @@ namespace SilverSim.Scene.Types.Object
                                     }
                                     if (!BitConverter.IsLittleEndian)
                                     {
-                                        byte[] b = new byte[4];
+                                        var b = new byte[4];
                                         Buffer.BlockCopy(value, pos, b, 0, 4);
                                         emesh.Flags = (ExtendedMeshParams.MeshFlags)BitConverter.ToUInt32(b, 0);
                                     }
@@ -275,6 +275,9 @@ namespace SilverSim.Scene.Types.Object
                                     {
                                         emesh.Flags = (ExtendedMeshParams.MeshFlags)BitConverter.ToUInt32(value, pos);
                                     }
+#if DEBUG
+                                    m_Log.DebugFormat("Setting ExtendedMesh flags {0} for {1}", emesh.Flags, ID);
+#endif
                                     break;
 
                                 default:

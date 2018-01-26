@@ -903,6 +903,7 @@ namespace SilverSim.Scene.Types.Scene
             const ushort LightEP = 0x20;
             const ushort SculptEP = 0x30;
             const ushort ProjectionEP = 0x40;
+            const ushort ExtendedMeshEP = 0x70;
 
             var req = (ObjectExtraParams)m;
             if (req.CircuitSessionID != req.SessionID ||
@@ -982,6 +983,19 @@ namespace SilverSim.Scene.Types.Scene
                         else
                         {
                             part.Projection = ProjectionParam.FromUdpDataBlock(data.ParamData);
+                        }
+                        break;
+
+                    case ExtendedMeshEP:
+                        if(!data.ParamInUse)
+                        {
+                            ExtendedMeshParams mesh = part.ExtendedMesh;
+                            mesh.Flags = ExtendedMeshParams.MeshFlags.None;
+                            part.ExtendedMesh = mesh;
+                        }
+                        else
+                        {
+                            part.ExtendedMesh = ExtendedMeshParams.FromUdpDataBlock(data.ParamData);
                         }
                         break;
                 }
