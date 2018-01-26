@@ -29,7 +29,7 @@ namespace SilverSim.Scene.Types.Object.Localization
         #region Media Properties
         public PrimitiveMedia m_Media;
 
-        public PrimitiveMedia Media => m_Media ?? m_ParentInfo.m_Media;
+        public PrimitiveMedia Media => m_Media ?? m_ParentInfo?.m_Media;
 
         internal void SetMedia(PrimitiveMedia media)
         {
