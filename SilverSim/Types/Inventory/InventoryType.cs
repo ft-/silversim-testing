@@ -65,8 +65,8 @@ namespace SilverSim.Types.Inventory
                 case InventoryType.Landmark: return "Landmark";
                 case InventoryType.Object: return "object";
                 case InventoryType.Notecard: return "notecard";
-                case InventoryType.LSL: return "lsltext";
-                case InventoryType.Animation: return "animatn";
+                case InventoryType.LSL: return "script";
+                case InventoryType.Animation: return "animation";
                 case InventoryType.Gesture: return "gesture";
                 case InventoryType.Mesh: return "mesh";
                 case InventoryType.Settings: return "settings";
@@ -90,9 +90,9 @@ namespace SilverSim.Types.Inventory
                     return InventoryType.Object;
                 case "notecard":
                     return InventoryType.Notecard;
-                case "lsltext":
+                case "script":
                     return InventoryType.LSL;
-                case "animatn":
+                case "animation":
                     return InventoryType.Animation;
                 case "gesture":
                     return InventoryType.Gesture;
