@@ -127,34 +127,8 @@ namespace SilverSim.Scene.Agent.Bakery
                 }
             }
 
-            double vpHeight;
-            double vpHeelHeight;
-            double vpPlatformHeight;
-            double vpHeadSize;
-            double vpLegLength;
-            double vpNeckLength;
-            double vpHipLength;
-
-            visualParamInputs.TryGetValue(33, out vpHeight);
-            visualParamInputs.TryGetValue(198, out vpHeelHeight);
-            visualParamInputs.TryGetValue(503, out vpPlatformHeight);
-            if (!visualParamInputs.TryGetValue(682, out vpHeadSize))
-            {
-                vpHeadSize = 0.5;
-            }
-            visualParamInputs.TryGetValue(692, out vpLegLength);
-            visualParamInputs.TryGetValue(756, out vpNeckLength);
-            visualParamInputs.TryGetValue(842, out vpHipLength);
-
-            /* algorithm has to be verified later but it at least provides a basis */
-            avatarHeight = 1.706 +
-                (vpLegLength * 0.1918) +
-                (vpHipLength * 0.0375) +
-                (vpHeight * 0.12022) +
-                (vpHeadSize * 0.01117) +
-                (vpNeckLength * 0.038) +
-                (vpHeelHeight * .08) +
-                (vpPlatformHeight * .07);
+            var skel = new AvatarSkeleton(BaseBakes.DefaultAvatarLad, visualParamInputs);
+            avatarHeight = skel.BodySize.Z;
 
             return visualParams;
         }

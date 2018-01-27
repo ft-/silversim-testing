@@ -217,7 +217,6 @@ namespace SilverSim.Scene.Agent.Bakery
             foreach (BoneInfo bone in DefaultSkeleton.Bones)
             {
                 var newBone = new BoneInfo(bone);
-                BonesRef.Add(newBone.Name, newBone);
                 Bones.Add(newBone);
                 BuildBonesRef(newBone);
             }
