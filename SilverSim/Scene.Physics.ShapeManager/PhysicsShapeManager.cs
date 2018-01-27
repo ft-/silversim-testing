@@ -322,7 +322,7 @@ namespace SilverSim.Scene.Physics.ShapeManager
                         {
                             /* no shape */
 #if DEBUG
-                            m_Log.DebugFormat("No convex in asset of {0}/{1}/{2}", shape.Type, shape.SculptType, shape.SculptMap);
+                            m_Log.DebugFormat("No suitable convex in asset of {0}/{1}/{2}", shape.Type, shape.SculptType, shape.SculptMap);
 #endif
                         }
                         catch(Exception e)
