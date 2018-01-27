@@ -37,7 +37,39 @@ namespace SilverSim.Viewer.Core
 {
     public partial class AgentCircuit
     {
-        private sealed class ObjectAnimationTriggerMessage : Message
+        private abstract class ChainMessage : Message
+        {
+            public Message ChainedMessage { get; set; }
+        }
+
+        private sealed class AvatarAnimationTriggerMessage : ChainMessage
+        {
+            private readonly AgentCircuit m_Circuit;
+
+            public AvatarAnimationTriggerMessage(AgentCircuit circuit)
+            {
+                m_Circuit = circuit;
+                OnSendCompletion += HandleCompletion;
+            }
+
+            public List<IAgent> Agents = new List<IAgent>();
+
+            private void HandleCompletion(bool f)
+            {
+                ViewerAgent agent = m_Circuit.Agent;
+                if (agent == null)
+                {
+                    return;
+                }
+                foreach (IAgent otheragent in Agents)
+                {
+                    m_Circuit.SendMessage(otheragent.GetAvatarAnimation());
+                }
+                ChainedMessage.OnSendComplete(f);
+            }
+        }
+
+        private sealed class ObjectAnimationTriggerMessage : ChainMessage
         {
             private readonly AgentCircuit m_Circuit;
 
@@ -48,8 +80,6 @@ namespace SilverSim.Viewer.Core
             }
 
             public List<ObjectPart> ObjectParts = new List<ObjectPart>();
-
-            public Message ChainedMessage;
 
             private void HandleCompletion(bool f)
             {
@@ -562,6 +592,7 @@ namespace SilverSim.Viewer.Core
 
                 ObjectPropertiesTriggerMessage full_packet_objprop = null;
                 ObjectAnimationTriggerMessage full_packet_objanim = null;
+                AvatarAnimationTriggerMessage full_packet_agentanim = null;
 
                 while (physicalOutQueue.Count != 0 || nonPhysicalOutQueue.Count != 0)
                 {
@@ -606,7 +637,7 @@ namespace SilverSim.Viewer.Core
                         else
                         {
                             var dofull = false;
-                            var mustBeReliable = false;
+                            var mustBeNonPhys = false;
                             var objknown = false;
                             if(!ui.IsAlwaysFull && LastObjSerialNo.Contains(ui.LocalID))
                             {
@@ -634,7 +665,7 @@ namespace SilverSim.Viewer.Core
                                     }
                                     else if (isSelected && !wasSelected)
                                     {
-                                        mustBeReliable = true;
+                                        mustBeNonPhys = true;
                                         SendSelectedObjects.Add(ui.ID);
                                         if (full_packet_objprop == null)
                                         {
@@ -644,12 +675,25 @@ namespace SilverSim.Viewer.Core
                                     }
                                     else if(!objknown && (oui.Part.ExtendedMesh.Flags & ExtendedMeshParams.MeshFlags.AnimatedMeshEnabled) != 0 && m_EnableObjectAnimation)
                                     {
-                                        mustBeReliable = true;
+                                        mustBeNonPhys = true;
                                         if (full_packet_objanim == null)
                                         {
                                             full_packet_objanim = new ObjectAnimationTriggerMessage(this);
                                         }
                                         full_packet_objanim.ObjectParts.Add(oui.Part);
+                                    }
+                                }
+                                else
+                                {
+                                    var aui = ui as AgentUpdateInfo;
+                                    if(aui != null && !objknown)
+                                    {
+                                        mustBeNonPhys = true;
+                                        if (full_packet_agentanim == null)
+                                        {
+                                            full_packet_agentanim = new AvatarAnimationTriggerMessage(this);
+                                        }
+                                        full_packet_agentanim.Agents.Add(aui.Agent);
                                     }
                                 }
                             }
@@ -660,7 +704,7 @@ namespace SilverSim.Viewer.Core
 
                                 if (fullUpdate != null)
                                 {
-                                    if (ui.IsPhysics && !mustBeReliable)
+                                    if (ui.IsPhysics && !mustBeNonPhys)
                                     {
                                         if (CanPhysFullBeSent(ui.LocalID))
                                         {
@@ -715,18 +759,40 @@ send_nonphys_packet:
                                                 break;
                                             }
                                             full_packet.IsReliable = true;
-                                            if (full_packet_objanim != null)
+
+                                            ChainMessage chain = null;
+
+                                            if(full_packet_agentanim != null)
                                             {
-                                                full_packet.AckMessage = full_packet_objanim;
-                                                full_packet_objanim.ChainedMessage = full_packet_objprop;
+                                                chain = full_packet_agentanim;
+                                                full_packet.AckMessage = full_packet_agentanim;
+                                                full_packet_agentanim = null;
+                                            }
+
+                                            if(full_packet_objanim != null)
+                                            {
+                                                if(chain != null)
+                                                {
+                                                    chain.ChainedMessage = full_packet_objanim;
+                                                }
+                                                else
+                                                {
+                                                    full_packet.AckMessage = full_packet_objanim;
+                                                }
+                                                chain = full_packet_objanim;
                                                 full_packet_objanim = null;
-                                                full_packet_objprop = null;
+                                            }
+
+                                            if(chain != null)
+                                            {
+                                                chain.ChainedMessage = full_packet_objprop;
                                             }
                                             else
                                             {
                                                 full_packet.AckMessage = full_packet_objprop;
-                                                full_packet_objprop = null;
                                             }
+
+                                            full_packet_objprop = null;
                                             SendFullUpdateMsg(full_packet, nonphys_full_packet_data);
                                             nonphys_full_packet_data = null;
                                         }
@@ -860,15 +926,37 @@ send_nonphys_packet:
                         break;
                     }
                     full_packet.IsReliable = true;
+
+                    ChainMessage chain = null;
+
+                    if (full_packet_agentanim != null)
+                    {
+                        chain = full_packet_agentanim;
+                        full_packet.AckMessage = full_packet_agentanim;
+                    }
+
                     if (full_packet_objanim != null)
                     {
-                        full_packet.AckMessage = full_packet_objanim;
-                        full_packet_objanim.ChainedMessage = full_packet_objprop;
+                        if (chain != null)
+                        {
+                            chain.ChainedMessage = full_packet_objanim;
+                        }
+                        else
+                        {
+                            full_packet.AckMessage = full_packet_objanim;
+                        }
+                        chain = full_packet_objanim;
+                    }
+
+                    if (chain != null)
+                    {
+                        chain.ChainedMessage = full_packet_objprop;
                     }
                     else
                     {
                         full_packet.AckMessage = full_packet_objprop;
                     }
+
                     SendFullUpdateMsg(full_packet, nonphys_full_packet_data);
                 }
 

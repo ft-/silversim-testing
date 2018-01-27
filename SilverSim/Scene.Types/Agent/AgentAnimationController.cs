@@ -122,6 +122,11 @@ namespace SilverSim.Scene.Types.Agent
 
         public void SendAnimations()
         {
+            m_SendAnimations(GetAvatarAnimation());
+        }
+
+        public AvatarAnimation GetAvatarAnimation()
+        {
             var m = new AvatarAnimation
             {
                 Sender = m_AgentID
@@ -134,7 +139,7 @@ namespace SilverSim.Scene.Types.Agent
                 }
             }
 
-            m_SendAnimations(m);
+            return m;
         }
 
         public void RevokePermissions(UUID sourceID, ScriptPermissions permissions)

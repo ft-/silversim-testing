@@ -47,6 +47,7 @@ using SilverSim.Types.Script;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Agent;
 using SilverSim.Viewer.Messages.Appearance;
+using SilverSim.Viewer.Messages.Avatar;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -64,6 +65,8 @@ namespace SilverSim.Scene.Types.Agent
         event Action<IAgent> OnAppearanceUpdate;
 
         AgentUpdateInfo GetUpdateInfo(UUID sceneID);
+
+        AvatarAnimation GetAvatarAnimation();
 
         void SendKillObject(UUID sceneID);
 
