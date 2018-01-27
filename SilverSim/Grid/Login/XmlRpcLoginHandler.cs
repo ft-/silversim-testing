@@ -374,8 +374,8 @@ namespace SilverSim.Grid.Login
             }
 
             var loginData = new LoginData();
-            string firstName; 
-            string lastName; 
+            string firstName;
+            string lastName;
             string passwd;
             if (loginParams.ContainsKey("username"))
             {
