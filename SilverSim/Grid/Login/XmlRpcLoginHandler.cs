@@ -384,11 +384,16 @@ namespace SilverSim.Grid.Login
                 lastName = parts.Length > 1 ? parts[1] : string.Empty;
                 passwd = "$1$" + loginParams["passwd"];
             }
-            else
+            else if(loginParams.ContainsKey("first") || loginParams.ContainsKey("last"))
             {
                 firstName = loginParams["first"];
                 lastName = loginParams["last"];
                 passwd = loginParams["passwd"];
+            }
+            else
+            {
+                m_Log.ErrorFormat("Request from {0} does not contain login credentials", req.CallerIP);
+                throw new XmlRpc.XmlRpcFaultException(4, "Missing login credentials");
             }
             loginData.ClientInfo.Channel = loginParams["channel"];
             loginData.ClientInfo.ClientVersion = loginParams["version"];
@@ -1028,7 +1033,7 @@ namespace SilverSim.Grid.Login
         private const string Option_AdultCompliant = "adult_compliant";
         private const string OptionExt_UserCapabilities = "user-capabilities";
 
-        private readonly string[] RequiredParameters = new string[] { "first", "last", "start", "passwd", "channel", "version", "mac", "id0" };
+        private readonly string[] RequiredParameters = new string[] { "start", "passwd", "channel", "version", "mac", "id0" };
 
         [Serializable]
         private class LoginFailResponseException : Exception
