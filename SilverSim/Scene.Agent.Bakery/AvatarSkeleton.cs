@@ -72,7 +72,7 @@ namespace SilverSim.Scene.Agent.Bakery
         {
             public string Name { get; }
             public string Support { get; }
-            public readonly List<string> Aliases = new List<string>();
+            public readonly string[] Aliases = new string[0];
             public bool IsJoint { get; }
             public Vector3 Position { get; }
             public Vector3 End { get; }
@@ -87,7 +87,7 @@ namespace SilverSim.Scene.Agent.Bakery
                 string val = elem.GetAttribute("aliases");
                 if(!string.IsNullOrEmpty(val))
                 {
-                    Aliases.AddRange(val.Split(' '));
+                    Aliases = val.Split(' ');
                 }
                 Name = elem.GetAttribute("name");
                 End = GetVectorAttribute(elem, "end");
