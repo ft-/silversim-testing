@@ -384,7 +384,7 @@ namespace SilverSim.Grid.Login
                 lastName = parts.Length > 1 ? parts[1] : string.Empty;
                 passwd = "$1$" + loginParams["passwd"];
             }
-            else if(loginParams.ContainsKey("first") || loginParams.ContainsKey("last"))
+            else if(loginParams.ContainsKey("first") && loginParams.ContainsKey("last"))
             {
                 firstName = loginParams["first"];
                 lastName = loginParams["last"];
