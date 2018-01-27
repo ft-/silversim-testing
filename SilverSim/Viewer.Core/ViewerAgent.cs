@@ -834,7 +834,6 @@ namespace SilverSim.Viewer.Core
                     circuit.SendMessage(props);
                 }
                 circuit.ScheduleFirstUpdate();
-                SendAnimations();
             }
         }
 
