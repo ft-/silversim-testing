@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using SilverSim.Types;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -53,9 +54,9 @@ namespace SilverSim.Scene.Agent.Bakery
             public string Name;
             public string Support;
             public Vector3 End { get; }
-            public Vector3 Position { get; }
+            public Vector3 Position { get; set; }
             public Vector3 Rot { get; }
-            public Vector3 Scale { get; }
+            public Vector3 Scale { get; set; }
 
             public CollisionVolume(XmlElement elem)
             {
@@ -66,6 +67,16 @@ namespace SilverSim.Scene.Agent.Bakery
                 Scale = GetVectorAttribute(elem, "scale");
                 End = GetVectorAttribute(elem, "end");
             }
+
+            public CollisionVolume(CollisionVolume src)
+            {
+                Name = src.Name;
+                Support = src.Support;
+                End = src.End;
+                Position = src.Position;
+                Rot = src.Rot;
+                Scale = src.Scale;
+            }
         }
 
         public sealed class BoneInfo
@@ -74,10 +85,10 @@ namespace SilverSim.Scene.Agent.Bakery
             public string Support { get; }
             public readonly string[] Aliases = new string[0];
             public bool IsJoint { get; }
-            public Vector3 Position { get; }
+            public Vector3 Position { get; set; }
             public Vector3 End { get; }
             public Vector3 Rot { get; }
-            public Vector3 Scale { get; }
+            public Vector3 Scale { get; set; }
             public Vector3 Pivot { get; }
             public readonly List<BoneInfo> Children = new List<BoneInfo>();
             public readonly List<CollisionVolume> CollisionVolumes = new List<CollisionVolume>();
@@ -98,9 +109,32 @@ namespace SilverSim.Scene.Agent.Bakery
                 Support = elem.GetAttribute("support");
                 IsJoint = bool.Parse(elem.GetAttribute("connected"));
             }
+
+            public BoneInfo(BoneInfo src)
+            {
+                Name = src.Name;
+                End = src.End;
+                Pivot = src.Pivot;
+                Position = src.Position;
+                Rot = src.Rot;
+                Scale = src.Scale;
+                Support = src.Support;
+                IsJoint = src.IsJoint;
+
+                foreach(BoneInfo child in src.Children)
+                {
+                    Children.Add(new BoneInfo(child));
+                }
+
+                foreach(CollisionVolume colvol in src.CollisionVolumes)
+                {
+                    CollisionVolumes.Add(new CollisionVolume(colvol));
+                }
+            }
         }
 
         public readonly List<BoneInfo> Bones = new List<BoneInfo>();
+        public readonly Dictionary<string, BoneInfo> BonesRef = new Dictionary<string, BoneInfo>();
 
         private void Load(Stream s)
         {
@@ -117,6 +151,11 @@ namespace SilverSim.Scene.Agent.Bakery
                 if(elem.Name == "bone")
                 {
                     var info = new BoneInfo(elem);
+                    BonesRef.Add(info.Name, info);
+                    foreach (string alias in info.Aliases)
+                    {
+                        BonesRef.Add(alias, info);
+                    }
                     Bones.Add(info);
                     stack.Add(new KeyValuePair<XmlElement, BoneInfo>(elem, info));
                 }
@@ -133,6 +172,11 @@ namespace SilverSim.Scene.Agent.Bakery
                     {
                         var info = new BoneInfo(elem);
                         kvp.Value.Children.Add(info);
+                        BonesRef.Add(info.Name, info);
+                        foreach(string alias in info.Aliases)
+                        {
+                            BonesRef.Add(alias, info);
+                        }
                         stack.Add(new KeyValuePair<XmlElement, BoneInfo>(elem, info));
                     }
                     else if(elem.Name == "collision_volume")
@@ -154,5 +198,81 @@ namespace SilverSim.Scene.Agent.Bakery
         }
 
         public static readonly AvatarSkeleton DefaultSkeleton = new AvatarSkeleton();
+
+        private void BuildBonesRef(BoneInfo bone)
+        {
+            BonesRef.Add(bone.Name, bone);
+            foreach (string alias in bone.Aliases)
+            {
+                BonesRef.Add(alias, bone);
+            }
+            foreach (BoneInfo children in bone.Children)
+            {
+                BuildBonesRef(children);
+            }
+        }
+
+        public AvatarSkeleton(AvatarLad lad, Dictionary<uint, double> visualParamInputs)
+        {
+            foreach (BoneInfo bone in DefaultSkeleton.Bones)
+            {
+                var newBone = new BoneInfo(bone);
+                BonesRef.Add(newBone.Name, newBone);
+                Bones.Add(newBone);
+                BuildBonesRef(newBone);
+            }
+            foreach (KeyValuePair<uint, AvatarLad.VisualParam> kvp in lad.VisualParams)
+            {
+                double val;
+                if (visualParamInputs.TryGetValue(kvp.Key, out val))
+                {
+                    foreach (AvatarLad.BoneParam bp in kvp.Value.Bones)
+                    {
+                        Vector3 scale = bp.Scale * val;
+                        Vector3 offset = bp.Offset * val;
+                        BoneInfo bone;
+                        if (BonesRef.TryGetValue(bp.Name, out bone))
+                        {
+                            bone.Scale = bone.Scale.ElementMultiply(scale);
+                            bone.Position += offset;
+                        }
+                        foreach (CollisionVolume colvol in bone.CollisionVolumes)
+                        {
+                            colvol.Scale = colvol.Scale.ElementMultiply(scale);
+                        }
+                    }
+                }
+            }
+        }
+
+        public Vector3 BodySize
+        {
+            get
+            {
+                var size = new Vector3(0.45, 0.6, 0);
+                BoneInfo pelvis = BonesRef["mPelvis"];
+                BoneInfo skull = BonesRef["mSkull"];
+                BoneInfo neck = BonesRef["mNeck"];
+                BoneInfo chest = BonesRef["mChest"];
+                BoneInfo head = BonesRef["mHead"];
+                BoneInfo torso = BonesRef["mTorso"];
+                BoneInfo hipleft = BonesRef["mHipLeft"];
+                BoneInfo kneeleft = BonesRef["mKneeLeft"];
+                BoneInfo ankleleft = BonesRef["mAnkleLeft"];
+                BoneInfo footleft = BonesRef["mFootLeft"];
+
+                double pelvisToFoot = (hipleft.Position.Z * pelvis.Scale.Z) -
+                    (kneeleft.Position.Z * hipleft.Scale.Z) -
+                    (ankleleft.Position.Z * kneeleft.Scale.Z) -
+                    (footleft.Position.Z * ankleleft.Scale.Z);
+
+                size.Z = pelvisToFoot + (Math.Sqrt(2.0) * (skull.Position.Z * head.Scale.Z)) +
+                    (head.Position.Z * neck.Scale.Z) +
+                    (neck.Position.Z * chest.Scale.Z) +
+                    (chest.Position.Z * torso.Scale.Z) +
+                    (torso.Position.Z * pelvis.Scale.Z);
+                return size;
+            }
+        }
     }
 }
