@@ -377,17 +377,17 @@ namespace SilverSim.Grid.Login
             string firstName;
             string lastName;
             string passwd;
-            if (loginParams.ContainsKey("username"))
+            if (structParam.ContainsKey("username"))
             {
-                string[] parts = loginParams["username"].Split(new char[] { '.' }, 2);
+                string[] parts = structParam["username"].ToString().Split(new char[] { '.' }, 2);
                 firstName = parts[0];
                 lastName = parts.Length > 1 ? parts[1] : string.Empty;
                 passwd = "$1$" + loginParams["passwd"];
             }
-            else if(loginParams.ContainsKey("first") && loginParams.ContainsKey("last"))
+            else if(structParam.ContainsKey("first") && structParam.ContainsKey("last"))
             {
-                firstName = loginParams["first"];
-                lastName = loginParams["last"];
+                firstName = structParam["first"].ToString();
+                lastName = structParam["last"].ToString();
                 passwd = loginParams["passwd"];
             }
             else
