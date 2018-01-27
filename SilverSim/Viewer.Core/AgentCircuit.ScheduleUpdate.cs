@@ -22,6 +22,7 @@
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Object.Localization;
+using SilverSim.Scene.Types.Object.Parameters;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Inventory;
@@ -36,6 +37,35 @@ namespace SilverSim.Viewer.Core
 {
     public partial class AgentCircuit
     {
+        private sealed class ObjectAnimationTriggerMessage : Message
+        {
+            private readonly AgentCircuit m_Circuit;
+
+            public ObjectAnimationTriggerMessage(AgentCircuit circuit)
+            {
+                m_Circuit = circuit;
+                OnSendCompletion += HandleCompletion;
+            }
+
+            public List<ObjectPart> ObjectParts = new List<ObjectPart>();
+
+            public Message ChainedMessage;
+
+            private void HandleCompletion(bool f)
+            {
+                ViewerAgent agent = m_Circuit.Agent;
+                if (agent == null)
+                {
+                    return;
+                }
+                foreach(ObjectPart part in ObjectParts)
+                {
+                    part.AnimationController.SendAnimationsToAgent(agent);
+                }
+                ChainedMessage.OnSendComplete(f);
+            }
+        }
+     
         #region ObjectProperties handler
         private sealed class ObjectPropertiesTriggerMessage : Message
         {
@@ -531,6 +561,7 @@ namespace SilverSim.Viewer.Core
                 int nonphys_full_packet_data_length = 0;
 
                 ObjectPropertiesTriggerMessage full_packet_objprop = null;
+                ObjectAnimationTriggerMessage full_packet_objanim = null;
 
                 while (physicalOutQueue.Count != 0 || nonPhysicalOutQueue.Count != 0)
                 {
@@ -575,11 +606,13 @@ namespace SilverSim.Viewer.Core
                         else
                         {
                             var dofull = false;
-                            var haveobjprop = false;
+                            var mustBeReliable = false;
+                            var objknown = false;
                             if(!ui.IsAlwaysFull && LastObjSerialNo.Contains(ui.LocalID))
                             {
                                 int serialno = LastObjSerialNo[ui.LocalID];
                                 dofull = serialno != ui.SerialNumber;
+                                objknown = true;
                             }
                             else
                             {
@@ -601,13 +634,22 @@ namespace SilverSim.Viewer.Core
                                     }
                                     else if (isSelected && !wasSelected)
                                     {
-                                        haveobjprop = true;
+                                        mustBeReliable = true;
                                         SendSelectedObjects.Add(ui.ID);
                                         if (full_packet_objprop == null)
                                         {
                                             full_packet_objprop = new ObjectPropertiesTriggerMessage(this);
                                         }
                                         full_packet_objprop.ObjectParts.Add(oui.Part);
+                                    }
+                                    else if(!objknown && (oui.Part.ExtendedMesh.Flags & ExtendedMeshParams.MeshFlags.AnimatedMeshEnabled) != 0 && m_EnableObjectAnimation)
+                                    {
+                                        mustBeReliable = true;
+                                        if (full_packet_objanim == null)
+                                        {
+                                            full_packet_objanim = new ObjectAnimationTriggerMessage(this);
+                                        }
+                                        full_packet_objanim.ObjectParts.Add(oui.Part);
                                     }
                                 }
                             }
@@ -618,7 +660,7 @@ namespace SilverSim.Viewer.Core
 
                                 if (fullUpdate != null)
                                 {
-                                    if (ui.IsPhysics && !haveobjprop)
+                                    if (ui.IsPhysics && !mustBeReliable)
                                     {
                                         if (CanPhysFullBeSent(ui.LocalID))
                                         {
@@ -673,8 +715,18 @@ send_nonphys_packet:
                                                 break;
                                             }
                                             full_packet.IsReliable = true;
-                                            full_packet.AckMessage = full_packet_objprop;
-                                            full_packet_objprop = null;
+                                            if (full_packet_objanim != null)
+                                            {
+                                                full_packet.AckMessage = full_packet_objanim;
+                                                full_packet_objanim.ChainedMessage = full_packet_objprop;
+                                                full_packet_objanim = null;
+                                                full_packet_objprop = null;
+                                            }
+                                            else
+                                            {
+                                                full_packet.AckMessage = full_packet_objprop;
+                                                full_packet_objprop = null;
+                                            }
                                             SendFullUpdateMsg(full_packet, nonphys_full_packet_data);
                                             nonphys_full_packet_data = null;
                                         }
@@ -808,7 +860,15 @@ send_nonphys_packet:
                         break;
                     }
                     full_packet.IsReliable = true;
-                    full_packet.AckMessage = full_packet_objprop;
+                    if (full_packet_objanim != null)
+                    {
+                        full_packet.AckMessage = full_packet_objanim;
+                        full_packet_objanim.ChainedMessage = full_packet_objprop;
+                    }
+                    else
+                    {
+                        full_packet.AckMessage = full_packet_objprop;
+                    }
                     SendFullUpdateMsg(full_packet, nonphys_full_packet_data);
                 }
 

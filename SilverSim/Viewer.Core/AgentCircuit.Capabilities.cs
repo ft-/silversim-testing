@@ -198,11 +198,17 @@ namespace SilverSim.Viewer.Core
                 {
                     /* triggers enable of objectanimation */
                     m_EnableObjectAnimation = true;
-                    foreach(ObjectPart p in Scene.Primitives)
+                    if (m_EnableObjectAnimation && m_EnableObjectUpdates)
                     {
-                        if ((p.ExtendedMesh.Flags & ExtendedMeshParams.MeshFlags.AnimatedMeshEnabled) != 0)
+                        foreach (ObjectPart p in Scene.Primitives)
                         {
-                            p.AnimationController.SendAnimationsToAgent(Agent);
+                            if ((p.ExtendedMesh.Flags & ExtendedMeshParams.MeshFlags.AnimatedMeshEnabled) != 0)
+                            {
+#if DEBUG
+                                m_Log.DebugFormat("Sending object animations for {0}", p.ID);
+#endif
+                                p.AnimationController.SendAnimationsToAgent(Agent);
+                            }
                         }
                     }
                 }
