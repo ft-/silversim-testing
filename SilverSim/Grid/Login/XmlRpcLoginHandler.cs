@@ -374,9 +374,22 @@ namespace SilverSim.Grid.Login
             }
 
             var loginData = new LoginData();
-            string firstName = loginParams["first"];
-            string lastName = loginParams["last"];
-            string passwd = loginParams["passwd"];
+            string firstName; 
+            string lastName; 
+            string passwd;
+            if (loginParams.ContainsKey("username"))
+            {
+                string[] parts = loginParams["username"].Split(new char[] { '.' }, 2);
+                firstName = parts[0];
+                lastName = parts.Length > 1 ? parts[1] : string.Empty;
+                passwd = "$1$" + loginParams["passwd"];
+            }
+            else
+            {
+                firstName = loginParams["first"];
+                lastName = loginParams["last"];
+                passwd = loginParams["passwd"];
+            }
             loginData.ClientInfo.Channel = loginParams["channel"];
             loginData.ClientInfo.ClientVersion = loginParams["version"];
             loginData.ClientInfo.Mac = loginParams["mac"];
