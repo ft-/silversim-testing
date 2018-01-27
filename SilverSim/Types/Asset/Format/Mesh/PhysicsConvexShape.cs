@@ -157,8 +157,6 @@ namespace SilverSim.Types.Asset.Format.Mesh
 
         public void Load(byte[] data, int physOffset, int physSize, bool uselist)
         {
-            physOffset += 2;
-            physSize -= 2;
             Map physics_convex;
             using (var ms = new MemoryStream(data, physOffset, physSize))
             {
