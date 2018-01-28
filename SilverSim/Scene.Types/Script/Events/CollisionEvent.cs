@@ -23,7 +23,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.Scene.Types.Script.Events
 {
-    public struct CollisionEvent : IScriptDetectedEvent
+    public class CollisionEvent : IScriptDetectedEvent
     {
         public enum CollisionType
         {
@@ -34,5 +34,10 @@ namespace SilverSim.Scene.Types.Script.Events
 
         public CollisionType Type;
         public List<DetectInfo> Detected { get; set; }
+
+        public CollisionEvent()
+        {
+            Detected = new List<DetectInfo>();
+        }
     }
 }
