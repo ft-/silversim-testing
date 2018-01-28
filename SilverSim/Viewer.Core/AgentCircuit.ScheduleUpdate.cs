@@ -65,7 +65,7 @@ namespace SilverSim.Viewer.Core
                 {
                     m_Circuit.SendMessage(otheragent.GetAvatarAnimation());
                 }
-                ChainedMessage.OnSendComplete(f);
+                ChainedMessage?.OnSendComplete(f);
             }
         }
 
@@ -92,7 +92,7 @@ namespace SilverSim.Viewer.Core
                 {
                     part.AnimationController.SendAnimationsToAgent(agent);
                 }
-                ChainedMessage.OnSendComplete(f);
+                ChainedMessage?.OnSendComplete(f);
             }
         }
      
