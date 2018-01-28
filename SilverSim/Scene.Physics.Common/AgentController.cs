@@ -37,7 +37,7 @@ namespace SilverSim.Scene.Physics.Common
         private static readonly ILog m_Log = LogManager.GetLogger("AGENT CONTROLLER");
 #endif
 
-        protected IAgent Agent { get; }
+        public IAgent Agent { get; }
         protected readonly PhysicsStateData m_StateData;
         private readonly object m_Lock = new object();
 
