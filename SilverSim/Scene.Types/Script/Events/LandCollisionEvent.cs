@@ -23,7 +23,7 @@ using SilverSim.Types;
 
 namespace SilverSim.Scene.Types.Script.Events
 {
-    public struct LandCollisionEvent : IScriptEvent
+    public class LandCollisionEvent : IScriptEvent
     {
         public enum CollisionType
         {
