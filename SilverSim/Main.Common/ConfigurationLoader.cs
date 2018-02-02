@@ -1119,6 +1119,11 @@ namespace SilverSim.Main.Common
                     IPlugin instance = kvp.Value;
                     if (instance != httpServer)
                     {
+                        var shutdown = instance as IPluginShutdown;
+                        if(shutdown != null)
+                        {
+                            m_ShutdownList.Add(shutdown);
+                        }
                         instance.Startup(this);
                     }
                 }
@@ -1271,6 +1276,8 @@ namespace SilverSim.Main.Common
             }
         }
 
+        private readonly List<IPluginShutdown> m_ShutdownList = new List<IPluginShutdown>();
+
         public void Shutdown()
         {
             Scenes.OnRegionAdd -= LoadParamsOnAddedScene;
@@ -1283,6 +1290,10 @@ namespace SilverSim.Main.Common
 
             foreach(IPluginShutdown s in GetServices<IPluginShutdown>().Values)
             {
+                if(!m_ShutdownList.Contains(s))
+                {
+                    continue;
+                }
                 switch(s.ShutdownOrder)
                 {
                     case ShutdownOrder.Any:
