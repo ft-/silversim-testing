@@ -86,5 +86,8 @@ namespace SilverSim.Scene.Types.Script
         double ScriptEventsPerSec { get; }
         double ScriptTimeMsPerSec { get; }
         int ExecutingScripts { get; }
+
+        int MinimumThreads { get; set; }
+        int MaximumThreads { get; set; }
     }
 }

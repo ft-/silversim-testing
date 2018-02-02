@@ -217,7 +217,7 @@ namespace SilverSim.Scene.Implementation.Common
             OnRemove += RemoveScene;
             m_UDPServer.Start();
 
-            ScriptThreadPool = new ScriptWorkerThreadPool(50, 150, ID);
+            ScriptThreadPool = sceneParams.ScriptWorkerThreadPoolFactory.InstantiateThreadPool(ID);
         }
 
         protected void StartScene(SceneImplementationFactory sceneParams)

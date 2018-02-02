@@ -28,6 +28,8 @@ using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Pathfinding;
 using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.Scene.Types.Script;
+using SilverSim.Scripting.Common;
 using SilverSim.ServiceInterfaces;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.AvatarName;
@@ -46,6 +48,7 @@ namespace SilverSim.Scene.Implementation.Common
 {
     public abstract class SceneImplementationFactory : SceneFactoryInterface
     {
+        public IScriptWorkerThreadPoolFactory ScriptWorkerThreadPoolFactory { get; protected set; }
         public ChatServiceFactoryInterface ChatFactory { get; protected set; }
         public GroupsNameServiceInterface GroupsNameService { get; protected set; }
         public AssetServiceInterface AssetService { get; protected set; }
@@ -72,5 +75,10 @@ namespace SilverSim.Scene.Implementation.Common
         public List<IUserAgentServicePlugin> UserAgentServicePlugins { get; protected set; }
         public List<IAssetServicePlugin> AssetServicePlugins { get; protected set; }
         public List<IInventoryServicePlugin> InventoryServicePlugins { get; protected set; }
+
+        protected SceneImplementationFactory()
+        {
+            ScriptWorkerThreadPoolFactory = ScriptWorkerThreadPool.Factory;
+        }
     }
 }

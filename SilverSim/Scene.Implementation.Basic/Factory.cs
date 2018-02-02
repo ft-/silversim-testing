@@ -27,6 +27,8 @@ using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Pathfinding;
 using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.Scene.Types.Script;
+using SilverSim.Scripting.Common;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Estate;
@@ -63,6 +65,7 @@ namespace SilverSim.Scene.Implementation.Basic
         private readonly string m_WindModelFactoryName;
         private readonly string m_PathfindingServiceFactoryName;
         private readonly string m_ExperienceServiceName;
+        private readonly string m_ScriptWorkerThreadPoolName;
         private readonly List<string> m_AvatarNameServiceNames = new List<string>();
 
         public SceneFactory(IConfig ownConfig)
@@ -82,6 +85,7 @@ namespace SilverSim.Scene.Implementation.Basic
             m_WindModelFactoryName = ownConfig.GetString("WindPlugin", string.Empty);
             m_PathfindingServiceFactoryName = ownConfig.GetString("PathfindingPlugin", string.Empty);
             m_ExperienceServiceName = ownConfig.GetString("ExperienceService", string.Empty);
+            m_ScriptWorkerThreadPoolName = ownConfig.GetString("ScriptWorkerThreadPool", string.Empty);
             string avatarNameServices = ownConfig.GetString("AvatarNameServices", string.Empty);
             if (!string.IsNullOrEmpty(avatarNameServices))
             {
@@ -150,6 +154,8 @@ namespace SilverSim.Scene.Implementation.Basic
             UserAgentServicePlugins = loader.GetServicesByValue<IUserAgentServicePlugin>();
             AssetServicePlugins = loader.GetServicesByValue<IAssetServicePlugin>();
             InventoryServicePlugins = loader.GetServicesByValue<IInventoryServicePlugin>();
+            IScriptWorkerThreadPoolFactory scriptWorkerFactory;
+            ScriptWorkerThreadPoolFactory = m_ScriptWorkerThreadPoolName?.Length != 0 && loader.TryGetService(m_ScriptWorkerThreadPoolName, out scriptWorkerFactory) ? scriptWorkerFactory : ScriptWorkerThreadPool.Factory;
         }
 
         public override SceneInterface Instantiate(RegionInfo ri) => new BasicScene(

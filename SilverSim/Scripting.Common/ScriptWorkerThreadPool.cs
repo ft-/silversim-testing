@@ -31,6 +31,16 @@ namespace SilverSim.Scripting.Common
 {
     public sealed class ScriptWorkerThreadPool : IScriptWorkerThreadPool
     {
+        private sealed class FactoryClass : IScriptWorkerThreadPoolFactory
+        {
+            public IScriptWorkerThreadPool InstantiateThreadPool(UUID sceneID)
+            {
+                return new ScriptWorkerThreadPool(50, 150, sceneID);
+            }
+        }
+
+        public static readonly IScriptWorkerThreadPoolFactory Factory = new FactoryClass();
+
         private static readonly ILog m_Log = LogManager.GetLogger("SCRIPT WORKER THREAD POOL");
 
         private readonly BlockingQueue<ScriptInstance> m_ScriptTriggerQueue = new BlockingQueue<ScriptInstance>();
