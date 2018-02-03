@@ -1030,6 +1030,7 @@ namespace SilverSim.Main.Common
                 KnownConfigurationIssues.Add("Configure HTTPS support in [HTTPS] section");
             }
 
+            m_ShutdownList.Add(httpServer);
             httpServer.Startup(this);
 
             if(startupConfig != null)
