@@ -378,6 +378,7 @@ namespace SilverSim.Main.Common
             FeaturesTable[typeof(HttpJson20RpcHandler)] = "JSON2.0RPC Server";
             FeaturesTable[typeof(IServerParamListener)] = "Server Params";
             FeaturesTable[typeof(IPortControlServiceInterface)] = "Port Control";
+            FeaturesTable[typeof(IScriptWorkerThreadPoolFactory)] = "Script Worker Thread Pool Factory";
 
             AppDomain.CurrentDomain.AssemblyResolve += ArchSpecificResolveEventHandler;
         }
