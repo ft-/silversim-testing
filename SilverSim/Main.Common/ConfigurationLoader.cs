@@ -1033,6 +1033,12 @@ namespace SilverSim.Main.Common
             m_ShutdownList.Add(httpServer);
             httpServer.Startup(this);
 
+            if(httpsServer != null)
+            {
+                m_ShutdownList.Add(httpsServer);
+                httpsServer.Startup(this);
+            }
+
             if(startupConfig != null)
             {
                 HomeURI = startupConfig.GetString("HomeURI", httpServer.ServerURI);
@@ -1118,7 +1124,7 @@ namespace SilverSim.Main.Common
                         continue;
                     }
                     IPlugin instance = kvp.Value;
-                    if (instance != httpServer)
+                    if (instance != httpServer && instance != httpsServer)
                     {
                         var shutdown = instance as IPluginShutdown;
                         if(shutdown != null)
