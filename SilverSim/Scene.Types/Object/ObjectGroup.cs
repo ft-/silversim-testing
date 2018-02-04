@@ -1022,14 +1022,6 @@ namespace SilverSim.Scene.Types.Object
             {
                 linkTarget = LINK_ROOT;
             }
-            else if(linkTarget == LINK_THIS)
-            {
-                linkTarget = linkThis;
-            }
-            else if(linkTarget < LINK_ROOT)
-            {
-                throw new LocalizedScriptErrorException(this, "InvalidLinkTargetParameterForFunction0Msg1", "Invalid link target parameter for {0}: {1}", "SetPrimitiveParams", linkTarget);
-            }
             string cultureName = null;
 
             while (enumerator.MoveNext())
