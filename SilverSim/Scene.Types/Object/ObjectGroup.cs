@@ -1027,6 +1027,7 @@ namespace SilverSim.Scene.Types.Object
                 linkTarget = linkThis;
             }
             string cultureName = null;
+            bool haveAtLeastOne = false;
 
             while (enumerator.MoveNext())
             {
@@ -1102,12 +1103,19 @@ namespace SilverSim.Scene.Types.Object
                                     {
                                         enumerator.GoToMarkPosition();
                                         kvp.Value.SetPrimitiveParams(enumerator, cultureName);
+                                        haveAtLeastOne = true;
                                     }
                                 }
                                 foreach(IAgent agent in m_SittingAgents.Keys1)
                                 {
                                     enumerator.GoToMarkPosition();
                                     agent.SetPrimitiveParams(enumerator);
+                                    haveAtLeastOne = true;
+                                }
+                                if (!haveAtLeastOne)
+                                {
+                                    enumerator.GoToMarkPosition();
+                                    SkipParameterBlock(enumerator);
                                 }
                                 break;
 
@@ -1119,12 +1127,19 @@ namespace SilverSim.Scene.Types.Object
                                     {
                                         enumerator.GoToMarkPosition();
                                         kvp.Value.SetPrimitiveParams(enumerator, cultureName);
+                                        haveAtLeastOne = true;
                                     }
                                 }
                                 foreach(IAgent agent in m_SittingAgents.Keys1)
                                 {
                                     enumerator.GoToMarkPosition();
                                     agent.SetPrimitiveParams(enumerator);
+                                    haveAtLeastOne = true;
+                                }
+                                if(!haveAtLeastOne)
+                                {
+                                    enumerator.GoToMarkPosition();
+                                    SkipParameterBlock(enumerator);
                                 }
                                 break;
 
@@ -1146,6 +1161,63 @@ namespace SilverSim.Scene.Types.Object
                                 break;
                         }
                         break;
+                }
+            }
+        }
+
+        private void SkipParameterBlock(AnArray.MarkEnumerator enumerator)
+        {
+            int paramcount = 0;
+            switch(ParamsHelper.GetPrimParamType(enumerator))
+            {
+                case PrimitiveParamsType.Type:
+                    /* skip prim type block */
+                    ObjectPart.PrimitiveShape.FromPrimitiveParams(enumerator);
+                    return;
+
+                case PrimitiveParamsType.FullBright:
+                case PrimitiveParamsType.TexGen:
+                case PrimitiveParamsType.Glow:
+                    paramcount = 2;
+                    break;
+
+
+                case PrimitiveParamsType.Text:
+                case PrimitiveParamsType.Color:
+                case PrimitiveParamsType.BumpShiny:
+                case PrimitiveParamsType.Omega:
+                case PrimitiveParamsType.AlphaMode:
+                case PrimitiveParamsType.SitTarget:
+                case PrimitiveParamsType.UnSitTarget:
+                    paramcount = 3;
+                    break;
+
+
+                case PrimitiveParamsType.Texture:
+                case PrimitiveParamsType.PointLight:
+                case PrimitiveParamsType.Normal:
+                case PrimitiveParamsType.Projector:
+                    paramcount = 5;
+                    break;
+
+                case PrimitiveParamsType.Flexible:
+                    paramcount = 7;
+                    break;
+
+                case PrimitiveParamsType.Specular:
+                    paramcount = 8;
+                    break;
+
+                default:
+                    paramcount = 1;
+                    break;
+            }
+
+            while(paramcount-->0)
+            {
+                if(!enumerator.MoveNext())
+                {
+                    break;
                 }
             }
         }
