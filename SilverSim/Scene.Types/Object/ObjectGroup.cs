@@ -1022,6 +1022,10 @@ namespace SilverSim.Scene.Types.Object
             {
                 linkTarget = LINK_ROOT;
             }
+            else if(linkTarget == LINK_THIS)
+            {
+                linkTarget = linkThis;
+            }
             string cultureName = null;
 
             while (enumerator.MoveNext())
