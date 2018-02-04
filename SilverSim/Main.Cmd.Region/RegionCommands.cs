@@ -790,7 +790,7 @@ namespace SilverSim.Main.Cmd.Region
                     "Parameters:\n" +
                     "regionid <uuid> - if not specified, a random uuid will be generated\n" +
                     "scopeid <uuid>\n" +
-                    "size <x>,<y> - region size\n" +
+                    "size <x>,<y> - region size (in number of regions)\n" +
                     "productname <regiontype>\n" +
                     "owner <uui>|<uuid>|<firstname>.<lastname>\n" +
                     "estate <name>\n" +
