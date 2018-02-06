@@ -31,6 +31,7 @@ namespace SilverSim.Scene.Types.Scene
 
     public interface IWindModel
     {
+        string Name { get; }
         Vector3 this[Vector3 pos] { get; set; }
         Vector3 PrevailingWind { get; }
 

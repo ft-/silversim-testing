@@ -28,6 +28,8 @@ namespace SilverSim.Scene.Types.Scene
     /* this class provides a simple no wind model for having at least some Wind model hooked to EnvironmentController */
     public class NoWindModel : IWindModel, IWindModelPreset
     {
+        public string Name => "NoWind";
+
         public Vector3 this[Vector3 pos]
         {
             get { return new Vector3(); }
