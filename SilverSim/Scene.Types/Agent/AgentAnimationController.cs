@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using log4net;
+using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
 using SilverSim.Types.Script;
 using SilverSim.Viewer.Messages.Avatar;
@@ -80,11 +81,13 @@ namespace SilverSim.Scene.Types.Agent
 
         private readonly List<AnimationInfo> m_ActiveAnimations = new List<AnimationInfo>();
         private readonly UUID m_AgentID;
+        private readonly IAgent m_Agent;
         private readonly Action<AvatarAnimation> m_SendAnimations;
 
-        public AgentAnimationController(UUID agentID, Action<AvatarAnimation> del)
+        public AgentAnimationController(IAgent agent, Action<AvatarAnimation> del)
         {
-            m_AgentID = agentID;
+            m_Agent = agent;
+            m_AgentID = agent.ID;
             m_SendAnimations = del;
             foreach (string s in m_AnimStates)
             {
@@ -244,11 +247,13 @@ namespace SilverSim.Scene.Types.Agent
                 ++m_NextAnimSeqNumber;
                 m_ActiveAnimations.Add(new AnimationInfo(animid, m_NextAnimSeqNumber, objectid));
             }
+            m_Agent.PostEvent(new ChangedEvent(ChangedEvent.ChangedFlags.Animation));
             SendAnimations();
         }
 
         public void StopAnimation(UUID animid, UUID objectid)
         {
+            bool found = false;
             lock (m_Lock)
             {
                 for (int i = 0; i < m_ActiveAnimations.Count; ++i)
@@ -256,9 +261,14 @@ namespace SilverSim.Scene.Types.Agent
                     if (m_ActiveAnimations[i].AnimID == animid)
                     {
                         m_ActiveAnimations.RemoveAt(i);
+                        found = true;
                         break;
                     }
                 }
+            }
+            if (found)
+            {
+                m_Agent.PostEvent(new ChangedEvent(ChangedEvent.ChangedFlags.Animation));
             }
             SendAnimations();
         }
@@ -283,6 +293,7 @@ namespace SilverSim.Scene.Types.Agent
                 ++m_NextAnimSeqNumber;
                 m_ActiveAnimations.Add(new AnimationInfo(animid, m_NextAnimSeqNumber, objectid));
             }
+            m_Agent.PostEvent(new ChangedEvent(ChangedEvent.ChangedFlags.Animation));
             SendAnimations();
         }
 
@@ -299,6 +310,7 @@ namespace SilverSim.Scene.Types.Agent
                     }
                 }
             }
+            m_Agent.PostEvent(new ChangedEvent(ChangedEvent.ChangedFlags.Animation));
             SendAnimations();
         }
 
@@ -328,11 +340,22 @@ namespace SilverSim.Scene.Types.Agent
 #if DEBUG
                             m_Log.DebugFormat("Changed default animation to {0} for agent {1}", anim_state, m_AgentID);
 #endif
-                            ReplaceAnimation(m_AnimationOverride[anim_state], m_AnimationOverride[m_CurrentDefaultAnimation], UUID.Zero);
+                            for (int i = 0; i < m_ActiveAnimations.Count; ++i)
+                            {
+                                if (m_ActiveAnimations[i].AnimID == m_AnimationOverride[m_CurrentDefaultAnimation])
+                                {
+                                    m_ActiveAnimations.RemoveAt(i);
+                                    break;
+                                }
+                            }
+                            ++m_NextAnimSeqNumber;
+                            m_ActiveAnimations.Add(new AnimationInfo(m_AnimationOverride[anim_state], m_NextAnimSeqNumber, m_AgentID));
                         }
                         m_CurrentDefaultAnimation = anim_state;
                     }
                 }
+                m_Agent.PostEvent(new ChangedEvent(ChangedEvent.ChangedFlags.Animation));
+                SendAnimations();
             }
             else
             {

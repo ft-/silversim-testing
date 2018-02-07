@@ -40,6 +40,7 @@ namespace SilverSim.Scene.Types.Object
         Teleport = 0x200,
         RegionStart = 0x400,
         Media = 0x800,
+        Animation = 0x4000, /* extension */
 
         Physics = 1 << 32,
         PartPermissions = 1 << 33,

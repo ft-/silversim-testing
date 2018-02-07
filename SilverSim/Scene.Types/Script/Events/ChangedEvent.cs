@@ -40,7 +40,8 @@ namespace SilverSim.Scene.Types.Script.Events
             Region = 0x100,
             Teleport = 0x200,
             RegionStart = 0x400,
-            Media = 0x800
+            Media = 0x800,
+            Animation = 0x4000 /* extension */
         }
 
         public ChangedFlags Flags;

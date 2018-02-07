@@ -158,7 +158,7 @@ namespace SilverSim.Scene.Agent
             Group = UGI.Unknown;
             ID = agentId;
             HomeURI = homeURI;
-            m_AnimationController = new AgentAnimationController(ID, SendAnimations);
+            m_AnimationController = new AgentAnimationController(this, SendAnimations);
             AllowUnsit = true;
         }
 
