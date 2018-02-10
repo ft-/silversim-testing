@@ -203,7 +203,7 @@ namespace SilverSim.Scripting.Common
         {
         }
 
-        public abstract void Read(List<string> arguments);
+        public abstract void Read(List<TokenInfo> arguments);
         protected int cur_linenumber;
         protected string cur_filename;
 
