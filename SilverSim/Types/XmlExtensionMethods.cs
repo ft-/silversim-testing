@@ -329,6 +329,25 @@ namespace SilverSim.Types
             return long.Parse(ReadElementValueAsString(reader, tagname));
         }
 
+        public static Date ReadElementValueAsCrazyDate(this XmlTextReader reader, string tagname = null)
+        {
+            if (reader.IsEmptyElement && reader.NodeType == XmlNodeType.Element)
+            {
+                return Date.UnixTimeToDateTime(0);
+            }
+            string v = reader.ReadElementValueAsString(tagname);
+            ulong val;
+            if(v.StartsWith("-"))
+            {
+                val = (uint)int.Parse(v); 
+            }
+            else
+            {
+                val = ulong.Parse(v);
+            }
+            return Date.UnixTimeToDateTime(val);
+        }
+
         public static ulong ReadElementValueAsULong(this XmlTextReader reader, string tagname = null)
         {
             if (reader.IsEmptyElement && reader.NodeType == XmlNodeType.Element)

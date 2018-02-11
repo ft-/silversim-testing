@@ -1396,11 +1396,11 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "CreationDate":
-                                part.CreationDate = Date.UnixTimeToDateTime(reader.ReadElementValueAsULong());
+                                part.CreationDate = reader.ReadElementValueAsCrazyDate();
                                 break;
 
                             case "RezDate":
-                                part.RezDate = Date.UnixTimeToDateTime(reader.ReadElementValueAsULong());
+                                part.RezDate = reader.ReadElementValueAsCrazyDate();
                                 break;
 
                             case "Category":
