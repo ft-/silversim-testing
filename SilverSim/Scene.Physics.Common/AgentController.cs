@@ -296,7 +296,9 @@ namespace SilverSim.Scene.Physics.Common
             m_LastKnownBodyRotation = Agent.BodyRotation;
 
             forces.Add(BuoyancyMotor(this, Agent, Vector3.Zero));
-            if (!Agent.IsFlying)
+            Vector3 currentPosition = Agent.GlobalPosition;
+            Vector3 size = Agent.Size;
+            if (!Agent.IsFlying && currentPosition.Z - size.Z / 2 > LocationInfoProvider.At(currentPosition).GroundHeight)
             {
                 forces.Add(GravityMotor(this, Agent, Vector3.Zero));
             }
