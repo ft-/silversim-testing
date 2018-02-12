@@ -51,7 +51,8 @@ namespace SilverSim.Types
         Key = 4,
         Vector = 5,
         Rotation = 6,
-        LongInteger = 7
+        LongInteger = 7,
+        List = 8
     }
 
     /**************************************************************************/

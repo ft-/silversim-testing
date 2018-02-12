@@ -51,7 +51,7 @@ namespace SilverSim.Types
         #region Properties
         public ValueType Type => ValueType.Array;
 
-        public LSLValueType LSL_Type => LSLValueType.Invalid;
+        public LSLValueType LSL_Type => LSLValueType.List;
 
         #endregion Properties
 
