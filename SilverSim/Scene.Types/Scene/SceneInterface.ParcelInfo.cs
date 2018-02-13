@@ -58,7 +58,7 @@ namespace SilverSim.Scene.Types.Scene
 
         public abstract bool RemoveParcel(ParcelInfo p, UUID mergeTo);
 
-        public void ClearParcels()
+        public virtual void ClearParcels()
         {
             m_Parcels.Clear();
         }

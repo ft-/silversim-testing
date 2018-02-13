@@ -643,6 +643,14 @@ namespace SilverSim.Scene.Implementation.Common
             return removed;
         }
 
+        public override void ClearParcels()
+        {
+            foreach (UUID parcelID in m_SimulationDataStorage.Parcels.ParcelsInRegion(ID))
+            {
+                m_SimulationDataStorage.Parcels.Remove(ID, parcelID);
+            }
+        }
+
         public override void ResetParcels()
         {
             foreach (UUID parcelID in m_SimulationDataStorage.Parcels.ParcelsInRegion(ID))
@@ -672,7 +680,7 @@ namespace SilverSim.Scene.Implementation.Common
             lock (m_ParcelUpdateLock)
             {
                 m_SimulationDataStorage.Parcels.Store(ID, pi);
-                ClearParcels();
+                base.ClearParcels();
                 AddParcel(pi);
             }
         }
