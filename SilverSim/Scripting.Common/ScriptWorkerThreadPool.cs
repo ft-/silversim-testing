@@ -24,6 +24,7 @@ using SilverSim.Scene.Types.Script;
 using SilverSim.Threading;
 using SilverSim.Types;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Timers;
 
@@ -291,6 +292,46 @@ namespace SilverSim.Scripting.Common
         int m_ExecutingScripts;
 
         public int ExecutingScripts => m_ExecutingScripts;
+
+        public IList<ScriptInfo> ExecutingScriptsList
+        {
+            get
+            {
+                var list = new List<ScriptInfo>();
+
+                foreach(var tc in m_Threads)
+                {
+                    lock(tc)
+                    {
+                        var instance = tc.CurrentScriptInstance;
+                        if(instance != null)
+                        {
+                            try
+                            {
+                                var scriptInfo = new ScriptInfo
+                                {
+                                    ItemID = instance.Item.ID,
+                                    PartID = instance.Part.ID,
+                                    PartName = instance.Part.Name,
+                                    ItemName = instance.Part.Name,
+                                    LinkNumber = instance.Part.LinkNumber,
+                                    ObjectID = instance.Part.ObjectGroup.ID,
+                                    ObjectName = instance.Part.ObjectGroup.Name,
+                                    AssetID = instance.Item.AssetID
+                                };
+                                list.Add(scriptInfo);
+                            }
+                            catch
+                            {
+                                /* ignore */
+                            }
+                        }
+                    }
+                }
+
+                return list;
+            }
+        }
 
         private void ThreadMain(object obj)
         {

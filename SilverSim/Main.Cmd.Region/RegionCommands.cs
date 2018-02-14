@@ -138,6 +138,7 @@ namespace SilverSim.Main.Cmd.Region
             loader.CommandRegistry.AddDisableCommand("script", DisableScriptCmd);
             loader.CommandRegistry.AddEnableCommand("scripts", EnableScriptsCmd);
             loader.CommandRegistry.AddShowCommand("scripts", ShowScriptsCmd);
+            loader.CommandRegistry.AddShowCommand("executing-scripts", ShowExecutingScriptsCmd);
             loader.CommandRegistry.AddClearCommand("hacdcache", ClearHacdCacheCmd);
 
             IConfig sceneConfig = loader.Config.Configs["DefaultSceneImplementation"];
@@ -222,6 +223,45 @@ namespace SilverSim.Main.Cmd.Region
                 catch(Exception e)
                 {
                     io.WriteFormatted("Could not clean HACD cache: {0}", e.Message);
+                }
+            }
+        }
+
+        private void ShowExecutingScriptsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            UUID selectedScene;
+            if (args[0] == "help")
+            {
+                io.Write("show scripts [functional|not functional] [running|not running]");
+                return;
+            }
+            else if (limitedToScene != UUID.Zero)
+            {
+                selectedScene = limitedToScene;
+            }
+            else if (io.SelectedScene == UUID.Zero)
+            {
+                io.Write("show scripts needs a selected region before.");
+                return;
+            }
+            else
+            {
+                selectedScene = io.SelectedScene;
+            }
+
+            SceneInterface scene;
+            if (!m_Scenes.TryGetValue(selectedScene, out scene))
+            {
+                io.Write("no scene selected");
+            }
+            else
+            {
+                foreach (ScriptInfo scriptInfo in scene.ScriptThreadPool.ExecutingScriptsList)
+                {
+                    io.WriteFormatted("Script {0} ({1})\n- Primitive: {2} ({3})\n- Object: {4} ({5})",
+                                                    scriptInfo.ItemName, scriptInfo.AssetID,
+                                                    scriptInfo.PartName, scriptInfo.PartID,
+                                                    scriptInfo.ObjectName, scriptInfo.ObjectID);
                 }
             }
         }

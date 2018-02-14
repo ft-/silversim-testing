@@ -20,7 +20,9 @@
 // exception statement from your version.
 
 using SilverSim.Threading;
+using SilverSim.Types;
 using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace SilverSim.Scene.Types.Script
@@ -73,6 +75,18 @@ namespace SilverSim.Scene.Types.Script
         }
     }
 
+    public struct ScriptInfo
+    {
+        public UUID PartID;
+        public UUID ItemID;
+        public UUID AssetID;
+        public UUID ObjectID;
+        public string PartName;
+        public string ObjectName;
+        public int LinkNumber;
+        public string ItemName;
+    }
+
     public interface IScriptWorkerThreadPool
     {
         void PostScript(ScriptInstance script);
@@ -89,5 +103,6 @@ namespace SilverSim.Scene.Types.Script
 
         int MinimumThreads { get; set; }
         int MaximumThreads { get; set; }
+        IList<ScriptInfo> ExecutingScriptsList { get; }
     }
 }
