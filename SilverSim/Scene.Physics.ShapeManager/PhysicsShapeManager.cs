@@ -223,7 +223,12 @@ namespace SilverSim.Scene.Physics.ShapeManager
 
         public bool TryGetConvexShape(PrimitivePhysicsShapeType physicsShape, ObjectPart.PrimitiveShape shape, out PhysicsShapeReference physics)
         {
-            if(shape.Type == PrimitiveShapeType.Sculpt)
+            if(physicsShape == PrimitivePhysicsShapeType.None)
+            {
+                physics = null;
+                return false;
+            }
+            else if(shape.Type == PrimitiveShapeType.Sculpt)
             {
                 switch(shape.SculptType)
                 {
