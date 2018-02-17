@@ -22,13 +22,13 @@
 using SilverSim.Types;
 using SilverSim.Types.Asset.Format;
 using System;
-using Image = System.Drawing.Image;
-using Bitmap = System.Drawing.Bitmap;
-using Rectangle = System.Drawing.Rectangle;
-using Graphics = System.Drawing.Graphics;
-using SolidBrush = System.Drawing.SolidBrush;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+using Bitmap = System.Drawing.Bitmap;
+using Graphics = System.Drawing.Graphics;
+using Image = System.Drawing.Image;
+using Rectangle = System.Drawing.Rectangle;
+using SolidBrush = System.Drawing.SolidBrush;
 
 namespace SilverSim.Scene.Agent.Bakery
 {

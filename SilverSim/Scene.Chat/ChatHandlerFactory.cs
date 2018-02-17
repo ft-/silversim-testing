@@ -20,15 +20,14 @@
 // exception statement from your version.
 
 using SilverSim.Main.Common;
+using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.ServiceInterfaces.Chat;
-using Nini.Config;
-using System.ComponentModel;
+using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Threading;
 using SilverSim.Types;
+using System.ComponentModel;
 using System.Globalization;
-using SilverSim.Scene.Management.Scene;
-using SilverSim.Scene.Types.Scene;
 
 namespace SilverSim.Scene.Chat
 {

@@ -22,11 +22,9 @@
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
-using SilverSim.Scene.Types.Script;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Scene.Types.Transfer;
 using SilverSim.ServiceInterfaces.Asset;
-using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Asset;

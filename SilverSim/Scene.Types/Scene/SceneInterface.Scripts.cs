@@ -29,7 +29,6 @@ using SilverSim.Types.Script;
 using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Generic;
-using SilverSim.Viewer.Messages.Land;
 using SilverSim.Viewer.Messages.Script;
 using System;
 using System.IO;

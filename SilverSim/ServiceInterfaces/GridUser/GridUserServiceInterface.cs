@@ -21,8 +21,8 @@
 
 using SilverSim.Types;
 using SilverSim.Types.GridUser;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace SilverSim.ServiceInterfaces.GridUser

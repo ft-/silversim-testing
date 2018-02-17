@@ -19,17 +19,12 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.ServiceInterfaces.PortControl;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Net;
-using System.Net.Sockets;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces;
+using SilverSim.ServiceInterfaces.PortControl;
 using System.ComponentModel;
+using System.Net;
+using System.Net.Sockets;
 
 namespace SilverSim.Network.Common
 {

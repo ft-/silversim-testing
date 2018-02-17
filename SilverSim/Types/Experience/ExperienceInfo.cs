@@ -20,7 +20,6 @@
 // exception statement from your version.
 
 using SilverSim.Types.Grid;
-using SilverSim.Types.Script;
 using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.IO;

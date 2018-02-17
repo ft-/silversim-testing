@@ -24,7 +24,6 @@ using SilverSim.Main.Common;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Types;
 using System.ComponentModel;
-using System;
 
 namespace SilverSim.Database.Memory.SimulationData
 {

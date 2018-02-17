@@ -20,7 +20,6 @@
 // exception statement from your version.
 
 using SilverSim.Threading;
-using System.Net;
 
 namespace SilverSim.ServiceInterfaces
 {

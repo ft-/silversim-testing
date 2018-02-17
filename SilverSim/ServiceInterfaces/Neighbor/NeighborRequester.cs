@@ -20,7 +20,6 @@
 // exception statement from your version.
 
 using SilverSim.ServiceInterfaces.Grid;
-using SilverSim.Types;
 using SilverSim.Types.Grid;
 using System.Collections.Generic;
 

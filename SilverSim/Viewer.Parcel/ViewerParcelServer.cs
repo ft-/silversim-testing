@@ -23,29 +23,29 @@
 #pragma warning disable RCS1029
 #pragma warning disable RCS1163
 
+using log4net;
 using SilverSim.Main.Common;
+using SilverSim.Main.Common.HttpServer;
+using SilverSim.Scene.Management.Scene;
+using SilverSim.Scene.Types.Agent;
+using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Scene;
+using SilverSim.ServiceInterfaces.Economy;
 using SilverSim.Threading;
+using SilverSim.Types;
+using SilverSim.Types.Economy.Transactions;
+using SilverSim.Types.Grid;
+using SilverSim.Types.Parcel;
+using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Viewer.Core;
 using SilverSim.Viewer.Messages;
-using System.Collections.Generic;
-using System;
-using System.Threading;
-using SilverSim.Scene.Types.Scene;
 using SilverSim.Viewer.Messages.Parcel;
-using SilverSim.Types.Parcel;
-using SilverSim.Types;
-using log4net;
-using SilverSim.Types.Grid;
-using SilverSim.Scene.Management.Scene;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
-using SilverSim.Main.Common.HttpServer;
-using System.Net;
-using SilverSim.Types.StructuredData.Llsd;
 using System.IO;
-using SilverSim.ServiceInterfaces.Economy;
-using SilverSim.Types.Economy.Transactions;
-using SilverSim.Scene.Types.Object;
-using SilverSim.Scene.Types.Agent;
+using System.Net;
+using System.Threading;
 
 namespace SilverSim.Viewer.Parcel
 {

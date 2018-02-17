@@ -20,7 +20,6 @@
 // exception statement from your version.
 
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
-using SilverSim.Scene.Types.Scene;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Parcel;

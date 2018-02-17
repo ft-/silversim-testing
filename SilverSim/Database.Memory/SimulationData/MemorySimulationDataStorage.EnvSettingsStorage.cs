@@ -20,11 +20,11 @@
 // exception statement from your version.
 
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
-using WindLightSettings = SilverSim.Scene.Types.WindLight.EnvironmentSettings;
 using SilverSim.Threading;
 using SilverSim.Types;
 using System.Collections.Generic;
 using System.IO;
+using WindLightSettings = SilverSim.Scene.Types.WindLight.EnvironmentSettings;
 
 namespace SilverSim.Database.Memory.SimulationData
 {

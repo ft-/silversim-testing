@@ -22,7 +22,6 @@
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Types;
 using SilverSim.Types.StructuredData.Llsd;
-using System.IO;
 using System.Net;
 
 namespace SilverSim.Viewer.Core

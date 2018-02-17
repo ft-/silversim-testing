@@ -19,9 +19,6 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.Threading;
-using System.Net;
-using System;
 
 namespace SilverSim.Types.Grid
 {

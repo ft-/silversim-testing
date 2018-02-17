@@ -21,9 +21,6 @@
 
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
-using SilverSim.Types;
-using SilverSim.Types.Primitive;
-using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Avatar;
 
 namespace SilverSim.Scene.Types.Scene

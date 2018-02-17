@@ -19,12 +19,12 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Threading;
 using SilverSim.Types;
+using SilverSim.Types.Asset.Format;
 using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
-using SilverSim.Threading;
-using SilverSim.Types.Asset.Format;
 
 namespace SilverSim.Scene.Types.Object.Localization
 {

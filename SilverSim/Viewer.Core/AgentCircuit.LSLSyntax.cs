@@ -20,14 +20,12 @@
 // exception statement from your version.
 
 using SilverSim.Main.Common.HttpServer;
-using SilverSim.Scene.Types.Script;
 using SilverSim.Scripting.Common;
 using SilverSim.Types;
 using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.IO;
 using System.Net;
-using System.Reflection;
 
 namespace SilverSim.Viewer.Core
 {

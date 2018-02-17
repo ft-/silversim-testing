@@ -20,7 +20,6 @@
 // exception statement from your version.
 
 using System.Reflection;
-using System.Diagnostics.CodeAnalysis;
 
 [assembly: AssemblyTitle("Backend Common Logic")]
 [assembly: AssemblyDescription("")]

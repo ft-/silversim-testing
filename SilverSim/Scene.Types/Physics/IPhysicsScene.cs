@@ -23,7 +23,6 @@ using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
-using System.Threading;
 
 namespace SilverSim.Scene.Types.Physics
 {

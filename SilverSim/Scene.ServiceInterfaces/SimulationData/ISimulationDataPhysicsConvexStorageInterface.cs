@@ -19,10 +19,9 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
 using SilverSim.Types.Asset.Format.Mesh;
-using SilverSim.Scene.Types.Object;
-using System.Collections.Generic;
 using SilverSim.Types.Primitive;
 
 namespace SilverSim.Scene.ServiceInterfaces.SimulationData

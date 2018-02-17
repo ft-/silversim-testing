@@ -48,7 +48,6 @@ using SilverSim.Types.IM;
 using SilverSim.Types.Parcel;
 using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Viewer.Core;
-using SilverSim.Viewer.Core.Capabilities;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.LayerData;
 using System;

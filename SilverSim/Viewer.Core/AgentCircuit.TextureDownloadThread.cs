@@ -21,11 +21,11 @@
 
 using SilverSim.Types;
 using SilverSim.Types.Asset;
+using SilverSim.Viewer.Messages;
+using SilverSim.Viewer.Messages.Image;
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using SilverSim.Viewer.Messages.Image;
-using SilverSim.Viewer.Messages;
 
 namespace SilverSim.Viewer.Core
 {

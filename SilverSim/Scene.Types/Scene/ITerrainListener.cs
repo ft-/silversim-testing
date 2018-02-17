@@ -20,7 +20,6 @@
 // exception statement from your version.
 
 using SilverSim.Viewer.Messages.LayerData;
-using System.Collections.Generic;
 
 namespace SilverSim.Scene.Types.Scene
 {

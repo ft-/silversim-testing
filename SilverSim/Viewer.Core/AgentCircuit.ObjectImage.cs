@@ -25,11 +25,7 @@ using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Object;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SilverSim.Viewer.Core
 {

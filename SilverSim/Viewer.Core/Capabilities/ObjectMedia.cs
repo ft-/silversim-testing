@@ -22,10 +22,9 @@
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
-using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Types;
 using SilverSim.Types.Primitive;
-using System.IO;
+using SilverSim.Types.StructuredData.Llsd;
 using System.Net;
 
 namespace SilverSim.Viewer.Core.Capabilities

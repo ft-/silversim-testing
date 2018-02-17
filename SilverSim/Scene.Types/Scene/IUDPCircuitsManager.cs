@@ -19,11 +19,11 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.Viewer.Messages;
-using SilverSim.Types;
 using SilverSim.Scene.Types.Object;
-using System.Net;
+using SilverSim.Types;
+using SilverSim.Viewer.Messages;
 using System;
+using System.Net;
 
 namespace SilverSim.Scene.Types.Scene
 {

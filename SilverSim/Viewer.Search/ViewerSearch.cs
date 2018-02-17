@@ -23,7 +23,6 @@
 #pragma warning disable RCS1029
 
 using log4net;
-using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Types.Scene;

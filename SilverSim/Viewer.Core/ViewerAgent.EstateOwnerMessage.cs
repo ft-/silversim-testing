@@ -25,22 +25,18 @@
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
-using SilverSim.Scene.Types.Script;
-using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Estate;
 using SilverSim.Types.Experience;
 using SilverSim.Types.Grid;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Generic;
-using SilverSim.Viewer.Messages.Land;
 using SilverSim.Viewer.Messages.LayerData;
 using SilverSim.Viewer.Messages.Telehub;
 using SilverSim.Viewer.Messages.Transfer;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 
 namespace SilverSim.Viewer.Core
 {

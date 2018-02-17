@@ -22,7 +22,6 @@
 #pragma warning disable IDE0018
 #pragma warning disable RCS1029
 
-using SilverSim.Threading;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.LayerData;
 using System;

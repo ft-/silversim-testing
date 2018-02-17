@@ -25,7 +25,6 @@ using SilverSim.Scene.Types.Scene;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Viewer.Messages.LayerData;
-using System;
 using System.Collections.Generic;
 using System.Threading;
 

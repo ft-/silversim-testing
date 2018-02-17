@@ -22,7 +22,6 @@
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Asset.Format;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml;

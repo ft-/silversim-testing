@@ -24,7 +24,6 @@ using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
 using SilverSim.Types.StructuredData.Llsd;
 using System;
-using System.Collections.Generic;
 using System.Net;
 
 namespace SilverSim.Viewer.Core

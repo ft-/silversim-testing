@@ -20,7 +20,6 @@
 // exception statement from your version.
 
 using SilverSim.Scene.Types.Object;
-using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
 using System;

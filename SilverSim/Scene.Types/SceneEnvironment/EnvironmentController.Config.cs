@@ -19,13 +19,12 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using System.IO;
 using SilverSim.Types;
-using System.Xml;
 using System;
+using System.IO;
 using System.Runtime.Serialization;
-using System.Linq;
 using System.Threading;
+using System.Xml;
 
 namespace SilverSim.Scene.Types.SceneEnvironment
 {

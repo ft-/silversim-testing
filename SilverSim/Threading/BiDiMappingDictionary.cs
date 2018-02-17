@@ -20,9 +20,9 @@
 // exception statement from your version.
 
 using System;
-using System.Threading;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using System.Threading;
 
 namespace SilverSim.Threading
 {

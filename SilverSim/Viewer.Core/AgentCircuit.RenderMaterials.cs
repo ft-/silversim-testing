@@ -21,16 +21,13 @@
 
 using Ionic.Zlib;
 using SilverSim.Main.Common.HttpServer;
-using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
 using SilverSim.Types.Asset.Format;
-using SilverSim.Types.Primitive;
 using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using System.Xml;
 
 namespace SilverSim.Viewer.Core
 {

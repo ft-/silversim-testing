@@ -20,9 +20,9 @@
 // exception statement from your version.
 
 using SilverSim.Types;
-using MapType = SilverSim.Types.Map;
 using SilverSim.Types.Parcel;
 using System;
+using MapType = SilverSim.Types.Map;
 
 namespace SilverSim.Viewer.Messages.Parcel
 {

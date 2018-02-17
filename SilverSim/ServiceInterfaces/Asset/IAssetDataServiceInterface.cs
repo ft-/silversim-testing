@@ -20,7 +20,6 @@
 // exception statement from your version.
 
 using SilverSim.Types;
-using SilverSim.Types.Asset;
 using System.IO;
 
 namespace SilverSim.ServiceInterfaces.Asset

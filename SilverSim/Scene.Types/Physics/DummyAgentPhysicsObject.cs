@@ -20,8 +20,6 @@
 // exception statement from your version.
 
 using SilverSim.Types;
-using System.Diagnostics.CodeAnalysis;
-using System;
 using SilverSim.Types.Agent;
 
 namespace SilverSim.Scene.Types.Physics

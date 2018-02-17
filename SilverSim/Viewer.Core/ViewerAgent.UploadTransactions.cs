@@ -23,7 +23,6 @@
 #pragma warning disable RCS1029
 
 using SilverSim.Scene.Types.Scene;
-using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Asset;

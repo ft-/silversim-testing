@@ -20,7 +20,6 @@
 // exception statement from your version.
 
 using SilverSim.Main.Common.HttpServer;
-using SilverSim.Scene.ServiceInterfaces.Chat;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Economy;
 using SilverSim.Types;

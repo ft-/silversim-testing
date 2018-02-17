@@ -19,14 +19,13 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using System;
-using System.Collections.Generic;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
+using SilverSim.Scene.Types.Scene;
+using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Parcel;
-using SilverSim.Threading;
+using System.Collections.Generic;
 using System.Linq;
-using SilverSim.Scene.Types.Scene;
 
 namespace SilverSim.Database.Memory.SimulationData
 {

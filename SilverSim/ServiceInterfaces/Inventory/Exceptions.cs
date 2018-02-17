@@ -21,7 +21,6 @@
 
 using SilverSim.Types;
 using SilverSim.Types.Asset;
-using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;

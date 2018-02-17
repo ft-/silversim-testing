@@ -20,7 +20,6 @@
 // exception statement from your version.
 
 using SilverSim.Types;
-using SilverSim.Types.Parcel;
 
 namespace SilverSim.Viewer.Messages.Parcel
 {

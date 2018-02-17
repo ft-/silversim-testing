@@ -22,7 +22,6 @@
 #pragma warning disable IDE0018
 #pragma warning disable RCS1029
 
-using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Types;

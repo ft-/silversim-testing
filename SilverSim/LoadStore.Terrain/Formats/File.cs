@@ -19,14 +19,14 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.Viewer.Messages.LayerData;
 using SilverSim.Main.Common;
 using SilverSim.Scene.ServiceInterfaces.Terrain;
+using SilverSim.Viewer.Messages.LayerData;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.IO;
-using System.ComponentModel;
 
 namespace SilverSim.LoadStore.Terrain.Formats
 {

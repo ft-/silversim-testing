@@ -20,9 +20,9 @@
 // exception statement from your version.
 
 using SilverSim.Types;
+using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
-using SilverSim.Types.Primitive;
 
 namespace SilverSim.Viewer.Messages.Object
 {

@@ -20,13 +20,9 @@
 // exception statement from your version.
 
 using SilverSim.ServiceInterfaces.Estate;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SilverSim.Types;
 using SilverSim.Threading;
+using SilverSim.Types;
+using System.Collections.Generic;
 
 namespace SilverSim.Database.Memory.Estate
 {

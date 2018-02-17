@@ -26,7 +26,6 @@ using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using SilverSim.Types.Estate;
 using SilverSim.Types.StructuredData.Llsd;
-using System.IO;
 using System.Net;
 
 namespace SilverSim.Viewer.Core.Capabilities
