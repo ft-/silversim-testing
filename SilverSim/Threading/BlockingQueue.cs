@@ -52,6 +52,14 @@ namespace SilverSim.Threading
             }
         }
 
+        public new T Peek()
+        {
+            lock(m_Lock)
+            {
+                return base.Peek();
+            }
+        }
+
         public new T Dequeue()
         {
             return Dequeue(Timeout.Infinite);
@@ -66,13 +74,21 @@ namespace SilverSim.Threading
         {
             lock(m_Lock)
             {
-                while(base.Count == 0)
+                while (base.Count == 0)
                 {
-                    if(!Monitor.Wait(m_Lock, timeout))
+                    if (!Monitor.Wait(m_Lock, timeout))
                     {
                         throw new TimeoutException();
                     }
                 }
+                return base.Dequeue();
+            }
+        }
+
+        public T DequeueNoWait()
+        {
+            lock(m_Lock)
+            {
                 return base.Dequeue();
             }
         }
