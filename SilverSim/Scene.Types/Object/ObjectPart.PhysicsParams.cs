@@ -281,7 +281,6 @@ namespace SilverSim.Scene.Types.Object
             {
                 m_IsPhysics = value;
                 PhysicsActor.IsPhysicsActive = value;
-                IncrementPhysicsShapeUpdateSerial();
                 IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(UpdateChangedFlags.Physics);
             }
@@ -293,7 +292,6 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_IsVolumeDetect = value;
-                IncrementPhysicsShapeUpdateSerial();
                 IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(UpdateChangedFlags.Physics);
             }

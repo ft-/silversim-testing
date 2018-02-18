@@ -1483,7 +1483,6 @@ namespace SilverSim.Scene.Types.Object
                         l.SetScale(value);
                     }
                 }
-                IncrementPhysicsShapeUpdateSerial();
                 IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(UpdateChangedFlags.Scale);
             }
