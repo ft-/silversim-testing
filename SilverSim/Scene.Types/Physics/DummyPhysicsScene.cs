@@ -29,48 +29,45 @@ using SilverSim.Types.Asset.Format.Mesh;
 using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace SilverSim.Scene.Types.Physics
 {
-    public class DummyPhysicsScene : IPhysicsScene
+    public class DummyPhysicsScene : IPhysicsScene, IAgentListener
     {
         private SceneInterface m_Scene;
         private readonly UUID m_SceneID;
-        private readonly RwLockedList<IObject> m_Agents = new RwLockedList<IObject>();
+        private readonly RwLockedList<IAgent> m_Agents = new RwLockedList<IAgent>();
 
         public DummyPhysicsScene(SceneInterface scene)
         {
             m_SceneID = scene.ID;
             m_Scene = scene;
+            m_Scene.AgentListeners.Add(this);
         }
 
-        public void Add(IObject obj)
+        ~DummyPhysicsScene()
         {
-            if(obj.GetType().GetInterfaces().Contains(typeof(IAgent)))
-            {
-                var agent = (IAgent)obj;
-                agent.PhysicsActors.Add(m_SceneID, new AgentUfoPhysics(agent, m_SceneID));
-                m_Agents.Add(obj);
-            }
+            m_Scene.AgentListeners.Remove(this);
         }
 
-        public void Remove(IObject obj)
+        void IAgentListener.AddedAgent(IAgent agent)
         {
-            if (obj.GetType().GetInterfaces().Contains(typeof(IAgent)))
-            {
-                var agent = (IAgent)obj;
-                IPhysicsObject physobj;
-                m_Agents.Remove(agent);
-                agent.PhysicsActors.Remove(m_SceneID, out physobj);
-            }
+            agent.PhysicsActors.Add(m_SceneID, new AgentUfoPhysics(agent, m_SceneID));
+            m_Agents.Add(agent);
+        }
+
+        void IAgentListener.RemovedAgent(IAgent agent)
+        {
+            IPhysicsObject physobj;
+            m_Agents.Remove(agent);
+            agent.PhysicsActors.Remove(m_SceneID, out physobj);
         }
 
         public void Shutdown()
         {
             foreach (var obj in m_Agents)
             {
-                Remove(obj);
+                ((IAgentListener)this).RemovedAgent(obj);
             }
             m_Scene = null;
         }
@@ -79,7 +76,7 @@ namespace SilverSim.Scene.Types.Physics
         {
             foreach(var obj in m_Agents)
             {
-                Remove(obj);
+                ((IAgentListener)this).RemovedAgent(obj);
             }
         }
 
@@ -451,6 +448,11 @@ namespace SilverSim.Scene.Types.Physics
                     }
                 }
             }
+        }
+
+        void IAgentListener.AgentChangedScene(IAgent agent)
+        {
+            throw new NotImplementedException();
         }
     }
 }
