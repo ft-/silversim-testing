@@ -373,18 +373,13 @@ namespace SilverSim.Scene.Types.Scene
             }
             set
             {
-                if (value == null)
+                if (value == null || m_PhysicsScene != null)
                 {
                     throw new ArgumentNullException("value");
                 }
                 lock (m_PhysicsSceneChangeLock)
                 {
-                    m_PhysicsScene?.RemoveAll();
                     m_PhysicsScene = value;
-                    foreach (ObjectPart p in Primitives)
-                    {
-                        m_PhysicsScene.Add(p);
-                    }
                 }
             }
         }

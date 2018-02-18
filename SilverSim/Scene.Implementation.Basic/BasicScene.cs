@@ -485,7 +485,6 @@ namespace SilverSim.Scene.Implementation.Basic
                         var agent = (IAgent)obj;
                         m_Agents.Add(obj.ID, agent);
                         Interlocked.Increment(ref m_AgentCount);
-                        PhysicsScene.Add(obj);
                         foreach (IAgentListener aglistener in AgentListeners)
                         {
                             try
@@ -578,7 +577,6 @@ namespace SilverSim.Scene.Implementation.Basic
                     /* only detach if agent is at our scene */
                     agent.DetachAllAttachments();
                 }
-                PhysicsScene.Remove(agent);
                 m_Objects.Remove(agent.ID);
                 if(m_Agents.Remove(agent.ID))
                 {

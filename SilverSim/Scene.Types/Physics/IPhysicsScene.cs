@@ -19,7 +19,6 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
@@ -52,8 +51,6 @@ namespace SilverSim.Scene.Types.Physics
     public interface IPhysicsScene
     {
         void RemoveAll();
-        void Add(IObject obj);
-        void Remove(IObject obj);
 
         void Shutdown();
 
