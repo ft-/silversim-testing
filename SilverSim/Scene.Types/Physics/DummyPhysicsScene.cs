@@ -452,7 +452,7 @@ namespace SilverSim.Scene.Types.Physics
 
         void IAgentListener.AgentChangedScene(IAgent agent)
         {
-            throw new NotImplementedException();
+            /* intentionally left empty */
         }
     }
 }
