@@ -85,12 +85,18 @@ namespace SilverSim.Threading
             }
         }
 
-        public T DequeueNoWait()
+        public bool TryDequeue(out T value)
         {
             lock(m_Lock)
             {
-                return base.Dequeue();
+                if(base.Count != 0)
+                {
+                    value = base.Dequeue();
+                    return true;
+                }
             }
+            value = default(T);
+            return false;
         }
 
         public new void Enqueue(T obj)
