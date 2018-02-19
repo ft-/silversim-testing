@@ -648,14 +648,12 @@ namespace SilverSim.Scene.Implementation.Common
             {
                 m_SimulationDataStorage.Parcels.Remove(ID, parcelID);
             }
+            base.ClearParcels();
         }
 
         public override void ResetParcels()
         {
-            foreach (UUID parcelID in m_SimulationDataStorage.Parcels.ParcelsInRegion(ID))
-            {
-                m_SimulationDataStorage.Parcels.Remove(ID, parcelID);
-            }
+            ClearParcels();
 
             var pi = new ParcelInfo((int)SizeX / 4, (int)SizeY / 4)
             {
