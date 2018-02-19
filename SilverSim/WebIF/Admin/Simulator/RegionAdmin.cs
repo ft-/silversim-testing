@@ -824,6 +824,12 @@ namespace SilverSim.WebIF.Admin.Simulator
                         m_EstateService.RegionMap[rInfo.ID] = allEstates[0].ID;
                     }
                 }
+
+                if ((rInfo.Flags & RegionFlags.RegionOnline) == 0)
+                {
+                    m_RegionStorage.RemoveRegionFlags(rInfo.ID, RegionFlags.RegionOnline);
+                }
+
                 m_WebIF.SuccessResponse(req, new Map());
             }
         }
