@@ -1035,6 +1035,10 @@ namespace SilverSim.Main.Cmd.Region
 
                 m_EstateService.RegionMap[rInfo.ID] = selectedEstate.ID;
                 io.WriteFormatted("Assigning new region {0} to estate {1} owned by {2}", rInfo.Name, selectedEstate.Name, ResolveName(selectedEstate.Owner).FullName);
+                if((rInfo.Flags & RegionFlags.RegionOnline) == 0)
+                {
+                    m_RegionStorage.RemoveRegionFlags(rInfo.ID, RegionFlags.RegionOnline);
+                }
             }
         }
 
