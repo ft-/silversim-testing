@@ -47,7 +47,7 @@ namespace SilverSim.Scene.Types.Physics
 
         ~DummyPhysicsScene()
         {
-            m_Scene.AgentListeners.Remove(this);
+            m_Scene?.AgentListeners.Remove(this);
         }
 
         void IAgentListener.AddedAgent(IAgent agent)
@@ -69,6 +69,7 @@ namespace SilverSim.Scene.Types.Physics
             {
                 ((IAgentListener)this).RemovedAgent(obj);
             }
+            m_Scene.AgentListeners.Remove(this);
             m_Scene = null;
         }
 
