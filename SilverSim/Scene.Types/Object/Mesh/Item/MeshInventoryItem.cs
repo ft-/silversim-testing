@@ -21,6 +21,7 @@
 
 using SilverSim.Types;
 using SilverSim.Types.Asset;
+using SilverSim.Types.Asset.Format.Mesh;
 using SilverSim.Types.Inventory;
 using SilverSim.Types.Primitive;
 using SilverSim.Types.StructuredData.Llsd;
@@ -35,6 +36,7 @@ namespace SilverSim.Scene.Types.Object.Mesh.Item
         public readonly List<AssetData> Assets = new List<AssetData>();
         public readonly Dictionary<int, UUID> TextureMap = new Dictionary<int, UUID>();
         public readonly Dictionary<int, UUID> MeshMap = new Dictionary<int, UUID>();
+        public readonly Dictionary<int, int> MeshFaces = new Dictionary<int, int>();
         public readonly List<InventoryItem> TextureItems = new List<InventoryItem>();
 
         public static MeshInventoryItem FromUploadFormat(string name, Stream s, UUI creator, AssetData objectAsset = null)
@@ -125,7 +127,12 @@ namespace SilverSim.Scene.Types.Object.Mesh.Item
 
                 item.Assets.Add(newasset);
                 item.MeshMap.Add(idx, newasset.ID);
-
+                var m = new LLMesh(newasset);
+                MeshLOD lod = m.GetLOD(LLMesh.LodLevel.LOD3);
+                if(lod.NumFaces >= 1 && lod.NumFaces <= 9)
+                {
+                    item.MeshFaces.Add(idx, lod.NumFaces);
+                }
                 ++idx;
             }
         }
@@ -153,34 +160,42 @@ namespace SilverSim.Scene.Types.Object.Mesh.Item
             var grp = new ObjectGroup();
             foreach(Map instanceData in instanceList.OfType<Map>())
             {
+                var shape = new ObjectPart.PrimitiveShape
+                {
+                    SculptType = PrimitiveSculptType.Mesh,
+                    ProfileCurve = 1,
+                    PathBegin = 0,
+                    PathCurve = 16,
+                    PathEnd = 0,
+                    PathRadiusOffset = 0,
+                    PathRevolutions = 0,
+                    PathScaleX = 100,
+                    PathScaleY = 100,
+                    PathShearX = 0,
+                    PathShearY = 0,
+                    PathSkew = 0,
+                    PathTaperX = 0,
+                    PathTaperY = 0,
+                    PathTwist = 0,
+                    PathTwistBegin = 0,
+                    PCode = PrimitiveCode.Prim,
+                    ProfileBegin = 9375,
+                    ProfileEnd = 0,
+                    ProfileHollow = 0,
+                    State = 0,
+                    SculptMap = item.MeshMap[instanceData["mesh"].AsInt]
+                };
+
+                int numfaces;
+                if(item.MeshFaces.TryGetValue(instanceData["mesh"].AsInt, out numfaces))
+                {
+                    shape.SetMeshNumFaces(numfaces);
+                }
+
                 var part = new ObjectPart
                 {
                     Name = item.Name,
-                    Shape = new ObjectPart.PrimitiveShape
-                    {
-                        SculptType = PrimitiveSculptType.Mesh,
-                        ProfileCurve = 1,
-                        PathBegin = 0,
-                        PathCurve = 16,
-                        PathEnd = 0,
-                        PathRadiusOffset = 0,
-                        PathRevolutions = 0,
-                        PathScaleX = 100,
-                        PathScaleY = 100,
-                        PathShearX = 0,
-                        PathShearY = 0,
-                        PathSkew = 0,
-                        PathTaperX = 0,
-                        PathTaperY = 0,
-                        PathTwist = 0,
-                        PathTwistBegin = 0,
-                        PCode = PrimitiveCode.Prim,
-                        ProfileBegin = 9375,
-                        ProfileEnd = 0,
-                        ProfileHollow = 0,
-                        State = 0,
-                        SculptMap = item.MeshMap[instanceData["mesh"].AsInt]
-                    },
+                    Shape = shape,
                     IsReturnAtEdge = true,
                     Size = GetVector(instanceData["scale"]),
                     PhysicsShapeType = (PrimitivePhysicsShapeType)instanceData["physics_shape_type"].AsInt,

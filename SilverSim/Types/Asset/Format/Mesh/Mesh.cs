@@ -67,6 +67,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
         public List<Vector3> Normals = new List<Vector3>();
         public List<UVCoord> UVCoords = new List<UVCoord>();
         public List<Triangle> Triangles = new List<Triangle>();
+        public int NumFaces { get; private set; }
 
         public MeshLOD(byte[] data, int physOffset, int physSize)
         {
@@ -274,6 +275,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
                 }
                 ++faceNo;
             }
+            NumFaces = faceNo;
         }
 
         private static string VertexToString(Vector3 v) => string.Format(CultureInfo.InvariantCulture, "{0} {1} {2}", v.X, v.Y, v.Z);
