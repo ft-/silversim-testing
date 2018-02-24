@@ -215,17 +215,23 @@ namespace SilverSim.Scripting.Common
 
         public bool IsIncluded => m_ParserInputs.Count > 1;
 
-        public void Push(TextReader stream, string filename, int lineNumber = 1)
+        public void Push(TextReader stream, string filename, int lineNumber = 1, TextWriter sourceWriter = null)
         {
             var pi = new ParserInput
             {
                 FileName = filename,
                 Reader = stream,
-                LineNumberCounter = lineNumber
+                LineNumberCounter = lineNumber,
+                Writer = sourceWriter
             };
             m_ParserInputs.Add(pi);
             cur_linenumber = pi.LineNumberCounter;
             cur_filename = pi.FileName;
+        }
+
+        public void Push(TextReader stream, string filename, TextWriter sourceWriter)
+        {
+            Push(stream, filename, 1, sourceWriter);
         }
 
         public void Pop()
