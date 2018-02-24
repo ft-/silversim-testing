@@ -204,6 +204,15 @@ namespace SilverSim.Scripting.Common
         {
         }
 
+        ~ParserBase()
+        {
+            foreach (ParserInput pi in m_ParserInputs)
+            {
+                pi.Reader?.Dispose();
+                pi.Writer?.Dispose();
+            }
+        }
+
         public abstract void Read(List<TokenInfo> arguments);
         protected int cur_linenumber;
         protected string cur_filename;
@@ -236,7 +245,13 @@ namespace SilverSim.Scripting.Common
 
         public void Pop()
         {
-            m_ParserInputs.RemoveAt(m_ParserInputs.Count - 1);
+            if (m_ParserInputs.Count > 0)
+            {
+                ParserInput pi = m_ParserInputs[m_ParserInputs.Count - 1];
+                pi.Reader?.Dispose();
+                pi.Writer?.Dispose();
+                m_ParserInputs.RemoveAt(m_ParserInputs.Count - 1);
+            }
 
             if(m_ParserInputs.Count != 0)
             {
