@@ -175,9 +175,9 @@ namespace SilverSim.Scene.Types.Object.Mesh.Item
                         PathTwist = 0,
                         PathTwistBegin = 0,
                         PCode = PrimitiveCode.Prim,
-                        ProfileBegin = 0,
+                        ProfileBegin = 12500,
                         ProfileEnd = 0,
-                        ProfileHollow = 0,
+                        ProfileHollow = 27500,
                         State = 0,
                         SculptMap = item.MeshMap[instanceData["mesh"].AsInt]
                     },

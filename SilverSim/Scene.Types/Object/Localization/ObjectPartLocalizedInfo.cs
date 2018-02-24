@@ -502,7 +502,7 @@ namespace SilverSim.Scene.Types.Object.Localization
                 if (shape.SculptType == PrimitiveSculptType.Mesh)
                 {
                     m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileCurve] = 0x01;
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathCurve] = 0x10; 
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathCurve] = 0x10;
                     m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileBegin] = 12500 % 256;
                     m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileBegin + 1] = 12500 / 256;
                     m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileEnd] = 0;

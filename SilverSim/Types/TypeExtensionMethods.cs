@@ -55,6 +55,8 @@ namespace SilverSim.Types
             }
         }
 
+        public static bool IsInRange(this double val, double min, double max) => val >= min && val <= max;
+
         public static bool IsFinite(this double value) => !(double.IsNaN(value) || double.IsInfinity(value));
 
         public static int Clamp(this int val, int min, int max)
