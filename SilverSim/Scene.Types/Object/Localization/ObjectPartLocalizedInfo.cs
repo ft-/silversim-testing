@@ -501,19 +501,27 @@ namespace SilverSim.Scene.Types.Object.Localization
 
                 if (shape.SculptType == PrimitiveSculptType.Mesh)
                 {
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileCurve] = 0x01;
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathCurve] = 0x10; 
                     m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileBegin] = 12500 % 256;
                     m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileBegin + 1] = 12500 / 256;
                     m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileEnd] = 0;
                     m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileEnd + 1] = 0;
                     m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileHollow] = 27500 % 256;
                     m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileHollow + 1] = 27500 / 256;
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathScaleX] = 100;
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathScaleY] = 100;
 
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileCurve] = 0x01;
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathCurve] = 0x10;
                     m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileBegin] = 12500 % 256;
                     m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileBegin + 1] = 12500 / 256;
                     m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileEnd] = 0;
                     m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileEnd + 1] = 0;
                     m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileHollow] = 27500 % 256;
                     m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileHollow + 1] = 27500 / 256;
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathScaleX] = 100;
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathScaleY] = 100;
                 }
             }
         }
