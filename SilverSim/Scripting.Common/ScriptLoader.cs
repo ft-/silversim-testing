@@ -64,14 +64,14 @@ namespace SilverSim.Scripting.Common
         {
             return m_CompilerLock.AcquireReaderLock(() =>
             {
-                var assembly = m_LoadedAssemblies.GetOrAddIfNotExists(data.ID, () =>
+                IScriptAssembly assembly = m_LoadedAssemblies.GetOrAddIfNotExists(data.ID, () =>
                 {
                     using (var reader = new StreamReader(data.InputStream))
                     {
                         return CompilerRegistry.ScriptCompilers.Compile(AppDomain.CurrentDomain, user, data.ID, reader, currentCulture, openInclude);
                     }
                 });
-                m_LoadedAssemblies[data.ID] = assembly;
+
                 ScriptInstance instance = assembly.Instantiate(part, item, serializedState);
                 if (!m_LoadedInstances.ContainsKey(data.ID))
                 {
