@@ -176,15 +176,10 @@ namespace SilverSim.Scene.Types.Object
             #endregion
 
             #region Properties
-            public PrimitiveShapeType Type
+            private PrimitiveShapeType TypeNoSculptCheck
             {
                 get
                 {
-                    if (SculptType != PrimitiveSculptType.None)
-                    {
-                        return PrimitiveShapeType.Sculpt;
-                    }
-
                     PrimitiveProfileShape profileShape = (PrimitiveProfileShape)(ProfileCurve & (byte)PrimitiveProfileShape.Mask);
                     PrimitiveExtrusion extrusion = (PrimitiveExtrusion)PathCurve;
 
@@ -233,7 +228,83 @@ namespace SilverSim.Scene.Types.Object
                 }
             }
 
-            public int NumberOfSides
+            public PrimitiveShapeType Type
+            {
+                get
+                {
+                    if (SculptType != PrimitiveSculptType.None)
+                    {
+                        return PrimitiveShapeType.Sculpt;
+                    }
+
+                    return TypeNoSculptCheck;
+                }
+            }
+
+            public void SetMeshNumFaces(int numfaces)
+            {
+                if(SculptType != PrimitiveSculptType.Mesh)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(numfaces));
+                }
+
+                PathScaleX = 100;
+                PathScaleY = 100;
+                ProfileEnd = 0;
+                PathBegin = 0;
+                PathEnd = 0;
+                ProfileHollow = 0;
+
+                switch (numfaces)
+                {
+                    case 1:
+                        ProfileCurve = (byte)PrimitiveProfileShape.Circle | (byte)PrimitiveProfileHollowShape.Triangle;
+                        PathCurve = (byte)PrimitiveExtrusion.Curve1;
+                        PathScaleY = 150;
+                        break;
+
+                    case 2:
+                        ProfileHollow = 27500;
+                        goto case 1;
+
+                    case 3:
+                        ProfileCurve = (byte)PrimitiveProfileShape.Circle | (byte)PrimitiveProfileHollowShape.Triangle;
+                        PathCurve = (byte)PrimitiveExtrusion.Straight;
+                        break;
+
+                    case 4:
+                        ProfileHollow = 27500;
+                        goto case 3;
+
+                    case 5:
+                        ProfileCurve = (byte)PrimitiveProfileShape.EquilateralTriangle | (byte)PrimitiveProfileHollowShape.Triangle;
+                        PathCurve = (byte)PrimitiveExtrusion.Straight;
+                        break;
+
+                    case 6:
+                        ProfileCurve = (byte)PrimitiveProfileShape.Square | (byte)PrimitiveProfileHollowShape.Triangle;
+                        PathCurve = (byte)PrimitiveExtrusion.Straight;
+                        break;
+
+                    case 7:
+                        ProfileHollow = 27500;
+                        goto case 6;
+
+                    case 8:
+                        ProfileBegin = 9375;
+                        goto case 6;
+
+                    case 9:
+                        ProfileHollow = 27500;
+                        ProfileBegin = 9375;
+                        goto case 6;
+
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(numfaces));
+                }
+            }
+
+            private int NumberOfSidesNoSculptCheck
             {
                 get
                 {
@@ -243,7 +314,7 @@ namespace SilverSim.Scene.Types.Object
                     bool hasDimple;
                     bool hasProfileCut;
 
-                    var primType = Type;
+                    var primType = TypeNoSculptCheck;
                     hasCut = (primType == PrimitiveShapeType.Box ||
                         primType == PrimitiveShapeType.Cylinder ||
                         primType == PrimitiveShapeType.Prism) ?
@@ -349,12 +420,66 @@ namespace SilverSim.Scene.Types.Object
                                 ret++;
                             }
                             break;
+                        default:
+                            break;
+                    }
+
+                    return ret;
+                }
+            }
+
+            public int NumberOfSides
+            {
+                get
+                {
+                    int ret = 0;
+                    bool hasCut;
+                    bool hasHollow;
+                    bool hasDimple;
+                    bool hasProfileCut;
+
+                    var primType = Type;
+                    hasCut = (primType == PrimitiveShapeType.Box ||
+                        primType == PrimitiveShapeType.Cylinder ||
+                        primType == PrimitiveShapeType.Prism) ?
+                        (ProfileBegin > 0 || ProfileEnd > 0) :
+                        (PathBegin > 0 || PathEnd > 0);
+
+                    hasHollow = ProfileHollow > 0;
+                    hasDimple = (ProfileBegin > 0) || (ProfileEnd > 0); // taken from llSetPrimitiveParms
+                    hasProfileCut = hasDimple; // is it the same thing?
+
+                    switch (primType)
+                    {
+                        case PrimitiveShapeType.Box:
+                        case PrimitiveShapeType.Cylinder:
+                        case PrimitiveShapeType.Prism:
+                        case PrimitiveShapeType.Sphere:
+                        case PrimitiveShapeType.Torus:
+                        case PrimitiveShapeType.Tube:
+                        case PrimitiveShapeType.Ring:
+                            ret = NumberOfSidesNoSculptCheck;
+                            break;
+
                         case PrimitiveShapeType.Sculpt:
                             // Special mesh handling
-                            ret = (SculptType == PrimitiveSculptType.Mesh) ?
-                                32 : // if it's a mesh then max 32 faces
-                                1; // if it's a sculpt then max 1 face
+                            if(SculptType == PrimitiveSculptType.Mesh)
+                            {
+                                if(((PrimitiveProfileHollowShape)ProfileCurve & PrimitiveProfileHollowShape.Mask) == PrimitiveProfileHollowShape.Triangle)
+                                {
+                                    ret = NumberOfSidesNoSculptCheck;
+                                }
+                                else
+                                {
+                                    ret = 8;
+                                }
+                            }
+                            else
+                            {
+                                ret = 1; /* sculpt */
+                            }
                             break;
+
                         default:
                             break;
                     }

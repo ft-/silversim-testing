@@ -450,15 +450,8 @@ namespace SilverSim.Scene.Types.Object.Localization
         {
             lock (m_UpdateDataLock)
             {
-                m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathBegin] = (byte)(shape.PathBegin % 256);
-                m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathBegin + 1] = (byte)(shape.PathBegin / 256);
-                m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathEnd] = (byte)(shape.PathEnd % 256);
-                m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathEnd + 1] = (byte)(shape.PathEnd / 256);
-                m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathCurve] = shape.PathCurve;
                 m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathRadiusOffset] = (byte)shape.PathRadiusOffset;
                 m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathRevolutions] = shape.PathRevolutions;
-                m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathScaleX] = shape.PathScaleX;
-                m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathScaleY] = shape.PathScaleY;
                 m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathShearX] = shape.PathShearX;
                 m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathShearY] = shape.PathShearY;
                 m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathSkew] = (byte)shape.PathSkew;
@@ -467,23 +460,9 @@ namespace SilverSim.Scene.Types.Object.Localization
                 m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathTwist] = (byte)shape.PathTwist;
                 m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathTwistBegin] = (byte)shape.PathTwistBegin;
                 m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PCode] = (byte)shape.PCode;
-                m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileBegin] = (byte)(shape.ProfileBegin % 256);
-                m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileBegin + 1] = (byte)(shape.ProfileBegin / 256);
-                m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileCurve] = shape.ProfileCurve;
-                m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileEnd] = (byte)(shape.ProfileEnd % 256);
-                m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileEnd + 1] = (byte)(shape.ProfileEnd / 256);
-                m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileHollow] = (byte)(shape.ProfileHollow % 256);
-                m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileHollow + 1] = (byte)(shape.ProfileHollow / 256);
 
-                m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathBegin] = (byte)(shape.PathBegin % 256);
-                m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathBegin + 1] = (byte)(shape.PathBegin / 256);
-                m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathEnd] = (byte)(shape.PathEnd % 256);
-                m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathEnd + 1] = (byte)(shape.PathEnd / 256);
-                m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathCurve] = shape.PathCurve;
                 m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathRadiusOffset] = (byte)shape.PathRadiusOffset;
                 m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathRevolutions] = shape.PathRevolutions;
-                m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathScaleX] = shape.PathScaleX;
-                m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathScaleY] = shape.PathScaleY;
                 m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathShearX] = shape.PathShearX;
                 m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathShearY] = shape.PathShearY;
                 m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathSkew] = (byte)shape.PathSkew;
@@ -491,37 +470,116 @@ namespace SilverSim.Scene.Types.Object.Localization
                 m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathTaperY] = (byte)shape.PathTaperY;
                 m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathTwist] = (byte)shape.PathTwist;
                 m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathTwistBegin] = (byte)shape.PathTwistBegin;
-                m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileBegin] = (byte)(shape.ProfileBegin % 256);
-                m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileBegin + 1] = (byte)(shape.ProfileBegin / 256);
-                m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileCurve] = shape.ProfileCurve;
-                m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileEnd] = (byte)(shape.ProfileEnd % 256);
-                m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileEnd + 1] = (byte)(shape.ProfileEnd / 256);
-                m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileHollow] = (byte)(shape.ProfileHollow % 256);
-                m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileHollow + 1] = (byte)(shape.ProfileHollow / 256);
 
                 if (shape.SculptType == PrimitiveSculptType.Mesh)
                 {
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileCurve] = 0x01;
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathCurve] = 0x10;
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileBegin] = 12500 % 256;
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileBegin + 1] = 12500 / 256;
+                    /* filter away mishaps and reproduce relevant data */
+                    PrimitiveProfileShape profileCurve = PrimitiveProfileShape.Circle;
+                    PrimitiveExtrusion pathCurve = PrimitiveExtrusion.Straight;
+                    ushort profileBegin = 0;
+                    ushort profileHollow = 0;
+                    switch(shape.NumberOfSides)
+                    {
+                        case 1:
+                            pathCurve = PrimitiveExtrusion.Curve1;
+                            break;
+
+                        case 2:
+                            pathCurve = PrimitiveExtrusion.Curve1;
+                            profileHollow = 27500;
+                            break;
+
+                        case 3:
+                            break;
+
+                        case 4:
+                            profileHollow = 27500;
+                            break;
+
+                        case 5:
+                            profileCurve = PrimitiveProfileShape.EquilateralTriangle;
+                            break;
+
+                        case 6:
+                            profileCurve = PrimitiveProfileShape.Square;
+                            break;
+
+                        case 7:
+                            profileCurve = PrimitiveProfileShape.Square;
+                            profileHollow = 27500;
+                            break;
+
+                        case 8:
+                        default:
+                            profileCurve = PrimitiveProfileShape.Square;
+                            profileBegin = 9375;
+                            break;
+
+                        case 9:
+                            profileHollow = 27500;
+                            goto case 8;
+                    }
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileCurve] = (byte)profileCurve;
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathCurve] = (byte)pathCurve;
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileBegin] = (byte)(profileBegin % 256);
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileBegin + 1] = (byte)(profileBegin / 256);
                     m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileEnd] = 0;
                     m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileEnd + 1] = 0;
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileHollow] = 27500 % 256;
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileHollow + 1] = 27500 / 256;
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileHollow] = (byte)(profileHollow % 256);
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileHollow + 1] = (byte)(profileHollow / 256);
                     m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathScaleX] = 100;
                     m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathScaleY] = 100;
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathBegin] = 0;
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathBegin + 1] = 0;
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathEnd] = 0;
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathEnd + 1] = 0;
 
-                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileCurve] = 0x01;
-                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathCurve] = 0x10;
-                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileBegin] = 12500 % 256;
-                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileBegin + 1] = 12500 / 256;
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileCurve] = (byte)profileCurve;
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathCurve] = (byte)pathCurve;
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileBegin] = (byte)(profileBegin % 256);
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileBegin + 1] = (byte)(profileBegin / 256);
                     m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileEnd] = 0;
                     m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileEnd + 1] = 0;
-                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileHollow] = 27500 % 256;
-                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileHollow + 1] = 27500 / 256;
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileHollow] = (byte)(profileHollow % 256);
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileHollow + 1] = (byte)(profileHollow / 256);
                     m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathScaleX] = 100;
                     m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathScaleY] = 100;
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathBegin] = 0;
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathBegin + 1] = 0;
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathEnd] = 0;
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathEnd + 1] = 0;
+                }
+                else
+                {
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathBegin] = (byte)(shape.PathBegin % 256);
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathBegin + 1] = (byte)(shape.PathBegin / 256);
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathEnd] = (byte)(shape.PathEnd % 256);
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathEnd + 1] = (byte)(shape.PathEnd / 256);
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathCurve] = shape.PathCurve;
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathScaleX] = shape.PathScaleX;
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathScaleY] = shape.PathScaleY;
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileBegin] = (byte)(shape.ProfileBegin % 256);
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileBegin + 1] = (byte)(shape.ProfileBegin / 256);
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileCurve] = shape.ProfileCurve;
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileEnd] = (byte)(shape.ProfileEnd % 256);
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileEnd + 1] = (byte)(shape.ProfileEnd / 256);
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileHollow] = (byte)(shape.ProfileHollow % 256);
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileHollow + 1] = (byte)(shape.ProfileHollow / 256);
+
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathBegin] = (byte)(shape.PathBegin % 256);
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathBegin + 1] = (byte)(shape.PathBegin / 256);
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathEnd] = (byte)(shape.PathEnd % 256);
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathEnd + 1] = (byte)(shape.PathEnd / 256);
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathCurve] = shape.PathCurve;
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathScaleX] = shape.PathScaleX;
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.PathScaleY] = shape.PathScaleY;
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileBegin] = (byte)(shape.ProfileBegin % 256);
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileBegin + 1] = (byte)(shape.ProfileBegin / 256);
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileCurve] = shape.ProfileCurve;
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileEnd] = (byte)(shape.ProfileEnd % 256);
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileEnd + 1] = (byte)(shape.ProfileEnd / 256);
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileHollow] = (byte)(shape.ProfileHollow % 256);
+                    m_CompressedUpdateFixedBlock[(int)CompressedUpdateOffset.ProfileHollow + 1] = (byte)(shape.ProfileHollow / 256);
                 }
             }
         }
