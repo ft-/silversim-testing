@@ -195,6 +195,7 @@ namespace SilverSim.Scripting.Common
             public string FileName;
             public TextReader Reader;
             public int LineNumberCounter;
+            public TextWriter Writer;
         }
 
         private readonly List<ParserInput> m_ParserInputs = new List<ParserInput>();
@@ -314,6 +315,7 @@ namespace SilverSim.Scripting.Common
                 }
                 else
                 {
+                    pi.Writer?.Write(c);
                     if(c == '\n')
                     {
                         ++cur_linenumber;
