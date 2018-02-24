@@ -459,10 +459,10 @@ namespace SilverSim.Scene.Types.Object
                         (ProfileHollow / 50000.0).IsInRange(0f, 0.99f);
                     valid = valid && ((ProfileBegin / 50000.0).IsInRange(0, 1) &&
                         (ProfileEnd / 50000.0).IsInRange(0, 1));
-                    valid = valid && (ProfileBegin + 50000 - ProfileEnd < 50000) && ProfileBegin < ProfileEnd;
+                    valid = valid && ProfileBegin + ProfileEnd < 50000;
                     valid = valid && (PathBegin / 50000.0).IsInRange(0, 1);
                     valid = valid && ((50000 - PathEnd) / 50000.0).IsInRange(0, 1);
-                    valid = valid && (PathBegin + PathEnd < 50000) && PathBegin < (50000 - PathEnd);
+                    valid = valid && PathBegin + PathEnd < 50000;
                     valid = valid && (PathScaleX / 100.0 - 1).IsInRange(-1, 1);
                     valid = valid && (PathScaleY / 100.0 - 1).IsInRange(-1, 1);
                     valid = valid && ((sbyte)PathShearX / 100.0).IsInRange(-0.5, 0.5);
