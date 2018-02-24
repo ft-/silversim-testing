@@ -321,7 +321,7 @@ namespace SilverSim.Scripting.Common
                 }
                 else
                 {
-                    pi.Writer?.Write(c);
+                    pi.Writer?.Write((char)c);
                     if(c == '\n')
                     {
                         ++cur_linenumber;
