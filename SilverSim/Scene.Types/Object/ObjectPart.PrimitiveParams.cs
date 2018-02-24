@@ -107,7 +107,7 @@ namespace SilverSim.Scene.Types.Object
                     Buffer.BlockCopy(BitConverter.GetBytes(ProfileHollow), 0, serialized, 41, 2);
                     serialized[43] = (byte)PCode;
                     serialized[44] = State;
-                    if(!BitConverter.IsLittleEndian)
+                    if (!BitConverter.IsLittleEndian)
                     {
                         Array.Reverse(serialized, 20, 2);
                         Array.Reverse(serialized, 23, 2);
@@ -121,7 +121,7 @@ namespace SilverSim.Scene.Types.Object
 
                 set
                 {
-                    if(value.Length != 45)
+                    if (value.Length != 45)
                     {
                         throw new ArgumentException("Array length must be 45.");
                     }
@@ -136,7 +136,7 @@ namespace SilverSim.Scene.Types.Object
 
                     SculptMap.FromBytes(value, 0);
                     SculptType = (PrimitiveSculptType)value[17];
-                    if(SculptMap == UUID.Zero)
+                    if (SculptMap == UUID.Zero)
                     {
                         SculptType = PrimitiveSculptType.None;
                     }
@@ -180,7 +180,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 get
                 {
-                    if(SculptType != PrimitiveSculptType.None)
+                    if (SculptType != PrimitiveSculptType.None)
                     {
                         return PrimitiveShapeType.Sculpt;
                     }
@@ -188,10 +188,10 @@ namespace SilverSim.Scene.Types.Object
                     PrimitiveProfileShape profileShape = (PrimitiveProfileShape)(ProfileCurve & (byte)PrimitiveProfileShape.Mask);
                     PrimitiveExtrusion extrusion = (PrimitiveExtrusion)PathCurve;
 
-                    switch(profileShape)
+                    switch (profileShape)
                     {
                         case PrimitiveProfileShape.Square:
-                            if(extrusion == PrimitiveExtrusion.Curve1)
+                            if (extrusion == PrimitiveExtrusion.Curve1)
                             {
                                 return PrimitiveShapeType.Tube;
                             }
@@ -210,14 +210,14 @@ namespace SilverSim.Scene.Types.Object
                             break;
 
                         case PrimitiveProfileShape.HalfCircle:
-                            if(extrusion == PrimitiveExtrusion.Curve1 || extrusion == PrimitiveExtrusion.Curve2)
+                            if (extrusion == PrimitiveExtrusion.Curve1 || extrusion == PrimitiveExtrusion.Curve2)
                             {
                                 return PrimitiveShapeType.Sphere;
                             }
                             break;
 
                         case PrimitiveProfileShape.EquilateralTriangle:
-                            switch(extrusion)
+                            switch (extrusion)
                             {
                                 case PrimitiveExtrusion.Straight:
                                 case PrimitiveExtrusion.Default:
@@ -440,6 +440,43 @@ namespace SilverSim.Scene.Types.Object
                 /** <summary>value range -0.95f to 0.95f</summary> */
                 public double Skew;
                 #endregion
+            }
+
+            public bool IsSane
+            {
+                get
+                {
+                    PrimitiveProfileShape profileShape = ((PrimitiveProfileShape)ProfileCurve) & PrimitiveProfileShape.Mask;
+                    PrimitiveProfileHollowShape holeShape = ((PrimitiveProfileHollowShape)ProfileCurve) & PrimitiveProfileHollowShape.Mask;
+                    int path_type = PathCurve >> 4;
+                    bool valid = true;
+                    valid = valid && (profileShape <= PrimitiveProfileShape.HalfCircle);
+                    valid = valid && (holeShape <= PrimitiveProfileHollowShape.Triangle);
+                    valid = valid && (path_type >= 1 && path_type <= 8);
+                    valid = valid && ((Type != PrimitiveShapeType.Box || Type != PrimitiveShapeType.Tube) &&
+                        holeShape == PrimitiveProfileHollowShape.Square) ?
+                        (ProfileHollow / 50000.0).IsInRange(0f, 0.7f) :
+                        (ProfileHollow / 50000.0).IsInRange(0f, 0.99f);
+                    valid = valid && ((ProfileBegin / 50000.0).IsInRange(0, 1) &&
+                        (ProfileEnd / 50000.0).IsInRange(0, 1));
+                    valid = valid && (ProfileBegin + 50000 - ProfileEnd < 50000) && ProfileBegin < ProfileEnd;
+                    valid = valid && (PathBegin / 50000.0).IsInRange(0, 1);
+                    valid = valid && ((50000 - PathEnd) / 50000.0).IsInRange(0, 1);
+                    valid = valid && (PathBegin + PathEnd < 50000) && PathBegin < (50000 - PathEnd);
+                    valid = valid && (PathScaleX / 100.0 - 1).IsInRange(-1, 1);
+                    valid = valid && (PathScaleY / 100.0 - 1).IsInRange(-1, 1);
+                    valid = valid && ((sbyte)PathShearX / 100.0).IsInRange(-0.5, 0.5);
+                    valid = valid && ((sbyte)PathShearY / 100.0).IsInRange(-0.5, 0.5);
+                    valid = valid && (PathTwistBegin / 100.0).IsInRange(-1, 1);
+                    valid = valid && (PathTwist / 100.0).IsInRange(-1, 1);
+                    //valid = valid && (PathRadiusOffset / 100.0); TODO: see LLVolumeParams.setRadiusOffset for this
+                    valid = valid && (PathTaperX / 100.0).IsInRange(-1, 1);
+                    valid = valid && (PathTaperY / 100.0).IsInRange(-1, 1);
+                    valid = valid && (PathRevolutions / 100.0 + 1).IsInRange(1, 4);
+                    valid = valid && (PathSkew / 100.0).IsInRange(-1, 1);
+                    valid = valid && (SculptType & PrimitiveSculptType.TypeMask) <= PrimitiveSculptType.Mesh;
+                    return valid;
+                }
             }
 
             public Decoded DecodedParams
