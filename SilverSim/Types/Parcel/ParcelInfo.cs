@@ -194,11 +194,11 @@ namespace SilverSim.Types.Parcel
 
                 for (int pos = (int)aabbMin.X; pos <= (int)aabbMin.X; ++pos)
                 {
-                    if (LandBitmap[pos, (int)aabbMin.Y])
+                    if (LandBitmap[pos / 4, (int)aabbMin.Y / 4])
                     {
                         return new Vector3(pos, aabbMin.Y, 0);
                     }
-                    if (LandBitmap[pos, (int)aabbMax.Y])
+                    if (LandBitmap[pos / 4, (int)aabbMax.Y / 4])
                     {
                         return new Vector3(pos, aabbMax.Y, 0);
                     }
