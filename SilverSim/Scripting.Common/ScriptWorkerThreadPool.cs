@@ -193,13 +193,10 @@ namespace SilverSim.Scripting.Common
             }
 
             bool enqueued = false;
-            lock(i)
+            if (i.ThreadPool == null)
             {
-                if (i.ThreadPool == null)
-                {
-                    m_ScriptTriggerQueue.Enqueue(i);
-                    enqueued = true;
-                }
+                m_ScriptTriggerQueue.Enqueue(i);
+                enqueued = true;
             }
 
             if(enqueued)
