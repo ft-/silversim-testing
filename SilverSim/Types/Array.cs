@@ -153,6 +153,21 @@ namespace SilverSim.Types
             return from val in this where val is T select (T)val;
         }
 
+        public void AddRange(AnArray src, int start, int length)
+        {
+            int srcLength = src.Count;
+            int position = start;
+            int count = length;
+            if(start < 0 || start >= srcLength || start + length > srcLength || length < 0 || start + length < 0)
+            {
+                throw new IndexOutOfRangeException();
+            }
+            while(count-- != 0)
+            {
+                Add(src[position++]);
+            }
+        }
+
         #region Helper
         public ABoolean AsBoolean => new ABoolean();
         public Integer AsInteger => new Integer();
