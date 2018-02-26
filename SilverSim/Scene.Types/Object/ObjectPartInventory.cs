@@ -607,7 +607,7 @@ namespace SilverSim.Scene.Types.Object
                                 }
                                 try
                                 {
-                                    Add(item, false);
+                                    Add(item, true);
                                 }
                                 catch
                                 {
