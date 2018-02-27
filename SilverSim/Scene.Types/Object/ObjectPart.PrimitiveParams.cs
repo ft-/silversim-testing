@@ -362,7 +362,7 @@ namespace SilverSim.Scene.Types.Object
                             break;
                         case PrimitiveShapeType.Sphere:
                             ret = 1;
-                            if (hasCut)
+                            if (hasCut || PathSkew != 0)
                             {
                                 ret += 2;
                             }
@@ -377,7 +377,7 @@ namespace SilverSim.Scene.Types.Object
                             break;
                         case PrimitiveShapeType.Torus:
                             ret = 1;
-                            if (hasCut)
+                            if (hasCut || PathSkew != 0)
                             {
                                 ret += 2;
                             }
@@ -392,7 +392,7 @@ namespace SilverSim.Scene.Types.Object
                             break;
                         case PrimitiveShapeType.Tube:
                             ret = 4;
-                            if (hasCut)
+                            if (hasCut || PathSkew != 0)
                             {
                                 ret += 2;
                             }
@@ -407,7 +407,7 @@ namespace SilverSim.Scene.Types.Object
                             break;
                         case PrimitiveShapeType.Ring:
                             ret = 3;
-                            if (hasCut)
+                            if (hasCut || PathSkew != 0)
                             {
                                 ret += 2;
                             }
