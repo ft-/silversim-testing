@@ -358,7 +358,7 @@ namespace SilverSim.Scene.Implementation.Common
         {
             RegionInfo ri = GetRegionInfo();
             GridService.RegisterRegion(ri);
-            RegionStorage?.RegisterRegion(ri);
+            RegionStorage?.RegisterRegion(ri, true);
             foreach (IAgent agent in Agents)
             {
                 var viewerAgent = agent as ViewerAgent;

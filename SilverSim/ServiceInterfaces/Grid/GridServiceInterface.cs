@@ -130,6 +130,14 @@ namespace SilverSim.ServiceInterfaces.Grid
 
         #region Region Registration
         public abstract void RegisterRegion(RegionInfo regionInfo);
+        public virtual void RegisterRegion(RegionInfo regionInfo, bool keepOnlineUnmodified)
+        {
+            if(keepOnlineUnmodified) /* if set, means that a re-register will keep the flag */
+            {
+                throw new NotSupportedException(nameof(keepOnlineUnmodified));
+            }
+            RegisterRegion(regionInfo);
+        }
         public abstract void UnregisterRegion(UUID scopeID, UUID regionID);
         public abstract void DeleteRegion(UUID scopeID, UUID regionID);
         public virtual void AddRegionFlags(UUID regionID, RegionFlags setflags)

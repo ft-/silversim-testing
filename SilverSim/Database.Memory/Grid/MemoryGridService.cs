@@ -234,15 +234,32 @@ namespace SilverSim.Database.MySQL.Grid
 
         public override void RegisterRegion(RegionInfo regionInfo)
         {
+            RegisterRegion(regionInfo, false);
+        }
+
+        public override void RegisterRegion(RegionInfo regionInfo, bool keepOnlineUnmodified)
+        {
             foreach (var service in m_RegionDefaultServices)
             {
                 regionInfo.Flags |= service.GetRegionDefaultFlags(regionInfo.ID);
             }
 
-            RegionInfo oldRegion;
+            RegionInfo oldRegion = null;
             if (!AllowDuplicateRegionNames && TryGetValue(regionInfo.ScopeID, regionInfo.Name, out oldRegion) && oldRegion.ID != regionInfo.ID)
             {
                 throw new GridRegionUpdateFailedException("Duplicate region name");
+            }
+
+            if (oldRegion != null && keepOnlineUnmodified)
+            {
+                if ((oldRegion.Flags & RegionFlags.RegionOnline) != 0)
+                {
+                    regionInfo.Flags |= RegionFlags.RegionOnline;
+                }
+                else
+                {
+                    regionInfo.Flags &= ~RegionFlags.RegionOnline;
+                }
             }
 
             /* we have to give checks for all intersection variants */
