@@ -252,14 +252,8 @@ namespace SilverSim.Database.MySQL.Grid
 
             if (oldRegion != null && keepOnlineUnmodified)
             {
-                if ((oldRegion.Flags & RegionFlags.RegionOnline) != 0)
-                {
-                    regionInfo.Flags |= RegionFlags.RegionOnline;
-                }
-                else
-                {
-                    regionInfo.Flags &= ~RegionFlags.RegionOnline;
-                }
+                regionInfo.Flags &= (~RegionFlags.RegionOnline);
+                regionInfo.Flags |= (oldRegion.Flags & RegionFlags.RegionOnline);
             }
 
             /* we have to give checks for all intersection variants */
