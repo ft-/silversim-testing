@@ -634,7 +634,7 @@ namespace SilverSim.Scene.Implementation.Common
                 if (m_Parcels.TryGetValue(mergeTo, out mergeParcel))
                 {
                     removed = m_Parcels.Remove(p.ID);
-                    m_SimulationDataStorage.RemoveRegion(p.ID);
+                    m_SimulationDataStorage.Parcels.Remove(ID, p.ID);
                     mergeParcel.LandBitmap.Merge(p.LandBitmap);
                     TriggerParcelUpdate(mergeParcel);
                 }
