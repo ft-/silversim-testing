@@ -280,10 +280,8 @@ namespace SilverSim.Database.MySQL.Grid
         {
             if(IsDeleteOnUnregister)
             {
-                /* we handoff most stuff to mysql here */
                 /* first line deletes only when region is not persistent */
                 m_Data.RemoveIf(regionID, (RegionInfo regInfo) => (scopeID == UUID.Zero || regInfo.ScopeID == scopeID) && (regInfo.Flags & RegionFlags.Persistent) == 0);
-
                 /* second step is to set it offline when it is persistent */
             }
 
