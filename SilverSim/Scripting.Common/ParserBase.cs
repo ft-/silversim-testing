@@ -323,6 +323,7 @@ namespace SilverSim.Scripting.Common
 
             for(;;)
             {
+                CurrentLineNumber = cur_linenumber;
                 int c = pi.Reader.Read();
                 if(c == -1)
                 {
