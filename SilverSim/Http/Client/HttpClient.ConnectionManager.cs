@@ -167,7 +167,8 @@ namespace SilverSim.Http.Client
             X509CertificateCollection clientCertificates,
             SslProtocols enabledSslProtocols,
             bool checkCertificateRevocation,
-            ConnectionModeEnum reuseMode)
+            ConnectionModeEnum reuseMode,
+            RemoteCertificateValidationCallback remoteCertificateValidationCallback)
         {
             if(reuseMode == ConnectionModeEnum.UpgradeHttp2 && scheme != Uri.UriSchemeHttp)
             {
@@ -212,7 +213,7 @@ namespace SilverSim.Http.Client
             }
             else if (scheme == Uri.UriSchemeHttps)
             {
-                return ConnectToSslServer(host, port, clientCertificates, enabledSslProtocols, checkCertificateRevocation, reuseMode == ConnectionModeEnum.Keepalive);
+                return ConnectToSslServer(host, port, clientCertificates, enabledSslProtocols, checkCertificateRevocation, reuseMode == ConnectionModeEnum.Keepalive, remoteCertificateValidationCallback);
             }
             else
             {
@@ -226,9 +227,10 @@ namespace SilverSim.Http.Client
             X509CertificateCollection clientCertificates,
             SslProtocols enabledSslProtocols,
             bool checkCertificateRevocation,
-            bool enableReuseConnection)
+            bool enableReuseConnection,
+            RemoteCertificateValidationCallback remoteCertificateValidationCallback)
         {
-            var sslstream = new SslStream(new NetworkStream(ConnectToTcp(host, port), true));
+            var sslstream = new SslStream(new NetworkStream(ConnectToTcp(host, port), true), false, remoteCertificateValidationCallback);
             sslstream.AuthenticateAsClient(host, clientCertificates, enabledSslProtocols, checkCertificateRevocation);
             if (!sslstream.IsEncrypted)
             {
@@ -302,7 +304,8 @@ namespace SilverSim.Http.Client
             string scheme, string host, int port,
             X509CertificateCollection clientCertificates,
             SslProtocols enabledSslProtocols,
-            bool checkCertificateRevocation)
+            bool checkCertificateRevocation,
+            RemoteCertificateValidationCallback remoteCertificateValidationCallback)
         {
             Http2Connection.Http2Stream h2stream = TryReuseStream(scheme, host, port);
             if(h2stream != null)
@@ -317,7 +320,7 @@ namespace SilverSim.Http.Client
             }
             else if (scheme == Uri.UriSchemeHttps)
             {
-                s = ConnectToSslServer(host, port, clientCertificates, enabledSslProtocols, checkCertificateRevocation, false);
+                s = ConnectToSslServer(host, port, clientCertificates, enabledSslProtocols, checkCertificateRevocation, false, remoteCertificateValidationCallback);
             }
             else
             {

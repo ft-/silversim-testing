@@ -23,6 +23,7 @@ using SilverSim.Types;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Security;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 
@@ -51,6 +52,7 @@ namespace SilverSim.Http.Client
             public SslProtocols EnabledSslProtocols = SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12;
             public bool CheckCertificateRevocation = true;
             public IHttpAuthorization Authorization;
+            public RemoteCertificateValidationCallback RemoteCertificateValidationCallback;
 
             public Request(string url)
             {

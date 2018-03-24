@@ -367,7 +367,7 @@ redoafter401:
 
             int retrycnt = 1;
             retry:
-            AbstractHttpStream s = OpenStream(uri.Scheme, uri.Host, uri.Port, request.ClientCertificates, request.EnabledSslProtocols, request.CheckCertificateRevocation, request.ConnectionMode);
+            AbstractHttpStream s = OpenStream(uri.Scheme, uri.Host, uri.Port, request.ClientCertificates, request.EnabledSslProtocols, request.CheckCertificateRevocation, request.ConnectionMode, request.RemoteCertificateValidationCallback);
             string finalreqdata = reqdata.ToString();
             if (!s.IsReusable)
             {
@@ -808,7 +808,7 @@ redoafter401:
 
             int retrycnt = 1;
             retry:
-            Http2Connection.Http2Stream s = reuseStream ?? OpenHttp2Stream(uri.Scheme, uri.Host, uri.Port, request.ClientCertificates, request.EnabledSslProtocols, request.CheckCertificateRevocation);
+            Http2Connection.Http2Stream s = reuseStream ?? OpenHttp2Stream(uri.Scheme, uri.Host, uri.Port, request.ClientCertificates, request.EnabledSslProtocols, request.CheckCertificateRevocation, request.RemoteCertificateValidationCallback);
             headers.Clear();
             try
             {
