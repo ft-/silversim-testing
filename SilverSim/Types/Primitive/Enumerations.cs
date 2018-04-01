@@ -141,7 +141,68 @@ namespace SilverSim.Types.Primitive
         SitAnimation = 12001,
         Language = 12002,
         RemoveLanguage = 12003,
-        RemoveAllLanguages = 12004
+        RemoveAllLanguages = 12004,
+        LoopSound = 12005,
+        SoundRadius = 12006,
+        SoundVolume = 12007,
+        SoundQueueing = 12008
+    }
+
+    public static class PrimitiveParamsToLslMethodsExtension
+    {
+        public static string GetLslName(this PrimitiveParamsType paramtype)
+        {
+            switch(paramtype)
+            {
+                case PrimitiveParamsType.AllowUnsit: return "PRIM_ALLOW_UNSIT";
+                case PrimitiveParamsType.Alpha: return "PRIM_ALPHA";
+                case PrimitiveParamsType.AlphaMode: return "PRIM_ALPHA_MODE";
+                case PrimitiveParamsType.BumpShiny: return "PRIM_BUMP_SHINY";
+                case PrimitiveParamsType.Color: return "PRIM_COLOR";
+                case PrimitiveParamsType.Desc: return "PRIM_DESC";
+                case PrimitiveParamsType.Flexible: return "PRIM_FLEXIBLE";
+                case PrimitiveParamsType.FullBright: return "PRIM_FULLBRIGHT";
+                case PrimitiveParamsType.Glow: return "PRIM_GLOW";
+                case PrimitiveParamsType.Language: return "PRIM_LANGUAGE";
+                case PrimitiveParamsType.LinkTarget: return "PRIM_LINK_TARGET";
+                case PrimitiveParamsType.LoopSound: return "PRIM_LOOP_SOUND";
+                case PrimitiveParamsType.Material: return "PRIM_MATERIAL";
+                case PrimitiveParamsType.Name: return "PRIM_NAME";
+                case PrimitiveParamsType.Normal: return "PRIM_NORMAL";
+                case PrimitiveParamsType.Omega: return "PRIM_OMEGA";
+                case PrimitiveParamsType.Phantom: return "PRIM_PHANTOM";
+                case PrimitiveParamsType.Physics: return "PRIM_PHYSICS";
+                case PrimitiveParamsType.PhysicsShapeType: return "PRIM_PHYSICS_SHAPE_TYPE";
+                case PrimitiveParamsType.PointLight: return "PRIM_POINT_LIGHT";
+                case PrimitiveParamsType.Position: return "PRIM_POSITION";
+                case PrimitiveParamsType.PosLocal: return "PRIM_POS_LOCAL";
+                case PrimitiveParamsType.Projector: return "PRIM_PROJECTOR";
+                case PrimitiveParamsType.ProjectorEnabled: return "PRIM_PROJECTOR_ENABLED";
+                case PrimitiveParamsType.ProjectorFocus: return "PRIM_PROJECTOR_FOCUS";
+                case PrimitiveParamsType.ProjectorFov: return "PRIM_PROJECTOR_FOV";
+                case PrimitiveParamsType.ProjectorTexture: return "PRIM_PROJECTOR_TEXTURE";
+                case PrimitiveParamsType.RemoveAllLanguages: return "PRIM_REMOVE_ALL_LANGUAGES";
+                case PrimitiveParamsType.RemoveLanguage: return "PRIM_REMOVE_LANGUAGE";
+                case PrimitiveParamsType.Rotation: return "PRIM_ROTATION";
+                case PrimitiveParamsType.RotLocal: return "PRIM_ROT_LOCAL";
+                case PrimitiveParamsType.ScriptedSitOnly: return "PRIM_SCRIPTED_SIT_ONLY";
+                case PrimitiveParamsType.SitAnimation: return "PRIM_SIT_ANIMATION";
+                case PrimitiveParamsType.SitTarget: return "PRIM_SIT_TARGET";
+                case PrimitiveParamsType.Size: return "PRIM_SIZE";
+                case PrimitiveParamsType.Slice: return "PRIM_SLICE";
+                case PrimitiveParamsType.SoundQueueing: return "PRIM_SOUND_QUEUEING";
+                case PrimitiveParamsType.SoundRadius: return "PRIM_SOUND_RADIUS";
+                case PrimitiveParamsType.SoundVolume: return "PRIM_SOUND_VOLUME";
+                case PrimitiveParamsType.Specular: return "PRIM_SPECULAR";
+                case PrimitiveParamsType.TempOnRez: return "PRIM_TEMP_ON_REZ";
+                case PrimitiveParamsType.TexGen: return "PRIM_TEXGEN";
+                case PrimitiveParamsType.Text: return "PRIM_TEXT";
+                case PrimitiveParamsType.Texture: return "PRIM_TEXTURE";
+                case PrimitiveParamsType.Type: return "PRIM_TYPE";
+                case PrimitiveParamsType.UnSitTarget: return "PRIM_UNSIT_TARGET";
+            }
+            return string.Format("PRIM_{0}", (int)paramtype);
+        }
     }
 
     public enum PrimitivePhysicsShapeType

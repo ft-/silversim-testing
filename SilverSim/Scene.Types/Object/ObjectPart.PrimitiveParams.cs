@@ -19,9 +19,12 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object.Localization;
 using SilverSim.Scene.Types.Object.Parameters;
+using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script;
+using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Primitive;
@@ -1078,6 +1081,27 @@ namespace SilverSim.Scene.Types.Object
             PrimitiveParamsType paramtype = ParamsHelper.GetPrimParamType(enumerator);
             switch (paramtype)
             {
+                case PrimitiveParamsType.LoopSound:
+                    {
+                        SoundParam p = Sound;
+                        paramList.Add(GetSoundInventoryItem(p.SoundID));
+                        paramList.Add(p.Gain);
+                        paramList.Add((int)(p.Flags & (PrimitiveSoundFlags.SyncMaster | PrimitiveSoundFlags.SyncSlave)));
+                    }
+                    break;
+
+                case PrimitiveParamsType.SoundRadius:
+                    paramList.Add(Sound.Radius);
+                    break;
+
+                case PrimitiveParamsType.SoundVolume:
+                    paramList.Add(Sound.Gain);
+                    break;
+
+                case PrimitiveParamsType.SoundQueueing:
+                    paramList.Add(IsSoundQueueing ? 1 : 0);
+                    break;
+
                 case PrimitiveParamsType.Name:
                     paramList.Add(localization.Name);
                     break;
@@ -1293,6 +1317,53 @@ namespace SilverSim.Scene.Types.Object
             PrimitiveParamsType paramtype = ParamsHelper.GetPrimParamType(enumerator);
             switch (paramtype)
             {
+                case PrimitiveParamsType.LoopSound:
+                    {
+                        UUID soundID = GetSoundParam(enumerator, "PRIM_LOOP_SOUND");
+                        double volume = ParamsHelper.GetDouble(enumerator, "PRIM_LOOP_SOUND").Clamp(0, 1);
+                        int soundflags = ParamsHelper.GetInteger(enumerator, "PRIM_LOOP_SOUND");
+                        if(TryFetchSound(soundID))
+                        {
+                            SoundParam p = Sound;
+                            p.SoundID = soundID;
+                            p.Gain = volume;
+                            p.Flags = PrimitiveSoundFlags.Looped;
+                            if(IsSoundQueueing)
+                            {
+                                p.Flags |= PrimitiveSoundFlags.Queue;
+                            }
+                            if((soundflags & (int)PrimitiveSoundFlags.SyncMaster) != 0)
+                            {
+                                p.Flags |= PrimitiveSoundFlags.SyncMaster;
+                            }
+                            if ((soundflags & (int)PrimitiveSoundFlags.SyncSlave) != 0)
+                            {
+                                p.Flags |= PrimitiveSoundFlags.SyncSlave;
+                            }
+                            Sound = p;
+                        }
+                    }
+                    break;
+
+                case PrimitiveParamsType.SoundRadius:
+                    {
+                        SoundParam p = Sound;
+                        p.Radius = Math.Max(0, ParamsHelper.GetDouble(enumerator, "PRIM_SOUND_RADIUS"));
+                    }
+                    break;
+
+                case PrimitiveParamsType.SoundVolume:
+                    {
+                        SoundParam p = Sound;
+                        p.Gain = ParamsHelper.GetDouble(enumerator, "PRIM_SOUND_VOLUME").Clamp(0, 1);
+                        Sound = p;
+                    }
+                    break;
+
+                case PrimitiveParamsType.SoundQueueing:
+                    IsSoundQueueing = ParamsHelper.GetBoolean(enumerator, "PRIM_SOUND_QUEUEING");
+                    break;
+
                 case PrimitiveParamsType.RemoveLanguage:
                     RemoveLocalization(ParamsHelper.GetString(enumerator, "PRIM_REMOVE_LANGUAGE"));
                     break;
@@ -1572,6 +1643,126 @@ namespace SilverSim.Scene.Types.Object
                 return texitem.AssetID;
             }
             throw new ArgumentException("texture does not name either a inventory item or a uuid");
+        }
+
+        internal bool TryFetchTexture(UUID textureID)
+        {
+            ObjectGroup grp = ObjectGroup;
+            SceneInterface scene = grp.Scene;
+            AssetServiceInterface assetService = scene.AssetService;
+            AssetMetadata metadata;
+            AssetData data;
+            if (!assetService.Metadata.TryGetValue(textureID, out metadata))
+            {
+                if (grp.IsAttached) /* on attachments, we have to fetch from agent eventually */
+                {
+                    IAgent owner;
+                    if (!grp.Scene.RootAgents.TryGetValue(grp.Owner.ID, out owner))
+                    {
+                        return false;
+                    }
+                    if (!owner.AssetService.TryGetValue(textureID, out data))
+                    {
+                        /* not found */
+                        return false;
+                    }
+                    assetService.Store(data);
+                    if (data.Type != AssetType.Texture)
+                    {
+                        /* ignore wrong asset here */
+                        return false;
+                    }
+                }
+                else
+                {
+                    /* ignore missing asset here */
+                    return false;
+                }
+            }
+            else if (metadata.Type != AssetType.Texture)
+            {
+                /* ignore wrong asset here */
+                return false;
+            }
+
+            return true;
+        }
+        #endregion
+
+        #region Sound inventory
+        internal string GetSoundInventoryItem(UUID assetID)
+        {
+            if (assetID != UUID.Zero)
+            {
+                foreach (var item in Inventory.Values)
+                {
+                    if (item.AssetType == AssetType.Sound && item.AssetID == assetID)
+                    {
+                        return item.Name;
+                    }
+                }
+            }
+            return assetID.ToString();
+        }
+
+        internal UUID GetSoundParam(IEnumerator<IValue> enumerator, string paraName)
+        {
+            var texture = ParamsHelper.GetString(enumerator, paraName);
+            UUID uuid;
+            ObjectPartInventoryItem sounditem;
+            if (UUID.TryParse(texture, out uuid))
+            {
+                return uuid;
+            }
+            else if (Inventory.TryGetValue(texture, out sounditem) &&
+                sounditem.AssetType == AssetType.Sound)
+            {
+                return sounditem.AssetID;
+            }
+            throw new ArgumentException("texture does not name either a inventory item or a uuid");
+        }
+
+        internal bool TryFetchSound(UUID soundID)
+        {
+            ObjectGroup grp = ObjectGroup;
+            SceneInterface scene = grp.Scene;
+            AssetServiceInterface assetService = scene.AssetService;
+            AssetMetadata metadata;
+            AssetData data;
+            if (!assetService.Metadata.TryGetValue(soundID, out metadata))
+            {
+                if (grp.IsAttached) /* on attachments, we have to fetch from agent eventually */
+                {
+                    IAgent owner;
+                    if (!grp.Scene.RootAgents.TryGetValue(grp.Owner.ID, out owner))
+                    {
+                        return false;
+                    }
+                    if (!owner.AssetService.TryGetValue(soundID, out data))
+                    {
+                        /* not found */
+                        return false;
+                    }
+                    assetService.Store(data);
+                    if (data.Type != AssetType.Sound)
+                    {
+                        /* ignore wrong asset here */
+                        return false;
+                    }
+                }
+                else
+                {
+                    /* ignore missing asset here */
+                    return false;
+                }
+            }
+            else if (metadata.Type != AssetType.Sound)
+            {
+                /* ignore wrong asset here */
+                return false;
+            }
+
+            return true;
         }
         #endregion
     }

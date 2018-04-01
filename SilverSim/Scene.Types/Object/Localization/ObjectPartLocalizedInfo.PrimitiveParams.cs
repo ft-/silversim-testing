@@ -141,8 +141,8 @@ namespace SilverSim.Scene.Types.Object.Localization
                         {
                             var mat = m_Part.ObjectGroup.Scene.GetMaterial(face.MaterialID);
                             paramList.Add(m_Part.GetTextureInventoryItem(mat.NormMap));
-                            paramList.Add(new Vector3(mat.NormRepeatX, mat.NormRepeatY, 0) / SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER);
-                            paramList.Add(new Vector3(mat.NormOffsetX, mat.NormOffsetY, 0) / SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER);
+                            paramList.Add(new Vector3(mat.NormRepeatX, mat.NormRepeatY, 0) / Material.MATERIALS_MULTIPLIER);
+                            paramList.Add(new Vector3(mat.NormOffsetX, mat.NormOffsetY, 0) / Material.MATERIALS_MULTIPLIER);
                             paramList.Add(mat.NormRotation);
                         }
                         catch
@@ -173,9 +173,9 @@ namespace SilverSim.Scene.Types.Object.Localization
                         {
                             var mat = m_Part.ObjectGroup.Scene.GetMaterial(face.MaterialID);
                             paramList.Add(m_Part.GetTextureInventoryItem(mat.SpecMap));
-                            paramList.Add(new Vector3(mat.SpecRepeatX, mat.SpecRepeatY, 0) / SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER);
-                            paramList.Add(new Vector3(mat.SpecOffsetX, mat.SpecOffsetY, 0) / SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER);
-                            paramList.Add(mat.SpecRotation / SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER);
+                            paramList.Add(new Vector3(mat.SpecRepeatX, mat.SpecRepeatY, 0) / Material.MATERIALS_MULTIPLIER);
+                            paramList.Add(new Vector3(mat.SpecOffsetX, mat.SpecOffsetY, 0) / Material.MATERIALS_MULTIPLIER);
+                            paramList.Add(mat.SpecRotation / Material.MATERIALS_MULTIPLIER);
                             paramList.Add(mat.SpecColor.AsVector3);
                             paramList.Add(mat.SpecExp);
                             paramList.Add(mat.EnvIntensity);
@@ -224,7 +224,11 @@ namespace SilverSim.Scene.Types.Object.Localization
             {
                 case PrimitiveParamsType.Texture:
                     {
-                        face.TextureID = m_Part.GetTextureParam(enumerator, "PRIM_TEXTURE");
+                        UUID textureID = m_Part.GetTextureParam(enumerator, "PRIM_TEXTURE");
+                        if(m_Part.TryFetchTexture(textureID))
+                        {
+                            face.TextureID = textureID;
+                        }
                         Vector3 v = ParamsHelper.GetVector(enumerator, "PRIM_TEXTURE");
                         face.RepeatU = (float)v.X;
                         face.RepeatV = (float)v.Y;
@@ -338,8 +342,11 @@ namespace SilverSim.Scene.Types.Object.Localization
                         mat.NormRepeatY = (int)Math.Round(repeats.Y);
                         mat.NormRotation = (int)Math.Round(rotation);
                         mat.MaterialID = UUID.Random;
-                        m_Part.ObjectGroup.Scene.StoreMaterial(mat);
-                        face.MaterialID = mat.MaterialID;
+                        if (m_Part.TryFetchTexture(texture))
+                        {
+                            m_Part.ObjectGroup.Scene.StoreMaterial(mat);
+                            face.MaterialID = mat.MaterialID;
+                        }
                     }
                     flags |= UpdateChangedFlags.Texture;
                     isUpdated = true;
@@ -351,11 +358,11 @@ namespace SilverSim.Scene.Types.Object.Localization
                         UUID texture = m_Part.GetTextureParam(enumerator, "PRIM_NORMAL");
                         Vector3 repeats = ParamsHelper.GetVector(enumerator, "PRIM_SPECULAR");
                         Vector3 offsets = ParamsHelper.GetVector(enumerator, "PRIM_SPECULAR");
-                        repeats *= SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER;
-                        offsets *= SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER;
+                        repeats *= Material.MATERIALS_MULTIPLIER;
+                        offsets *= Material.MATERIALS_MULTIPLIER;
                         double rotation = ParamsHelper.GetDouble(enumerator, "PRIM_SPECULAR");
                         rotation %= Math.PI * 2;
-                        rotation *= SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER;
+                        rotation *= Material.MATERIALS_MULTIPLIER;
                         var color = new ColorAlpha(ParamsHelper.GetVector(enumerator, "PRIM_SPECULAR"), 1);
                         int glossiness = ParamsHelper.GetInteger(enumerator, "PRIM_SPECULAR");
                         int environment = ParamsHelper.GetInteger(enumerator, "PRIM_SPECULAR");
@@ -380,8 +387,11 @@ namespace SilverSim.Scene.Types.Object.Localization
                         mat.EnvIntensity = environment;
                         mat.SpecExp = glossiness;
                         mat.MaterialID = UUID.Random;
-                        m_Part.ObjectGroup.Scene.StoreMaterial(mat);
-                        face.MaterialID = mat.MaterialID;
+                        if (m_Part.TryFetchTexture(texture))
+                        {
+                            m_Part.ObjectGroup.Scene.StoreMaterial(mat);
+                            face.MaterialID = mat.MaterialID;
+                        }
                     }
                     flags |= UpdateChangedFlags.Texture;
                     isUpdated = true;
