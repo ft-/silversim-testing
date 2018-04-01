@@ -177,6 +177,7 @@ namespace SilverSim.Types.Primitive
                 case PrimitiveParamsType.Position: return "PRIM_POSITION";
                 case PrimitiveParamsType.PosLocal: return "PRIM_POS_LOCAL";
                 case PrimitiveParamsType.Projector: return "PRIM_PROJECTOR";
+                case PrimitiveParamsType.ProjectorAmbience: return "PRIM_PROJECTOR_AMBIENCE";
                 case PrimitiveParamsType.ProjectorEnabled: return "PRIM_PROJECTOR_ENABLED";
                 case PrimitiveParamsType.ProjectorFocus: return "PRIM_PROJECTOR_FOCUS";
                 case PrimitiveParamsType.ProjectorFov: return "PRIM_PROJECTOR_FOV";
