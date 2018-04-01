@@ -127,6 +127,7 @@ namespace SilverSim.Types.Primitive
         AllowUnsit = 39,
         ScriptedSitOnly = 40,
         SitTarget = 41,
+        CastShadows = 24,
 
         Alpha = 11001,
 
@@ -158,6 +159,7 @@ namespace SilverSim.Types.Primitive
                 case PrimitiveParamsType.Alpha: return "PRIM_ALPHA";
                 case PrimitiveParamsType.AlphaMode: return "PRIM_ALPHA_MODE";
                 case PrimitiveParamsType.BumpShiny: return "PRIM_BUMP_SHINY";
+                case PrimitiveParamsType.CastShadows: return "PRIM_CAST_SHADOWS";
                 case PrimitiveParamsType.Color: return "PRIM_COLOR";
                 case PrimitiveParamsType.Desc: return "PRIM_DESC";
                 case PrimitiveParamsType.Flexible: return "PRIM_FLEXIBLE";
