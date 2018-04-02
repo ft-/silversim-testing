@@ -49,7 +49,7 @@ namespace SilverSim.Viewer.OfflineIM
                 req.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
                 return;
             }
-            if (req.Method != "POST")
+            if (req.Method != "GET")
             {
                 req.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
                 return;
