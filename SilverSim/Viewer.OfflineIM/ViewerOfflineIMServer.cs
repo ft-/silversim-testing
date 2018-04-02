@@ -34,7 +34,7 @@ namespace SilverSim.Viewer.OfflineIM
 {
     [Description("Viewer Offline IM Handler")]
     [PluginName("ViewerOfflineIMServer")]
-    public class ViewerOfflineIMServer : IPlugin, IPacketHandlerExtender, ICapabilityExtender, IPluginShutdown
+    public class ViewerOfflineIMServer : IPlugin, IPacketHandlerExtender, IPluginShutdown
     {
         [PacketHandler(MessageType.RetrieveInstantMessages)]
         private readonly BlockingQueue<KeyValuePair<AgentCircuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
