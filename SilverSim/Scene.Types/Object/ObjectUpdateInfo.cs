@@ -32,7 +32,6 @@ namespace SilverSim.Scene.Types.Object
         public uint LocalID { get; internal set; }
         public ObjectPart Part { get; }
         public UUID ID { get; internal set; }
-        public UUID SceneID { get; internal set; }
 
         internal ObjectUpdateInfo(ObjectPart part)
         {
@@ -76,18 +75,19 @@ namespace SilverSim.Scene.Types.Object
                 uint parentID = 0;
                 ObjectGroup objectGroup = Part.ObjectGroup;
                 ObjectPart rootPart = objectGroup.RootPart;
+                SceneInterface scene = objectGroup.Scene;
+                UUID sceneID = scene?.ID ?? UUID.Zero;
 
                 if (rootPart != Part)
                 {
-                    parentID = rootPart.LocalID[SceneID];
+                    parentID = rootPart.LocalID[sceneID];
                 }
                 else if (objectGroup.IsAttached)
                 {
                     IAgent agent;
-                    SceneInterface scene = objectGroup.Scene;
                     if (scene != null && scene.Agents.TryGetValue(Owner.ID, out agent))
                     {
-                        parentID = agent.LocalID[SceneID];
+                        parentID = agent.LocalID[sceneID];
                     }
                 }
 
