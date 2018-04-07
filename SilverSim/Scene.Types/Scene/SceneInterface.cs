@@ -565,6 +565,10 @@ namespace SilverSim.Scene.Types.Scene
 
         public void TriggerAgentChangedScene(IAgent agent)
         {
+            if(agent == null)
+            {
+                throw new ArgumentNullException(nameof(agent));
+            }
             foreach (IAgentListener aglistener in AgentListeners)
             {
                 try
