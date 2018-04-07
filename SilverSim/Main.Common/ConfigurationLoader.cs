@@ -1400,10 +1400,14 @@ namespace SilverSim.Main.Common
             if(DataSources.TryGetValue(dataSource, out accessor))
             {
                 object idata = accessor();
-                if(idata is T)
+                try
                 {
                     data = (T)idata;
                     return true;
+                }
+                catch
+                {
+                    /* ignore */
                 }
             }
             data = default(T);
