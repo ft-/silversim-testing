@@ -418,5 +418,15 @@ namespace SilverSim.Threading
             }
             return result;
         });
+
+        public IList<TKey1> Keys1 => m_RwLock.AcquireReaderLock(() =>
+        {
+            return new List<TKey1>(m_Dictionary_K1.Keys);
+        });
+
+        public IList<TKey2> Keys2 => m_RwLock.AcquireReaderLock(() =>
+        {
+            return new List<TKey2>(m_Dictionary_K2.Keys);
+        });
     }
 }

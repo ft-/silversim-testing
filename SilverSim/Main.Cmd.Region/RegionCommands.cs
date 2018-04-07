@@ -139,6 +139,12 @@ namespace SilverSim.Main.Cmd.Region
             loader.CommandRegistry.AddShowCommand("scripts", ShowScriptsCmd);
             loader.CommandRegistry.AddShowCommand("executing-scripts", ShowExecutingScriptsCmd);
             loader.CommandRegistry.AddClearCommand("hacdcache", ClearHacdCacheCmd);
+            loader.DataSources.Add("region-ids/online", GetOnlineRegionIdsDataSource);
+            loader.DataSources.Add("region-ids/offline", GetOfflineRegionIdsDataSource);
+            loader.DataSources.Add("region-ids/enabled", GetEnabledRegionIdsDataSource);
+            loader.DataSources.Add("region-ids/disabled", GetDisabledRegionIdsDataSource);
+            loader.DataSources.Add("region-ids", GetRegionIdsDataSource);
+            loader.DataSources.Add("region-id-name-pairs", GetRegionIdNamePairDataSource);
 
             IConfig sceneConfig = loader.Config.Configs["DefaultSceneImplementation"];
             var avatarNameServicesList = new RwLockedList<AvatarNameServiceInterface>();
@@ -1598,6 +1604,75 @@ namespace SilverSim.Main.Cmd.Region
                     scene.PhysicsScene.PhysicsEngineName);
             }
             io.Write(formattedList.ToString());
+        }
+
+        private object GetRegionIdNamePairDataSource()
+        {
+            var result = new Dictionary<string, string>();
+            foreach (RegionInfo ri in m_RegionStorage.GetAllRegions(UUID.Zero))
+            {
+                result.Add(ri.ID.ToString(), ri.Name);
+            }
+            return result;
+        }
+
+        private object GetRegionIdsDataSource()
+        {
+            var result = new List<string>();
+            foreach (RegionInfo ri in m_RegionStorage.GetAllRegions(UUID.Zero))
+            {
+                result.Add(ri.ID.ToString());
+            }
+            return result.ToArray();
+        }
+
+        private object GetEnabledRegionIdsDataSource()
+        {
+            var result = new List<string>();
+            foreach(RegionInfo ri in m_RegionStorage.GetOnlineRegions())
+            {
+                result.Add(ri.ID.ToString());
+            }
+            return result.ToArray();
+        }
+
+        private object GetDisabledRegionIdsDataSource()
+        {
+            var result = new List<string>();
+            foreach (RegionInfo ri in from rInfo in m_RegionStorage.GetAllRegions(UUID.Zero) where (rInfo.Flags & RegionFlags.RegionOnline) == 0 select rInfo)
+            {
+                result.Add(ri.ID.ToString());
+            }
+            return result.ToArray();
+        }
+
+        private object GetOnlineRegionIdsDataSource()
+        {
+            var result = new List<string>();
+            foreach (SceneInterface scene in m_Scenes.Values)
+            {
+                result.Add(scene.ID.ToString());
+            }
+            return result.ToArray();
+        }
+
+        private object GetOfflineRegionIdsDataSource()
+        {
+            IEnumerable<RegionInfo> regions;
+            var result = new List<string>();
+            var onlineRegions = new List<UUID>();
+
+            foreach (SceneInterface scene in m_Scenes.Values)
+            {
+                onlineRegions.Add(scene.ID);
+            }
+            regions = from rInfo in m_RegionStorage.GetAllRegions(UUID.Zero) where !onlineRegions.Contains(rInfo.ID) select rInfo;
+
+            foreach (RegionInfo ri in regions)
+            {
+                result.Add(ri.ID.ToString());
+            }
+            return result.ToArray();
         }
 
         private void ShowRegionsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)

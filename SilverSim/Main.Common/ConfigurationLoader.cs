@@ -1388,6 +1388,27 @@ namespace SilverSim.Main.Common
         }
         #endregion
 
+        #region Data sources
+        /** <summary>only use System.* types for this, it is meant for external access </summary> */
+        public readonly RwLockedDictionary<string, Func<object>> DataSources = new RwLockedDictionary<string, Func<object>>();
+
+        public bool TryGetData<T>(string dataSource, out T data)
+        {
+            Func<object> accessor;
+            if(DataSources.TryGetValue(dataSource, out accessor))
+            {
+                object idata = accessor();
+                if(idata is T)
+                {
+                    data = (T)idata;
+                    return true;
+                }
+            }
+            data = default(T);
+            return false;
+        }
+        #endregion
+
         #region Common Commands
         public void ExecuteCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
