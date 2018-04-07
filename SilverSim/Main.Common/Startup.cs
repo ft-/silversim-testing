@@ -39,7 +39,7 @@ namespace SilverSim.Main.Common
 
         public void ExecuteCommand(List<string> args, CmdIO.TTY io)
         {
-            m_ConfigLoader.ExecuteCommand(args, io, UUID.Zero);
+            m_ConfigLoader.CommandRegistry.ExecuteCommand(args, io, UUID.Zero);
         }
 
         private sealed class OutputText : CmdIO.TTY
@@ -82,12 +82,12 @@ namespace SilverSim.Main.Common
 
         public void ExecuteCommand(List<string> args, Action<string> action)
         {
-            m_ConfigLoader.ExecuteCommand(args, new OutputAction(action), UUID.Zero);
+            m_ConfigLoader.CommandRegistry.ExecuteCommand(args, new OutputAction(action), UUID.Zero);
         }
 
         public void ExecuteCommand(List<string> args, Action<string> action, Func<string, bool, string> input)
         {
-            m_ConfigLoader.ExecuteCommand(args, new OutputAction(action, input), UUID.Zero);
+            m_ConfigLoader.CommandRegistry.ExecuteCommand(args, new OutputAction(action, input), UUID.Zero);
         }
 
         public bool TryGetData<T>(string datasource, out T data) => m_ConfigLoader.TryGetData(datasource, out data);

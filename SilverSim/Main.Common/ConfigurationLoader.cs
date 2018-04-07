@@ -1416,7 +1416,7 @@ namespace SilverSim.Main.Common
         #endregion
 
         #region Common Commands
-        public void ExecuteCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        private void ExecuteCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             if(args[0] == "help" || args.Count < 2)
             {
@@ -1434,7 +1434,6 @@ namespace SilverSim.Main.Common
                 }
             }
         }
-
         #endregion
     }
 }
