@@ -901,8 +901,8 @@ namespace SilverSim.Viewer.Core
             }
             ChatSessionRequestCapability = null;
             m_UploadCapabilities.Clear();
-            Agent = null;
             Scene = null;
+            Agent = null;
         }
 
         private void HandleTermination()

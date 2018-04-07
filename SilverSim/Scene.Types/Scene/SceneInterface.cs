@@ -565,15 +565,18 @@ namespace SilverSim.Scene.Types.Scene
 
         public void TriggerAgentChangedScene(IAgent agent)
         {
-            foreach(IAgentListener aglistener in AgentListeners)
+            if (agent != null)
             {
-                try
+                foreach (IAgentListener aglistener in AgentListeners)
                 {
-                    aglistener.AgentChangedScene(agent);
-                }
-                catch(Exception e)
-                {
-                    m_Log.DebugFormat("TriggerAgentChangedScene: {0}\n{1}", e.Message, e.StackTrace);
+                    try
+                    {
+                        aglistener.AgentChangedScene(agent);
+                    }
+                    catch (Exception e)
+                    {
+                        m_Log.DebugFormat("TriggerAgentChangedScene: {0}\n{1}", e.Message, e.StackTrace);
+                    }
                 }
             }
         }
