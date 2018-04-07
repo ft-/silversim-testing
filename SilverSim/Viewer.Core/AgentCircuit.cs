@@ -127,7 +127,11 @@ namespace SilverSim.Viewer.Core
                         }
                     }
                     m_Scene = value;
-                    oldScene?.TriggerAgentChangedScene(Agent);
+                    IAgent ag = Agent;
+                    if (ag != null)
+                    {
+                        oldScene?.TriggerAgentChangedScene(ag);
+                    }
                     if (m_Scene != null)
                     {
                         var sceneCapID = UUID.Random;
