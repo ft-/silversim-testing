@@ -94,6 +94,8 @@ namespace SilverSim.Main.Common
 
         public bool TryGetData(string datasource, out object data) => m_ConfigLoader.TryGetData(datasource, out data);
 
+        public bool HaveData(string datasource) => m_ConfigLoader.HaveData(datasource);
+
         public bool Run(string[] args, Action<string> writeLine)
         {
             try

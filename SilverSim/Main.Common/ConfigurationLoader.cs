@@ -1392,6 +1392,8 @@ namespace SilverSim.Main.Common
         /** <summary>only use System.* types for this, it is meant for external access </summary> */
         public readonly RwLockedDictionary<string, Func<object>> DataSources = new RwLockedDictionary<string, Func<object>>();
 
+        public bool HaveData(string dataSource) => DataSources.ContainsKey(dataSource);
+
         public bool TryGetData<T>(string dataSource, out T data)
         {
             Func<object> accessor;
