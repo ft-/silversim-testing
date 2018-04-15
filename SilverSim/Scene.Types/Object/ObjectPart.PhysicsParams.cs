@@ -280,7 +280,6 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_IsPhysics = value;
-                PhysicsActor.IsPhysicsActive = value;
                 IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(UpdateChangedFlags.Physics);
             }

@@ -60,35 +60,23 @@ namespace SilverSim.Scene.Types.Physics
             }
         }
 
-        public void TransferState(IPhysicsObject target, Vector3 positionOffset)
-        {
-            lock(m_Lock)
-            {
-                IsPhysicsActive = false;
-                target.ReceiveState(m_StateData, positionOffset);
-                IsPhysicsActive = true;
-            }
-        }
-
         public void ReceiveState(PhysicsStateData data, Vector3 positionOffset)
         {
             lock (m_Lock)
             {
-                IsPhysicsActive = false;
                 m_StateData.Position = data.Position + positionOffset;
                 m_StateData.Rotation = data.Rotation;
                 m_StateData.Velocity = data.Velocity;
                 m_StateData.AngularVelocity = data.AngularVelocity;
                 m_StateData.Acceleration = data.Acceleration;
                 m_StateData.AngularAcceleration = data.AngularAcceleration;
-                IsPhysicsActive = true;
             }
         }
 
         private void UfoTimerFunction(object sender, ElapsedEventArgs e)
         {
             Vector3 controlTarget;
-            if (IsPhysicsActive)
+            if (m_Agent.SittingOnObject != null || m_Agent.SceneID == m_StateData.SceneID)
             {
                 lock (m_Lock)
                 {
@@ -141,8 +129,6 @@ namespace SilverSim.Scene.Types.Physics
         public Vector3 Torque => Vector3.Zero;
 
         public Vector3 Force => Vector3.Zero;
-
-        public bool IsPhysicsActive { get; set; }
 
         public bool ContributesToCollisionSurfaceAsChild
         {

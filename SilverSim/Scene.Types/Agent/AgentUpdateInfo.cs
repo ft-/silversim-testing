@@ -184,7 +184,7 @@ namespace SilverSim.Scene.Types.Agent
             {
                 if (Agent != null && !m_Killed)
                 {
-                    return Agent.PhysicsActor.IsPhysicsActive;
+                    return Agent.SittingOnObject == null;
                 }
                 return false;
             }

@@ -36,11 +36,6 @@ namespace SilverSim.Scene.Types.Physics
             }
         }
 
-        public void TransferState(IPhysicsObject target, Vector3 positionOffset)
-        {
-            /* intentionally left empty */
-        }
-
         public void ReceiveState(PhysicsStateData data, Vector3 positionOffset)
         {
             /* intentionally left empty */
@@ -97,16 +92,6 @@ namespace SilverSim.Scene.Types.Physics
         public double Buoyancy
         {
             get { return 0f; }
-
-            set
-            {
-                /* intentionally left empty */
-            }
-        }
-
-        public bool IsPhysicsActive
-        {
-            get { return false; }
 
             set
             {

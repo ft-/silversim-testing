@@ -51,32 +51,18 @@ namespace SilverSim.Scene.Physics.Common
             LocationInfoProvider = locInfoProvider;
         }
 
-        public void TransferState(IPhysicsObject target, Vector3 positionOffset)
-        {
-            lock (m_Lock)
-            {
-                IsPhysicsActive = false;
-                target.ReceiveState(m_StateData, positionOffset);
-                IsPhysicsActive = true;
-            }
-        }
-
         public void ReceiveState(PhysicsStateData data, Vector3 positionOffset)
         {
             lock (m_Lock)
             {
-                IsPhysicsActive = false;
                 m_StateData.Position = data.Position + positionOffset;
                 m_StateData.Rotation = data.Rotation;
                 m_StateData.Velocity = data.Velocity;
                 m_StateData.AngularVelocity = data.AngularVelocity;
                 m_StateData.Acceleration = data.Acceleration;
                 m_StateData.AngularAcceleration = data.AngularAcceleration;
-                IsPhysicsActive = true;
             }
         }
-
-        public abstract bool IsPhysicsActive { get; set; } /* disables updates of object */
 
         public bool IsAgentCollisionActive
         {
@@ -200,7 +186,7 @@ namespace SilverSim.Scene.Physics.Common
             {
                 return forces;
             }
-            if (!IsPhysicsActive)
+            if (grp.Scene == null || grp.Scene.ID != m_StateData.SceneID)
             {
                 return forces;
             }

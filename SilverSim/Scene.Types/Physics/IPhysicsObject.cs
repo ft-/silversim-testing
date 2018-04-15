@@ -25,13 +25,12 @@ namespace SilverSim.Scene.Types.Physics
 {
     public interface IPhysicsObject
     {
-        /* position, acceleration, velocity (angular and linear) is pushed to target object when IsPhysicsActive equals true */
+        /* position, acceleration, velocity (angular and linear) is pushed to target object */
         void SetAppliedForce(Vector3 value);
         void SetAppliedTorque(Vector3 value);
         void SetLinearImpulse(Vector3 value);
         void SetAngularImpulse(Vector3 value);
 
-        bool IsPhysicsActive { get; set; } /* disables updates of object */
         double Mass { get; }
 
         double Buoyancy { get; set; }
@@ -41,7 +40,6 @@ namespace SilverSim.Scene.Types.Physics
 
         /* Vehicle model is now accessed through shared memory class VehicleParams */
 
-        void TransferState(IPhysicsObject target, Vector3 positionOffset);
         void ReceiveState(PhysicsStateData data, Vector3 positionOffset);
 
         void SetHoverHeight(double height, bool water, double tau);

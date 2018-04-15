@@ -59,14 +59,6 @@ namespace SilverSim.Scene.Physics.Common
             LocationInfoProvider = locInfoProvider;
         }
 
-        public void TransferState(IPhysicsObject target, Vector3 positionOffset)
-        {
-            lock (m_Lock)
-            {
-                target.ReceiveState(m_StateData, positionOffset);
-            }
-        }
-
         public void ReceiveState(PhysicsStateData data, Vector3 positionOffset)
         {
             lock (m_Lock)
@@ -80,8 +72,6 @@ namespace SilverSim.Scene.Physics.Common
             }
         }
 
-        public abstract bool IsPhysicsActive { get; set; } /* disables updates of object */
-
         public double Mass => 2;
 
         public abstract bool IsAgentCollisionActive { get; set; }
@@ -89,7 +79,7 @@ namespace SilverSim.Scene.Physics.Common
         private ControlFlags m_ControlFlags;
         public void SetControlFlags(ControlFlags flags)
         {
-            if (IsPhysicsActive)
+            if (Agent.SittingOnObject == null)
             {
                 lock (m_Lock)
                 {
@@ -227,7 +217,7 @@ namespace SilverSim.Scene.Physics.Common
             agentTorque = Vector3.Zero;
             Vector3 linearVelocity = Agent.Velocity;
             double horizontalVelocity = linearVelocity.HorizontalLength;
-            if (!IsPhysicsActive)
+            if (Agent.SittingOnObject != null || Agent.SceneID != m_StateData.SceneID)
             {
                 /* No animation update on disabled physics */
                 return forces;
