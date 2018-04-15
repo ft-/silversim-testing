@@ -21,6 +21,7 @@
 
 #pragma warning disable RCS1154
 
+using SilverSim.Threading;
 using System;
 
 namespace SilverSim.Types.Inventory
@@ -64,13 +65,73 @@ namespace SilverSim.Types.Inventory
         Every = 0x7FFFFFFF
     }
 
-    public struct InventoryPermissionsData
+    public class InventoryPermissionsData
     {
-        public InventoryPermissionsMask Base;
-        public InventoryPermissionsMask Current;
-        public InventoryPermissionsMask EveryOne;
-        public InventoryPermissionsMask Group;
-        public InventoryPermissionsMask NextOwner;
+        private ReferenceBoxed<InventoryPermissionsMask> m_Base;
+        private ReferenceBoxed<InventoryPermissionsMask> m_Current;
+        private ReferenceBoxed<InventoryPermissionsMask> m_EveryOne;
+        private ReferenceBoxed<InventoryPermissionsMask> m_Group;
+        private ReferenceBoxed<InventoryPermissionsMask> m_NextOwner;
+
+        public InventoryPermissionsMask Base
+        {
+            get
+            {
+                return m_Base;
+            }
+            set
+            {
+                m_Base = value;
+            }
+        }
+
+        public InventoryPermissionsMask Current
+        {
+            get
+            {
+                return m_Current;
+            }
+            set
+            {
+                m_Current = value;
+            }
+        }
+
+        public InventoryPermissionsMask EveryOne
+        {
+            get
+            {
+                return m_EveryOne;
+            }
+            set
+            {
+                m_EveryOne = value;
+            }
+        }
+
+        public InventoryPermissionsMask Group
+        {
+            get
+            {
+                return m_Group;
+            }
+            set
+            {
+                m_Group = value;
+            }
+        }
+
+        public InventoryPermissionsMask NextOwner
+        {
+            get
+            {
+                return m_NextOwner;
+            }
+            set
+            {
+                m_NextOwner = value;
+            }
+        }
 
         public void AdjustToNextOwner()
         {

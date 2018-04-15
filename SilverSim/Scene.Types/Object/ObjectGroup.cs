@@ -79,18 +79,42 @@ namespace SilverSim.Scene.Types.Object
         private bool m_IsGroupOwned;
         private bool m_IsIncludedInSearch;
         private AttachmentPoint m_AttachPoint;
-        private Vector3 m_AttachedPos = Vector3.Zero;
-        private Vector3 m_Velocity = Vector3.Zero;
+        private ReferenceBoxed<Vector3> m_AttachedPos = Vector3.Zero;
+        private ReferenceBoxed<Vector3> m_Velocity = Vector3.Zero;
         private UGI m_Group = UGI.Unknown;
         private UUI m_Owner = UUI.Unknown;
         private UUI m_LastOwner = UUI.Unknown;
-        private UUID m_OriginalAssetID = UUID.Zero; /* necessary for reducing asset re-generation */
-        private UUID m_NextOwnerAssetID = UUID.Zero; /* necessary for reducing asset re-generation */
+        private ReferenceBoxed<UUID> m_OriginalAssetID = UUID.Zero; /* necessary for reducing asset re-generation */
+        private ReferenceBoxed<UUID> m_NextOwnerAssetID = UUID.Zero; /* necessary for reducing asset re-generation */
         protected internal RwLockedBiDiMappingDictionary<IAgent, ObjectPart> m_SittingAgents = new RwLockedBiDiMappingDictionary<IAgent, ObjectPart>();
         public AgentSittingInterface AgentSitting { get; }
         public SceneInterface Scene { get; set; }
-        public UUID FromItemID = UUID.Zero; /* used for attachments */
-        public UUID RezzingObjectID = UUID.Zero; /* used alongside llRezObject and llRezAtRoot */
+
+        private ReferenceBoxed<UUID> m_FromItemID = UUID.Zero;
+        public UUID FromItemID /* used for attachments */
+        {
+            get
+            {
+                return m_FromItemID;
+            }
+            set
+            {
+                m_FromItemID = value;
+            }
+        }
+
+        private ReferenceBoxed<UUID> m_RezzingObjectID = UUID.Zero;
+        public UUID RezzingObjectID /* used alongside llRezObject and llRezAtRoot */
+        {
+            get
+            {
+                return m_RezzingObjectID;
+            }
+            set
+            {
+                m_RezzingObjectID = value;
+            }
+        }
         private BoundingBox? m_BoundingBox;
 
         private readonly object m_Lock = new object();
@@ -273,17 +297,11 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock(m_Lock)
-                {
-                    return m_OriginalAssetID;
-                }
+                return m_OriginalAssetID;
             }
             set
             {
-                lock(m_Lock)
-                {
-                    m_OriginalAssetID = value;
-                }
+                m_OriginalAssetID = value;
                 if (value != UUID.Zero)
                 {
                     TriggerOnAssetIDChange();
@@ -295,17 +313,11 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (m_Lock)
-                {
-                    return m_NextOwnerAssetID;
-                }
+                return m_NextOwnerAssetID;
             }
             set
             {
-                lock (m_Lock)
-                {
-                    m_NextOwnerAssetID = value;
-                }
+                m_NextOwnerAssetID = value;
                 if (value != UUID.Zero)
                 {
                     TriggerOnAssetIDChange();
@@ -708,10 +720,7 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (m_Lock)
-                {
-                    return m_IsGroupOwned;
-                }
+                return m_IsGroupOwned;
             }
             set
             {
@@ -733,17 +742,11 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (m_Lock)
-                {
-                    return new UGI(m_Group);
-                }
+                return new UGI(m_Group);
             }
             set
             {
-                lock (m_Lock)
-                {
-                    m_Group = new UGI(value);
-                }
+                m_Group = new UGI(value);
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
@@ -753,17 +756,11 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock(m_Lock)
-                {
-                    return new UUI(m_LastOwner);
-                }
+                return new UUI(m_LastOwner);
             }
             set
             {
-                lock(m_Lock)
-                {
-                    m_LastOwner = value;
-                }
+                m_LastOwner = new UUI(value);
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
@@ -773,17 +770,11 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (m_Lock)
-                {
-                    return new UUI(m_Owner);
-                }
+                return new UUI(m_Owner);
             }
             set
             {
-                lock (m_Lock)
-                {
-                    m_Owner = value;
-                }
+                m_Owner = new UUI(value);
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(UpdateChangedFlags.Owner);
             }
@@ -795,17 +786,11 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (m_Lock)
-                {
-                    return m_Velocity;
-                }
+                return m_Velocity;
             }
             set
             {
-                lock (m_Lock)
-                {
-                    m_Velocity = value;
-                }
+                m_Velocity = value;
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }

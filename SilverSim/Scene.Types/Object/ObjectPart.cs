@@ -35,6 +35,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 
 namespace SilverSim.Scene.Types.Object
 {
@@ -77,24 +78,24 @@ namespace SilverSim.Scene.Types.Object
 
         public ILocalIDAccessor LocalID => this;
 
-        private UUID m_ID = UUID.Zero;
-        private Vector3 m_LocalPosition = Vector3.Zero;
-        private Vector3 m_SandboxOrigin = Vector3.Zero;
-        private Quaternion m_LocalRotation = Quaternion.Identity;
-        private Vector3 m_Slice = new Vector3(0, 1, 0);
+        private ReferenceBoxed<UUID> m_ID = UUID.Zero;
+        private ReferenceBoxed<Vector3> m_LocalPosition = Vector3.Zero;
+        private ReferenceBoxed<Vector3> m_SandboxOrigin = Vector3.Zero;
+        private ReferenceBoxed<Quaternion> m_LocalRotation = Quaternion.Identity;
+        private ReferenceBoxed<Vector3> m_Slice = new Vector3(0, 1, 0);
         private PrimitivePhysicsShapeType m_PhysicsShapeType;
         private PrimitiveMaterial m_Material = PrimitiveMaterial.Wood;
-        private Vector3 m_Size = new Vector3(0.5, 0.5, 0.5);
+        private ReferenceBoxed<Vector3> m_Size = new Vector3(0.5, 0.5, 0.5);
         private bool m_IsSitTargetActive;
-        private Vector3 m_SitTargetOffset = Vector3.Zero;
+        private ReferenceBoxed<Vector3> m_SitTargetOffset = Vector3.Zero;
         private string m_SitAnimation = string.Empty;
-        private Quaternion m_SitTargetOrientation = Quaternion.Identity;
+        private ReferenceBoxed<Quaternion> m_SitTargetOrientation = Quaternion.Identity;
         private bool m_IsAllowedDrop;
         private ClickActionType m_ClickAction;
         private PassEventMode m_PassCollisionMode;
         private PassEventMode m_PassTouchMode = PassEventMode.Always;
-        private Vector3 m_AngularVelocity = Vector3.Zero;
-        private Vector3 m_Velocity = Vector3.Zero;
+        private ReferenceBoxed<Vector3> m_AngularVelocity = Vector3.Zero;
+        private ReferenceBoxed<Vector3> m_Velocity = Vector3.Zero;
         private UUI m_Creator = UUI.Unknown;
         private Date m_CreationDate = Date.Now;
         private Date m_RezDate = Date.Now;
@@ -106,7 +107,7 @@ namespace SilverSim.Scene.Types.Object
 
         public Map DynAttrs => m_DynAttrMap;
 
-        private InventoryPermissionsData m_Permissions = new InventoryPermissionsData();
+        private readonly InventoryPermissionsData m_Permissions = new InventoryPermissionsData();
 
         public int ScriptAccessPin;
 
@@ -729,10 +730,7 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (m_DataLock)
-                {
-                    return m_Permissions.Base;
-                }
+                return m_Permissions.Base;
             }
             set
             {
@@ -772,10 +770,7 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (m_DataLock)
-                {
-                    return m_Permissions.Current;
-                }
+                return m_Permissions.Current;
             }
             set
             {
@@ -810,10 +805,7 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (m_DataLock)
-                {
-                    return m_Permissions.Group;
-                }
+                return m_Permissions.Group;
             }
             set
             {
@@ -848,10 +840,7 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (m_DataLock)
-                {
-                    return m_Permissions.EveryOne;
-                }
+                return m_Permissions.EveryOne;
             }
             set
             {
@@ -908,10 +897,7 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (m_DataLock)
-                {
-                    return m_Permissions.NextOwner;
-                }
+                return m_Permissions.NextOwner;
             }
             set
             {
@@ -931,17 +917,11 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock(m_DataLock)
-                {
-                    return new Date(m_RezDate);
-                }
+                return new Date(m_RezDate);
             }
             set
             {
-                lock(m_DataLock)
-                {
-                    m_RezDate = new Date(value);
-                }
+                m_RezDate = new Date(value);
                 TriggerOnUpdate(0);
             }
         }
@@ -950,10 +930,7 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (m_DataLock)
-                {
-                    return new Date(m_CreationDate);
-                }
+                return new Date(m_CreationDate);
             }
             set
             {
@@ -973,10 +950,7 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock(m_DataLock)
-                {
-                    return m_PrimitiveFlags;
-                }
+                return m_PrimitiveFlags;
             }
             set
             {
@@ -1001,26 +975,35 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (m_DataLock)
-                {
                     return new UUI(m_Creator);
-                }
             }
             set
             {
+                var uui = new UUI(value);
                 lock (m_DataLock)
                 {
-                    m_Creator = value;
+                    m_Creator = uui;
                     foreach (ObjectPartLocalizedInfo l in Localizations)
                     {
-                        l.SetCreator(value);
+                        l.SetCreator(uui);
                     }
                 }
                 TriggerOnUpdate(0);
             }
         }
 
-        public ObjectGroup ObjectGroup { get; set; }
+        private ObjectGroup m_ObjectGroupStore;
+        public ObjectGroup ObjectGroup
+        {
+            get
+            {
+                return m_ObjectGroupStore;
+            }
+            set
+            {
+                m_ObjectGroupStore = value;
+            }
+        }
         public ObjectPartInventory Inventory { get; }
 
         public bool IsChanged { get; private set; }
@@ -1096,10 +1079,7 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (m_DataLock)
-                {
-                    return m_AngularVelocity;
-                }
+                return m_AngularVelocity;
             }
             set
             {
@@ -1119,15 +1099,14 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                return (ObjectGroup != null) ?
-                    ObjectGroup.Acceleration :
-                    Vector3.Zero;
+                return ObjectGroup?.Acceleration ?? Vector3.Zero;
             }
             set
             {
-                if(ObjectGroup != null)
+                ObjectGroup grp = ObjectGroup;
+                if(grp != null)
                 {
-                    ObjectGroup.Acceleration = value;
+                    grp.Acceleration = value;
                 }
             }
         }
@@ -1136,15 +1115,14 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                return (ObjectGroup != null) ?
-                    ObjectGroup.AngularAcceleration :
-                    Vector3.Zero;
+                return ObjectGroup?.AngularAcceleration ?? Vector3.Zero;
             }
             set
             {
-                if (ObjectGroup != null)
+                ObjectGroup grp = ObjectGroup;
+                if (grp != null)
                 {
-                    ObjectGroup.AngularAcceleration = value;
+                    grp.AngularAcceleration = value;
                 }
             }
         }
@@ -1203,17 +1181,11 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock(m_DataLock)
-                {
-                    return m_IsSitTargetActive;
-                }
+                return m_IsSitTargetActive;
             }
             set
             {
-                lock(m_DataLock)
-                {
-                    m_IsSitTargetActive = value;
-                }
+                m_IsSitTargetActive = value;
                 TriggerOnUpdate(0);
             }
         }
@@ -1222,40 +1194,28 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock(m_DataLock)
-                {
-                    return m_SitAnimation;
-                }
+                return m_SitAnimation;
             }
             set
             {
-                lock(m_DataLock)
-                {
-                    m_SitAnimation = value ?? string.Empty;
-                }
+                m_SitAnimation = value ?? string.Empty;
                 TriggerOnUpdate(0);
             }
         }
 
-        private Vector3 m_UnSitTargetOffset = Vector3.Zero;
-        private Quaternion m_UnSitTargetOrientation = Quaternion.Identity;
+        private ReferenceBoxed<Vector3> m_UnSitTargetOffset = Vector3.Zero;
+        private ReferenceBoxed<Quaternion> m_UnSitTargetOrientation = Quaternion.Identity;
         private bool m_IsUnSitTargetActive;
 
         public Vector3 UnSitTargetOffset
         {
             get
             {
-                lock(m_DataLock)
-                {
-                    return m_UnSitTargetOffset;
-                }
+                return m_UnSitTargetOffset;
             }
             set
             {
-                lock(m_DataLock)
-                {
-                    m_UnSitTargetOffset = value;
-                }
+                m_UnSitTargetOffset = value;
                 TriggerOnUpdate(0);
             }
         }
@@ -1264,17 +1224,11 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock(m_DataLock)
-                {
-                    return m_UnSitTargetOrientation;
-                }
+                return m_UnSitTargetOrientation;
             }
             set
             {
-                lock(m_DataLock)
-                {
-                    m_UnSitTargetOrientation = value;
-                }
+                m_UnSitTargetOrientation = value;
                 TriggerOnUpdate(0);
             }
         }
@@ -1283,17 +1237,11 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock(m_DataLock)
-                {
-                    return m_IsUnSitTargetActive;
-                }
+                return m_IsUnSitTargetActive;
             }
             set
             {
-                lock(m_DataLock)
-                {
-                    m_IsUnSitTargetActive = value;
-                }
+                m_IsUnSitTargetActive = value;
                 TriggerOnUpdate(0);
             }
         }
@@ -1302,17 +1250,11 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (m_DataLock)
-                {
-                    return m_SitTargetOffset;
-                }
+                return m_SitTargetOffset;
             }
             set
             {
-                lock (m_DataLock)
-                {
-                    m_SitTargetOffset = value;
-                }
+                m_SitTargetOffset = value;
                 TriggerOnUpdate(0);
             }
         }
@@ -1321,17 +1263,11 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (m_DataLock)
-                {
-                    return m_SitTargetOrientation;
-                }
+                return m_SitTargetOrientation;
             }
             set
             {
-                lock (m_DataLock)
-                {
-                    m_SitTargetOrientation = value;
-                }
+                m_SitTargetOrientation = value;
                 TriggerOnUpdate(0);
             }
         }
@@ -1468,10 +1404,7 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock(m_DataLock)
-                {
-                    return m_Size;
-                }
+                return m_Size;
             }
             set
             {
@@ -1492,17 +1425,11 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (m_DataLock)
-                {
-                    return m_Slice;
-                }
+                return m_Slice;
             }
             set
             {
-                lock(m_DataLock)
-                {
-                    m_Slice = value;
-                }
+                m_Slice = value;
                 IncrementPhysicsShapeUpdateSerial();
                 IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(UpdateChangedFlags.Shape);
@@ -1531,10 +1458,7 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock(m_DataLock)
-                {
-                    return m_ID;
-                }
+                return m_ID;
             }
             private set
             {
@@ -1600,21 +1524,18 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock(m_DataLock)
-                {
-                    return m_LocalPosition;
-                }
+                return m_LocalPosition;
             }
             set
             {
-                lock(m_DataLock)
+                if (m_IsSandbox &&
+                    ObjectGroup?.RootPart == this &&
+                    HasHitSandboxLimit(value))
                 {
-                    if(m_IsSandbox && 
-                        ObjectGroup != null && ObjectGroup.RootPart == this &&
-                        HasHitSandboxLimit(value))
-                    {
-                        goto hitsandboxlimit;
-                    }
+                    goto hitsandboxlimit;
+                }
+                lock (m_DataLock)
+                {
                     m_LocalPosition = value;
                     foreach(ObjectPartLocalizedInfo l in Localizations)
                     {
@@ -1638,30 +1559,29 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock(m_DataLock)
+                ObjectGroup grp = ObjectGroup;
+                if(grp != null && grp.RootPart != this)
                 {
-                    if(ObjectGroup != null && ObjectGroup.RootPart != this)
-                    {
-                        return m_LocalPosition + ObjectGroup.RootPart.GlobalPosition;
-                    }
-                    return m_LocalPosition;
+                    return m_LocalPosition + grp.RootPart.GlobalPosition;
                 }
+                return m_LocalPosition;
             }
             set
             {
-                lock(m_DataLock)
+                ObjectGroup grp = ObjectGroup;
+                if (grp != null)
                 {
-                    if (ObjectGroup != null)
+                    if (grp.RootPart != this)
                     {
-                        if (ObjectGroup.RootPart != this)
-                        {
-                            value -= ObjectGroup.RootPart.GlobalPosition;
-                        }
-                        else if(m_IsSandbox && (value - m_SandboxOrigin).Length > 10)
-                        {
-                            goto hitsandboxlimit;
-                        }
+                        value -= grp.RootPart.GlobalPosition;
                     }
+                    else if (m_IsSandbox && (value - m_SandboxOrigin).Length > 10)
+                    {
+                        goto hitsandboxlimit;
+                    }
+                }
+                lock (m_DataLock)
+                {
                     m_LocalPosition = value;
                     foreach (ObjectPartLocalizedInfo l in Localizations)
                     {
@@ -1686,21 +1606,19 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (m_DataLock)
-                {
-                    return m_LocalPosition;
-                }
+                return m_LocalPosition;
             }
             set
             {
+                ObjectGroup grp = ObjectGroup;
+                if (m_IsSandbox &&
+                    grp?.RootPart != null &&
+                    HasHitSandboxLimit(value))
+                {
+                    goto hitsandboxlimit;
+                }
                 lock (m_DataLock)
                 {
-                    if (m_IsSandbox &&
-                        ObjectGroup != null && ObjectGroup.RootPart == this &&
-                        HasHitSandboxLimit(value))
-                    {
-                        goto hitsandboxlimit;
-                    }
                     m_LocalPosition = value;
                     foreach (ObjectPartLocalizedInfo l in Localizations)
                     {
@@ -1727,10 +1645,7 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (m_DataLock)
-                {
-                    return m_LocalRotation;
-                }
+                return m_LocalRotation;
             }
             set
             {
@@ -1752,20 +1667,19 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (m_DataLock)
-                {
-                    return (ObjectGroup != null && this != ObjectGroup.RootPart) ?
-                        m_LocalRotation * ObjectGroup.RootPart.GlobalRotation :
-                        m_LocalRotation;
-                }
+                ObjectGroup grp = ObjectGroup;
+                return (grp != null && this != grp.RootPart) ?
+                    m_LocalRotation * ObjectGroup.RootPart.GlobalRotation :
+                    (Quaternion)m_LocalRotation;
             }
             set
             {
                 lock (m_DataLock)
                 {
-                    if (ObjectGroup != null && this != ObjectGroup.RootPart)
+                    ObjectGroup grp = ObjectGroup;
+                    if (grp != null && this != grp.RootPart)
                     {
-                        value /= ObjectGroup.RootPart.GlobalRotation;
+                        value /= grp.RootPart.GlobalRotation;
                     }
                     m_LocalRotation = value;
                     foreach (ObjectPartLocalizedInfo l in Localizations)
@@ -1783,10 +1697,7 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (m_DataLock)
-                {
-                    return m_LocalRotation;
-                }
+                return m_LocalRotation;
             }
             set
             {
@@ -1808,23 +1719,16 @@ namespace SilverSim.Scene.Types.Object
         #region Link / Unlink
         protected internal void Link(ObjectGroup group)
         {
-            lock(m_DataLock)
+            if(null != Interlocked.CompareExchange(ref m_ObjectGroupStore, group, null))
             {
-                if(ObjectGroup != null)
-                {
-                    throw new ArgumentException("ObjectGroup is already set");
-                }
-                ObjectGroup = group;
-                UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.All);
+                throw new ArgumentException("ObjectGroup is already set");
             }
+            UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.All);
         }
 
         protected internal void Unlink()
         {
-            lock (m_DataLock)
-            {
-                ObjectGroup = null;
-            }
+            ObjectGroup = null;
             UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.All);
         }
         #endregion

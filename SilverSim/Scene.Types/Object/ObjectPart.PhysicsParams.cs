@@ -32,27 +32,21 @@ namespace SilverSim.Scene.Types.Object
     {
         #region Physics Properties
 
-        private double m_Mass = 1;
-        private double m_PhysicsDensity = 1000f;
-        private double m_PhysicsFriction = 0.6f;
-        private double m_PhysicsRestitution = 0.5f;
-        private double m_PhysicsGravityMultiplier = 1f;
+        private ReferenceBoxed<double> m_Mass = 1;
+        private ReferenceBoxed<double> m_PhysicsDensity = 1000f;
+        private ReferenceBoxed<double> m_PhysicsFriction = 0.6f;
+        private ReferenceBoxed<double> m_PhysicsRestitution = 0.5f;
+        private ReferenceBoxed<double> m_PhysicsGravityMultiplier = 1f;
 
         public double PhysicsDensity
         {
             get
             {
-                lock (m_DataLock)
-                {
-                    return m_PhysicsDensity;
-                }
+                return m_PhysicsDensity;
             }
             set
             {
-                lock (m_DataLock)
-                {
-                    m_PhysicsDensity = value;
-                }
+                m_PhysicsDensity = value;
                 IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(0);
             }
@@ -62,17 +56,11 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (m_DataLock)
-                {
-                    return m_Mass;
-                }
+                return m_Mass;
             }
             set
             {
-                lock (m_DataLock)
-                {
-                    m_Mass = (value < double.Epsilon) ? double.Epsilon : value;
-                }
+                m_Mass = (value < double.Epsilon) ? double.Epsilon : value;
                 IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(0);
             }
@@ -82,17 +70,11 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (m_DataLock)
-                {
-                    return m_PhysicsFriction;
-                }
+                return m_PhysicsFriction;
             }
             set
             {
-                lock (m_DataLock)
-                {
-                    m_PhysicsFriction = value;
-                }
+                m_PhysicsFriction = value;
                 IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(0);
             }
@@ -102,17 +84,11 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (m_DataLock)
-                {
-                    return m_PhysicsRestitution;
-                }
+                return m_PhysicsRestitution;
             }
             set
             {
-                lock (m_DataLock)
-                {
-                    m_PhysicsRestitution = value;
-                }
+                m_PhysicsRestitution = value;
                 IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(0);
             }
@@ -122,17 +98,11 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (m_DataLock)
-                {
-                    return m_PhysicsGravityMultiplier;
-                }
+                return m_PhysicsGravityMultiplier;
             }
             set
             {
-                lock (m_DataLock)
-                {
-                    m_PhysicsGravityMultiplier = value;
-                }
+                m_PhysicsGravityMultiplier = value;
                 IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(0);
             }
@@ -147,21 +117,13 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (m_DataLock)
+                IPhysicsObject obj;
+                SceneInterface scene = ObjectGroup?.Scene;
+                if (scene == null || !m_PhysicsActors.TryGetValue(scene.ID, out obj))
                 {
-                    IPhysicsObject obj;
-                    ObjectGroup group = ObjectGroup;
-                    SceneInterface scene = null;
-                    if (group != null)
-                    {
-                        scene = group.Scene;
-                    }
-                    if (scene == null || !m_PhysicsActors.TryGetValue(scene.ID, out obj))
-                    {
-                        obj = DummyPhysicsObject.SharedInstance;
-                    }
-                    return obj;
+                    obj = DummyPhysicsObject.SharedInstance;
                 }
+                return obj;
             }
         }
 
@@ -180,16 +142,15 @@ namespace SilverSim.Scene.Types.Object
                 {
                     try
                     {
+                        if (m_IsSandbox &&
+                            ObjectGroup?.RootPart == this &&
+                            HasHitSandboxLimit(value.Position))
+                        {
+                            throw new HitSandboxLimitException();
+                        }
                         lock (m_DataLock)
                         {
-                            if (m_IsSandbox &&
-                                ObjectGroup != null && ObjectGroup.RootPart == this &&
-                                HasHitSandboxLimit(value.Position))
-                            {
-                                throw new HitSandboxLimitException();
-                            }
                             m_LocalPosition = value.Position;
-
                             m_LocalRotation = value.Rotation;
                             m_Velocity = value.Velocity;
                             m_AngularVelocity = value.AngularVelocity;

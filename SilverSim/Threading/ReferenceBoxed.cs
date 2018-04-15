@@ -19,51 +19,23 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.Threading;
-using SilverSim.Types;
-
-namespace SilverSim.Scene.Types.Object
+namespace SilverSim.Threading
 {
-    public partial class ObjectPart
+    public sealed class ReferenceBoxed<T> where T : struct
     {
-        private ReferenceBoxed<Vector3> m_CameraEyeOffset = Vector3.Zero;
-        private ReferenceBoxed<Vector3> m_CameraAtOffset = Vector3.Zero;
-        private bool m_ForceMouselook;
+        private T Value;
 
-        public Vector3 CameraEyeOffset
+        public ReferenceBoxed()
         {
-            get
-            {
-                return m_CameraEyeOffset;
-            }
-            set
-            {
-                m_CameraEyeOffset = value;
-                TriggerOnUpdate(0);
-            }
         }
 
-        public Vector3 CameraAtOffset
+        public ReferenceBoxed(T value)
         {
-            get
-            {
-                return m_CameraAtOffset;
-            }
-            set
-            {
-                m_CameraAtOffset = value;
-                TriggerOnUpdate(0);
-            }
+            Value = value;
         }
 
-        public bool ForceMouselook
-        {
-            get { return m_ForceMouselook; }
-            set
-            {
-                m_ForceMouselook = value;
-                TriggerOnUpdate(0);
-            }
-        }
+        public static implicit operator T(ReferenceBoxed<T> reference) => reference?.Value ?? default(T);
+
+        public static implicit operator ReferenceBoxed<T>(T value) => new ReferenceBoxed<T>(value);
     }
 }
