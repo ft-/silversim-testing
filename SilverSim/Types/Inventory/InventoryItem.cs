@@ -149,7 +149,6 @@ namespace SilverSim.Types.Inventory
         public InventoryItem(UUID id)
         {
             ID = id;
-            Permissions = new InventoryPermissionsData();
         }
 
         public InventoryItem(InventoryItem item)
