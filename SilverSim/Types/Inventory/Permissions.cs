@@ -73,6 +73,19 @@ namespace SilverSim.Types.Inventory
         private ReferenceBoxed<InventoryPermissionsMask> m_Group;
         private ReferenceBoxed<InventoryPermissionsMask> m_NextOwner;
 
+        public InventoryPermissionsData()
+        {
+        }
+
+        public InventoryPermissionsData(InventoryPermissionsData src)
+        {
+            m_Base = src.m_Base;
+            m_Current = src.m_Current;
+            m_EveryOne = src.m_EveryOne;
+            m_Group = src.m_Group;
+            m_NextOwner = src.m_NextOwner;
+        }
+
         public InventoryPermissionsMask Base
         {
             get

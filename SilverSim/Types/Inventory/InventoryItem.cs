@@ -67,7 +67,7 @@ namespace SilverSim.Types.Inventory
         #endregion
 
         #region Permissions
-        public InventoryPermissionsData Permissions;
+        public readonly InventoryPermissionsData Permissions = new InventoryPermissionsData();
 
         public bool CheckPermissions(UUI accessor, UGI accessorgroup, InventoryPermissionsMask wanted) => (IsGroupOwned) ?
                 Permissions.CheckGroupPermissions(Creator, Group, accessor, accessorgroup, wanted) :
@@ -167,7 +167,7 @@ namespace SilverSim.Types.Inventory
             Name = item.Name;
             Owner = new UUI(item.Owner);
             ParentFolderID = new UUID(item.ParentFolderID);
-            Permissions = item.Permissions;
+            Permissions = new InventoryPermissionsData(item.Permissions);
             SaleInfo = item.SaleInfo;
         }
 

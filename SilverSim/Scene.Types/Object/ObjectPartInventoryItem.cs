@@ -115,7 +115,11 @@ namespace SilverSim.Scene.Types.Object
             Name = item.Name;
             Owner = new UUI(item.Owner);
             ParentFolderID = new UUID(item.ParentFolderID);
-            Permissions = item.Permissions;
+            Permissions.Base = item.Permissions.Base;
+            Permissions.Current = item.Permissions.Current;
+            Permissions.EveryOne = item.Permissions.EveryOne;
+            Permissions.Group = item.Permissions.Group;
+            Permissions.NextOwner = item.Permissions.NextOwner;
             SaleInfo = item.SaleInfo;
             UpdateInfo = new ObjectInventoryUpdateInfo(this);
         }
@@ -136,7 +140,11 @@ namespace SilverSim.Scene.Types.Object
             Name = item.Name;
             Owner = new UUI(item.Owner);
             ParentFolderID = new UUID(item.ParentFolderID);
-            Permissions = item.Permissions;
+            Permissions.Base = item.Permissions.Base;
+            Permissions.Current = item.Permissions.Current;
+            Permissions.EveryOne = item.Permissions.EveryOne;
+            Permissions.Group = item.Permissions.Group;
+            Permissions.NextOwner = item.Permissions.NextOwner;
             SaleInfo = item.SaleInfo;
             UpdateInfo = new ObjectInventoryUpdateInfo(this);
         }

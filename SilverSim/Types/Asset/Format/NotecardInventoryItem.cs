@@ -51,7 +51,11 @@ namespace SilverSim.Types.Asset.Format
             Name = item.Name;
             Owner = new UUI(item.Owner);
             ParentFolderID = item.ParentFolderID;
-            Permissions = item.Permissions;
+            Permissions.Base = item.Permissions.Base;
+            Permissions.Current = item.Permissions.Current;
+            Permissions.EveryOne = item.Permissions.EveryOne;
+            Permissions.Group = item.Permissions.Group;
+            Permissions.NextOwner = item.Permissions.NextOwner;
             SaleInfo = item.SaleInfo;
         }
     }
