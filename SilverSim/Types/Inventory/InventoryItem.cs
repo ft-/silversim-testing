@@ -149,6 +149,7 @@ namespace SilverSim.Types.Inventory
         public InventoryItem(UUID id)
         {
             ID = id;
+            Permissions = new InventoryPermissionsData();
         }
 
         public InventoryItem(InventoryItem item)
@@ -187,7 +188,7 @@ namespace SilverSim.Types.Inventory
             Name = item.Name;
             Owner = new UUI(item.Owner);
             ParentFolderID = new UUID(item.ParentFolderID);
-            Permissions = item.Permissions;
+            Permissions = new InventoryPermissionsData(item.Permissions);
             SaleInfo = item.SaleInfo;
         }
         #endregion
