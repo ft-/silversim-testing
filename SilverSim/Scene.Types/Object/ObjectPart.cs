@@ -231,36 +231,51 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        public uint m_PhysicsParameterUpdateSerial = 1;
-        public uint m_PhysicsShapeUpdateSerial = 1;
+        private int m_PhysicsParameterUpdateSerial = 1;
+        private int m_PhysicsShapeUpdateSerial = 1;
 
-        public uint PhysicsParameterUpdateSerial => m_PhysicsParameterUpdateSerial;
-        public uint PhysicsShapeUpdateSerial => m_PhysicsShapeUpdateSerial;
+        public uint PhysicsParameterUpdateSerial
+        {
+            get
+            {
+                int retVal = m_PhysicsParameterUpdateSerial;
+                if (retVal == 0)
+                {
+                    retVal = Interlocked.CompareExchange(ref m_PhysicsParameterUpdateSerial, 1, 0);
+                    if (retVal == 0)
+                    {
+                        retVal = 1;
+                    }
+                }
+                return (uint)retVal;
+            }
+        }
+
+        public uint PhysicsShapeUpdateSerial
+        {
+            get
+            {
+                int retVal = m_PhysicsShapeUpdateSerial;
+                if (retVal == 0)
+                {
+                    retVal = Interlocked.CompareExchange(ref m_PhysicsShapeUpdateSerial, 1, 0);
+                    if (retVal == 0)
+                    {
+                        retVal = 1;
+                    }
+                }
+                return (uint)retVal;
+            }
+        }
 
         private void IncrementPhysicsParameterUpdateSerial()
         {
-            lock (m_DataLock)
-            {
-                uint serial = m_PhysicsParameterUpdateSerial + 1;
-                if (serial == 0)
-                {
-                    serial = 1;
-                }
-                m_PhysicsParameterUpdateSerial = serial;
-            }
+            Interlocked.Increment(ref m_PhysicsParameterUpdateSerial);
         }
 
         private void IncrementPhysicsShapeUpdateSerial()
         {
-            lock (m_DataLock)
-            {
-                uint serial = m_PhysicsShapeUpdateSerial + 1;
-                if (serial == 0)
-                {
-                    serial = 1;
-                }
-                m_PhysicsShapeUpdateSerial = serial;
-            }
+            Interlocked.Increment(ref m_PhysicsShapeUpdateSerial);
         }
 
         public class OmegaParam
