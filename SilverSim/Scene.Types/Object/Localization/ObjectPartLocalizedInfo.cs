@@ -688,9 +688,7 @@ namespace SilverSim.Scene.Types.Object.Localization
         private byte[] m_CompressedUpdateData;
         private readonly object m_UpdateDataLock = new object();
 
-        private int m_ObjectSerial;
-
-        public int SerialNumber => m_ObjectSerial;
+        public int SerialNumber => m_Part.SerialNumber;
 
         public byte[] FullUpdateData
         {
@@ -875,14 +873,9 @@ namespace SilverSim.Scene.Types.Object.Localization
         {
             lock (m_UpdateDataLock)
             {
-                if (incSerial || 0 == m_ObjectSerial)
+                if (incSerial)
                 {
-                    int objectSerial = m_ObjectSerial + 1;
-                    if (objectSerial == 0)
-                    {
-                        objectSerial = 1;
-                    }
-                    m_ObjectSerial = objectSerial;
+                    m_Part.IncSerialNumber();
                 }
 
                 if (m_FullUpdateData == null)

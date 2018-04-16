@@ -45,9 +45,30 @@ namespace SilverSim.Scene.Types.Object
 
         private readonly object m_DataLock = new object();
 
-        private int m_ObjectSerial;
+        private int m_ObjectPartSerial;
 
-        public int SerialNumber => m_ObjectSerial;
+        public int SerialNumber
+        {
+            get
+            {
+                int retVal = m_ObjectPartSerial;
+                if (retVal == 0)
+                {
+                    /* ensure that we get a non-zero number */
+                    retVal = Interlocked.CompareExchange(ref m_ObjectPartSerial, 1, 0);
+                    if(retVal == 0)
+                    {
+                        retVal = 1;
+                    }
+                }
+                return retVal;
+            }
+        }
+
+        public void IncSerialNumber()
+        {
+            Interlocked.Increment(ref m_ObjectPartSerial);
+        }
 
         #region Events
         public event Action<ObjectPart, UpdateChangedFlags> OnUpdate;
