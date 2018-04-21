@@ -61,6 +61,10 @@ namespace SilverSim.Types.Inventory
 
         SettingsType_Mask = 0xFF,
 
+        SettingsType_Sky = 0,
+        SettingsType_Water = 1,
+        SettingsType_Daycycle = 2,
+
         SharedSingleReference = 1 << 30,
         PermOverwriteMask = ObjectPermOverwriteBase | ObjectPermOverwriteOwner | ObjectPermOverwriteGroup | ObjectPermOverwriteEveryOne | ObjectPermOverwriteNextOwner
     }
