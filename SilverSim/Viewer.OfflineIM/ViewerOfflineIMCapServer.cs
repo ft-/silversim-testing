@@ -21,20 +21,15 @@
 
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
-using SilverSim.ServiceInterfaces.IM;
-using SilverSim.Types;
-using SilverSim.Types.IM;
-using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Viewer.Core;
 using System.ComponentModel;
-using System.IO;
 using System.Net;
 
 namespace SilverSim.Viewer.OfflineIM
 {
     [Description("Viewer Offline IM Cap Handler")]
     [PluginName("ViewerOfflineIMCapServer")]
-    public sealed class ViewerOfflineIMCapServer : IPlugin, ICapabilityExtender
+    public sealed class ViewerOfflineIMCapServer : ViewerOfflineIMServerBase, IPlugin, ICapabilityExtender
     {
         public void Startup(ConfigurationLoader loader)
         {
@@ -55,47 +50,7 @@ namespace SilverSim.Viewer.OfflineIM
                 return;
             }
 
-            var resmap = new Map();
-            var msgs = new AnArray();
-            resmap.Add("messages", msgs);
-            OfflineIMServiceInterface offlineIMService = agent.OfflineIMService;
-            if (offlineIMService != null)
-            {
-                try
-                {
-                    foreach (GridInstantMessage gim in offlineIMService.GetOfflineIMs(agent.Owner.ID))
-                    {
-                        msgs.Add(new Map
-                        {
-                            { "binary_bucket", new BinaryData(gim.BinaryBucket) },
-                            { "parent_estate_id", gim.ParentEstateID },
-                            { "from_agent_id", gim.FromAgent.ID },
-                            { "from_group", gim.IsFromGroup },
-                            { "dialog", (int)gim.Dialog },
-                            { "session_id", gim.IMSessionID },
-                            { "timestamp", gim.Timestamp.AsInt },
-                            { "from_agent_name", gim.FromAgent.FullName },
-                            { "message", gim.Message },
-                            { "region_id", gim.RegionID },
-                            { "local_x", gim.Position.X },
-                            { "local_y", gim.Position.Y },
-                            { "local_z", gim.Position.Z },
-                            { "asset_id", gim.FromGroup.ID } /* probably this gets changed in feature */
-                        });
-                    }
-                }
-                catch
-                {
-                    /* do not pass exceptions to caller */
-                }
-            }
-            using (HttpResponse res = req.BeginResponse("application/llsd+xml"))
-            {
-                using (Stream s = res.GetOutputStream())
-                {
-                    LlsdXml.Serialize(resmap, s);
-                }
-            }
+            ProcessReadOfflineMsgs(agent.Owner.ID, req, agent.OfflineIMService);
         }
     }
 }
