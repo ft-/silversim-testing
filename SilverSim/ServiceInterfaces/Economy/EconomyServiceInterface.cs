@@ -51,7 +51,7 @@ namespace SilverSim.ServiceInterfaces.Economy
 
         public abstract string CurrencySymbol { get; }
 
-        public abstract void Login(UUID sceneID, UGUI agentID, UUID sessionID, UUID secureSessionID);
+        public abstract void Login(UUID sceneID, UGUIWithName agentID, UUID sessionID, UUID secureSessionID);
 
         public abstract void Logout(UGUI agentID, UUID sessionID, UUID secureSessionID);
 
