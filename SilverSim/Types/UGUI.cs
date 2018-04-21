@@ -37,7 +37,7 @@ namespace SilverSim.Types
         /* make UGUI typecastable to UUI */
         public static explicit operator UUI(UGUI v) => new UUI(v.ID) { HomeURI = v.HomeURI };
 
-        public static implicit operator UGUI(UUI v) => new UGUI(v.ID, v.HomeURI);
+        public static implicit operator UGUI(UUI v) => new UGUI(v.ID, v.HomeURI) { IsAuthoritative = v.IsAuthoritative };
 
         public override bool Equals(object obj)
         {
