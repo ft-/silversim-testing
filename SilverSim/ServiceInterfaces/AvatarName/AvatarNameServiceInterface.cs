@@ -79,6 +79,19 @@ namespace SilverSim.ServiceInterfaces.AvatarName
             return false;
         }
 
+        public bool TryGetValue(UGUI input, out UUI uui)
+        {
+            if(TryGetValue(input.ID, out uui))
+            {
+                if(!input.IsAuthoritative || input.EqualsGrid(uui))
+                {
+                    return true;
+                }
+            }
+            uui = UUI.Unknown;
+            return false;
+        }
+
         public UUI this[UUI input]
         {
             get
@@ -90,6 +103,22 @@ namespace SilverSim.ServiceInterfaces.AvatarName
                     return resultuui;
                 }
                 return input;
+            }
+        }
+
+        public UUI this[UGUI input]
+        {
+            get
+            {
+                UUI resultuui;
+                if (TryGetValue(input.ID, out resultuui))
+                {
+                    if (!input.IsAuthoritative || input.EqualsGrid(resultuui))
+                    {
+                        return resultuui;
+                    }
+                }
+                throw new KeyNotFoundException();
             }
         }
 
