@@ -70,7 +70,7 @@ namespace SilverSim.Viewer.Voice
 
             try
             {
-                info = m_VoiceService.ProvisionAccount(agent.Owner);
+                info = m_VoiceService.ProvisionAccount(agent.NamedOwner);
             }
             catch
             {
