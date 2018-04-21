@@ -52,11 +52,11 @@ namespace SilverSim.ServiceInterfaces.Friends
             }
         }
 
-        public abstract FriendInfo this[UUI user, UUI friend] { get; }
+        public abstract FriendInfo this[UGUI user, UGUI friend] { get; }
 
-        public abstract List<FriendInfo> this[UUI user] { get; }
+        public abstract List<FriendInfo> this[UGUI user] { get; }
 
-        public abstract bool TryGetValue(UUI user, UUI friend, out FriendInfo fInfo);
+        public abstract bool TryGetValue(UGUI user, UGUI friend, out FriendInfo fInfo);
 
         public abstract void Store(FriendInfo fi);
 

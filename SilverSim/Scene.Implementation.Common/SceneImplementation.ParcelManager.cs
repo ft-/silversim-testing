@@ -39,7 +39,7 @@ namespace SilverSim.Scene.Implementation.Common
             private readonly IParcelAccessList m_BlackListStorage;
             private readonly IParcelAccessList m_LandpassListStorage;
             private readonly SceneInterface m_Scene;
-            private readonly RwLockedDictionary<UUI, Date> m_ExpiryList = new RwLockedDictionary<UUI, Date>();
+            private readonly RwLockedDictionary<UGUI, Date> m_ExpiryList = new RwLockedDictionary<UGUI, Date>();
             private readonly IParcelAccessList[] m_StorageList;
             private Timer m_Timer;
 
@@ -69,7 +69,7 @@ namespace SilverSim.Scene.Implementation.Common
             public void Start() => m_Timer.Start();
             public void Stop() => m_Timer.Stop();
 
-            private void CheckAccess(UUI accessor, UUID parcelID)
+            private void CheckAccess(UGUI accessor, UUID parcelID)
             {
                 try
                 {
@@ -127,7 +127,7 @@ namespace SilverSim.Scene.Implementation.Common
                 IAgent agent;
                 try
                 {
-                    foreach (KeyValuePair<UUI, Date> kvp in new Dictionary<UUI, Date>(m_ExpiryList))
+                    foreach (KeyValuePair<UGUI, Date> kvp in new Dictionary<UGUI, Date>(m_ExpiryList))
                     {
                         if (kvp.Value.AsULong <= Date.Now.AsULong &&
                             m_Scene.RootAgents.TryGetValue(kvp.Key.ID, out agent) &&
@@ -165,7 +165,7 @@ namespace SilverSim.Scene.Implementation.Common
                         }
                         catch (Exception e)
                         {
-                            m_Log.Warn("CheckAllAccesses failed for " + agent.Owner.FullName, e);
+                            m_Log.Warn("CheckAllAccesses failed for " + agent.NamedOwner.FullName, e);
                         }
                     }
                 }
@@ -188,7 +188,7 @@ namespace SilverSim.Scene.Implementation.Common
 
                 public List<ParcelAccessEntry> this[UUID regionID, UUID parcelID] => m_StorageList[regionID, parcelID];
 
-                public bool this[UUID regionID, UUID parcelID, UUI accessor]
+                public bool this[UUID regionID, UUID parcelID, UGUI accessor]
                 {
                     get
                     {
@@ -197,7 +197,7 @@ namespace SilverSim.Scene.Implementation.Common
                     }
                 }
 
-                public void ExtendExpiry(UUID regionID, UUID parcelID, UUI accessor, ulong extendseconds)
+                public void ExtendExpiry(UUID regionID, UUID parcelID, UGUI accessor, ulong extendseconds)
                 {
                     m_StorageList.ExtendExpiry(regionID, parcelID, accessor, extendseconds);
                     m_ParcelManager.CheckAccess(accessor, parcelID);
@@ -214,7 +214,7 @@ namespace SilverSim.Scene.Implementation.Common
                     return result;
                 }
 
-                public bool Remove(UUID regionID, UUID parcelID, UUI accessor)
+                public bool Remove(UUID regionID, UUID parcelID, UGUI accessor)
                 {
                     bool result = m_StorageList.Remove(regionID, parcelID, accessor);
                     if(result)
@@ -230,7 +230,7 @@ namespace SilverSim.Scene.Implementation.Common
                     m_ParcelManager.CheckAccess(entry.Accessor, entry.ParcelID);
                 }
 
-                public bool TryGetValue(UUID regionID, UUID parcelID, UUI accessor, out ParcelAccessEntry e)
+                public bool TryGetValue(UUID regionID, UUID parcelID, UGUI accessor, out ParcelAccessEntry e)
                 {
                     bool res = m_StorageList.TryGetValue(regionID, parcelID, accessor, out e);
                     if(res)

@@ -24,7 +24,7 @@ namespace SilverSim.Types.Groups
     public class GroupMembership
     {
         public UGI Group = UGI.Unknown;
-        public UUI Principal = UUI.Unknown;
+        public UGUI Principal = UGUI.Unknown;
         public GroupPowers GroupPowers = GroupPowers.None;
         public bool IsAcceptNotices;
         public UUID GroupInsigniaID = UUID.Zero;
@@ -34,7 +34,7 @@ namespace SilverSim.Types.Groups
         public bool IsAllowPublish;
         public string Charter;
         public UUID ActiveRoleID;
-        public UUI Founder = UUI.Unknown;
+        public UGUI Founder = UGUI.Unknown;
         public string AccessToken;
         public bool IsMaturePublish;
         public bool IsOpenEnrollment;

@@ -29,38 +29,38 @@ namespace SilverSim.Groups.Common.Permissions
 {
     partial class DefaultPermissionsGroupsService : GroupsServiceInterface.IGroupInvitesInterface
     {
-        GroupInvite IGroupInvitesInterface.this[UUI requestingAgent, UUID groupInviteID] => m_InnerService.Invites[requestingAgent, groupInviteID];
+        GroupInvite IGroupInvitesInterface.this[UGUI requestingAgent, UUID groupInviteID] => m_InnerService.Invites[requestingAgent, groupInviteID];
 
-        bool IGroupInvitesInterface.TryGetValue(UUI requestingAgent, UUID groupInviteID, out GroupInvite ginvite) =>
+        bool IGroupInvitesInterface.TryGetValue(UGUI requestingAgent, UUID groupInviteID, out GroupInvite ginvite) =>
             m_InnerService.Invites.TryGetValue(requestingAgent, groupInviteID, out ginvite);
 
-        bool IGroupInvitesInterface.ContainsKey(UUI requestingAgent, UUID groupInviteID) =>
+        bool IGroupInvitesInterface.ContainsKey(UGUI requestingAgent, UUID groupInviteID) =>
             m_InnerService.Invites.ContainsKey(requestingAgent, groupInviteID);
 
         bool IGroupInvitesInterface.DoesSupportListGetters => false;
 
-        List<GroupInvite> IGroupInvitesInterface.this[UUI requestingAgent, UGI group, UUID roleID, UUI principal]
+        List<GroupInvite> IGroupInvitesInterface.this[UGUI requestingAgent, UGI group, UUID roleID, UGUI principal]
         {
             get { throw new NotSupportedException(); }
         }
 
-        List<GroupInvite> IGroupInvitesInterface.this[UUI requestingAgent, UUI principal]
+        List<GroupInvite> IGroupInvitesInterface.this[UGUI requestingAgent, UGUI principal]
         {
             get { throw new NotSupportedException(); }
         }
 
-        List<GroupInvite> IGroupInvitesInterface.GetByGroup(UUI requestingAgent, UGI group)
+        List<GroupInvite> IGroupInvitesInterface.GetByGroup(UGUI requestingAgent, UGI group)
         {
             throw new NotSupportedException();
         }
 
-        void IGroupInvitesInterface.Add(UUI requestingAgent, GroupInvite invite)
+        void IGroupInvitesInterface.Add(UGUI requestingAgent, GroupInvite invite)
         {
             VerifyAgentPowers(invite.Group, requestingAgent, GroupPowers.Invite);
             m_InnerService.Invites.Add(requestingAgent, invite);
         }
 
-        void IGroupInvitesInterface.Delete(UUI requestingAgent, UUID inviteID)
+        void IGroupInvitesInterface.Delete(UGUI requestingAgent, UUID inviteID)
         {
             m_InnerService.Invites.Delete(requestingAgent, inviteID);
         }

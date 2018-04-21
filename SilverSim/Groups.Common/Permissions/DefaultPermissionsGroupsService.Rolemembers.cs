@@ -28,25 +28,25 @@ namespace SilverSim.Groups.Common.Permissions
 {
     partial class DefaultPermissionsGroupsService: GroupsServiceInterface.IGroupRolemembersInterface
     {
-        GroupRolemember IGroupRolemembersInterface.this[UUI requestingAgent, UGI group, UUID roleID, UUI principal] =>
+        GroupRolemember IGroupRolemembersInterface.this[UGUI requestingAgent, UGI group, UUID roleID, UGUI principal] =>
             m_InnerService.Rolemembers[requestingAgent, group, roleID, principal];
 
-        bool IGroupRolemembersInterface.TryGetValue(UUI requestingAgent, UGI group, UUID roleID, UUI principal, out GroupRolemember grolemem) =>
+        bool IGroupRolemembersInterface.TryGetValue(UGUI requestingAgent, UGI group, UUID roleID, UGUI principal, out GroupRolemember grolemem) =>
             m_InnerService.Rolemembers.TryGetValue(requestingAgent, group, roleID, principal, out grolemem);
 
-        bool IGroupRolemembersInterface.ContainsKey(UUI requestingAgent, UGI group, UUID roleID, UUI principal) =>
+        bool IGroupRolemembersInterface.ContainsKey(UGUI requestingAgent, UGI group, UUID roleID, UGUI principal) =>
             m_InnerService.Rolemembers.ContainsKey(requestingAgent, group, roleID, principal);
 
-        List<GroupRolemember> IGroupRolemembersInterface.this[UUI requestingAgent, UGI group, UUID roleID] =>
+        List<GroupRolemember> IGroupRolemembersInterface.this[UGUI requestingAgent, UGI group, UUID roleID] =>
             m_InnerService.Rolemembers[requestingAgent, group, roleID];
 
-        List<GroupRolemembership> IGroupRolemembersInterface.this[UUI requestingAgent, UUI principal] =>
+        List<GroupRolemembership> IGroupRolemembersInterface.this[UGUI requestingAgent, UGUI principal] =>
             m_InnerService.Rolemembers[requestingAgent, principal];
 
-        List<GroupRolemember> IGroupRolemembersInterface.this[UUI requestingAgent, UGI group] =>
+        List<GroupRolemember> IGroupRolemembersInterface.this[UGUI requestingAgent, UGI group] =>
             m_InnerService.Rolemembers[requestingAgent, group];
 
-        void IGroupRolemembersInterface.Add(UUI requestingAgent, GroupRolemember rolemember)
+        void IGroupRolemembersInterface.Add(UGUI requestingAgent, GroupRolemember rolemember)
         {
             bool isUnlimited = false;
             if(m_InnerService.Invites[requestingAgent, rolemember.Group, rolemember.RoleID, rolemember.Principal].Count != 0)
@@ -80,7 +80,7 @@ namespace SilverSim.Groups.Common.Permissions
             m_InnerService.Rolemembers.Add(requestingAgent, rolemember);
         }
 
-        void IGroupRolemembersInterface.Delete(UUI requestingAgent, UGI group, UUID roleID, UUI principal)
+        void IGroupRolemembersInterface.Delete(UGUI requestingAgent, UGI group, UUID roleID, UGUI principal)
         {
             bool isUnlimited = false;
             if (!IsGroupOwner(group, requestingAgent))

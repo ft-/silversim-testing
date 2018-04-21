@@ -141,7 +141,7 @@ namespace SilverSim.Viewer.Teleport
                 RegionInfo hgRegionInfo;
 
 #if DEBUG
-                m_Log.DebugFormat("Teleport location request at location {0} for agent {1} ({2})", req.GridPosition, agent.Owner.FullName, agent.Owner.ID);
+                m_Log.DebugFormat("Teleport location request at location {0} for agent {1} ({2})", req.GridPosition, agent.NamedOwner.FullName, agent.Owner.ID);
 #endif
 
                 /* check whether HG destination is addressed */

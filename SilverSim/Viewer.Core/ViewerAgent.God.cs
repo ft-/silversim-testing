@@ -91,7 +91,7 @@ namespace SilverSim.Viewer.Core
                 return false;
             }
 
-            return scene.IsPossibleGod(new UUI(ID, FirstName, LastName, HomeURI));
+            return scene.IsPossibleGod(new UGUI(ID, HomeURI));
         }
     }
 }

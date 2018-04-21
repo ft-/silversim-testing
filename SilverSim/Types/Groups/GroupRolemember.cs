@@ -25,7 +25,7 @@ namespace SilverSim.Types.Groups
     {
         public UGI Group = UGI.Unknown;
         public UUID RoleID = UUID.Zero;
-        public UUI Principal = UUI.Unknown;
+        public UGUI Principal = UGUI.Unknown;
 
         /* informative field */
         public GroupPowers Powers;

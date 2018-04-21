@@ -33,7 +33,7 @@ namespace SilverSim.Scene.Types.Scene
 {
     public partial class SceneInterface
     {
-        public bool CanEjectFromParcel(UUI requestingAgent, Vector3 position, out ParcelInfo pInfo)
+        public bool CanEjectFromParcel(UGUI requestingAgent, Vector3 position, out ParcelInfo pInfo)
         {
             if (Parcels.TryGetValue(position, out pInfo))
             {
@@ -72,7 +72,7 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
             ParcelInfo pInfo;
-            UUI targetId = targetAgent.Owner;
+            UGUI targetId = targetAgent.Owner;
             if(CanEjectFromParcel(agent.Owner, targetAgent.GlobalPosition, out pInfo))
             {
                 EjectFromParcel(targetAgent.ID, pInfo.ID);

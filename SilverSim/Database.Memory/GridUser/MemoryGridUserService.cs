@@ -71,12 +71,12 @@ namespace SilverSim.Database.Memory.GridUser
             }
         }
 
-        public override bool TryGetValue(UUI userID, out GridUserInfo gridUserInfo) =>
+        public override bool TryGetValue(UGUI userID, out GridUserInfo gridUserInfo) =>
             TryGetValue(userID.ID, out gridUserInfo);
 
-        public override GridUserInfo this[UUI userID] => this[userID.ID];
+        public override GridUserInfo this[UGUI userID] => this[userID.ID];
 
-        public override void LoggedInAdd(UUI userID)
+        public override void LoggedInAdd(UGUI userID)
         {
             GridUserInfo info;
             if(m_Data.TryGetValue(userID.ID, out info))
@@ -96,7 +96,7 @@ namespace SilverSim.Database.Memory.GridUser
             }
         }
 
-        public override void LoggedIn(UUI userID)
+        public override void LoggedIn(UGUI userID)
         {
             GridUserInfo info;
             if (m_Data.TryGetValue(userID.ID, out info))
@@ -109,7 +109,7 @@ namespace SilverSim.Database.Memory.GridUser
             }
         }
 
-        public override void LoggedOut(UUI userID, UUID lastRegionID, Vector3 lastPosition, Vector3 lastLookAt)
+        public override void LoggedOut(UGUI userID, UUID lastRegionID, Vector3 lastPosition, Vector3 lastLookAt)
         {
             GridUserInfo info;
             if (m_Data.TryGetValue(userID.ID, out info))
@@ -125,7 +125,7 @@ namespace SilverSim.Database.Memory.GridUser
             }
         }
 
-        public override void SetHome(UUI userID, UUID homeRegionID, Vector3 homePosition, Vector3 homeLookAt)
+        public override void SetHome(UGUI userID, UUID homeRegionID, Vector3 homePosition, Vector3 homeLookAt)
         {
             GridUserInfo info;
             if (m_Data.TryGetValue(userID.ID, out info))
@@ -139,7 +139,7 @@ namespace SilverSim.Database.Memory.GridUser
             }
         }
 
-        public override void SetPosition(UUI userID, UUID lastRegionID, Vector3 lastPosition, Vector3 lastLookAt)
+        public override void SetPosition(UGUI userID, UUID lastRegionID, Vector3 lastPosition, Vector3 lastLookAt)
         {
             GridUserInfo info;
             if (m_Data.TryGetValue(userID.ID, out info))

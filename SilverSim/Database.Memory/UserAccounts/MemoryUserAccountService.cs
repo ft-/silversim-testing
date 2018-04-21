@@ -53,14 +53,14 @@ namespace SilverSim.Database.Memory.UserAccounts
             }
         }
 
-        public List<UUI> AccountList
+        public List<UGUIWithName> AccountList
         {
             get
             {
-                var list = new List<UUI>();
+                var list = new List<UGUIWithName>();
                 foreach(UserAccount acc in m_Data.Values)
                 {
-                    list.Add(new UUI(acc.Principal.ID, acc.Principal.FirstName, acc.Principal.LastName));
+                    list.Add(new UGUIWithName(acc.Principal.ID, acc.Principal.FirstName, acc.Principal.LastName));
                 }
                 return list;
             }

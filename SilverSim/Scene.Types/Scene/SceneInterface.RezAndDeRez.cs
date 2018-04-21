@@ -53,7 +53,7 @@ namespace SilverSim.Scene.Types.Scene
             public InventoryPermissionsMask GroupMask;
             public InventoryPermissionsMask EveryoneMask;
             public InventoryPermissionsMask NextOwnerMask;
-            public UUI RezzingAgent;
+            public UGUI RezzingAgent;
         }
 
         private Vector3 CalculateTargetedRezLocation(
@@ -191,7 +191,7 @@ namespace SilverSim.Scene.Types.Scene
             return RezObject(group, rezparams.RezzingAgent);
         }
 
-        public UInt32 RezObject(ObjectGroup group, UUI rezzingAgent)
+        public UInt32 RezObject(ObjectGroup group, UGUI rezzingAgent)
         {
             if (!group.Owner.EqualsGrid(rezzingAgent))
             {
@@ -219,7 +219,7 @@ namespace SilverSim.Scene.Types.Scene
 
         public abstract void RezScriptsForObject(ObjectGroup group);
 
-        public List<UUID> ReturnObjects(UUI returningAgent, List<UUID> objectids)
+        public List<UUID> ReturnObjects(UGUI returningAgent, List<UUID> objectids)
         {
             var returned = new List<UUID>();
 
@@ -233,10 +233,10 @@ namespace SilverSim.Scene.Types.Scene
                         continue;
                     }
 
-                    var copyItems = new Dictionary<UUI, List<InventoryItem>>();
+                    var copyItems = new Dictionary<UGUI, List<InventoryItem>>();
                     UUID assetID;
                     bool changePermissions = false;
-                    UUI targetAgent = grp.Owner;
+                    UGUI targetAgent = grp.Owner;
 
                     assetID = grp.OriginalAssetID;
                     if (UUID.Zero == assetID)
@@ -270,7 +270,7 @@ namespace SilverSim.Scene.Types.Scene
                     newitem.Permissions.EveryOne = InventoryPermissionsMask.None;
                     copyItems[grp.Owner].Add(newitem);
 
-                    foreach (KeyValuePair<UUI, List<InventoryItem>> kvp in copyItems)
+                    foreach (KeyValuePair<UGUI, List<InventoryItem>> kvp in copyItems)
                     {
                         var assetIDs = new List<UUID>();
                         IAgent toAgent;
@@ -583,12 +583,12 @@ namespace SilverSim.Scene.Types.Scene
                     return;
             }
 
-            var copyItems = new Dictionary<UUI, List<InventoryItem>>();
+            var copyItems = new Dictionary<UGUI, List<InventoryItem>>();
             foreach (ObjectGroup grp in objectgroups)
             {
                 UUID assetID;
                 bool changePermissions = false;
-                UUI targetAgent;
+                UGUI targetAgent;
                 switch (req.Destination)
                 {
                     case DeRezAction.ReturnToOwner:
@@ -649,7 +649,7 @@ namespace SilverSim.Scene.Types.Scene
                 copyItems[grp.Owner].Add(item);
             }
 
-            foreach(KeyValuePair<UUI, List<InventoryItem>> kvp in copyItems)
+            foreach(KeyValuePair<UGUI, List<InventoryItem>> kvp in copyItems)
             {
                 var assetIDs = new List<UUID>();
                 IAgent toAgent;

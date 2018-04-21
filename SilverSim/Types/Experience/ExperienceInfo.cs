@@ -44,8 +44,8 @@ namespace SilverSim.Types.Experience
         public string Name = string.Empty;
         public string Description = string.Empty;
         public ExperiencePropertyFlags Properties = ExperiencePropertyFlags.None;
-        public UUI Owner = UUI.Unknown;
-        public UUI Creator = UUI.Unknown;
+        public UGUI Owner = UGUI.Unknown;
+        public UGUI Creator = UGUI.Unknown;
         public UGI Group = UGI.Unknown;
         public RegionAccess Maturity;
         public string Marketplace = string.Empty;
@@ -88,8 +88,8 @@ namespace SilverSim.Types.Experience
             Name = info.Name;
             Description = info.Description;
             Properties = info.Properties;
-            Creator = new UUI(info.Creator);
-            Owner = new UUI(info.Owner);
+            Creator = new UGUI(info.Creator);
+            Owner = new UGUI(info.Owner);
             Group = new UGI(info.Group);
             Maturity = info.Maturity;
             Marketplace = info.Marketplace;

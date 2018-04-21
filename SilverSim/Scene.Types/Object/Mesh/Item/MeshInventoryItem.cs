@@ -39,7 +39,7 @@ namespace SilverSim.Scene.Types.Object.Mesh.Item
         public readonly Dictionary<int, int> MeshFaces = new Dictionary<int, int>();
         public readonly List<InventoryItem> TextureItems = new List<InventoryItem>();
 
-        public static MeshInventoryItem FromUploadFormat(string name, Stream s, UUI creator, AssetData objectAsset = null)
+        public static MeshInventoryItem FromUploadFormat(string name, Stream s, UGUI creator, AssetData objectAsset = null)
         {
             var map = (Map)LlsdXml.Deserialize(s);
             var item = new MeshInventoryItem

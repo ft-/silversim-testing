@@ -30,7 +30,7 @@ namespace SilverSim.Viewer.Core
 {
     public partial class AgentCircuit
     {
-        private void WriteAvatarNameData(XmlTextWriter writer, UUI nd)
+        private void WriteAvatarNameData(XmlTextWriter writer, UGUIWithName nd)
         {
             writer.WriteStartElement("map");
             writer.WriteKeyValuePair("username", nd.FullName.Replace(' ', '.'));
@@ -108,11 +108,11 @@ namespace SilverSim.Viewer.Core
 
                     foreach (var id in uuids)
                     {
-                        UUI nd;
+                        UGUIWithName nd;
                         IAgent otherAgent;
                         if (Scene.Agents.TryGetValue(id, out otherAgent) && otherAgent.IsNpc)
                         {
-                            nd = otherAgent.Owner;
+                            nd = otherAgent.NamedOwner;
                         }
                         else
                         {
@@ -138,7 +138,7 @@ namespace SilverSim.Viewer.Core
 
                     foreach (var name in names)
                     {
-                        UUI nd;
+                        UGUIWithName nd;
                         var nameparts = name.Split('.');
                         if (nameparts.Length < 2)
                         {

@@ -402,7 +402,7 @@ namespace SilverSim.Scene.Implementation.Basic
             var objgroup = obj as ObjectGroup;
             if (objgroup != null)
             {
-                UUI uui = objgroup.LastOwner;
+                UGUI uui = objgroup.LastOwner;
                 if (uui.HomeURI == null && AvatarNameService.TryGetValue(uui, out uui))
                 {
                     objgroup.LastOwner = uui;

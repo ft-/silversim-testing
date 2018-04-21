@@ -165,7 +165,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                             if(!m_Agent.InventoryService.Folder.TryGetValue(m_Agent.ID, ncitem.AssetType, out destinationFolder) &&
                                 !m_Agent.InventoryService.Folder.TryGetValue(m_Agent.ID, AssetType.Object, out destinationFolder))
                             {
-                                m_Log.WarnFormat("Failed to copy notecard inventory {0} to agent {1} ({2}): No Folder found for {3}", ncitem.Name, m_Agent.Owner.FullName, m_Agent.ID, ncitem.AssetType.ToString());
+                                m_Log.WarnFormat("Failed to copy notecard inventory {0} to agent {1} ({2}): No Folder found for {3}", ncitem.Name, m_Agent.NamedOwner.FullName, m_Agent.ID, ncitem.AssetType.ToString());
                                 continue;
                             }
                             else
@@ -181,7 +181,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                     }
                     catch(Exception e)
                     {
-                        m_Log.WarnFormat("Failed to copy notecard inventory {0} to agent {1} ({2}): {3}: {4}\n{5}", ncitem.Name, m_Agent.Owner.FullName, m_Agent.ID, e.GetType().FullName, e.Message, e.StackTrace);
+                        m_Log.WarnFormat("Failed to copy notecard inventory {0} to agent {1} ({2}): {3}: {4}\n{5}", ncitem.Name, m_Agent.NamedOwner.FullName, m_Agent.ID, e.GetType().FullName, e.Message, e.StackTrace);
                     }
                 }
 

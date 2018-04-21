@@ -162,15 +162,17 @@ namespace SilverSim.Main.Cmd.Region
             m_AvatarNameService = new AggregatingAvatarNameService(avatarNameServicesList);
         }
 
-        private UUI ResolveName(UUI uui)
+        private UGUIWithName ResolveName(UGUIWithName uui)
         {
-            UUI resultUui;
+            UGUIWithName resultUui;
             if(m_AvatarNameService.TryGetValue(uui, out resultUui))
             {
                 return resultUui;
             }
             return uui;
         }
+
+        private UGUIWithName ResolveName(UGUI ugui) => ResolveName((UGUIWithName)ugui);
 
         [Description("Clear HACD cache")]
         private void ClearHacdCacheCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
@@ -760,7 +762,7 @@ namespace SilverSim.Main.Cmd.Region
                         },
                         Flags = RegionFlags.RegionOnline,
                         ProductName = regionEntry.GetString("RegionType", "Mainland"),
-                        Owner = new UUI(regionEntry.GetString("Owner")),
+                        Owner = new UGUI(regionEntry.GetString("Owner")),
                         ScopeID = regionEntry.GetString("ScopeID", "00000000-0000-0000-0000-000000000000"),
                         ServerHttpPort = m_HttpServer.Port,
                         RegionMapTexture = regionEntry.GetString("MaptileStaticUUID", "00000000-0000-0000-0000-000000000000")
@@ -799,12 +801,12 @@ namespace SilverSim.Main.Cmd.Region
                         if (ownerEstates.Count != 0)
                         {
                             m_EstateService.RegionMap[r.ID] = ownerEstates[0].ID;
-                            msg.AppendFormat("Assigning new region {0} to estate {1} owned by {2}", r.Name, allEstates[0].Name, ResolveName(allEstates[0].Owner).FullName);
+                            msg.AppendFormat("Assigning new region {0} to estate {1} owned by {2}", r.Name, allEstates[0].Name, ResolveName((UGUIWithName)allEstates[0].Owner).FullName);
                         }
                         else if (allEstates.Count != 0)
                         {
                             m_EstateService.RegionMap[r.ID] = allEstates[0].ID;
-                            msg.AppendFormat("Assigning new region {0} to estate {1} owned by {2}", r.Name, allEstates[0].Name, ResolveName(allEstates[0].Owner).FullName);
+                            msg.AppendFormat("Assigning new region {0} to estate {1} owned by {2}", r.Name, allEstates[0].Name, ResolveName((UGUIWithName)allEstates[0].Owner).FullName);
                         }
                     }
                 }
@@ -1342,7 +1344,7 @@ namespace SilverSim.Main.Cmd.Region
             string msg = string.Join(" ", args.GetRange(4, args.Count - 4));
             foreach (IAgent agent in scene.RootAgents)
             {
-                UUI agentid = agent.Owner;
+                UGUIWithName agentid = agent.NamedOwner;
                 if (agentid.FullName.ToLower() == (args[2] + " " + args[3]).ToLower())
                 {
                     agent.SendAlertMessage(msg, scene.ID);
@@ -1388,7 +1390,7 @@ namespace SilverSim.Main.Cmd.Region
             bool agentFound = false;
             foreach (IAgent agent in scene.RootAgents)
             {
-                UUI agentid = agent.Owner;
+                UGUIWithName agentid = agent.NamedOwner;
                 if (agentid.FullName.ToLower() == (args[2] + " " + args[3]).ToLower())
                 {
                     FormattedListBuilder lb = new FormattedListBuilder();
@@ -1444,7 +1446,7 @@ namespace SilverSim.Main.Cmd.Region
             bool agentFound = false;
             foreach (IAgent agent in scene.RootAgents)
             {
-                UUI agentid = agent.Owner;
+                UGUIWithName agentid = agent.NamedOwner;
                 if (agentid.FullName.ToLower() == (args[1] + " " + args[2]).ToLower())
                 {
                     agent.RebakeAppearance(io.Write);
@@ -1494,7 +1496,7 @@ namespace SilverSim.Main.Cmd.Region
             bool agentFound = false;
             foreach (IAgent agent in scene.RootAgents)
             {
-                UUI agentid = agent.Owner;
+                UGUIWithName agentid = agent.NamedOwner;
                 if(args.Count < 4)
                 {
                     msg = this.GetLanguageString(agent.CurrentCulture, "YouHaveBeenKicked", "You have been kicked.");
@@ -2004,7 +2006,7 @@ namespace SilverSim.Main.Cmd.Region
 
             foreach(IAgent agent in agents)
             {
-                output.AppendFormat("\n{0}\n    id={1}  Type={2}\n    Latency={3} ms\n", agent.Owner.FullName, agent.Owner.ID.ToString(), agent.IsInScene(scene) ? "Root" : "Child", agent.LastMeasuredLatencyMsecs);
+                output.AppendFormat("\n{0}\n    id={1}  Type={2}\n    Latency={3} ms\n", agent.NamedOwner.FullName, agent.Owner.ID.ToString(), agent.IsInScene(scene) ? "Root" : "Child", agent.LastMeasuredLatencyMsecs);
             }
             io.Write(output.ToString());
         }

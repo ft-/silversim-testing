@@ -78,8 +78,8 @@ namespace SilverSim.Database.Memory.SimulationData
         private ObjectGroup ObjectGroupFromMap(Map map) => new ObjectGroup
         {
             IsTempOnRez = map["IsTempOnRez"].AsBoolean,
-            Owner = new UUI(map["Owner"].ToString()),
-            LastOwner = new UUI(map["LastOwner"].ToString()),
+            Owner = new UGUI(map["Owner"].ToString()),
+            LastOwner = new UGUI(map["LastOwner"].ToString()),
             Group = new UGI(map["Group"].ToString()),
             SaleType = (InventoryItem.SaleInfoData.SaleType)map["SaleType"].AsUInt,
             SalePrice = map["SalePrice"].AsInt,
@@ -108,7 +108,7 @@ namespace SilverSim.Database.Memory.SimulationData
                 SitTargetOffset = map["SitTargetOffset"].AsVector3,
                 SitTargetOrientation = map["SitTargetOrientation"].AsQuaternion,
                 SitAnimation = map["SitAnimation"].ToString(),
-                Creator = new UUI(map["Creator"].ToString()),
+                Creator = new UGUI(map["Creator"].ToString()),
                 CreationDate = (Date)map["CreationDate"],
                 RezDate = (Date)map["RezDate"],
                 Flags = (PrimitiveFlags)map["Flags"].AsUInt,
@@ -238,15 +238,15 @@ namespace SilverSim.Database.Memory.SimulationData
                 AssetID = map["AssetID"].AsUUID,
                 AssetType = (AssetType)map["AssetType"].AsInt,
                 CreationDate = (Date)map["CreationDate"],
-                Creator = new UUI(map["Creator"].ToString()),
+                Creator = new UGUI(map["Creator"].ToString()),
                 Description = map["Description"].ToString(),
                 Flags = (InventoryFlags)map["Flags"].AsUInt,
                 Group = new UGI(map["Group"].ToString()),
                 IsGroupOwned = map["GroupOwned"].AsBoolean,
                 InventoryType = (InventoryType)map["InventoryType"].AsInt,
-                LastOwner = new UUI(map["LastOwner"].ToString()),
+                LastOwner = new UGUI(map["LastOwner"].ToString()),
                 Name = map["Name"].ToString(),
-                Owner = new UUI(map["Owner"].ToString()),
+                Owner = new UGUI(map["Owner"].ToString()),
                 ParentFolderID = map["ParentFolderID"].AsUUID,
                 ExperienceID = map["ExperienceID"].AsUUID,
                 CollisionFilter = new ObjectPartInventoryItem.CollisionFilterParam
@@ -268,7 +268,7 @@ namespace SilverSim.Database.Memory.SimulationData
             {
                 try
                 {
-                    grantinfo.PermsGranter = new UUI(map["PermsGranter"].ToString());
+                    grantinfo.PermsGranter = new UGUI(map["PermsGranter"].ToString());
                 }
                 catch
                 {

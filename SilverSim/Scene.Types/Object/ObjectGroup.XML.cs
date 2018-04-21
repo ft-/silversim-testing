@@ -32,15 +32,15 @@ namespace SilverSim.Scene.Types.Object
         #region XML Serialization
         public void ToXml(XmlTextWriter writer, XmlSerializationOptions options = XmlSerializationOptions.None)
         {
-            ToXml(writer, UUI.Unknown, Vector3.Zero, options, false);
+            ToXml(writer, UGUI.Unknown, Vector3.Zero, options, false);
         }
 
-        public void ToXml(XmlTextWriter writer, UUI nextOwner, XmlSerializationOptions options = XmlSerializationOptions.None)
+        public void ToXml(XmlTextWriter writer, UGUI nextOwner, XmlSerializationOptions options = XmlSerializationOptions.None)
         {
             ToXml(writer, nextOwner, Vector3.Zero, options, false);
         }
 
-        public void ToXml(XmlTextWriter writer, UUI nextOwner, Vector3 offsetpos, XmlSerializationOptions options = XmlSerializationOptions.None, bool writeOffsetPos = true)
+        public void ToXml(XmlTextWriter writer, UGUI nextOwner, Vector3 offsetpos, XmlSerializationOptions options = XmlSerializationOptions.None, bool writeOffsetPos = true)
         {
             List<ObjectPart> parts = Values;
             writer.WriteStartElement("SceneObjectGroup");
@@ -110,7 +110,7 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region XML Deserialization
-        private static ObjectPart ParseOtherPart(XmlTextReader reader, ObjectGroup group, UUI currentOwner, XmlDeserializationOptions options)
+        private static ObjectPart ParseOtherPart(XmlTextReader reader, ObjectGroup group, UGUI currentOwner, XmlDeserializationOptions options)
         {
             ObjectPart otherPart = null;
             if (reader.IsEmptyElement)
@@ -163,7 +163,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        private static void FromXmlOtherParts(XmlTextReader reader, ObjectGroup group, UUI currentOwner, XmlDeserializationOptions options)
+        private static void FromXmlOtherParts(XmlTextReader reader, ObjectGroup group, UGUI currentOwner, XmlDeserializationOptions options)
         {
             ObjectPart part;
             var links = new SortedDictionary<int, ObjectPart>();
@@ -236,7 +236,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        private static ObjectPart ParseRootPart(XmlTextReader reader, ObjectGroup group, UUI currentOwner, XmlDeserializationOptions options)
+        private static ObjectPart ParseRootPart(XmlTextReader reader, ObjectGroup group, UGUI currentOwner, XmlDeserializationOptions options)
         {
             ObjectPart rootPart = null;
             if (reader.IsEmptyElement)
@@ -294,10 +294,10 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        public static ObjectGroup FromXml(XmlTextReader reader, UUI currentOwner, XmlDeserializationOptions options) =>
+        public static ObjectGroup FromXml(XmlTextReader reader, UGUI currentOwner, XmlDeserializationOptions options) =>
             FromXml(reader, currentOwner, inRootPart: false, options: options);
 
-        public static ObjectGroup FromXml(XmlTextReader reader, UUI currentOwner, bool inRootPart = false, XmlDeserializationOptions options = XmlDeserializationOptions.None)
+        public static ObjectGroup FromXml(XmlTextReader reader, UGUI currentOwner, bool inRootPart = false, XmlDeserializationOptions options = XmlDeserializationOptions.None)
         {
             var group = new ObjectGroup();
             ObjectPart rootPart = null;

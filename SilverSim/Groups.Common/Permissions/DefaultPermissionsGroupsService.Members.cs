@@ -28,22 +28,22 @@ namespace SilverSim.Groups.Common.Permissions
 {
     partial class DefaultPermissionsGroupsService : GroupsServiceInterface.IGroupMembersInterface
     {
-        GroupMember IGroupMembersInterface.this[UUI requestingAgent, UGI group, UUI principal] =>
+        GroupMember IGroupMembersInterface.this[UGUI requestingAgent, UGI group, UGUI principal] =>
             m_InnerService.Members[requestingAgent, group, principal];
 
-        bool IGroupMembersInterface.TryGetValue(UUI requestingAgent, UGI group, UUI principal, out GroupMember gmem) =>
+        bool IGroupMembersInterface.TryGetValue(UGUI requestingAgent, UGI group, UGUI principal, out GroupMember gmem) =>
             m_InnerService.Members.TryGetValue(requestingAgent, group, principal, out gmem);
 
-        bool IGroupMembersInterface.ContainsKey(UUI requestingAgent, UGI group, UUI principal) =>
+        bool IGroupMembersInterface.ContainsKey(UGUI requestingAgent, UGI group, UGUI principal) =>
             m_InnerService.Members.ContainsKey(requestingAgent, group, principal);
 
-        List<GroupMember> IGroupMembersInterface.this[UUI requestingAgent, UGI group] =>
+        List<GroupMember> IGroupMembersInterface.this[UGUI requestingAgent, UGI group] =>
             m_InnerService.Members[requestingAgent, group];
 
-        List<GroupMember> IGroupMembersInterface.this[UUI requestingAgent, UUI principal] =>
+        List<GroupMember> IGroupMembersInterface.this[UGUI requestingAgent, UGUI principal] =>
             m_InnerService.Members[requestingAgent, principal];
 
-        GroupMember IGroupMembersInterface.Add(UUI requestingAgent, UGI group, UUI principal, UUID roleID, string accessToken)
+        GroupMember IGroupMembersInterface.Add(UGUI requestingAgent, UGI group, UGUI principal, UUID roleID, string accessToken)
         {
             if(Invites[requestingAgent, group, roleID, principal].Count == 0)
             {
@@ -52,17 +52,17 @@ namespace SilverSim.Groups.Common.Permissions
             return m_InnerService.Members.Add(requestingAgent, group, principal, roleID, accessToken);
         }
 
-        void IGroupMembersInterface.SetContribution(UUI requestingagent, UGI group, UUI principal, int contribution)
+        void IGroupMembersInterface.SetContribution(UGUI requestingagent, UGI group, UGUI principal, int contribution)
         {
             m_InnerService.Members.SetContribution(requestingagent, group, principal, contribution);
         }
 
-        void IGroupMembersInterface.Update(UUI requestingagent, UGI group, UUI principal, bool acceptNotices, bool listInProfile)
+        void IGroupMembersInterface.Update(UGUI requestingagent, UGI group, UGUI principal, bool acceptNotices, bool listInProfile)
         {
             m_InnerService.Members.Update(requestingagent, group, principal, acceptNotices, listInProfile);
         }
 
-        void IGroupMembersInterface.Delete(UUI requestingAgent, UGI group, UUI principal)
+        void IGroupMembersInterface.Delete(UGUI requestingAgent, UGI group, UGUI principal)
         {
             if(requestingAgent != principal && !IsGroupOwner(group, requestingAgent))
             {

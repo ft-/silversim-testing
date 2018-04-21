@@ -70,7 +70,7 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        private GroupPowers GetGroupPowers(UUI agentOwner, UGI group)
+        private GroupPowers GetGroupPowers(UGUI agentOwner, UGI group)
         {
             if(!IsGroupMember(agentOwner, group))
             {
@@ -87,9 +87,9 @@ namespace SilverSim.Scene.Types.Scene
             return GroupPowers.None;
         }
 
-        public bool HasGroupPower(UUI agentOwner, UGI group, GroupPowers power) => (GetGroupPowers(agentOwner, group) & power) != 0;
+        public bool HasGroupPower(UGUI agentOwner, UGI group, GroupPowers power) => (GetGroupPowers(agentOwner, group) & power) != 0;
 
-        private bool IsGroupMember(UUI agentOwner, UGI group)
+        private bool IsGroupMember(UGUI agentOwner, UGI group)
         {
             if (GroupsService == null || group.ID == UUID.Zero)
             {
@@ -114,13 +114,13 @@ namespace SilverSim.Scene.Types.Scene
             return true;
         }
 
-        public bool IsRegionOwner(UUI agent) => agent.EqualsGrid(Owner);
+        public bool IsRegionOwner(UGUI agent) => agent.EqualsGrid(Owner);
 
         /** <summary>This function also returns true if EO is passed</summary> */
-        public bool IsEstateManager(UUI agent)
+        public bool IsEstateManager(UGUI agent)
         {
             uint estateID;
-            UUI estateOwner;
+            UGUI estateOwner;
 
             return EstateService.RegionMap.TryGetValue(ID, out estateID) &&
                 EstateService.EstateOwner.TryGetValue(estateID, out estateOwner) &&
@@ -128,10 +128,10 @@ namespace SilverSim.Scene.Types.Scene
                     EstateService.EstateManager[estateID, agent]);
         }
 
-        public bool IsEstateOwner(UUI agent)
+        public bool IsEstateOwner(UGUI agent)
         {
             uint estateID;
-            UUI estateOwner;
+            UGUI estateOwner;
 
             return EstateService.RegionMap.TryGetValue(ID, out estateID) &&
                 EstateService.EstateOwner.TryGetValue(estateID, out estateOwner) &&
@@ -154,11 +154,11 @@ namespace SilverSim.Scene.Types.Scene
                 regionID, value);
         }
 
-        private readonly RwLockedList<UUI> m_GodAgentsLocal = new RwLockedList<UUI>();
-        private readonly RwLockedList<UUI> m_GodAgentsGlobal = new RwLockedList<UUI>();
+        private readonly RwLockedList<UGUI> m_GodAgentsLocal = new RwLockedList<UGUI>();
+        private readonly RwLockedList<UGUI> m_GodAgentsGlobal = new RwLockedList<UGUI>();
         private bool m_GodAgentsSetToLocal;
 
-        private void UpdateGodAgentsList(RwLockedList<UUI> list, UUID regionId, string value)
+        private void UpdateGodAgentsList(RwLockedList<UGUI> list, UUID regionId, string value)
         {
             if(string.IsNullOrEmpty(value))
             {
@@ -167,13 +167,13 @@ namespace SilverSim.Scene.Types.Scene
             else
             {
                 string[] god_agents_list = value.Split(new char[] { ',' });
-                var new_gods = new List<UUI>();
+                var new_gods = new List<UGUI>();
                 foreach (string god_agent in god_agents_list)
                 {
-                    UUI uui;
+                    UGUI uui;
                     try
                     {
-                        uui = new UUI(god_agent);
+                        uui = new UGUI(god_agent);
                     }
                     catch
                     {
@@ -183,7 +183,7 @@ namespace SilverSim.Scene.Types.Scene
                     new_gods.Add(uui);
                 }
 
-                foreach(UUI god in new List<UUI>(list))
+                foreach(UGUI god in new List<UGUI>(list))
                 {
                     if (!new_gods.Contains(god))
                     {
@@ -191,7 +191,7 @@ namespace SilverSim.Scene.Types.Scene
                     }
                 }
 
-                foreach(UUI god in new_gods)
+                foreach(UGUI god in new_gods)
                 {
                     if(!list.Contains(god))
                     {
@@ -219,13 +219,13 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        private bool IsInGodAgents(UUI agent)
+        private bool IsInGodAgents(UGUI agent)
         {
-            RwLockedList<UUI> activeList = m_GodAgentsSetToLocal ? m_GodAgentsLocal : m_GodAgentsGlobal;
+            RwLockedList<UGUI> activeList = m_GodAgentsSetToLocal ? m_GodAgentsLocal : m_GodAgentsGlobal;
             return activeList.Contains(agent);
         }
 
-        public bool IsPossibleGod(UUI agent) => agent.EqualsGrid(Owner) ||
+        public bool IsPossibleGod(UGUI agent) => agent.EqualsGrid(Owner) ||
                 (EstateManagerIsGod && IsEstateManager(agent)) ||
                 IsInGodAgents(agent);
 
@@ -280,7 +280,7 @@ namespace SilverSim.Scene.Types.Scene
                 value);
         }
 
-        public bool IsSimConsoleAllowed(UUI agent)
+        public bool IsSimConsoleAllowed(UGUI agent)
         {
             if (RegionOwnerIsSimConsoleUser &&
                 agent.EqualsGrid(Owner))
@@ -304,7 +304,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         #region Object Permissions
-        public bool CanRez(UUI agent, Vector3 location)
+        public bool CanRez(UGUI agent, Vector3 location)
         {
             ParcelInfo pinfo;
             if (!Parcels.TryGetValue(location, out pinfo))
@@ -332,7 +332,7 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        public bool CanRunScript(UUI agent, Vector3 location)
+        public bool CanRunScript(UGUI agent, Vector3 location)
         {
             ParcelInfo pinfo;
             if (!Parcels.TryGetValue(location, out pinfo))
@@ -362,8 +362,8 @@ namespace SilverSim.Scene.Types.Scene
 
         public bool CanMove(IAgent agent, ObjectGroup group, Vector3 location)
         {
-            UUI agentOwner = agent.Owner;
-            UUI groupOwner = group.Owner;
+            UGUI agentOwner = agent.Owner;
+            UGUI groupOwner = group.Owner;
 
             if (IsPossibleGod(agentOwner))
             {
@@ -431,8 +431,8 @@ namespace SilverSim.Scene.Types.Scene
 
         public bool CanEdit(IAgent agent, ObjectGroup group, Vector3 location)
         {
-            UUI agentOwner = agent.Owner;
-            UUI groupOwner = group.Owner;
+            UGUI agentOwner = agent.Owner;
+            UGUI groupOwner = group.Owner;
 
             if (IsPossibleGod(agentOwner))
             {
@@ -476,8 +476,8 @@ namespace SilverSim.Scene.Types.Scene
 
         public bool CanChangeGroup(IAgent agent, ObjectGroup group, Vector3 location)
         {
-            UUI agentOwner = agent.Owner;
-            UUI groupOwner = group.Owner;
+            UGUI agentOwner = agent.Owner;
+            UGUI groupOwner = group.Owner;
 
             if (IsPossibleGod(agentOwner))
             {
@@ -514,7 +514,7 @@ namespace SilverSim.Scene.Types.Scene
             return false;
         }
 
-        public bool CanEditParcelDetails(UUI agentOwner, ParcelInfo parcelInfo)
+        public bool CanEditParcelDetails(UGUI agentOwner, ParcelInfo parcelInfo)
         {
             if (IsPossibleGod(agentOwner))
             {
@@ -534,7 +534,7 @@ namespace SilverSim.Scene.Types.Scene
             return false;
         }
 
-        public bool CanReclaimParcel(UUI agentOwner, ParcelInfo parcelInfo)
+        public bool CanReclaimParcel(UGUI agentOwner, ParcelInfo parcelInfo)
         {
             if (IsPossibleGod(agentOwner))
             {
@@ -549,7 +549,7 @@ namespace SilverSim.Scene.Types.Scene
             return false;
         }
 
-        public bool CanGodForceParcelOwner(UUI agentOwner, ParcelInfo parcelInfo)
+        public bool CanGodForceParcelOwner(UGUI agentOwner, ParcelInfo parcelInfo)
         {
             if (IsPossibleGod(agentOwner))
             {
@@ -559,7 +559,7 @@ namespace SilverSim.Scene.Types.Scene
             return false;
         }
 
-        public bool CanGodMarkParcelAsContent(UUI agentOwner, ParcelInfo parcelInfo)
+        public bool CanGodMarkParcelAsContent(UGUI agentOwner, ParcelInfo parcelInfo)
         {
             if (IsPossibleGod(agentOwner))
             {
@@ -569,7 +569,7 @@ namespace SilverSim.Scene.Types.Scene
             return false;
         }
 
-        public bool CanDeedParcel(UUI agentOwner, ParcelInfo parcelInfo)
+        public bool CanDeedParcel(UGUI agentOwner, ParcelInfo parcelInfo)
         {
             if (IsPossibleGod(agentOwner))
             {
@@ -589,7 +589,7 @@ namespace SilverSim.Scene.Types.Scene
             return false;
         }
 
-        public bool CanDivideJoinParcel(UUI agentOwner, ParcelInfo parcelInfo)
+        public bool CanDivideJoinParcel(UGUI agentOwner, ParcelInfo parcelInfo)
         {
             if (IsPossibleGod(agentOwner))
             {
@@ -609,7 +609,7 @@ namespace SilverSim.Scene.Types.Scene
             return false;
         }
 
-        public bool CanReleaseParcel(UUI agentOwner, ParcelInfo parcelInfo)
+        public bool CanReleaseParcel(UGUI agentOwner, ParcelInfo parcelInfo)
         {
             if (IsPossibleGod(agentOwner))
             {
@@ -631,8 +631,8 @@ namespace SilverSim.Scene.Types.Scene
 
         public bool CanDelete(IAgent agent, ObjectGroup group, Vector3 location)
         {
-            UUI agentOwner = agent.Owner;
-            UUI groupOwner = group.Owner;
+            UGUI agentOwner = agent.Owner;
+            UGUI groupOwner = group.Owner;
             if (IsPossibleGod(agentOwner))
             {
                 return true;
@@ -687,9 +687,9 @@ namespace SilverSim.Scene.Types.Scene
         public bool CanReturn(IAgent agent, ObjectGroup group, Vector3 location) =>
             CanReturn(agent.Owner, group, location);
 
-        public bool CanReturn(UUI agentOwner, ObjectGroup group, Vector3 location)
+        public bool CanReturn(UGUI agentOwner, ObjectGroup group, Vector3 location)
         {
-            UUI groupOwner = group.Owner;
+            UGUI groupOwner = group.Owner;
             if (IsPossibleGod(agentOwner))
             {
                 return true;
@@ -762,8 +762,8 @@ namespace SilverSim.Scene.Types.Scene
 
         public bool CanTakeCopy(IAgent agent, ObjectGroup group, Vector3 location)
         {
-            UUI agentOwner = agent.Owner;
-            UUI groupOwner = group.Owner;
+            UGUI agentOwner = agent.Owner;
+            UGUI groupOwner = group.Owner;
             if (IsPossibleGod(agentOwner))
             {
                 return true;
@@ -817,8 +817,8 @@ namespace SilverSim.Scene.Types.Scene
 
         public bool CanTake(IAgent agent, ObjectGroup group, Vector3 location)
         {
-            UUI agentOwner = agent.Owner;
-            UUI groupOwner = group.Owner;
+            UGUI agentOwner = agent.Owner;
+            UGUI groupOwner = group.Owner;
             if (IsPossibleGod(agentOwner))
             {
                 return true;
@@ -863,7 +863,7 @@ namespace SilverSim.Scene.Types.Scene
         }
         #endregion
 
-        public bool CanTerraform(UUI agentOwner, Vector3 location)
+        public bool CanTerraform(UGUI agentOwner, Vector3 location)
         {
             if (IsPossibleGod(agentOwner))
             {

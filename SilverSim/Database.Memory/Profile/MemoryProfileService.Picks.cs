@@ -31,7 +31,7 @@ namespace SilverSim.Database.Memory.Profile
     {
         private readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, ProfilePick>> m_Picks = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, ProfilePick>>(() => new RwLockedDictionary<UUID, ProfilePick>());
 
-        ProfilePick IPicksInterface.this[UUI user, UUID id]
+        ProfilePick IPicksInterface.this[UGUI user, UUID id]
         {
             get
             {
@@ -44,7 +44,7 @@ namespace SilverSim.Database.Memory.Profile
             }
         }
 
-        public Dictionary<UUID, string> GetPicks(UUI user)
+        public Dictionary<UUID, string> GetPicks(UGUI user)
         {
             var results = new Dictionary<UUID, string>();
             RwLockedDictionary<UUID, ProfilePick> picks;
@@ -58,7 +58,7 @@ namespace SilverSim.Database.Memory.Profile
             return results;
         }
 
-        public bool TryGetValue(UUI user, UUID id, out ProfilePick pick)
+        public bool TryGetValue(UGUI user, UUID id, out ProfilePick pick)
         {
             pick = default(ProfilePick);
             RwLockedDictionary<UUID, ProfilePick> picks;

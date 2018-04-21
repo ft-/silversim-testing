@@ -898,7 +898,7 @@ namespace SilverSim.Viewer.Core
             if (Agent != null && Scene != null)
             {
 #if DEBUG
-                m_Log.DebugFormat("Removing agent {0} from scene {1}", Agent.Owner.FullName, Scene.Name);
+                m_Log.DebugFormat("Removing agent {0} from scene {1}", Agent.NamedOwner.FullName, Scene.Name);
 #endif
                 Scene.Remove(Agent);
                 Agent.Circuits.Remove(Scene.ID);
@@ -1180,10 +1180,10 @@ namespace SilverSim.Viewer.Core
         public void LogIncomingAgent(ILog log, bool isChild)
         {
             log.InfoFormat("Incoming agent {0} {1} (Grid {2}, UUID {3}) TeleportFlags ({4}) Client IP {5} Type {6} Region {7} ({8})",
-                Agent.Owner.FirstName,
-                Agent.Owner.LastName,
-                Agent.Owner.HomeURI,
-                Agent.Owner.ID.ToString(),
+                Agent.NamedOwner.FirstName,
+                Agent.NamedOwner.LastName,
+                Agent.NamedOwner.HomeURI,
+                Agent.NamedOwner.ID.ToString(),
                 LastTeleportFlags,
                 ((IPEndPoint)RemoteEndPoint).Address.ToString(),
                 isChild ? "Child" : "Root",

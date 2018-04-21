@@ -141,7 +141,7 @@ namespace SilverSim.Viewer.Search
             DirPeopleReply res = null;
             var t = new UDPPacket();
 
-            foreach(UUI uui in scene.AvatarNameService.Search(req.QueryText.Split(new char[] {' '}, 2)))
+            foreach(UGUIWithName uui in scene.AvatarNameService.Search(req.QueryText.Split(new char[] {' '}, 2)))
             {
                 if(res == null)
                 {
@@ -363,7 +363,7 @@ namespace SilverSim.Viewer.Search
                 return;
             }
 
-            List<UUI> results = scene.AvatarNameService.Search(nameparts);
+            List<UGUIWithName> results = scene.AvatarNameService.Search(nameparts);
             using (HttpResponse res = req.BeginResponse("application/llsd+xml"))
             {
                 using (XmlTextWriter writer = res.GetOutputStream().UTF8XmlTextWriter())
@@ -379,7 +379,7 @@ namespace SilverSim.Viewer.Search
                         {
                             writer.WriteStartElement("map");
                             {
-                                UUI uui = results[offset];
+                                UGUIWithName uui = results[offset];
                                 writer.WriteNamedValue("key", "username");
                                 writer.WriteNamedValue("string", uui.FullName);
                                 writer.WriteNamedValue("key", "display_name");

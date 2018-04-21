@@ -57,7 +57,7 @@ namespace SilverSim.Scene.Types.Scene
 
         private bool DoNotAddScriptsToTrashFolder => m_DoNotAddScriptsToTrashFolderUpdatedSetToLocal ? m_DoNotAddScriptsToTrashFolderUpdatedLocal : m_DoNotAddScriptsToTrashFolderUpdatedGlobal;
 
-        private bool TryGetServices(UUI targetAgentId, out InventoryServiceInterface inventoryService, out AssetServiceInterface assetService)
+        private bool TryGetServices(UGUI targetAgentId, out InventoryServiceInterface inventoryService, out AssetServiceInterface assetService)
         {
             UserAgentServiceInterface userAgentService = null;
             inventoryService = null;
@@ -231,7 +231,7 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        private void AdjustPermissionsAccordingly(IAgent agent, UUI newOwner, ObjectPartInventoryItem item)
+        private void AdjustPermissionsAccordingly(IAgent agent, UGUI newOwner, ObjectPartInventoryItem item)
         {
             if(agent.Owner != newOwner && !agent.IsActiveGod)
             {
@@ -400,7 +400,7 @@ namespace SilverSim.Scene.Types.Scene
             if(CanEdit(agent, part.ObjectGroup, part.ObjectGroup.GlobalPosition) &&
                 part.Inventory.TryGetValue(req.ItemID, out item))
             {
-                UUI owner = item.Owner;
+                UGUI owner = item.Owner;
                 var deletedItem = new InventoryItem(item);
                 part.Inventory.Remove(req.ItemID);
                 InventoryServiceInterface inventoryService;

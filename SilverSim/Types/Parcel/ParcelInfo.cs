@@ -121,7 +121,7 @@ namespace SilverSim.Types.Parcel
     {
         public int Area;
         public uint AuctionID;
-        public UUI AuthBuyer = UUI.Unknown;
+        public UGUI AuthBuyer = UGUI.Unknown;
         public ParcelCategory Category;
         public Date ClaimDate = new Date();
         public int ClaimPrice;
@@ -147,7 +147,7 @@ namespace SilverSim.Types.Parcel
         public URI MediaURI;
         public UUID MediaID;
         public string MediaType = "none/none";
-        public UUI Owner = new UUI();
+        public UGUI Owner = UGUI.Unknown;
         public UUID SnapshotID = UUID.Zero;
         public Int32 SalePrice;
         public Int32 OtherCleanTime;
@@ -568,7 +568,7 @@ namespace SilverSim.Types.Parcel
             LandBitmap = new ParcelDataLandBitmap(m_LandBitmap, m_BitmapWidth, m_BitmapHeight, m_LandBitmapRwLock, this);
             Area = src.Area;
             AuctionID = src.AuctionID;
-            AuthBuyer = new UUI(src.AuthBuyer);
+            AuthBuyer = new UGUI(src.AuthBuyer);
             Category = src.Category;
             ClaimDate = src.ClaimDate;
             ClaimPrice = src.ClaimPrice;
@@ -587,7 +587,7 @@ namespace SilverSim.Types.Parcel
             MediaURI = src.MediaURI;
             MediaID = src.MediaID;
             MediaType = src.MediaType;
-            Owner = new UUI(src.Owner);
+            Owner = new UGUI(src.Owner);
             SnapshotID = src.SnapshotID;
             SalePrice = src.SalePrice;
             OtherCleanTime = src.OtherCleanTime;

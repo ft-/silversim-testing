@@ -33,11 +33,11 @@ namespace SilverSim.Viewer.Core.Capabilities
     public abstract class UploadAssetAbstractCapability : ICapabilityInterface
     {
         public abstract string CapabilityName { get; }
-        protected UUI Creator { get; }
+        protected UGUI Creator { get; }
         protected string m_ServerURI;
         protected readonly string m_RemoteIP;
 
-        protected UploadAssetAbstractCapability(UUI creator, string serverURI, string remoteip)
+        protected UploadAssetAbstractCapability(UGUI creator, string serverURI, string remoteip)
         {
             Creator = creator;
             m_ServerURI = serverURI;

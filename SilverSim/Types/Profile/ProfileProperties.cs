@@ -23,8 +23,8 @@ namespace SilverSim.Types.Profile
 {
     public struct ProfileProperties
     {
-        public UUI User;
-        public UUI Partner;
+        public UGUI User;
+        public UGUI Partner;
         public bool PublishProfile;
         public bool PublishMature;
         public string WebUrl;

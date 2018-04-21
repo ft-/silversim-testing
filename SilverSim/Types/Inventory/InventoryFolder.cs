@@ -30,7 +30,7 @@ namespace SilverSim.Types.Inventory
         public UUID ParentFolderID = UUID.Zero;
         public string Name = string.Empty;
         public AssetType DefaultType = AssetType.Unknown;
-        public UUI Owner = UUI.Unknown;
+        public UGUI Owner = UGUI.Unknown;
         public int Version = 1;
         #endregion
 
@@ -51,7 +51,7 @@ namespace SilverSim.Types.Inventory
             ParentFolderID = src.ParentFolderID;
             Name = src.Name;
             DefaultType = src.DefaultType;
-            Owner = new UUI(src.Owner);
+            Owner = new UGUI(src.Owner);
             Version = src.Version;
         }
         #endregion

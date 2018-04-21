@@ -25,6 +25,6 @@ namespace SilverSim.Scene.Types.Script.Events
 {
     public struct ExperiencePermissionsEvent : IScriptEvent
     {
-        public UUI PermissionsKey;
+        public UGUI PermissionsKey;
     }
 }

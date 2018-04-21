@@ -112,9 +112,6 @@ namespace SilverSim.Viewer.Core.Capabilities
                     m_InventoryService.Item.Add(kvp.Value);
                 }
                 catch
-#if DEBUG
-                (Exception e)
-#endif
                 {
                     throw new UploadErrorException(this.GetLanguageString(m_Agent.CurrentCulture, "FailedToStoreNewInventoryItem", "Failed to store new inventory item"));
                 }

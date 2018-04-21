@@ -57,7 +57,7 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            UUI agentID = circuit.Agent.Owner;
+            UGUIWithName agentID = circuit.Agent.NamedOwner;
             if(!scene.IsRegionOwner(agentID) && !scene.IsEstateOwner(agentID) && !scene.IsEstateManager(agentID))
             {
                 return;
@@ -116,12 +116,14 @@ namespace SilverSim.Viewer.Core
                         continue;
                     }
 
+                    UGUIWithName owner = scene.AvatarNameService.ResolveName(p.Owner);
+
                     if ((flags & LandStatFilterFlags.FilterByObject) != 0 && !p.Name.Contains(filter))
                     {
                         continue;
                     }
 
-                    if ((flags & LandStatFilterFlags.FilterByOwner) != 0 && !p.Owner.FullName.Contains(filter))
+                    if ((flags & LandStatFilterFlags.FilterByOwner) != 0 && !owner.FullName.Contains(filter))
                     {
                         continue;
                     }
@@ -139,7 +141,7 @@ namespace SilverSim.Viewer.Core
                         TaskID = p.ID,
                         TaskLocalID = kvp.Key,
                         TaskName = p.Name,
-                        OwnerName = p.Owner.FullName
+                        OwnerName = owner.FullName
                     };
 
                     if (allocedlength + entry.MessageLength > 1400)
@@ -202,12 +204,14 @@ namespace SilverSim.Viewer.Core
                         continue;
                     }
 
-                    if((flags & LandStatFilterFlags.FilterByObject) != 0 && !p.Name.Contains(filter))
+                    UGUIWithName owner = scene.AvatarNameService.ResolveName(p.Owner);
+
+                    if ((flags & LandStatFilterFlags.FilterByObject) != 0 && !p.Name.Contains(filter))
                     {
                         continue;
                     }
 
-                    if ((flags & LandStatFilterFlags.FilterByOwner) != 0 && !p.Owner.FullName.Contains(filter))
+                    if ((flags & LandStatFilterFlags.FilterByOwner) != 0 && !owner.FullName.Contains(filter))
                     {
                         continue;
                     }
@@ -225,7 +229,7 @@ namespace SilverSim.Viewer.Core
                         TaskID = p.ID,
                         TaskLocalID = kvp.Key,
                         TaskName = p.Name,
-                        OwnerName = p.Owner.FullName
+                        OwnerName = owner.FullName
                     };
 
                     if (allocedlength + entry.MessageLength > 1400)

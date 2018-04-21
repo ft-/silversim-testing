@@ -24,7 +24,7 @@ namespace SilverSim.Types.Profile
     public struct ProfileClassified
     {
         public UUID ClassifiedID;
-        public UUI Creator;
+        public UGUI Creator;
         public Date CreationDate;
         public Date ExpirationDate;
         public int Category;

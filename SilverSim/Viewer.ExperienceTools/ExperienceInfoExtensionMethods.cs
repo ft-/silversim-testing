@@ -60,7 +60,7 @@ namespace SilverSim.Viewer.ExperienceTools
         public static ExperienceInfo ToExperienceInfo(this Map m) => new ExperienceInfo
         {
             ID = m["public_id"].AsUUID,
-            Owner = new UUI(m["agent_id"].AsUUID),
+            Owner = new UGUI(m["agent_id"].AsUUID),
             Group = new UGI(m["group_id"].AsUUID),
             Name = m["name"].ToString(),
             Properties = (ExperiencePropertyFlags)m["properties"].AsInt,

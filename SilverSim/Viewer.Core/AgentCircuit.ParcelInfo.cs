@@ -227,7 +227,7 @@ namespace SilverSim.Viewer.Core
             }
             foreach (var upd in entries.Values)
             {
-                UUI uui;
+                UGUIWithName uui;
                 if (Scene.AvatarNameService.TryGetValue(upd.ID, out uui))
                 {
                     var pae = new ParcelAccessEntry

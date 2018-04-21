@@ -44,7 +44,7 @@ namespace SilverSim.Scene.Types.Object
             m_Killed = true;
         }
 
-        public UUI Owner => Part.ObjectGroup.Owner;
+        public UGUI Owner => Part.ObjectGroup.Owner;
 
         public virtual bool IsAlwaysFull => false;
 

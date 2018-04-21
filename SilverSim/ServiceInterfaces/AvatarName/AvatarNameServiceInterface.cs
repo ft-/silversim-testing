@@ -26,9 +26,9 @@ namespace SilverSim.ServiceInterfaces.AvatarName
 {
     public static class AvatarNameServiceExtensionMethods
     {
-        public static UUI FindUUIByName(this List<AvatarNameServiceInterface> list, string firstname, string lastname)
+        public static UGUIWithName FindUUIByName(this List<AvatarNameServiceInterface> list, string firstname, string lastname)
         {
-            UUI uui;
+            UGUIWithName uui;
             foreach(var service in list)
             {
                 if(service.TryGetValue(firstname, lastname, out uui))
@@ -39,9 +39,9 @@ namespace SilverSim.ServiceInterfaces.AvatarName
             throw new KeyNotFoundException();
         }
 
-        public static UUI FindUUIById(this List<AvatarNameServiceInterface> list, UUID id)
+        public static UGUIWithName FindUUIById(this List<AvatarNameServiceInterface> list, UUID id)
         {
-            UUI uui;
+            UGUIWithName uui;
             foreach (var service in list)
             {
                 if (service.TryGetValue(id, out uui))
@@ -55,20 +55,50 @@ namespace SilverSim.ServiceInterfaces.AvatarName
 
     public abstract class AvatarNameServiceInterface
     {
-        public abstract UUI this[UUID key] { get; }
-        public abstract bool TryGetValue(UUID key, out UUI uui);
+        public abstract UGUIWithName this[UUID key] { get; }
+        public abstract bool TryGetValue(UUID key, out UGUIWithName uui);
 
         /** <summary>if setting is not supported, ignore the details and return without exception. Only store authoritative information</summary> */
-        public abstract void Store(UUI uui);
+        public abstract void Store(UGUIWithName uui);
         public abstract bool Remove(UUID key);
 
-        public abstract UUI this[string firstName, string lastName] { get; }
+        public abstract UGUIWithName this[string firstName, string lastName] { get; }
 
-        public abstract bool TryGetValue(string firstName, string lastName, out UUI uui);
+        public abstract bool TryGetValue(string firstName, string lastName, out UGUIWithName uui);
 
-        public abstract List<UUI> Search(string[] names); /* returns empty list when not supported */
+        public abstract List<UGUIWithName> Search(string[] names); /* returns empty list when not supported */
 
-        public bool TryGetValue(UUI input, out UUI uui)
+        public bool TryGetValue(UUID key, out UGUI ugui)
+        {
+            UGUIWithName uui;
+            if(TryGetValue(key, out uui))
+            {
+                ugui = uui;
+                return true;
+            }
+            else
+            {
+                ugui = UGUI.Unknown;
+                return false;
+            }
+        }
+
+        public bool TryGetValue(UGUI input, out UGUI ugui)
+        {
+            UGUI uui;
+            if(TryGetValue(input.ID, out uui))
+            {
+                if(!input.IsAuthoritative || input.EqualsGrid(uui))
+                {
+                    ugui = uui;
+                    return true;
+                }
+            }
+            ugui = default(UGUI);
+            return false;
+        }
+
+        public bool TryGetValue(UGUIWithName input, out UGUIWithName uui)
         {
             if(!input.IsAuthoritative &&
                 TryGetValue(input.ID, out uui))
@@ -79,7 +109,7 @@ namespace SilverSim.ServiceInterfaces.AvatarName
             return false;
         }
 
-        public bool TryGetValue(UGUI input, out UUI uui)
+        public bool TryGetValue(UGUI input, out UGUIWithName uui)
         {
             if(TryGetValue(input.ID, out uui))
             {
@@ -88,15 +118,15 @@ namespace SilverSim.ServiceInterfaces.AvatarName
                     return true;
                 }
             }
-            uui = UUI.Unknown;
+            uui = UGUIWithName.Unknown;
             return false;
         }
 
-        public UUI this[UUI input]
+        public UGUIWithName this[UGUIWithName input]
         {
             get
             {
-                UUI resultuui;
+                UGUIWithName resultuui;
                 if (!input.IsAuthoritative &&
                     TryGetValue(input.ID, out resultuui))
                 {
@@ -106,11 +136,11 @@ namespace SilverSim.ServiceInterfaces.AvatarName
             }
         }
 
-        public UUI this[UGUI input]
+        public UGUIWithName this[UGUI input]
         {
             get
             {
-                UUI resultuui;
+                UGUIWithName resultuui;
                 if (TryGetValue(input.ID, out resultuui))
                 {
                     if (!input.IsAuthoritative || input.EqualsGrid(resultuui))
@@ -122,16 +152,37 @@ namespace SilverSim.ServiceInterfaces.AvatarName
             }
         }
 
-        public UUI ResolveName(UUI uui)
+        public UGUIWithName ResolveName(UGUIWithName uui)
         {
-            UUI resultuui;
+            UGUIWithName resultuui;
             return TryGetValue(uui, out resultuui) ? resultuui : uui;
         }
 
-        public bool TranslateToUUI(string arg, out UUI uui)
+        public UGUIWithName ResolveName(UGUI ugui)
         {
-            uui = UUI.Unknown;
-            if (UUI.TryParse(arg, out uui))
+            UGUIWithName resultuui;
+            if(TryGetValue(ugui, out resultuui))
+            {
+                if(!ugui.IsAuthoritative || ugui.EqualsGrid(resultuui))
+                {
+                    return resultuui;
+                }
+            }
+            return (UGUIWithName)ugui;
+        }
+
+        public bool TranslateToUUI(string arg, out UGUI ugui)
+        {
+            UGUIWithName uui;
+            bool success = TranslateToUUI(arg, out uui);
+            ugui = uui ?? null;
+            return success;
+        }
+
+        public bool TranslateToUUI(string arg, out UGUIWithName uui)
+        {
+            uui = UGUIWithName.Unknown;
+            if (UGUIWithName.TryParse(arg, out uui))
             {
                 return true;
             }
@@ -142,7 +193,7 @@ namespace SilverSim.ServiceInterfaces.AvatarName
                 {
                     names = new string[] { names[0], string.Empty };
                 }
-                UUI founduui;
+                UGUIWithName founduui;
                 if (TryGetValue(names[0], names[1], out founduui))
                 {
                     uui = founduui;
@@ -151,7 +202,7 @@ namespace SilverSim.ServiceInterfaces.AvatarName
             }
             else if (UUID.TryParse(arg, out uui.ID))
             {
-                UUI founduui;
+                UGUIWithName founduui;
                 if (TryGetValue(uui.ID, out founduui))
                 {
                     uui = founduui;

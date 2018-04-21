@@ -25,7 +25,7 @@ namespace SilverSim.Scene.Types.Script.Events
 {
     public struct ItemSoldEvent : IScriptEvent
     {
-        public UUI Agent;
+        public UGUI Agent;
         public UUID ObjectID;
         public string ObjectName;
     }

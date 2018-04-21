@@ -268,14 +268,20 @@ namespace SilverSim.Scene.Agent
             }
         }
 
-        public UUI Owner
+        public UGUIWithName NamedOwner => new UGUIWithName
+        {
+            FirstName = FirstName,
+            LastName = LastName,
+            ID = ID,
+            HomeURI = HomeURI
+        };
+
+        public UGUI Owner
         {
             get
             {
-                return new UUI
+                return new UGUI
                 {
-                    FirstName = FirstName,
-                    LastName = LastName,
                     ID = ID,
                     HomeURI = HomeURI
                 };
@@ -940,7 +946,7 @@ namespace SilverSim.Scene.Agent
         public abstract void SendMessageAlways(Message m, UUID fromSceneID);
         public abstract void SendAlertMessage(string msg, UUID fromSceneID);
         public abstract void SendAlertMessage(string msg, string notification, IValue llsd, UUID fromSceneID);
-        public abstract void SendRegionNotice(UUI fromAvatar, string message, UUID fromSceneID);
+        public abstract void SendRegionNotice(UGUI fromAvatar, string message, UUID fromSceneID);
         public abstract void HandleMessage(ChildAgentUpdate m);
         public abstract void HandleMessage(ChildAgentPositionUpdate m);
         public abstract RwLockedList<UUID> SelectedObjects(UUID scene);

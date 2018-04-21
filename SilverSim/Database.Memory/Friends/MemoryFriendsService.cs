@@ -59,22 +59,7 @@ namespace SilverSim.Database.Memory.Friends
             m_AvatarNameServiceNames = ownSection.GetString("AvatarNameServices", string.Empty).Split(',');
         }
 
-        public void ResolveUUI(FriendInfo fi)
-        {
-            UUI uui;
-            if (!fi.Friend.IsAuthoritative &&
-                m_AvatarNameService.TryGetValue(fi.Friend, out uui))
-            {
-                fi.Friend = uui;
-            }
-            if (!fi.User.IsAuthoritative &&
-                m_AvatarNameService.TryGetValue(fi.User, out uui))
-            {
-                fi.User = uui;
-            }
-        }
-
-        public override List<FriendInfo> this[UUI user]
+        public override List<FriendInfo> this[UGUI user]
         {
             get
             {
@@ -100,14 +85,13 @@ namespace SilverSim.Database.Memory.Friends
                     fi.Secret = kvp.Value.Secret;
                     fi.Friend.ID = kvp.Key;
                     fi.User = user;
-                    ResolveUUI(fi);
                     friends.Add(fi);
                 }
                 return friends;
             }
         }
 
-        public override FriendInfo this[UUI user, UUI friend]
+        public override FriendInfo this[UGUI user, UGUI friend]
         {
             get
             {
@@ -175,7 +159,7 @@ namespace SilverSim.Database.Memory.Friends
             }
         }
 
-        public override bool TryGetValue(UUI user, UUI friend, out FriendInfo fInfo)
+        public override bool TryGetValue(UGUI user, UGUI friend, out FriendInfo fInfo)
         {
             RwLockedDictionary<UUID, FriendData> friendList;
             FriendData data;
@@ -193,7 +177,6 @@ namespace SilverSim.Database.Memory.Friends
                 {
                     fInfo.UserGivenFlags = data.Rights;
                 }
-                ResolveUUI(fInfo);
                 return true;
             }
             return false;

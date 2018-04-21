@@ -23,7 +23,7 @@ namespace SilverSim.Types.Profile
 {
     public struct ProfilePreferences
     {
-        public UUI User;
+        public UGUI User;
         public bool IMviaEmail;
         public bool Visible;
     }

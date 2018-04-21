@@ -96,7 +96,7 @@ namespace SilverSim.Viewer.Core
         {
             public UUID AssetID;
             public AssetType AssetType;
-            public UUI Creator;
+            public UGUI Creator;
             public bool IsLocal;
             public bool IsTemporary;
             public bool IsCompleted;
@@ -211,14 +211,14 @@ namespace SilverSim.Viewer.Core
                 if (transaction.IsCompleted)
                 {
 #if DEBUG
-                    m_Log.DebugFormat("SetAssetUploadAsCreateInventoryItem(): Completing transaction {0} for {1}", transactionID, Owner.FullName);
+                    m_Log.DebugFormat("SetAssetUploadAsCreateInventoryItem(): Completing transaction {0} for {1}", transactionID, Owner.ToString());
 #endif
                     AssetUploadCompleted(transaction, transaction.SceneID);
                 }
 #if DEBUG
                 else
                 {
-                    m_Log.DebugFormat("SetAssetUploadAsCreateInventoryItem(): Appended action to transaction {0} for {1}", transactionID, Owner.FullName);
+                    m_Log.DebugFormat("SetAssetUploadAsCreateInventoryItem(): Appended action to transaction {0} for {1}", transactionID, Owner.ToString());
                 }
 #endif
             }
@@ -267,14 +267,14 @@ namespace SilverSim.Viewer.Core
                 if (transaction.IsCompleted)
                 {
 #if DEBUG
-                    m_Log.DebugFormat("SetAssetUploadAsCompletionAction(): Completing transaction {0} for {1}", transactionID, Owner.FullName);
+                    m_Log.DebugFormat("SetAssetUploadAsCompletionAction(): Completing transaction {0} for {1}", transactionID, Owner.ToString());
 #endif
                     AssetUploadCompleted(transaction, transaction.SceneID);
                 }
 #if DEBUG
                 else
                 {
-                    m_Log.DebugFormat("SetAssetUploadAsCompletionAction(): Appended action to transaction {0} for {1}", transactionID, Owner.FullName);
+                    m_Log.DebugFormat("SetAssetUploadAsCompletionAction(): Appended action to transaction {0} for {1}", transactionID, Owner.ToString());
                 }
 #endif
             }
@@ -304,14 +304,14 @@ namespace SilverSim.Viewer.Core
                 if (transaction.IsCompleted)
                 {
 #if DEBUG
-                    m_Log.DebugFormat("SetAssetUploadAsUpdateInventoryItem(): Completing transaction {0} for {1}", transactionID, Owner.FullName);
+                    m_Log.DebugFormat("SetAssetUploadAsUpdateInventoryItem(): Completing transaction {0} for {1}", transactionID, Owner.ToString());
 #endif
                     AssetUploadCompleted(transaction, transaction.SceneID);
                 }
 #if DEBUG
                 else
                 {
-                    m_Log.DebugFormat("SetAssetUploadAsUpdateInventoryItem(): Appended action to transaction {0} for {1}", transactionID, Owner.FullName);
+                    m_Log.DebugFormat("SetAssetUploadAsUpdateInventoryItem(): Appended action to transaction {0} for {1}", transactionID, Owner.ToString());
                 }
 #endif
             }
@@ -322,7 +322,7 @@ namespace SilverSim.Viewer.Core
         private UUID AddAssetUploadTransaction(UUID transactionID, AssetUploadTransaction t, UUID fromSceneID)
         {
 #if DEBUG
-            m_Log.DebugFormat("AddAssetUploadTransaction(): Added asset upload transaction {0} for {1}", transactionID, Owner.FullName);
+            m_Log.DebugFormat("AddAssetUploadTransaction(): Added asset upload transaction {0} for {1}", transactionID, Owner.ToString());
 #endif
             UInt64 XferID = NextXferID;
             m_AssetTransactions.Add(transactionID, XferID, t);
@@ -387,7 +387,7 @@ namespace SilverSim.Viewer.Core
             if(req.AssetData.Length > 2)
             {
 #if DEBUG
-                m_Log.DebugFormat("HandleAssetUploadRequest(): Added asset upload transaction {0} for {1}: Single packet", req.TransactionID, Owner.FullName);
+                m_Log.DebugFormat("HandleAssetUploadRequest(): Added asset upload transaction {0} for {1}: Single packet", req.TransactionID, Owner.ToString());
 #endif
                 transaction.DataBlocks.Add(req.AssetData);
                 lock (transaction)
@@ -405,7 +405,7 @@ namespace SilverSim.Viewer.Core
             else
             {
 #if DEBUG
-                m_Log.DebugFormat("AssetUploadRequest(): Added asset upload transaction {0} for {1}: Xfer packets", req.TransactionID, Owner.FullName);
+                m_Log.DebugFormat("AssetUploadRequest(): Added asset upload transaction {0} for {1}: Xfer packets", req.TransactionID, Owner.ToString());
 #endif
                 var reqxfer = new RequestXfer
                 {
@@ -447,7 +447,7 @@ namespace SilverSim.Viewer.Core
             try
             {
 #if DEBUG
-                m_Log.DebugFormat("Storing asset {0} for {1} / Target={2}", data.ID, Owner.FullName, transaction.Target.ToString());
+                m_Log.DebugFormat("Storing asset {0} for {1} / Target={2}", data.ID, Owner.ToString(), transaction.Target.ToString());
 #endif
                 if (transaction.Target == AssetUploadTransaction.TargetAsset.Agent)
                 {
@@ -460,7 +460,7 @@ namespace SilverSim.Viewer.Core
             }
             catch(Exception e)
             {
-                m_Log.ErrorFormat("Storing asset {0} for {1} failed {2}: {3}", data.ID, Owner.FullName, e.GetType().FullName, e.Message);
+                m_Log.ErrorFormat("Storing asset {0} for {1} failed {2}: {3}", data.ID, Owner.ToString(), e.GetType().FullName, e.Message);
 
                 SendAlertMessage("Could not upload asset", fromSceneID);
                 success = false;

@@ -23,7 +23,7 @@ namespace SilverSim.Types.Groups
 {
     public struct GroupActiveMembership
     {
-        public UUI User;
+        public UGUI User;
         public UGI Group;
         public UUID SelectedRoleID;
     }

@@ -116,6 +116,8 @@ namespace SilverSim.Scene.Types.Agent
             get;
         }
 
+        UGUIWithName NamedOwner { get; }
+
         Vector4 CollisionPlane { get; set; }
 
         AgentAttachments Attachments { get; }
@@ -201,7 +203,7 @@ namespace SilverSim.Scene.Types.Agent
         void SendMessageAlways(Message m, UUID fromSceneID);
         void SendAlertMessage(string msg, UUID fromSceneID);
         void SendAlertMessage(string msg, string notification, IValue llsd, UUID fromSceneID);
-        void SendRegionNotice(UUI fromAvatar, string message, UUID fromSceneID);
+        void SendRegionNotice(UGUI fromAvatar, string message, UUID fromSceneID);
         void HandleMessage(ChildAgentUpdate m);
         void HandleMessage(ChildAgentPositionUpdate m);
         bool UnSit();

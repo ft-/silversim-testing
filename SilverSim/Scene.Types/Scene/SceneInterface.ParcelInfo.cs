@@ -73,7 +73,7 @@ namespace SilverSim.Scene.Types.Scene
             return (int)(p.ParcelPrimBonus * parcelPrims);
         }
 
-        private ParcelOverlayType GetParcelLayerByte(int x, int y, UUI agentID)
+        private ParcelOverlayType GetParcelLayerByte(int x, int y, UGUI agentID)
         {
             ParcelInfo pi;
             var ov = ParcelOverlayType.Public;
@@ -121,7 +121,7 @@ namespace SilverSim.Scene.Types.Scene
             m_ParcelLayerRwLock.AcquireReaderLock(() =>
             {
                 int bytePos = 0;
-                UUI agentID = agent.Owner;
+                UGUI agentID = agent.Owner;
                 for (int y = 0; y < SizeY / PARCEL_BLOCK_SIZE; ++y)
                 {
                     for (int x = 0; x < SizeX / PARCEL_BLOCK_SIZE; ++x)
@@ -172,7 +172,7 @@ namespace SilverSim.Scene.Types.Scene
 
                                     SequenceID = sequenceID
                                 };
-                                UUI agentID = a.Owner;
+                                UGUI agentID = a.Owner;
                                 for (int pos = 0; pos < m.Data.Length; ++pos)
                                 {
                                     m.Data[pos] = (byte)GetParcelLayerByte((offset + pos) % xwidth, (offset + pos) / xwidth, agentID);
@@ -452,7 +452,7 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        public bool JoinParcels(UUI requestingAgent, int start_x, int start_y, int end_x, int end_y)
+        public bool JoinParcels(UGUI requestingAgent, int start_x, int start_y, int end_x, int end_y)
         {
             start_x &= (~3);
             start_y &= (~3);
@@ -501,7 +501,7 @@ namespace SilverSim.Scene.Types.Scene
             return true;
         }
 
-        public bool DivideParcel(UUI requestingAgent, int start_x, int start_y, int end_x, int end_y)
+        public bool DivideParcel(UGUI requestingAgent, int start_x, int start_y, int end_x, int end_y)
         {
             ParcelInfo pInfo;
             if(!Parcels.TryGetValue(new Vector3(start_x, start_y, 0), out pInfo))
@@ -585,7 +585,7 @@ namespace SilverSim.Scene.Types.Scene
             return true;
         }
 
-        public bool ClaimParcel(UUI requestingAgent, int start_x, int start_y, int end_x, int end_y, int soldforprice)
+        public bool ClaimParcel(UGUI requestingAgent, int start_x, int start_y, int end_x, int end_y, int soldforprice)
         {
             ParcelInfo pInfo;
             if (!Parcels.TryGetValue(new Vector3(start_x, start_y, 0), out pInfo))
@@ -614,7 +614,7 @@ namespace SilverSim.Scene.Types.Scene
                 }
             }
 
-            if (!pInfo.Owner.EqualsGrid(UUI.Unknown))
+            if (!pInfo.Owner.EqualsGrid(UGUI.Unknown))
             {
                 return false;
             }
@@ -627,7 +627,7 @@ namespace SilverSim.Scene.Types.Scene
             newParcel.ClaimDate = Date.Now;
             newParcel.ClaimPrice = soldforprice;
             newParcel.SalePrice = 0;
-            newParcel.AuthBuyer = UUI.Unknown;
+            newParcel.AuthBuyer = UGUI.Unknown;
             newParcel.Flags &= ~(ParcelFlags.ForSale | ParcelFlags.ForSaleObjects | ParcelFlags.SellParcelObjects | ParcelFlags.ShowDirectory);
 
             Parcels.Add(newParcel);

@@ -46,14 +46,14 @@ namespace SilverSim.Main.Friends
             m_FriendsSimStatusNotifyServiceName = section.GetString("FriendsSimStatusNotifyService", "FriendsSimStatusNotifyService");
         }
 
-        public void NotifyAsOffline(UUI notifier, List<KeyValuePair<UUI, string>> list) => InnerNotify(notifier, list, false);
+        public void NotifyAsOffline(UGUI notifier, List<KeyValuePair<UGUI, string>> list) => InnerNotify(notifier, list, false);
 
-        public void NotifyAsOnline(UUI notifier, List<KeyValuePair<UUI, string>> list) => InnerNotify(notifier, list, false);
+        public void NotifyAsOnline(UGUI notifier, List<KeyValuePair<UGUI, string>> list) => InnerNotify(notifier, list, false);
 
-        private void InnerNotify(UUI notifier, List<KeyValuePair<UUI, string>> list, bool isOnline)
+        private void InnerNotify(UGUI notifier, List<KeyValuePair<UGUI, string>> list, bool isOnline)
         {
-            var notified = new Dictionary<UUID, List<UUI>>();
-            Action<UUID, UUI, List<UUI>> notifyFunc;
+            var notified = new Dictionary<UUID, List<UGUI>>();
+            Action<UUID, UGUI, List<UGUI>> notifyFunc;
 
             if (isOnline)
             {
@@ -64,23 +64,23 @@ namespace SilverSim.Main.Friends
                 notifyFunc = m_FriendsSimStatusNotifyService.NotifyAsOffline;
             }
 
-            foreach(KeyValuePair<UUI, string> kvp in list)
+            foreach(KeyValuePair<UGUI, string> kvp in list)
             {
                 List<PresenceInfo> presences = m_PresenceService[kvp.Key.ID];
 
-                List<UUI> notifiedInRegion;
+                List<UGUI> notifiedInRegion;
                 foreach (PresenceInfo pinfo in presences)
                 {
                     if (!notified.TryGetValue(pinfo.RegionID, out notifiedInRegion))
                     {
-                        notifiedInRegion = new List<UUI>();
+                        notifiedInRegion = new List<UGUI>();
                         notified.Add(pinfo.RegionID, notifiedInRegion);
                     }
                     notifiedInRegion.Add(pinfo.UserID);
                 }
             }
 
-            foreach(KeyValuePair<UUID, List<UUI>> kvp in notified)
+            foreach(KeyValuePair<UUID, List<UGUI>> kvp in notified)
             {
                 notifyFunc(kvp.Key, notifier, kvp.Value);
             }

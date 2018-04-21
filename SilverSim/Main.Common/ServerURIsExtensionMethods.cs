@@ -29,7 +29,7 @@ namespace SilverSim.Main.Common
 {
     public static class ServerURIsExtensionMethods
     {
-        public static void GetServerURLs(this ServerURIs serverUrls, UUI user, string uri = null, int timeoutms = 20000)
+        public static void GetServerURLs(this ServerURIs serverUrls, UGUI user, string uri = null, int timeoutms = 20000)
         {
             var hash = new Map
             {

@@ -105,15 +105,15 @@ namespace SilverSim.Scene.Types.Object
             AssetID = new UUID(item.AssetID);
             AssetType = item.AssetType;
             CreationDate = item.CreationDate;
-            Creator = new UUI(item.Creator);
+            Creator = new UGUI(item.Creator);
             Description = item.Description;
             Flags = item.Flags;
             Group = new UGI(item.Group);
             IsGroupOwned = item.IsGroupOwned;
             InventoryType = item.InventoryType;
-            LastOwner = new UUI(item.LastOwner);
+            LastOwner = new UGUI(item.LastOwner);
             Name = item.Name;
-            Owner = new UUI(item.Owner);
+            Owner = new UGUI(item.Owner);
             ParentFolderID = new UUID(item.ParentFolderID);
             Permissions.Base = item.Permissions.Base;
             Permissions.Current = item.Permissions.Current;
@@ -130,15 +130,15 @@ namespace SilverSim.Scene.Types.Object
             AssetID = new UUID(item.AssetID);
             AssetType = item.AssetType;
             CreationDate = item.CreationDate;
-            Creator = new UUI(item.Creator);
+            Creator = new UGUI(item.Creator);
             Description = item.Description;
             Flags = item.Flags;
             Group = new UGI(item.Group);
             IsGroupOwned = item.IsGroupOwned;
             InventoryType = item.InventoryType;
-            LastOwner = new UUI(item.LastOwner);
+            LastOwner = new UGUI(item.LastOwner);
             Name = item.Name;
-            Owner = new UUI(item.Owner);
+            Owner = new UGUI(item.Owner);
             ParentFolderID = new UUID(item.ParentFolderID);
             Permissions.Base = item.Permissions.Base;
             Permissions.Current = item.Permissions.Current;
@@ -175,7 +175,7 @@ namespace SilverSim.Scene.Types.Object
 
         public class PermsGranterInfo
         {
-            public UUI PermsGranter = UUI.Unknown;
+            public UGUI PermsGranter = UGUI.Unknown;
             public ScriptPermissions PermsMask;
 
             public PermsGranterInfo()

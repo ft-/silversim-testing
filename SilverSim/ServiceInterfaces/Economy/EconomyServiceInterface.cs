@@ -38,9 +38,9 @@ namespace SilverSim.ServiceInterfaces.Economy
 
         public interface IMoneyBalanceAccessor
         {
-            int this[UUI agentID] { get; }
+            int this[UGUI agentID] { get; }
 
-            bool TryGetValue(UUI agentID, out int balance);
+            bool TryGetValue(UGUI agentID, out int balance);
         }
 
         public interface IGroupMoneyBalanceAccessor
@@ -51,9 +51,9 @@ namespace SilverSim.ServiceInterfaces.Economy
 
         public abstract string CurrencySymbol { get; }
 
-        public abstract void Login(UUID sceneID, UUI agentID, UUID sessionID, UUID secureSessionID);
+        public abstract void Login(UUID sceneID, UGUI agentID, UUID sessionID, UUID secureSessionID);
 
-        public abstract void Logout(UUI agentID, UUID sessionID, UUID secureSessionID);
+        public abstract void Logout(UGUI agentID, UUID sessionID, UUID secureSessionID);
 
         public abstract IMoneyBalanceAccessor MoneyBalance { get; }
 
@@ -71,18 +71,18 @@ namespace SilverSim.ServiceInterfaces.Economy
         /** <summary> Start a transaction for paying a grid service</summary>
          * <exception cref="InsufficientFundsException">this exception is thrown when not enough funds are available</exception>
          */
-        public abstract IActiveTransaction BeginChargeTransaction(UUI agentID, BaseTransaction transactionData, int amount);
+        public abstract IActiveTransaction BeginChargeTransaction(UGUI agentID, BaseTransaction transactionData, int amount);
 
         /** <summary> Start a transaction for paying another user by a user</summary>
          * <exception cref="InsufficientFundsException">this exception is thrown when not enough funds are available</exception>
          */
-        public abstract IActiveTransaction BeginTransferTransaction(UUI sourceID, UUI destinationID, BaseTransaction transactionData, int amount);
+        public abstract IActiveTransaction BeginTransferTransaction(UGUI sourceID, UGUI destinationID, BaseTransaction transactionData, int amount);
 
         /** <summary> Start a transaction for paying a group by a user</summary>
          * <exception cref="InsufficientFundsException">this exception is thrown when not enough funds are available</exception>
          * <exception cref="NotSupportedException">this exception is thrown when the economy service does not support group accounts</exception>
          */
-        public virtual IActiveTransaction BeginTransferTransaction(UUI sourceID, UGI destinationID, BaseTransaction transactionData, int amount)
+        public virtual IActiveTransaction BeginTransferTransaction(UGUI sourceID, UGI destinationID, BaseTransaction transactionData, int amount)
         {
             throw new NotSupportedException();
         }
@@ -91,7 +91,7 @@ namespace SilverSim.ServiceInterfaces.Economy
          * <exception cref="InsufficientFundsException">this exception is thrown when not enough funds are available</exception>
          * <exception cref="NotSupportedException">this exception is thrown when the economy service does not support group accounts</exception>
          */
-        public virtual IActiveTransaction BeginTransferTransaction(UGI sourceID, UUI destinationID, BaseTransaction transactionData, int amount)
+        public virtual IActiveTransaction BeginTransferTransaction(UGI sourceID, UGUI destinationID, BaseTransaction transactionData, int amount)
         {
             throw new NotSupportedException();
         }
@@ -100,7 +100,7 @@ namespace SilverSim.ServiceInterfaces.Economy
          * this function has to throw exception for signaling error
          * <returns>returns a debit permission key on success</returns>
          */
-        public virtual UUID RequestScriptDebitPermission(UUI sourceID, UUID regionID, UUID objectID, UUID itemID) => UUID.Zero;
+        public virtual UUID RequestScriptDebitPermission(UGUI sourceID, UUID regionID, UUID objectID, UUID itemID) => UUID.Zero;
 
         /** <summary>Request script debit permission</summary>
          */
@@ -108,7 +108,7 @@ namespace SilverSim.ServiceInterfaces.Economy
         {
         }
 
-        public void ChargeAmount(UUI agentID, BaseTransaction transactionData, int amount, Action processOperation)
+        public void ChargeAmount(UGUI agentID, BaseTransaction transactionData, int amount, Action processOperation)
         {
             IActiveTransaction transaction = BeginChargeTransaction(agentID, transactionData, amount);
             try
@@ -126,7 +126,7 @@ namespace SilverSim.ServiceInterfaces.Economy
         /** <summary> Start a transaction for paying another user by a user</summary>
          * <exception cref="InsufficientFundsException">this exception is thrown when not enough funds are available</exception>
          */
-        public void TransferMoney(UUI sourceID, UUI destinationID, BaseTransaction transactionData, int amount, Action processOperation)
+        public void TransferMoney(UGUI sourceID, UGUI destinationID, BaseTransaction transactionData, int amount, Action processOperation)
         {
             IActiveTransaction transaction = BeginTransferTransaction(sourceID, destinationID, transactionData, amount);
             try
@@ -145,7 +145,7 @@ namespace SilverSim.ServiceInterfaces.Economy
          * <exception cref="InsufficientFundsException">this exception is thrown when not enough funds are available</exception>
          * <exception cref="NotSupportedException">this exception is thrown when the economy service does not support group accounts</exception>
          */
-        public void TransferMoney(UUI sourceID, UGI destinationID, BaseTransaction transactionData, int amount, Action processOperation)
+        public void TransferMoney(UGUI sourceID, UGI destinationID, BaseTransaction transactionData, int amount, Action processOperation)
         {
             IActiveTransaction transaction = BeginTransferTransaction(sourceID, destinationID, transactionData, amount);
             try
@@ -164,7 +164,7 @@ namespace SilverSim.ServiceInterfaces.Economy
          * <exception cref="InsufficientFundsException">this exception is thrown when not enough funds are available</exception>
          * <exception cref="NotSupportedException">this exception is thrown when the economy service does not support group accounts</exception>
          */
-        public void TransferMoney(UGI sourceID, UUI destinationID, BaseTransaction transactionData, int amount, Action processOperation)
+        public void TransferMoney(UGI sourceID, UGUI destinationID, BaseTransaction transactionData, int amount, Action processOperation)
         {
             IActiveTransaction transaction = BeginTransferTransaction(sourceID, destinationID, transactionData, amount);
             try
@@ -204,9 +204,9 @@ namespace SilverSim.ServiceInterfaces.Economy
             public string Password;
         }
 
-        public abstract CurrencyQuote GetCurrencyQuote(UUI sourceID, string language, int currencyToBuy);
+        public abstract CurrencyQuote GetCurrencyQuote(UGUI sourceID, string language, int currencyToBuy);
 
-        public abstract void BuyCurrency(UUI sourceID, string language, CurrencyBuy quote);
+        public abstract void BuyCurrency(UGUI sourceID, string language, CurrencyBuy quote);
 
         /** <summary>extended exception to provide an actual URL describing an error into transaction system</summary> */
         public class UrlAttachedErrorException : Exception

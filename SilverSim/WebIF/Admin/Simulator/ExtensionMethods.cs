@@ -19,8 +19,10 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.Types;
 using SilverSim.Types.Estate;
 using SilverSim.Types.Grid;
@@ -29,13 +31,13 @@ namespace SilverSim.WebIF.Admin.Simulator
 {
     public static class ExtensionMethods
     {
-        public static Map ToJsonMap(this EstateInfo estate) => new Map
+        public static Map ToJsonMap(this EstateInfo estate, IAdminWebIF webif) => new Map
         {
             { "ID", (int)estate.ID },
             { "ParentEstateID", (int)estate.ParentEstateID },
             { "Name", estate.Name },
             { "Flags", ((uint)estate.Flags).ToString() },
-            { "Owner", estate.Owner.ToMap() },
+            { "Owner", webif.ResolveName(estate.Owner).ToMap() },
             { "PricePerMeter", estate.PricePerMeter },
             { "BillableFactor", estate.BillableFactor },
             { "SunPosition", estate.SunPosition },
@@ -43,7 +45,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             { "UseGlobalTime", estate.UseGlobalTime }
         };
 
-        public static Map ToJsonMap(this RegionInfo region)
+        public static Map ToJsonMap(this RegionInfo region, IAdminWebIF webif)
         {
             var m = new Map
             {
@@ -77,7 +79,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                     break;
             }
 
-            m.Add("Owner", region.Owner.ToMap());
+            m.Add("Owner", webif.ResolveName(region.Owner).ToMap());
             m.Add("Flags", ((uint)region.Flags).ToString());
             return m;
         }
@@ -85,10 +87,10 @@ namespace SilverSim.WebIF.Admin.Simulator
         public static Map ToJsonMap(this IAgent agent, SceneInterface scene) => new Map
         {
             { "ID", agent.Owner.ID },
-            { "FullName", agent.Owner.FullName },
-            { "FirstName", agent.Owner.FirstName },
-            { "LastName", agent.Owner.LastName },
-            { "HomeURI", agent.Owner.HomeURI != null ? agent.Owner.HomeURI.ToString() : string.Empty },
+            { "FullName", agent.NamedOwner.FullName },
+            { "FirstName", agent.NamedOwner.FirstName },
+            { "LastName", agent.NamedOwner.LastName },
+            { "HomeURI", agent.NamedOwner.HomeURI != null ? agent.NamedOwner.HomeURI.ToString() : string.Empty },
             { "Type", agent.IsNpc ? "Npc" : "User" },
             { "IsRoot", agent.IsInScene(scene) },
             { "Position", agent.GlobalPosition.ToString() },

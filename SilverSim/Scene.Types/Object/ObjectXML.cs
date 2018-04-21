@@ -31,12 +31,12 @@ namespace SilverSim.Scene.Types.Object
     public static class ObjectXML
     {
         public static AssetData Asset(this ObjectGroup grp, XmlSerializationOptions options = XmlSerializationOptions.None) =>
-            grp.Asset(UUI.Unknown, Vector3.Zero, options, false);
+            grp.Asset(UGUI.Unknown, Vector3.Zero, options, false);
 
-        public static AssetData Asset(this ObjectGroup grp, UUI nextOwner, XmlSerializationOptions options = XmlSerializationOptions.None) =>
+        public static AssetData Asset(this ObjectGroup grp, UGUI nextOwner, XmlSerializationOptions options = XmlSerializationOptions.None) =>
             grp.Asset(nextOwner, Vector3.Zero, options, false);
 
-        public static AssetData Asset(this ObjectGroup grp, UUI nextOwner, Vector3 offsetpos, XmlSerializationOptions options = XmlSerializationOptions.None, bool writeOffsetPos = true)
+        public static AssetData Asset(this ObjectGroup grp, UGUI nextOwner, Vector3 offsetpos, XmlSerializationOptions options = XmlSerializationOptions.None, bool writeOffsetPos = true)
         {
             using (var ms = new MemoryStream())
             {
@@ -55,9 +55,9 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        public static AssetData Asset(this List<ObjectGroup> objlist, XmlSerializationOptions options) => objlist.Asset(UUI.Unknown, options);
+        public static AssetData Asset(this List<ObjectGroup> objlist, XmlSerializationOptions options) => objlist.Asset(UGUI.Unknown, options);
 
-        public static AssetData Asset(this List<ObjectGroup> objlist, UUI nextOwner, XmlSerializationOptions options)
+        public static AssetData Asset(this List<ObjectGroup> objlist, UGUI nextOwner, XmlSerializationOptions options)
         {
             if (objlist.Count == 1)
             {
@@ -88,7 +88,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        public static List<ObjectGroup> FromAsset(AssetData data, UUI currentOwner, XmlDeserializationOptions options = XmlDeserializationOptions.None)
+        public static List<ObjectGroup> FromAsset(AssetData data, UGUI currentOwner, XmlDeserializationOptions options = XmlDeserializationOptions.None)
         {
             if(data.Type != AssetType.Object)
             {
@@ -101,7 +101,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        public static List<ObjectGroup> FromXml(Stream xmlstream, UUI currentOwner, XmlDeserializationOptions options = XmlDeserializationOptions.None)
+        public static List<ObjectGroup> FromXml(Stream xmlstream, UGUI currentOwner, XmlDeserializationOptions options = XmlDeserializationOptions.None)
         {
             using (var reader = new XmlTextReader(new ObjectXmlStreamFilter(xmlstream)))
             {
@@ -109,7 +109,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        private static List<ObjectGroup> FromXml(XmlTextReader reader, UUI currentOwner, XmlDeserializationOptions options = XmlDeserializationOptions.None)
+        private static List<ObjectGroup> FromXml(XmlTextReader reader, UGUI currentOwner, XmlDeserializationOptions options = XmlDeserializationOptions.None)
         {
             for(;;)
             {
@@ -135,12 +135,12 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        private static List<ObjectGroup> FromXmlSingleObject(XmlTextReader reader, UUI currentOwner, XmlDeserializationOptions options = XmlDeserializationOptions.None) => new List<ObjectGroup>
+        private static List<ObjectGroup> FromXmlSingleObject(XmlTextReader reader, UGUI currentOwner, XmlDeserializationOptions options = XmlDeserializationOptions.None) => new List<ObjectGroup>
         {
             ObjectGroup.FromXml(reader, currentOwner, options)
         };
 
-        private static List<ObjectGroup> FromXmlCoalescedObject(XmlTextReader reader, UUI currentOwner, XmlDeserializationOptions options = XmlDeserializationOptions.None)
+        private static List<ObjectGroup> FromXmlCoalescedObject(XmlTextReader reader, UGUI currentOwner, XmlDeserializationOptions options = XmlDeserializationOptions.None)
         {
             var list = new List<ObjectGroup>();
             for(;;)
@@ -209,7 +209,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        private static ObjectGroup FromXmlSingleWithinCoalescedObject(XmlTextReader reader, UUI currentOwner, XmlDeserializationOptions options = XmlDeserializationOptions.None)
+        private static ObjectGroup FromXmlSingleWithinCoalescedObject(XmlTextReader reader, UGUI currentOwner, XmlDeserializationOptions options = XmlDeserializationOptions.None)
         {
             ObjectGroup grp = null;
             for (; ; )

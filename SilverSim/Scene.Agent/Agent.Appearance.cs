@@ -281,9 +281,6 @@ namespace SilverSim.Scene.Agent
                     Textures.All = value.AvatarTextures.All;
                     //value.Attachments;
                 }
-#if DEBUG
-                m_Log.DebugFormat("Appearance property setter called for {0}", Owner.FullName);
-#endif
                 InvokeOnAppearanceUpdate();
             }
         }
@@ -305,7 +302,7 @@ namespace SilverSim.Scene.Agent
                 m_BakeCache.LoadFromCurrentOutfit(Owner, InventoryService, AssetService, logOutput);
                 Appearance = m_BakeCache.Bake(SceneAssetService, logOutput);
 #if DEBUG
-                logOutput?.Invoke(string.Format("Appearance for {0} at version {1}", Owner.FullName.ToString(), Appearance.Serial));
+                logOutput?.Invoke(string.Format("Appearance for {0} at version {1}", Owner.ToString(), Appearance.Serial));
 #endif
             }
             catch(AlreadyBakedException)
@@ -314,7 +311,7 @@ namespace SilverSim.Scene.Agent
             }
             catch(Exception e)
             {
-                m_Log.Error("Rebake appearance failed for " + Owner.FullName.ToString(), e);
+                m_Log.Error("Rebake appearance failed for " + Owner.ToString(), e);
                 return;
             }
             InvokeOnAppearanceUpdate();

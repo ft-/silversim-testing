@@ -59,8 +59,10 @@ namespace SilverSim.Main.Common
         void SuccessResponse(HttpRequest req, Map m);
         void ErrorResponse(HttpRequest req, AdminWebIfErrorResult reason);
 
-        UUI ResolveName(UUI uui);
-        bool TranslateToUUI(string arg, out UUI uui);
+        UGUIWithName ResolveName(UGUIWithName uui);
+        UGUIWithName ResolveName(UGUI ugui);
+        bool TranslateToUUI(string arg, out UGUIWithName uui);
+        bool TranslateToUUI(string arg, out UGUI uui);
 
         UUID GetSelectedRegion(HttpRequest req, Map jsonreq);
         void SetSelectedRegion(HttpRequest req, Map jsonreq, UUID sceneID);

@@ -29,7 +29,7 @@ namespace SilverSim.Database.Memory.Profile
     partial class MemoryProfileService : ProfileServiceInterface.INotesInterface
     {
         private readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, string>> m_Notes = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, string>>(() => new RwLockedDictionary<UUID, string>());
-        public string this[UUI user, UUI target]
+        public string this[UGUI user, UGUI target]
         {
             get
             {
@@ -44,13 +44,13 @@ namespace SilverSim.Database.Memory.Profile
             set { m_Notes[user.ID][target.ID] = value; }
         }
 
-        public bool ContainsKey(UUI user, UUI target)
+        public bool ContainsKey(UGUI user, UGUI target)
         {
             RwLockedDictionary<UUID, string> notes;
             return m_Notes.TryGetValue(user.ID, out notes) && notes.ContainsKey(target.ID);
         }
 
-        public bool TryGetValue(UUI user, UUI target, out string notes)
+        public bool TryGetValue(UGUI user, UGUI target, out string notes)
         {
             RwLockedDictionary<UUID, string> notesDict;
             notes = default(string);

@@ -25,8 +25,8 @@ namespace SilverSim.ServiceInterfaces.UserAgents
 {
     public interface IDisplayNameAccessor
     {
-        string this[UUI agent] { get;  set; }
-        bool TryGetValue(UUI agent, out string displayname);
-        bool ContainsKey(UUI agent);
+        string this[UGUI agent] { get;  set; }
+        bool TryGetValue(UGUI agent, out string displayname);
+        bool ContainsKey(UGUI agent);
     }
 }

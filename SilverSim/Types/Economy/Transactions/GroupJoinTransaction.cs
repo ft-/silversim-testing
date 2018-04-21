@@ -24,7 +24,7 @@ namespace SilverSim.Types.Economy.Transactions
     public sealed class GroupJoinTransaction : BaseTransaction
     {
         public UGI Group = UGI.Unknown;
-        public UUI Joiner = UUI.Unknown;
+        public UGUI Joiner = UGUI.Unknown;
 
         public GroupJoinTransaction(GridVector regionHandle, UUID regionID, string regionName) 
             : base(regionHandle, regionID, regionName)

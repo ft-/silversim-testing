@@ -26,10 +26,10 @@ namespace SilverSim.ServiceInterfaces.Friends
 {
     public interface IFriendshipChangeServiceInterface
     {
-        void Offered(UUI fromAgent, UUI toAgent, string message);
-        void Approved(UUI fromAgent, UUI toAgent);
-        void Denied(UUI fromAgent, UUI toAgent);
-        void Terminated(UUI fromAgent, UUI toAgent);
-        void GrantRights(UUI fromAgent, UUI toAgent, FriendRightFlags oldRights, FriendRightFlags newRights);
+        void Offered(UGUI fromAgent, UGUI toAgent, string message);
+        void Approved(UGUI fromAgent, UGUI toAgent);
+        void Denied(UGUI fromAgent, UGUI toAgent);
+        void Terminated(UGUI fromAgent, UGUI toAgent);
+        void GrantRights(UGUI fromAgent, UGUI toAgent, FriendRightFlags oldRights, FriendRightFlags newRights);
     }
 }

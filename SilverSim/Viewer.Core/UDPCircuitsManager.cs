@@ -350,7 +350,7 @@ namespace SilverSim.Viewer.Core
                                                 SimAccess = scene.Access,
                                                 SimName = scene.Name,
                                                 SimOwner = scene.Owner.ID,
-                                                IsEstateManager = scene.IsEstateManager(new UUI(acircuit.Agent.ID, acircuit.Agent.FirstName, acircuit.Agent.LastName, acircuit.Agent.HomeURI)),
+                                                IsEstateManager = scene.IsEstateManager(acircuit.Agent.Owner),
                                                 WaterHeight = scene.RegionSettings.WaterHeight,
                                                 BillableFactor = 1,
                                                 TerrainStartHeight00 = scene.RegionSettings.Elevation1SW,

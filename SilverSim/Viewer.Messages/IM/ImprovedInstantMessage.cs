@@ -79,10 +79,10 @@ namespace SilverSim.Viewer.Messages.IM
 
         public static explicit operator GridInstantMessage(ImprovedInstantMessage m) => new GridInstantMessage
         {
-            FromAgent = new UUI { ID = m.AgentID, FullName = m.FromAgentName },
+            FromAgent = new UGUIWithName { ID = m.AgentID, FullName = m.FromAgentName },
             FromGroup = new UGI(m.AgentID),
             IsFromGroup = m.FromGroup,
-            ToAgent = new UUI(m.ToAgentID),
+            ToAgent = new UGUI(m.ToAgentID),
             ParentEstateID = m.ParentEstateID,
             RegionID = m.RegionID,
             Position = m.Position,

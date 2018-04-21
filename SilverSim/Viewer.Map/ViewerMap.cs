@@ -402,7 +402,7 @@ namespace SilverSim.Viewer.Map
                                     X = (ushort)sceneagent.GlobalPosition.X,
                                     Y = (ushort)sceneagent.GlobalPosition.Y,
                                     ID = UUID.Zero,
-                                    Name = sceneagent.Owner.FullName,
+                                    Name = sceneagent.NamedOwner.FullName,
                                     Extra = 1,
                                     Extra2 = 0
                                 };

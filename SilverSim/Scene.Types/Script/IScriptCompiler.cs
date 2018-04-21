@@ -86,12 +86,12 @@ namespace SilverSim.Scene.Types.Script
 
     public interface IScriptCompiler
     {
-        IScriptAssembly Compile(AppDomain appDom, UUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1, CultureInfo cultureInfo = null, Func<string, TextReader> includeOpen = null);
-        void SyntaxCheck(UUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1, CultureInfo cultureInfo = null, Func<string, TextReader> includeOpen = null);
+        IScriptAssembly Compile(AppDomain appDom, UGUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1, CultureInfo cultureInfo = null, Func<string, TextReader> includeOpen = null);
+        void SyntaxCheck(UGUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1, CultureInfo cultureInfo = null, Func<string, TextReader> includeOpen = null);
         IScriptState StateFromXml(XmlTextReader reader, Dictionary<string, string> attrs, ObjectPartInventoryItem item);
 
         /* for testing */
-        void SyntaxCheckAndDump(Stream s, UUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1, CultureInfo cultureInfo = null, Func<string, TextReader> includeOpen = null);
-        void CompileToDisk(string filename, AppDomain appDom, UUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1, CultureInfo cultureInfo = null, Func<string, TextReader> includeOpen = null);
+        void SyntaxCheckAndDump(Stream s, UGUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1, CultureInfo cultureInfo = null, Func<string, TextReader> includeOpen = null);
+        void CompileToDisk(string filename, AppDomain appDom, UGUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1, CultureInfo cultureInfo = null, Func<string, TextReader> includeOpen = null);
     }
 }

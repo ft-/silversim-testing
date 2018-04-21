@@ -38,7 +38,7 @@ namespace SilverSim.Scene.Types.Scene
         public class AddToObjectTransferItem : AssetTransferWorkItem
         {
             private readonly ObjectPart m_Part;
-            protected readonly UUI m_SourceAgent;
+            protected readonly UGUI m_SourceAgent;
             protected readonly UUID m_SceneID;
             private readonly ObjectPartInventoryItem m_Item;
             protected readonly TryGetSceneDelegate TryGetScene;
@@ -77,7 +77,7 @@ namespace SilverSim.Scene.Types.Scene
         public class ObjectTransferItem : AssetTransferWorkItem
         {
             private readonly InventoryServiceInterface m_InventoryService;
-            protected readonly UUI m_DestinationAgent;
+            protected readonly UGUI m_DestinationAgent;
             protected readonly UUID m_SceneID;
             private readonly List<InventoryItem> m_Items;
             private readonly string m_DestinationFolder = string.Empty;
@@ -154,7 +154,7 @@ namespace SilverSim.Scene.Types.Scene
             public ObjectTransferItem(
                 InventoryServiceInterface inventoryService,
                 AssetServiceInterface assetService,
-                UUI agentOwner,
+                UGUI agentOwner,
                 SceneInterface scene,
                 List<UUID> assetids,
                 List<InventoryItem> items,
@@ -172,7 +172,7 @@ namespace SilverSim.Scene.Types.Scene
             public ObjectTransferItem(
                 InventoryServiceInterface inventoryService,
                 AssetServiceInterface assetService,
-                UUI agentOwner,
+                UGUI agentOwner,
                 SceneInterface scene,
                 List<UUID> assetids,
                 List<InventoryItem> items,

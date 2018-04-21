@@ -30,36 +30,36 @@ namespace SilverSim.ServiceInterfaces.Profile
     {
         public interface IClassifiedsInterface
         {
-            Dictionary<UUID, string> GetClassifieds(UUI user);
-            ProfileClassified this[UUI user, UUID id] { get; }
-            bool TryGetValue(UUI user, UUID id, out ProfileClassified classified);
-            bool ContainsKey(UUI user, UUID id);
+            Dictionary<UUID, string> GetClassifieds(UGUI user);
+            ProfileClassified this[UGUI user, UUID id] { get; }
+            bool TryGetValue(UGUI user, UUID id, out ProfileClassified classified);
+            bool ContainsKey(UGUI user, UUID id);
             void Update(ProfileClassified classified);
             void Delete(UUID id);
         }
 
         public interface IPicksInterface
         {
-            Dictionary<UUID, string> GetPicks(UUI user);
-            ProfilePick this[UUI user, UUID id] { get; }
-            bool TryGetValue(UUI user, UUID id, out ProfilePick pick);
-            bool ContainsKey(UUI user, UUID id);
+            Dictionary<UUID, string> GetPicks(UGUI user);
+            ProfilePick this[UGUI user, UUID id] { get; }
+            bool TryGetValue(UGUI user, UUID id, out ProfilePick pick);
+            bool ContainsKey(UGUI user, UUID id);
             void Update(ProfilePick pick);
             void Delete(UUID id);
         }
 
         public interface INotesInterface
         {
-            string this[UUI user, UUI target] { get; set; }
-            bool TryGetValue(UUI user, UUI target, out string notes);
-            bool ContainsKey(UUI user, UUI target);
+            string this[UGUI user, UGUI target] { get; set; }
+            bool TryGetValue(UGUI user, UGUI target, out string notes);
+            bool ContainsKey(UGUI user, UGUI target);
         }
 
         public interface IUserPreferencesInterface
         {
-            ProfilePreferences this[UUI user] { get; set; }
-            bool TryGetValue(UUI user, out ProfilePreferences profilePrefs);
-            bool ContainsKey(UUI user);
+            ProfilePreferences this[UGUI user] { get; set; }
+            bool TryGetValue(UGUI user, out ProfilePreferences profilePrefs);
+            bool ContainsKey(UGUI user);
         }
 
         [Flags]
@@ -72,8 +72,8 @@ namespace SilverSim.ServiceInterfaces.Profile
 
         public interface IPropertiesInterface
         {
-            ProfileProperties this[UUI user] { get; }
-            ProfileProperties this[UUI user, PropertiesUpdateFlags flags] { set; }
+            ProfileProperties this[UGUI user] { get; }
+            ProfileProperties this[UGUI user, PropertiesUpdateFlags flags] { set; }
         }
 
         public abstract IClassifiedsInterface Classifieds { get; }
@@ -84,6 +84,6 @@ namespace SilverSim.ServiceInterfaces.Profile
 
         public abstract void Remove(UUID scopeID, UUID accountID);
 
-        public virtual List<UUID> GetUserImageAssets(UUI userId) => new List<UUID>();
+        public virtual List<UUID> GetUserImageAssets(UGUI userId) => new List<UUID>();
     }
 }

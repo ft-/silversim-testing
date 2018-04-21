@@ -27,6 +27,6 @@ namespace SilverSim.ServiceInterfaces.Account
     public interface IUserAccountSerialNoInterface
     {
         ulong SerialNumber { get; } /* updated on every store operation */
-        List<UUI> AccountList { get; }
+        List<UGUIWithName> AccountList { get; }
     }
 }

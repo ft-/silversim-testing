@@ -28,9 +28,9 @@ namespace SilverSim.Database.Memory.Experience
 {
     public sealed partial class MemoryExperienceService : ExperienceServiceInterface.IExperiencePermissionsInterface
     {
-        private readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUI, bool>> m_Perms = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUI, bool>>(() => new RwLockedDictionary<UUI, bool>());
+        private readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UGUI, bool>> m_Perms = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UGUI, bool>>(() => new RwLockedDictionary<UGUI, bool>());
 
-        bool IExperiencePermissionsInterface.this[UUID experienceID, UUI agent]
+        bool IExperiencePermissionsInterface.this[UUID experienceID, UGUI agent]
         {
             get
             {
@@ -48,25 +48,25 @@ namespace SilverSim.Database.Memory.Experience
             }
         }
 
-        bool IExperiencePermissionsInterface.Remove(UUID experienceID, UUI agent)
+        bool IExperiencePermissionsInterface.Remove(UUID experienceID, UGUI agent)
         {
-            RwLockedDictionary<UUI, bool> k;
+            RwLockedDictionary<UGUI, bool> k;
             return m_Perms.TryGetValue(experienceID, out k) && k.Remove(agent);
         }
 
-        bool IExperiencePermissionsInterface.TryGetValue(UUID experienceID, UUI agent, out bool allowed)
+        bool IExperiencePermissionsInterface.TryGetValue(UUID experienceID, UGUI agent, out bool allowed)
         {
-            RwLockedDictionary<UUI, bool> k;
+            RwLockedDictionary<UGUI, bool> k;
             allowed = false;
             return m_Perms.TryGetValue(experienceID, out k) && k.TryGetValue(agent, out allowed);
         }
 
-        Dictionary<UUID, bool> IExperiencePermissionsInterface.this[UUI agent]
+        Dictionary<UUID, bool> IExperiencePermissionsInterface.this[UGUI agent]
         {
             get
             {
                 var res = new Dictionary<UUID, bool>();
-                foreach(KeyValuePair<UUID, RwLockedDictionary<UUI, bool>> kvp in m_Perms)
+                foreach(KeyValuePair<UUID, RwLockedDictionary<UGUI, bool>> kvp in m_Perms)
                 {
                     bool allowed;
                     if(kvp.Value.TryGetValue(agent ,out allowed))

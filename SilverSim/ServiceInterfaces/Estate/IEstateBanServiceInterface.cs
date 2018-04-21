@@ -26,12 +26,12 @@ namespace SilverSim.ServiceInterfaces.Estate
 {
     public interface IEstateBanServiceListAccessInterface
     {
-        List<UUI> this[uint estateID] { get; }
+        List<UGUI> this[uint estateID] { get; }
     }
 
     public interface IEstateBanServiceInterface
     {
-        bool this[uint estateID, UUI agent] { get; set; }
+        bool this[uint estateID, UGUI agent] { get; set; }
 
         IEstateBanServiceListAccessInterface All { get; }
     }

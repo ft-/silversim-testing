@@ -268,7 +268,7 @@ namespace SilverSim.Scene.Types.Scene
                                     assetID = grp.NextOwnerAssetID;
                                     if (assetID == UUID.Zero)
                                     {
-                                        newAsset = grp.Asset(UUI.Unknown, XmlSerializationOptions.WriteXml2 | XmlSerializationOptions.AdjustForNextOwner);
+                                        newAsset = grp.Asset(UGUI.Unknown, XmlSerializationOptions.WriteXml2 | XmlSerializationOptions.AdjustForNextOwner);
                                         assetID = UUID.Random;
                                         newAsset.ID = assetID;
                                         AssetService.Store(newAsset);
@@ -464,7 +464,7 @@ namespace SilverSim.Scene.Types.Scene
 
                 ObjectPart part;
                 SceneInterface scene;
-                UUI sellOwner;
+                UGUI sellOwner;
 
                 if (TryGetScene(m_SceneID, out scene) &&
                     scene.Primitives.TryGetValue(m_SellingPrimitiveID, out part))

@@ -23,8 +23,8 @@ namespace SilverSim.Types.Friends
 {
     public class FriendInfo
     {
-        public UUI User = UUI.Unknown;
-        public UUI Friend = UUI.Unknown;
+        public UGUI User = UGUI.Unknown;
+        public UGUI Friend = UGUI.Unknown;
         public string Secret = string.Empty;
         /** <summary>flags given to user</summary> */
         public FriendRightFlags UserGivenFlags;

@@ -45,19 +45,19 @@ namespace SilverSim.ServiceInterfaces.UserAgents
 
         public abstract void VerifyClient(UUID sessionID, string token);
 
-        public abstract List<UUID> NotifyStatus(List<KeyValuePair<UUI, string>> friends, UUI user, bool online);
+        public abstract List<UUID> NotifyStatus(List<KeyValuePair<UGUI, string>> friends, UGUI user, bool online);
 
-        public abstract UserInfo GetUserInfo(UUI user);
+        public abstract UserInfo GetUserInfo(UGUI user);
 
-        public abstract ServerURIs GetServerURLs(UUI user);
+        public abstract ServerURIs GetServerURLs(UGUI user);
 
-        public abstract string LocateUser(UUI user);
+        public abstract string LocateUser(UGUI user);
 
-        public abstract UUI GetUUI(UUI user, UUI targetUserID);
+        public abstract UGUIWithName GetUUI(UGUI user, UGUI targetUserID);
 
-        public abstract DestinationInfo GetHomeRegion(UUI user);
+        public abstract DestinationInfo GetHomeRegion(UGUI user);
 
-        public abstract bool IsOnline(UUI user);
+        public abstract bool IsOnline(UGUI user);
 
         [Serializable]
         public class RequestFailedException : Exception

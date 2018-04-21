@@ -178,7 +178,7 @@ namespace SilverSim.Scene.Npc
                         m_Log.InfoFormat("Rezzing persistent NPC {0} {1} ({2})", npcInfo.Npc.FirstName, npcInfo.Npc.LastName, npcInfo.Npc.ID);
                         try
                         {
-                            agent = new NpcAgent(npcInfo.Npc, null, m_PersistentAgentServices)
+                            agent = new NpcAgent(npcInfo.Npc, m_PersistentAgentServices)
                             {
                                 GlobalPosition = npcInfo.Position,
                                 LookAt = npcInfo.LookAt,
@@ -235,7 +235,7 @@ namespace SilverSim.Scene.Npc
                     }
                     catch
                     {
-                        m_Log.WarnFormat("Failed to detach attachments of NPC {0} {1} ({2})", agent.Owner.FirstName, agent.Owner.LastName, agent.Owner.ID);
+                        m_Log.WarnFormat("Failed to detach attachments of NPC {0} {1} ({2})", agent.NamedOwner.FirstName, agent.NamedOwner.LastName, agent.NamedOwner.ID);
                     }
                     removeList.Add(agent.ID, agent);
                 }
@@ -250,7 +250,7 @@ namespace SilverSim.Scene.Npc
                 IObject obj = npc.SittingOnObject;
                 var presenceInfo = new NpcPresenceInfo
                 {
-                    Npc = npc.Owner,
+                    Npc = npc.NamedOwner,
                     Owner = npc.NpcOwner,
                     Position = npc.Position,
                     LookAt = npc.LookAt,
@@ -269,7 +269,7 @@ namespace SilverSim.Scene.Npc
         }
 
         #region Control Functions
-        public NpcAgent CreateNpc(UUID sceneid, UUI owner, UGI group, string firstName, string lastName, Vector3 position, Notecard nc, NpcOptions options = NpcOptions.None)
+        public NpcAgent CreateNpc(UUID sceneid, UGUI owner, UGI group, string firstName, string lastName, Vector3 position, Notecard nc, NpcOptions options = NpcOptions.None)
         {
             SceneInterface scene;
             AgentServiceList agentServiceList = m_NonpersistentAgentServices;
@@ -286,7 +286,7 @@ namespace SilverSim.Scene.Npc
             NpcPresenceServiceInterface presenceService = agentServiceList.Get<NpcPresenceServiceInterface>();
             InventoryServiceInterface inventoryService = agentServiceList.Get<InventoryServiceInterface>();
 
-            var npcId = new UUI
+            var npcId = new UGUIWithName
             {
                 ID = UUID.Random,
                 FirstName = firstName,
@@ -294,7 +294,7 @@ namespace SilverSim.Scene.Npc
             };
             if (m_KnownScenes.TryGetValue(sceneid, out scene))
             {
-                var agent = new NpcAgent(npcId, null, agentServiceList)
+                var agent = new NpcAgent(npcId, agentServiceList)
                 {
                     NpcOwner = owner,
                     Group = group
@@ -305,7 +305,7 @@ namespace SilverSim.Scene.Npc
                     var npcInfo = new NpcPresenceInfo
                     {
                         RegionID = sceneid,
-                        Npc = agent.Owner,
+                        Npc = agent.NamedOwner,
                         Owner = agent.NpcOwner,
                         Group = agent.Group,
                     };
@@ -347,7 +347,7 @@ namespace SilverSim.Scene.Npc
         private void LoadAppearanceFromNotecardJob(object o)
         {
             var job = (RebakeJob)o;
-            UUI npcId = job.Agent.Owner;
+            UGUIWithName npcId = job.Agent.NamedOwner;
             try
             {
                 job.Agent.LoadAppearanceFromNotecard(job.Notecard);
@@ -452,7 +452,8 @@ namespace SilverSim.Scene.Npc
                     {
                         continue;
                     }
-                    sb.AppendFormat("Npc {0} {1} ({2})\n- Owner: {3}\n", agent.Owner.FirstName, agent.Owner.LastName, agent.Owner.ID.ToString(), agent.NpcOwner.FullName);
+                    UGUIWithName npcOwner = m_AdminWebIF.ResolveName(agent.NpcOwner);
+                    sb.AppendFormat("Npc {0} {1} ({2})\n- Owner: {3}\n", agent.NamedOwner.FirstName, agent.NamedOwner.LastName, agent.NamedOwner.ID.ToString(), npcOwner.FullName);
                     if(m_NpcPresenceService != null && m_NpcPresenceService[agent.Owner.ID].Count != 0)
                     {
                         sb.AppendFormat("- Persistent NPC\n");
@@ -523,7 +524,7 @@ namespace SilverSim.Scene.Npc
                 }
             }
 
-            UUI owner = scene.Owner;
+            UGUI owner = scene.Owner;
 
             UUID groupid;
 
@@ -787,14 +788,14 @@ namespace SilverSim.Scene.Npc
                 return;
             }
 
-            UUI uui = agent.Owner;
+            UGUIWithName uui = agent.NamedOwner;
             var npcid = new Map
             {
                 { "firstname", uui.FirstName },
                 { "lastname", uui.LastName },
                 { "id", uui.ID }
             };
-            uui = agent.NpcOwner;
+            uui = m_AdminWebIF.ResolveName(agent.NpcOwner);
             var npcowner = new Map
             {
                 { "fullname", uui.FullName },
@@ -834,14 +835,14 @@ namespace SilverSim.Scene.Npc
                 {
                     continue;
                 }
-                UUI uui = agent.Owner;
+                UGUIWithName uui = agent.NamedOwner;
                 var npcid = new Map
                 {
                     { "firstname", uui.FirstName },
                     { "lastname", uui.LastName },
                     { "id", uui.ID }
                 };
-                uui = agent.NpcOwner;
+                uui = m_AdminWebIF.ResolveName(agent.NpcOwner);
                 var npcowner = new Map
                 {
                     { "fullname", uui.FullName },

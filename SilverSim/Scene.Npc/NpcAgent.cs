@@ -99,10 +99,9 @@ namespace SilverSim.Scene.Npc
         }
 
         public NpcAgent(
-            UUI npcID,
-            Uri homeURI,
+            UGUIWithName npcID,
             AgentServiceList serviceList)
-            : base(npcID.ID, homeURI)
+            : base(npcID.ID, npcID.HomeURI)
         {
             FirstName = npcID.FirstName;
             LastName = npcID.LastName;
@@ -125,24 +124,18 @@ namespace SilverSim.Scene.Npc
             CurrentScene?.SendAgentAppearanceToAllAgents(this);
         }
 
-        private UUI m_NpcOwner = UUI.Unknown;
+        private UGUI m_NpcOwner = UGUI.Unknown;
 
         /* as the Npc must own itself, we actually have to provide a separate means to declare a NPC owner */
-        public UUI NpcOwner
+        public UGUI NpcOwner
         {
             get
             {
-                lock (m_DataLock)
-                {
-                    return new UUI(m_NpcOwner);
-                }
+                return new UGUI(m_NpcOwner);
             }
             set
             {
-                lock (m_DataLock)
-                {
-                    m_NpcOwner = new UUI(value);
-                }
+                m_NpcOwner = new UGUI(value);
             }
         }
 
@@ -366,7 +359,7 @@ namespace SilverSim.Scene.Npc
 
         public override UserAccount UntrustedAccountInfo => new UserAccount
         {
-            Principal = Owner,
+            Principal = NamedOwner,
             IsLocalToGrid = true,
             ScopeID = UUID.Zero,
             UserLevel = 0

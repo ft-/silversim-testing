@@ -32,13 +32,13 @@ namespace SilverSim.Database.Memory.SimulationData
 {
     public class MemorySimulationDataParcelAccessListStorage : ISimulationDataParcelAccessListStorageInterface
     {
-        private readonly RwLockedDictionaryAutoAdd<string, RwLockedDictionary<UUI, ParcelAccessEntry>> m_Data = new RwLockedDictionaryAutoAdd<string, RwLockedDictionary<UUI, ParcelAccessEntry>>(() => new RwLockedDictionary<UUI, ParcelAccessEntry>());
+        private readonly RwLockedDictionaryAutoAdd<string, RwLockedDictionary<UGUI, ParcelAccessEntry>> m_Data = new RwLockedDictionaryAutoAdd<string, RwLockedDictionary<UGUI, ParcelAccessEntry>>(() => new RwLockedDictionary<UGUI, ParcelAccessEntry>());
 
         private string GenParcelAccessListKey(UUID regionID, UUID parcelID) => regionID.ToString() + ":" + parcelID.ToString();
 
-        bool IParcelAccessList.TryGetValue(UUID regionID, UUID parcelID, UUI accessor, out ParcelAccessEntry e)
+        bool IParcelAccessList.TryGetValue(UUID regionID, UUID parcelID, UGUI accessor, out ParcelAccessEntry e)
         {
-            RwLockedDictionary<UUI, ParcelAccessEntry> list;
+            RwLockedDictionary<UGUI, ParcelAccessEntry> list;
             if (m_Data.TryGetValue(GenParcelAccessListKey(regionID, parcelID), out list))
             {
                 IEnumerable<ParcelAccessEntry> en = from entry in list.Values where entry.Accessor.EqualsGrid(accessor) select entry;
@@ -58,7 +58,7 @@ namespace SilverSim.Database.Memory.SimulationData
             return false;
         }
 
-        bool IParcelAccessList.this[UUID regionID, UUID parcelID, UUI accessor]
+        bool IParcelAccessList.this[UUID regionID, UUID parcelID, UGUI accessor]
         {
             get
             {
@@ -71,7 +71,7 @@ namespace SilverSim.Database.Memory.SimulationData
         {
             get
             {
-                RwLockedDictionary<UUI, ParcelAccessEntry> list;
+                RwLockedDictionary<UGUI, ParcelAccessEntry> list;
                 return (m_Data.TryGetValue(GenParcelAccessListKey(regionID, parcelID), out list)) ?
                     new List<ParcelAccessEntry>(from entry in list.Values where entry.ExpiresAt == null || entry.ExpiresAt.AsULong > Date.Now.AsULong select new ParcelAccessEntry(entry)) :
                     new List<ParcelAccessEntry>();
@@ -85,7 +85,7 @@ namespace SilverSim.Database.Memory.SimulationData
         }
 
         private readonly object m_ExpiryExtendLock = new object();
-        void IParcelAccessList.ExtendExpiry(UUID regionID, UUID parcelID, UUI accessor, ulong extendseconds)
+        void IParcelAccessList.ExtendExpiry(UUID regionID, UUID parcelID, UGUI accessor, ulong extendseconds)
         {
             lock (m_ExpiryExtendLock)
             {
@@ -124,9 +124,9 @@ namespace SilverSim.Database.Memory.SimulationData
         public bool Remove(UUID regionID, UUID parcelID) =>
             m_Data.Remove(GenParcelAccessListKey(regionID, parcelID));
 
-        public bool Remove(UUID regionID, UUID parcelID, UUI accessor)
+        public bool Remove(UUID regionID, UUID parcelID, UGUI accessor)
         {
-            RwLockedDictionary<UUI, ParcelAccessEntry> list;
+            RwLockedDictionary<UGUI, ParcelAccessEntry> list;
             return m_Data.TryGetValue(GenParcelAccessListKey(regionID, parcelID), out list) && list.Remove(accessor);
         }
     }

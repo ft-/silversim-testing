@@ -224,7 +224,6 @@ namespace SilverSim.Viewer.Core
             {
                 IList<KeyValuePair<Action<object, bool>, object>> waitForRootList;
                 AgentCircuit circuit;
-                IPhysicsObject physAgent;
                 if(!Circuits.TryGetValue(value, out circuit))
                 {
                     circuit = null;
@@ -443,7 +442,7 @@ namespace SilverSim.Viewer.Core
         }
         #endregion
 
-        public UUID CreateCallingCard(UUI agentid, bool isgod)
+        public UUID CreateCallingCard(UGUI agentid, bool isgod)
         {
             var item = new InventoryItem
             {
@@ -569,7 +568,7 @@ namespace SilverSim.Viewer.Core
             foreach(var service in m_TeleportServices)
             {
 #if DEBUG
-                m_Log.DebugFormat("Checking Teleport Service {0} for {1}", service.GetType().ToString(), Owner.FullName);
+                m_Log.DebugFormat("Checking Teleport Service {0} for {1}", service.GetType().ToString(), NamedOwner.FullName);
 #endif
 
                 if (service.TeleportTo(sceneInterface, this, regionName, position, lookAt, flags))
@@ -585,7 +584,7 @@ namespace SilverSim.Viewer.Core
             foreach (var service in m_TeleportServices)
             {
 #if DEBUG
-                m_Log.DebugFormat("Checking Teleport Service {0} for {1}", service.GetType().ToString(), Owner.FullName);
+                m_Log.DebugFormat("Checking Teleport Service {0} for {1}", service.GetType().ToString(), NamedOwner.FullName);
 #endif
                 if (service.TeleportTo(sceneInterface, this, location, position, lookAt, flags))
                 {
@@ -600,7 +599,7 @@ namespace SilverSim.Viewer.Core
             foreach (var service in m_TeleportServices)
             {
 #if DEBUG
-                m_Log.DebugFormat("Checking Teleport Service {0} for {1}", service.GetType().ToString(), Owner.FullName);
+                m_Log.DebugFormat("Checking Teleport Service {0} for {1}", service.GetType().ToString(), NamedOwner.FullName);
 #endif
                 if (service.TeleportTo(sceneInterface, this, gatekeeperURI, location, position, lookAt, flags))
                 {
@@ -615,7 +614,7 @@ namespace SilverSim.Viewer.Core
             foreach (var service in m_TeleportServices)
             {
 #if DEBUG
-                m_Log.DebugFormat("Checking Teleport Service {0} for {1}", service.GetType().ToString(), Owner.FullName);
+                m_Log.DebugFormat("Checking Teleport Service {0} for {1}", service.GetType().ToString(), NamedOwner.FullName);
 #endif
                 if (service.TeleportTo(sceneInterface, this, regionID, position, lookAt, flags))
                 {
@@ -630,7 +629,7 @@ namespace SilverSim.Viewer.Core
             foreach (var service in m_TeleportServices)
             {
 #if DEBUG
-                m_Log.DebugFormat("Checking Teleport Service {0} for {1}", service.GetType().ToString(), Owner.FullName);
+                m_Log.DebugFormat("Checking Teleport Service {0} for {1}", service.GetType().ToString(), NamedOwner.FullName);
 #endif
                 if (service.TeleportTo(sceneInterface, this, gatekeeperURI, regionID, position, lookAt, flags))
                 {
@@ -646,7 +645,7 @@ namespace SilverSim.Viewer.Core
             foreach(var service in m_TeleportServices)
             {
 #if DEBUG
-                m_Log.DebugFormat("Checking Teleport Service {0} for {1}", service.GetType().ToString(), Owner.FullName);
+                m_Log.DebugFormat("Checking Teleport Service {0} for {1}", service.GetType().ToString(), NamedOwner.FullName);
 #endif
                 if (service.TeleportHome(sceneInterface, this))
                 {
@@ -767,7 +766,8 @@ namespace SilverSim.Viewer.Core
             }
 
             AgentCircuit circuit;
-            if (experienceID != UUID.Zero && Circuits.TryGetValue(part.ObjectGroup.Scene.ID, out circuit) &&
+            SceneInterface scene = part.ObjectGroup.Scene;
+            if (experienceID != UUID.Zero && Circuits.TryGetValue(scene.ID, out circuit) &&
                 !circuit.AddExperienceTimeout(part.ID, itemID))
             {
                 return ScriptPermissions.None;
@@ -777,7 +777,7 @@ namespace SilverSim.Viewer.Core
                 ExperienceID = experienceID,
                 ItemID = itemID,
                 ObjectName = part.ObjectGroup.Name,
-                ObjectOwner = part.Owner.FullName,
+                ObjectOwner = scene.AvatarNameService.ResolveName(part.Owner).FullName,
                 Questions = permissions,
                 TaskID = part.ID
             };
@@ -982,7 +982,7 @@ namespace SilverSim.Viewer.Core
                     {
                         scene.DetermineInitialAgentLocation(this, circuit.LastTeleportFlags, GlobalPosition, LookAt);
                     }
-                    catch (Exception e)
+                    catch
                     {
                         /* TODO: how to do this? */
                         return;
@@ -999,10 +999,6 @@ namespace SilverSim.Viewer.Core
                     GridPosition = circuit.Scene.GridPosition,
                     Timestamp = (uint)Date.GetUnixTime()
                 };
-
-#if DEBUG
-                m_Log.DebugFormat("sending AgentMovementComplete at {0} / {1} for {2}", amc.Position.ToString(), amc.LookAt.ToString(), Owner.FullName);
-#endif
 
                 circuit.SendMessage(amc);
 
@@ -1162,11 +1158,11 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        public override void SendRegionNotice(UUI fromAvatar, string message, UUID fromSceneID)
+        public override void SendRegionNotice(UGUI fromAvatar, string message, UUID fromSceneID)
         {
             var im = new GridInstantMessage
             {
-                FromAgent = fromAvatar,
+                FromAgent = (UGUIWithName)fromAvatar,
                 ToAgent = Owner,
                 Dialog = GridInstantMessageDialog.MessageBox,
                 IsOffline = false,

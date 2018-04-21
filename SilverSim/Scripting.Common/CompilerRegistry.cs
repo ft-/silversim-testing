@@ -121,7 +121,7 @@ namespace SilverSim.Scripting.Common
                 return null;
             }
 
-            private IScriptAssembly Compile(UUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1, CultureInfo cultureInfo = null, Func<string, TextReader> includeOpen = null)
+            private IScriptAssembly Compile(UGUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1, CultureInfo cultureInfo = null, Func<string, TextReader> includeOpen = null)
             {
                 var compiler = DetermineShBangs(shbangs, cultureInfo);
 
@@ -155,14 +155,14 @@ namespace SilverSim.Scripting.Common
                 }
             }
 
-            private void SyntaxCheck(UUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1, CultureInfo cultureInfo = null, Func<string, TextReader> includeOpen = null)
+            private void SyntaxCheck(UGUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1, CultureInfo cultureInfo = null, Func<string, TextReader> includeOpen = null)
             {
                 var compiler = DetermineShBangs(shbangs, cultureInfo);
 
                 compiler.SyntaxCheck(user, shbangs, assetID, reader, linenumber, cultureInfo, includeOpen);
             }
 
-            private void SyntaxCheckAndDump(Stream s, UUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1, CultureInfo cultureInfo = null, Func<string, TextReader> includeOpen = null)
+            private void SyntaxCheckAndDump(Stream s, UGUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1, CultureInfo cultureInfo = null, Func<string, TextReader> includeOpen = null)
             {
                 var compiler = DetermineShBangs(shbangs, cultureInfo);
 
@@ -270,7 +270,7 @@ namespace SilverSim.Scripting.Common
                 public override string ReadToEnd() => m_Header + m_InnerReader.ReadToEnd();
             }
 
-            public IScriptAssembly Compile(AppDomain appDom, UUI user, UUID assetID, TextReader reader, CultureInfo cultureInfo = null, Func<string, TextReader> includeOpen = null)
+            public IScriptAssembly Compile(AppDomain appDom, UGUI user, UUID assetID, TextReader reader, CultureInfo cultureInfo = null, Func<string, TextReader> includeOpen = null)
             {
                 int linenumber = 1;
                 var shbangs = new Dictionary<int, string>();
@@ -292,7 +292,7 @@ namespace SilverSim.Scripting.Common
                 }
             }
 
-            public void SyntaxCheck(UUI user, UUID assetID, TextReader reader, CultureInfo cultureInfo = null, Func<string, TextReader> includeOpen = null)
+            public void SyntaxCheck(UGUI user, UUID assetID, TextReader reader, CultureInfo cultureInfo = null, Func<string, TextReader> includeOpen = null)
             {
                 int linenumber = 1;
                 var shbangs = new Dictionary<int, string>();
@@ -314,7 +314,7 @@ namespace SilverSim.Scripting.Common
                 }
             }
 
-            public void SyntaxCheckAndDump(Stream s, UUI user, UUID assetID, TextReader reader, CultureInfo cultureInfo = null, Func<string, TextReader> includeOpen = null)
+            public void SyntaxCheckAndDump(Stream s, UGUI user, UUID assetID, TextReader reader, CultureInfo cultureInfo = null, Func<string, TextReader> includeOpen = null)
             {
                 int linenumber = 1;
                 var shbangs = new Dictionary<int, string>();
@@ -335,7 +335,7 @@ namespace SilverSim.Scripting.Common
                 }
             }
 
-            public void CompileToDisk(string filename, UUI user, UUID assetID, TextReader reader, CultureInfo cultureInfo = null, Func<string, TextReader> includeOpen = null)
+            public void CompileToDisk(string filename, UGUI user, UUID assetID, TextReader reader, CultureInfo cultureInfo = null, Func<string, TextReader> includeOpen = null)
             {
                 int linenumber = 1;
                 var shbangs = new Dictionary<int, string>();

@@ -73,7 +73,7 @@ namespace SilverSim.Viewer.Core
                 IAgent agent;
                 if (Scene.Agents.TryGetValue(id, out agent) && agent.IsNpc)
                 {
-                    UUI nd = agent.Owner;
+                    UGUIWithName nd = agent.NamedOwner;
                     var d = new UUIDNameReply.Data
                     {
                         ID = nd.ID,
@@ -86,7 +86,7 @@ namespace SilverSim.Viewer.Core
                 {
                     try
                     {
-                        UUI nd = Scene.AvatarNameService[id];
+                        UGUIWithName nd = Scene.AvatarNameService[id];
                         var d = new UUIDNameReply.Data
                         {
                             ID = nd.ID,

@@ -37,7 +37,7 @@ namespace SilverSim.WebIF.Admin
             return webIF[0];
         }
 
-        public static Map ToMap(this UUI uui) => new Map
+        public static Map ToMap(this UGUIWithName uui) => new Map
         {
             { "fullname", uui.FullName },
             { "uui", uui.ToString() },

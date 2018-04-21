@@ -31,141 +31,141 @@ namespace SilverSim.ServiceInterfaces.Groups
     {
         public interface IGroupsInterface
         {
-            GroupInfo Create(UUI requestingAgent, GroupInfo group);
-            GroupInfo Update(UUI requestingAgent, GroupInfo group);
-            void Delete(UUI requestingAgent, UGI group);
+            GroupInfo Create(UGUI requestingAgent, GroupInfo group);
+            GroupInfo Update(UGUI requestingAgent, GroupInfo group);
+            void Delete(UGUI requestingAgent, UGI group);
 
-            UGI this[UUI requestingAgent, UUID groupID] { get; }
+            UGI this[UGUI requestingAgent, UUID groupID] { get; }
 
-            bool TryGetValue(UUI requestingAgent, UUID groupID, out UGI ugi);
-            bool ContainsKey(UUI requestingAgent, UUID groupID);
+            bool TryGetValue(UGUI requestingAgent, UUID groupID, out UGI ugi);
+            bool ContainsKey(UGUI requestingAgent, UUID groupID);
 
-            GroupInfo this[UUI requestingAgent, UGI group] { get; }
+            GroupInfo this[UGUI requestingAgent, UGI group] { get; }
 
-            bool TryGetValue(UUI requestingAgent, UGI groupID, out GroupInfo groupInfo);
-            bool ContainsKey(UUI requestingAgent, UGI groupID);
+            bool TryGetValue(UGUI requestingAgent, UGI groupID, out GroupInfo groupInfo);
+            bool ContainsKey(UGUI requestingAgent, UGI groupID);
 
-            GroupInfo this[UUI requestingAgent, string groupName] { get; }
+            GroupInfo this[UGUI requestingAgent, string groupName] { get; }
 
-            bool TryGetValue(UUI requestingAgent, string groupName, out GroupInfo groupInfo);
-            bool ContainsKey(UUI requestingAgent, string groupName);
+            bool TryGetValue(UGUI requestingAgent, string groupName, out GroupInfo groupInfo);
+            bool ContainsKey(UGUI requestingAgent, string groupName);
 
-            List<DirGroupInfo> GetGroupsByName(UUI requestingAgent, string query);
+            List<DirGroupInfo> GetGroupsByName(UGUI requestingAgent, string query);
         }
 
         public interface IGroupMembershipsInterface
         {
-            GroupMembership this[UUI requestingAgent, UGI group, UUI principal] { get; }
+            GroupMembership this[UGUI requestingAgent, UGI group, UGUI principal] { get; }
 
-            bool TryGetValue(UUI requestingAgent, UGI group, UUI principal, out GroupMembership gmem);
-            bool ContainsKey(UUI requestingAgent, UGI group, UUI principal);
+            bool TryGetValue(UGUI requestingAgent, UGI group, UGUI principal, out GroupMembership gmem);
+            bool ContainsKey(UGUI requestingAgent, UGI group, UGUI principal);
 
-            List<GroupMembership> this[UUI requestingAgent, UUI principal] { get; }
+            List<GroupMembership> this[UGUI requestingAgent, UGUI principal] { get; }
         }
 
         public interface IActiveGroupMembershipInterface
         {
-            GroupActiveMembership this[UUI requestingAgent, UUI principal] { get; }
+            GroupActiveMembership this[UGUI requestingAgent, UGUI principal] { get; }
 
-            bool TryGetValue(UUI requestingAgent, UUI principal, out GroupActiveMembership gam);
-            bool ContainsKey(UUI requestingAgent, UUI principal);
+            bool TryGetValue(UGUI requestingAgent, UGUI principal, out GroupActiveMembership gam);
+            bool ContainsKey(UGUI requestingAgent, UGUI principal);
         }
 
         public interface IGroupMembersInterface
         {
-            GroupMember this[UUI requestingAgent, UGI group, UUI principal] { get; }
+            GroupMember this[UGUI requestingAgent, UGI group, UGUI principal] { get; }
 
-            bool TryGetValue(UUI requestingAgent, UGI group, UUI principal, out GroupMember gmem);
-            bool ContainsKey(UUI requestingAgent, UGI group, UUI principal);
+            bool TryGetValue(UGUI requestingAgent, UGI group, UGUI principal, out GroupMember gmem);
+            bool ContainsKey(UGUI requestingAgent, UGI group, UGUI principal);
 
-            List<GroupMember> this[UUI requestingAgent, UGI group] { get; }
+            List<GroupMember> this[UGUI requestingAgent, UGI group] { get; }
 
-            List<GroupMember> this[UUI requestingAgent, UUI principal] { get; }
+            List<GroupMember> this[UGUI requestingAgent, UGUI principal] { get; }
 
-            GroupMember Add(UUI requestingAgent, UGI group, UUI principal, UUID roleID, string accessToken);
-            void SetContribution(UUI requestingagent, UGI group, UUI principal, int contribution);
-            void Update(UUI requestingagent, UGI group, UUI principal, bool acceptNotices, bool listInProfile);
-            void Delete(UUI requestingAgent, UGI group, UUI principal);
+            GroupMember Add(UGUI requestingAgent, UGI group, UGUI principal, UUID roleID, string accessToken);
+            void SetContribution(UGUI requestingagent, UGI group, UGUI principal, int contribution);
+            void Update(UGUI requestingagent, UGI group, UGUI principal, bool acceptNotices, bool listInProfile);
+            void Delete(UGUI requestingAgent, UGI group, UGUI principal);
         }
 
         public interface IGroupRolesInterface
         {
-            GroupRole this[UUI requestingAgent, UGI group, UUID roleID] { get; }
+            GroupRole this[UGUI requestingAgent, UGI group, UUID roleID] { get; }
 
-            bool TryGetValue(UUI requestingAgent, UGI group, UUID roleID, out GroupRole groupRole);
-            bool ContainsKey(UUI requestingAgent, UGI group, UUID roleID);
+            bool TryGetValue(UGUI requestingAgent, UGI group, UUID roleID, out GroupRole groupRole);
+            bool ContainsKey(UGUI requestingAgent, UGI group, UUID roleID);
 
-            List<GroupRole> this[UUI requestingAgent, UGI group] { get; }
-            List<GroupRole> this[UUI requestingAgent, UGI group, UUI principal] { get; }
+            List<GroupRole> this[UGUI requestingAgent, UGI group] { get; }
+            List<GroupRole> this[UGUI requestingAgent, UGI group, UGUI principal] { get; }
 
-            void Add(UUI requestingAgent, GroupRole role);
-            void Update(UUI requestingAgent, GroupRole role);
-            void Delete(UUI requestingAgent, UGI group, UUID roleID);
+            void Add(UGUI requestingAgent, GroupRole role);
+            void Update(UGUI requestingAgent, GroupRole role);
+            void Delete(UGUI requestingAgent, UGI group, UUID roleID);
         }
 
         public interface IGroupRolemembersInterface
         {
-            GroupRolemember this[UUI requestingAgent, UGI group, UUID roleID, UUI principal] { get; }
+            GroupRolemember this[UGUI requestingAgent, UGI group, UUID roleID, UGUI principal] { get; }
 
-            bool TryGetValue(UUI requestingAgent, UGI group, UUID roleID, UUI principal, out GroupRolemember grolemem);
-            bool ContainsKey(UUI requestingAgent, UGI group, UUID roleID, UUI principal);
+            bool TryGetValue(UGUI requestingAgent, UGI group, UUID roleID, UGUI principal, out GroupRolemember grolemem);
+            bool ContainsKey(UGUI requestingAgent, UGI group, UUID roleID, UGUI principal);
 
-            List<GroupRolemember> this[UUI requestingAgent, UGI group, UUID roleID] { get; }
+            List<GroupRolemember> this[UGUI requestingAgent, UGI group, UUID roleID] { get; }
 
-            List<GroupRolemembership> this[UUI requestingAgent, UUI principal] { get; }
+            List<GroupRolemembership> this[UGUI requestingAgent, UGUI principal] { get; }
 
-            List<GroupRolemember> this[UUI requestingAgent, UGI group] { get; }
+            List<GroupRolemember> this[UGUI requestingAgent, UGI group] { get; }
 
-            void Add(UUI requestingAgent, GroupRolemember rolemember);
-            void Delete(UUI requestingAgent, UGI group, UUID roleID, UUI principal);
+            void Add(UGUI requestingAgent, GroupRolemember rolemember);
+            void Delete(UGUI requestingAgent, UGI group, UUID roleID, UGUI principal);
         }
 
         public interface IGroupSelectInterface
         {
-            UGI this[UUI requestingAgent, UUI princialID] { get; set; }
+            UGI this[UGUI requestingAgent, UGUI princialID] { get; set; }
 
-            bool TryGetValue(UUI requestingAgent, UUI principalID, out UGI ugi);
+            bool TryGetValue(UGUI requestingAgent, UGUI principalID, out UGI ugi);
 
             /* get/set active role id */
-            UUID this[UUI requestingAgent, UGI group, UUI principal] { get; set; }
+            UUID this[UGUI requestingAgent, UGI group, UGUI principal] { get; set; }
 
-            bool TryGetValue(UUI requestingAgent, UGI group, UUI principal, out UUID id);
+            bool TryGetValue(UGUI requestingAgent, UGI group, UGUI principal, out UUID id);
         }
 
         public interface IGroupInvitesInterface
         {
-            GroupInvite this[UUI requestingAgent, UUID groupInviteID] { get; }
+            GroupInvite this[UGUI requestingAgent, UUID groupInviteID] { get; }
 
-            bool TryGetValue(UUI requestingAgent, UUID groupInviteID, out GroupInvite ginvite);
-            bool ContainsKey(UUI requestingAgent, UUID groupInviteID);
+            bool TryGetValue(UGUI requestingAgent, UUID groupInviteID, out GroupInvite ginvite);
+            bool ContainsKey(UGUI requestingAgent, UUID groupInviteID);
 
             bool DoesSupportListGetters { get; }
 
             /** <summary>Only for use of Permission modules</summary> */
-            List<GroupInvite> this[UUI requestingAgent, UGI group, UUID roleID, UUI principal] { get; }
+            List<GroupInvite> this[UGUI requestingAgent, UGI group, UUID roleID, UGUI principal] { get; }
 
             /** <summary>Only for use of Permission modules</summary> */
-            List<GroupInvite> this[UUI requestingAgent, UUI principal] { get; }
+            List<GroupInvite> this[UGUI requestingAgent, UGUI principal] { get; }
 
             /** <summary>Only for use of Permission modules</summary> */
-            List<GroupInvite> GetByGroup(UUI requestingAgent, UGI group);
+            List<GroupInvite> GetByGroup(UGUI requestingAgent, UGI group);
 
-            void Add(UUI requestingAgent, GroupInvite invite);
-            void Delete(UUI requestingAgent, UUID inviteID);
+            void Add(UGUI requestingAgent, GroupInvite invite);
+            void Delete(UGUI requestingAgent, UUID inviteID);
         }
 
         public interface IGroupNoticesInterface
         {
-            List<GroupNotice> GetNotices(UUI requestingAgent, UGI group);
+            List<GroupNotice> GetNotices(UGUI requestingAgent, UGI group);
 
-            GroupNotice this[UUI requestingAgent, UUID groupNoticeID] { get; }
+            GroupNotice this[UGUI requestingAgent, UUID groupNoticeID] { get; }
 
-            bool TryGetValue(UUI requestingAgent, UUID groupNoticeID, out GroupNotice groupNotice);
-            bool ContainsKey(UUI requestingAgent, UUID groupNoticeID);
+            bool TryGetValue(UGUI requestingAgent, UUID groupNoticeID, out GroupNotice groupNotice);
+            bool ContainsKey(UGUI requestingAgent, UUID groupNoticeID);
 
-            void Add(UUI requestingAgent, GroupNotice notice);
+            void Add(UGUI requestingAgent, GroupNotice notice);
 
-            void Delete(UUI requestingAgent, UUID groupNoticeID);
+            void Delete(UGUI requestingAgent, UUID groupNoticeID);
         }
 
         public abstract IGroupsInterface Groups { get; }
@@ -209,7 +209,7 @@ namespace SilverSim.ServiceInterfaces.Groups
             }
         }
 
-        public virtual GroupInfo CreateGroup(UUI requestingAgent, GroupInfo ginfo, GroupPowers everyonePowers, GroupPowers ownerPowers)
+        public virtual GroupInfo CreateGroup(UGUI requestingAgent, GroupInfo ginfo, GroupPowers everyonePowers, GroupPowers ownerPowers)
         {
             var role_everyone = new GroupRole
             {
@@ -263,7 +263,7 @@ namespace SilverSim.ServiceInterfaces.Groups
             return ginfo;
         }
 
-        public GroupMember AddAgentToGroup(UUI requestingAgent, UGI group, UUID roleid, UUI agent, string accessToken)
+        public GroupMember AddAgentToGroup(UGUI requestingAgent, UGI group, UUID roleid, UGUI agent, string accessToken)
         {
             bool alreadyInGroup;
 
@@ -322,7 +322,7 @@ namespace SilverSim.ServiceInterfaces.Groups
             return gmem;
         }
 
-        public virtual GroupPowers GetAgentPowers(UGI group, UUI agent)
+        public virtual GroupPowers GetAgentPowers(UGI group, UGUI agent)
         {
             var rolemembers = Rolemembers[agent, group];
             var powers = GroupPowers.None;
@@ -337,12 +337,12 @@ namespace SilverSim.ServiceInterfaces.Groups
             return powers;
         }
 
-        public void VerifyAgentPowers(UGI group, UUI agent, GroupPowers powers)
+        public void VerifyAgentPowers(UGI group, UGUI agent, GroupPowers powers)
         {
             VerifyAgentPowers(group, agent, new GroupPowers[] { powers });
         }
 
-        public void VerifyAgentPowers(UGI group, UUI agent, GroupPowers[] powers)
+        public void VerifyAgentPowers(UGI group, UGUI agent, GroupPowers[] powers)
         {
             var agentPowers = GetAgentPowers(group, agent);
 

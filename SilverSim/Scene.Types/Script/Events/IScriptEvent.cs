@@ -32,7 +32,7 @@ namespace SilverSim.Scene.Types.Script.Events
     {
         public UUID Key;
         public UGI Group;
-        public UUI Owner;
+        public UGUI Owner;
         public string Name;
         public DetectedTypeFlags ObjType;
         public Vector3 Position;

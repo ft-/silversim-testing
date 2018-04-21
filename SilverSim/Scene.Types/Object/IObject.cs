@@ -121,7 +121,7 @@ namespace SilverSim.Scene.Types.Object
             set;
         }
 
-        UUI Owner
+        UGUI Owner
         {
             get;
             set;

@@ -50,7 +50,7 @@ namespace SilverSim.Viewer.Core
                 req.LocationPos.Y = Agent.GlobalPosition.Y;
             }
 
-            var agentOwner = Agent.Owner;
+            var agentOwner = Agent.NamedOwner;
             ParcelInfo pInfo = null;
 
             var canSetHome = false;

@@ -25,7 +25,7 @@ namespace SilverSim.Types.Parcel
     {
         public UUID RegionID = UUID.Zero;
         public UUID ParcelID = UUID.Zero;
-        public UUI Accessor = UUI.Unknown;
+        public UGUI Accessor = UGUI.Unknown;
         public Date ExpiresAt;
 
         public ParcelAccessEntry()
@@ -36,7 +36,7 @@ namespace SilverSim.Types.Parcel
         {
             RegionID = src.RegionID;
             ParcelID = src.ParcelID;
-            Accessor = new UUI(src.Accessor);
+            Accessor = new UGUI(src.Accessor);
             ExpiresAt = src.ExpiresAt != null ? new Date(src.ExpiresAt) : null;
         }
     }

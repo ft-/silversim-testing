@@ -28,28 +28,28 @@ namespace SilverSim.Groups.Common.Permissions
 {
     partial class DefaultPermissionsGroupsService : GroupsServiceInterface.IGroupsInterface
     {
-        GroupInfo IGroupsInterface.this[UUI requestingAgent, string groupName] =>
+        GroupInfo IGroupsInterface.this[UGUI requestingAgent, string groupName] =>
             m_InnerService.Groups[requestingAgent, groupName];
 
-        GroupInfo IGroupsInterface.this[UUI requestingAgent, UGI group] =>
+        GroupInfo IGroupsInterface.this[UGUI requestingAgent, UGI group] =>
             m_InnerService.Groups[requestingAgent, group];
 
-        UGI IGroupsInterface.this[UUI requestingAgent, UUID groupID] =>
+        UGI IGroupsInterface.this[UGUI requestingAgent, UUID groupID] =>
             m_InnerService.Groups[requestingAgent, groupID];
 
-        bool IGroupsInterface.ContainsKey(UUI requestingAgent, string groupName) =>
+        bool IGroupsInterface.ContainsKey(UGUI requestingAgent, string groupName) =>
             m_InnerService.Groups.ContainsKey(requestingAgent, groupName);
 
-        bool IGroupsInterface.ContainsKey(UUI requestingAgent, UGI groupID) =>
+        bool IGroupsInterface.ContainsKey(UGUI requestingAgent, UGI groupID) =>
             m_InnerService.Groups.ContainsKey(requestingAgent, groupID);
 
-        bool IGroupsInterface.ContainsKey(UUI requestingAgent, UUID groupID) =>
+        bool IGroupsInterface.ContainsKey(UGUI requestingAgent, UUID groupID) =>
             m_InnerService.Groups.ContainsKey(requestingAgent, groupID);
 
-        GroupInfo IGroupsInterface.Create(UUI requestingAgent, GroupInfo group) =>
+        GroupInfo IGroupsInterface.Create(UGUI requestingAgent, GroupInfo group) =>
             m_InnerService.Groups.Create(requestingAgent, group);
 
-        void IGroupsInterface.Delete(UUI requestingAgent, UGI group)
+        void IGroupsInterface.Delete(UGUI requestingAgent, UGI group)
         {
             if(!IsGroupOwner(group, requestingAgent))
             {
@@ -58,19 +58,19 @@ namespace SilverSim.Groups.Common.Permissions
             m_InnerService.Groups.Delete(requestingAgent, group);
         }
 
-        List<DirGroupInfo> IGroupsInterface.GetGroupsByName(UUI requestingAgent, string query) =>
+        List<DirGroupInfo> IGroupsInterface.GetGroupsByName(UGUI requestingAgent, string query) =>
             m_InnerService.Groups.GetGroupsByName(requestingAgent, query);
 
-        bool IGroupsInterface.TryGetValue(UUI requestingAgent, string groupName, out GroupInfo groupInfo) =>
+        bool IGroupsInterface.TryGetValue(UGUI requestingAgent, string groupName, out GroupInfo groupInfo) =>
             m_InnerService.Groups.TryGetValue(requestingAgent, groupName, out groupInfo);
 
-        bool IGroupsInterface.TryGetValue(UUI requestingAgent, UGI groupID, out GroupInfo groupInfo) =>
+        bool IGroupsInterface.TryGetValue(UGUI requestingAgent, UGI groupID, out GroupInfo groupInfo) =>
             m_InnerService.Groups.TryGetValue(requestingAgent, groupID, out groupInfo);
 
-        bool IGroupsInterface.TryGetValue(UUI requestingAgent, UUID groupID, out UGI ugi) =>
+        bool IGroupsInterface.TryGetValue(UGUI requestingAgent, UUID groupID, out UGI ugi) =>
             m_InnerService.Groups.TryGetValue(requestingAgent, groupID, out ugi);
 
-        GroupInfo IGroupsInterface.Update(UUI requestingAgent, GroupInfo group)
+        GroupInfo IGroupsInterface.Update(UGUI requestingAgent, GroupInfo group)
         {
             VerifyAgentPowers(group.ID, requestingAgent, GroupPowers.ChangeOptions);
             return m_InnerService.Groups.Update(requestingAgent, group);

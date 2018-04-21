@@ -35,7 +35,7 @@ namespace SilverSim.UserCaps.CreateInventoryCategory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("CREATEINVENTORYCATEGORY");
 
-        protected static void HandleHttpRequest(HttpRequest httpreq, InventoryServiceInterface inventoryService, UUI agent)
+        protected static void HandleHttpRequest(HttpRequest httpreq, InventoryServiceInterface inventoryService, UGUI agent)
         {
             IValue o;
             if (httpreq.Method != "POST")

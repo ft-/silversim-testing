@@ -301,7 +301,7 @@ namespace SilverSim.Scene.Types.Scene
 
         private EstateInfo CheckEstateRights(IAgent agent)
         {
-            UUI agentOwner = agent.Owner;
+            UGUI agentOwner = agent.Owner;
             uint estateID = EstateService.RegionMap[ID];
             EstateInfo estateInfo = EstateService[estateID];
 
@@ -335,10 +335,7 @@ namespace SilverSim.Scene.Types.Scene
 
         public void DetermineInitialAgentLocation(IAgent agent, TeleportFlags teleportFlags, Vector3 destinationLocation, Vector3 destinationLookAt)
         {
-#if DEBUG
-            m_Log.DebugFormat("Received teleport flags {0} for agent {1}", teleportFlags.ToString(), agent.Owner.FullName);
-#endif
-            UUI agentOwner = agent.Owner;
+            UGUI agentOwner = agent.Owner;
             if (destinationLocation.X < 0 || destinationLocation.X >= SizeX)
             {
                 destinationLocation.X = SizeX / 2f;
@@ -491,7 +488,6 @@ namespace SilverSim.Scene.Types.Scene
                             break;
 
                         case TeleportLandingType.LandingPoint:
-                            m_Log.DebugFormat("Setting agent {0} to landing position {1}", agentOwner.FullName, p.LandingPosition.ToString());
                             destinationLocation = p.LandingPosition;
                             destinationLookAt = p.LandingLookAt;
                             break;

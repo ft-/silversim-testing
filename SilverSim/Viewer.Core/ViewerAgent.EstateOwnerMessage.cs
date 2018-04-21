@@ -191,7 +191,7 @@ namespace SilverSim.Viewer.Core
             EstateAccessFlags.Managers
         };
 
-        private void SendEstateList(UUID transactionID, UUID invoice, EstateAccessFlags code, List<UUI> data, uint estateID, UUID fromSceneID)
+        private void SendEstateList(UUID transactionID, UUID invoice, EstateAccessFlags code, List<UGUI> data, uint estateID, UUID fromSceneID)
         {
             int i = 0;
             while(i < data.Count)
@@ -671,7 +671,7 @@ namespace SilverSim.Viewer.Core
             var scene = circuit.Scene;
             var flags = (EstateAccessDeltaFlags)int.Parse(req.ParamList[1].FromUTF8Bytes());
             var prey = UUID.Parse(req.ParamList[2].FromUTF8Bytes());
-            var uui = UUI.Unknown;
+            var uui = UGUI.Unknown;
             var ugi = UGI.Unknown;
             if((scene.GroupsNameService == null || !scene.GroupsNameService.TryGetValue(prey, out ugi)) &&
                 (flags & (EstateAccessDeltaFlags.AddGroup | EstateAccessDeltaFlags.RemoveGroup)) != 0)

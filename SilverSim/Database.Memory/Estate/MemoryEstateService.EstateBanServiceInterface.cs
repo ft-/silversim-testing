@@ -29,24 +29,24 @@ namespace SilverSim.Database.Memory.Estate
 {
     public partial class MemoryEstateService : IEstateBanServiceInterface, IEstateBanServiceListAccessInterface
     {
-        private readonly RwLockedDictionaryAutoAdd<uint, RwLockedDictionary<UUI, bool>> m_EstateBanData = new RwLockedDictionaryAutoAdd<uint, RwLockedDictionary<UUI, bool>>(() => new RwLockedDictionary<UUI, bool>());
+        private readonly RwLockedDictionaryAutoAdd<uint, RwLockedDictionary<UGUI, bool>> m_EstateBanData = new RwLockedDictionaryAutoAdd<uint, RwLockedDictionary<UGUI, bool>>(() => new RwLockedDictionary<UGUI, bool>());
 
-        List<UUI> IEstateBanServiceListAccessInterface.this[uint estateID]
+        List<UGUI> IEstateBanServiceListAccessInterface.this[uint estateID]
         {
             get
             {
-                RwLockedDictionary<UUI, bool> res;
+                RwLockedDictionary<UGUI, bool> res;
                 return (m_EstateBanData.TryGetValue(estateID, out res)) ?
-                    new List<UUI>(from uui in res.Keys where true select new UUI(uui)) :
-                    new List<UUI>();
+                    new List<UGUI>(from uui in res.Keys where true select new UGUI(uui)) :
+                    new List<UGUI>();
             }
         }
 
-        bool IEstateBanServiceInterface.this[uint estateID, UUI agent]
+        bool IEstateBanServiceInterface.this[uint estateID, UGUI agent]
         {
             get
             {
-                RwLockedDictionary<UUI, bool> res;
+                RwLockedDictionary<UGUI, bool> res;
                 return m_EstateBanData.TryGetValue(estateID, out res) && res.ContainsKey(agent);
             }
             set

@@ -31,7 +31,7 @@ namespace SilverSim.Types.Estate
             RegionOptionFlags.AllowSetHome |
             RegionOptionFlags.AllowVoice |
             RegionOptionFlags.ExternallyVisible;
-        public UUI Owner = UUI.Unknown;
+        public UGUI Owner = UGUI.Unknown;
         public int PricePerMeter = 1;
         public double BillableFactor = 1;
         public double SunPosition;
@@ -50,7 +50,7 @@ namespace SilverSim.Types.Estate
             ParentEstateID = src.ParentEstateID;
             Name = src.Name;
             Flags = src.Flags;
-            Owner = new UUI(src.Owner);
+            Owner = new UGUI(src.Owner);
             PricePerMeter = src.PricePerMeter;
             BillableFactor = src.BillableFactor;
             SunPosition = src.SunPosition;

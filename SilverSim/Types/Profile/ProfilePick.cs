@@ -24,7 +24,7 @@ namespace SilverSim.Types.Profile
     public struct ProfilePick
     {
         public UUID PickID;
-        public UUI Creator;
+        public UGUI Creator;
         public bool TopPick;
         public string Name;
         public string OriginalName;

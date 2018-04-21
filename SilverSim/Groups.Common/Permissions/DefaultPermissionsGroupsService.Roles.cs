@@ -28,28 +28,28 @@ namespace SilverSim.Groups.Common.Permissions
 {
     partial class DefaultPermissionsGroupsService : GroupsServiceInterface.IGroupRolesInterface
     {
-        GroupRole IGroupRolesInterface.this[UUI requestingAgent, UGI group, UUID roleID] =>
+        GroupRole IGroupRolesInterface.this[UGUI requestingAgent, UGI group, UUID roleID] =>
             m_InnerService.Roles[requestingAgent, group, roleID];
 
-        bool IGroupRolesInterface.TryGetValue(UUI requestingAgent, UGI group, UUID roleID, out GroupRole groupRole) =>
+        bool IGroupRolesInterface.TryGetValue(UGUI requestingAgent, UGI group, UUID roleID, out GroupRole groupRole) =>
             m_InnerService.Roles.TryGetValue(requestingAgent, group, roleID, out groupRole);
 
-        bool IGroupRolesInterface.ContainsKey(UUI requestingAgent, UGI group, UUID roleID) =>
+        bool IGroupRolesInterface.ContainsKey(UGUI requestingAgent, UGI group, UUID roleID) =>
             m_InnerService.Roles.ContainsKey(requestingAgent, group, roleID);
 
-        List<GroupRole> IGroupRolesInterface.this[UUI requestingAgent, UGI group] =>
+        List<GroupRole> IGroupRolesInterface.this[UGUI requestingAgent, UGI group] =>
             m_InnerService.Roles[requestingAgent, group];
 
-        List<GroupRole> IGroupRolesInterface.this[UUI requestingAgent, UGI group, UUI principal] =>
+        List<GroupRole> IGroupRolesInterface.this[UGUI requestingAgent, UGI group, UGUI principal] =>
             m_InnerService.Roles[requestingAgent, group, principal];
 
-        void IGroupRolesInterface.Add(UUI requestingAgent, GroupRole role)
+        void IGroupRolesInterface.Add(UGUI requestingAgent, GroupRole role)
         {
             VerifyAgentPowers(role.Group, requestingAgent, GroupPowers.CreateRole);
             m_InnerService.Roles.Add(requestingAgent, role);
         }
 
-        void IGroupRolesInterface.Update(UUI requestingAgent, GroupRole role)
+        void IGroupRolesInterface.Update(UGUI requestingAgent, GroupRole role)
         {
             if(!IsGroupOwner(role.Group, requestingAgent))
             {
@@ -58,7 +58,7 @@ namespace SilverSim.Groups.Common.Permissions
             m_InnerService.Roles.Update(requestingAgent, role);
         }
 
-        void IGroupRolesInterface.Delete(UUI requestingAgent, UGI group, UUID roleID)
+        void IGroupRolesInterface.Delete(UGUI requestingAgent, UGI group, UUID roleID)
         {
             if (!IsGroupOwner(group, requestingAgent))
             {

@@ -46,12 +46,12 @@ namespace SilverSim.Types.Grid
             ParcelMapTexture = src.ParcelMapTexture;
             Access = src.Access;
             RegionSecret = src.RegionSecret;
-            Owner = new UUI(src.Owner);
+            Owner = new UGUI(src.Owner);
             Flags = src.Flags;
             ProductName = src.ProductName;
             ProtocolVariant = src.ProtocolVariant;
             GridURI = src.GridURI;
-            AuthenticatingPrincipal = new UUI(src.AuthenticatingPrincipal);
+            AuthenticatingPrincipal = new UGUI(src.AuthenticatingPrincipal);
             AuthenticatingToken = src.AuthenticatingToken;
             ScopeID = src.ScopeID;
         }
@@ -70,7 +70,7 @@ namespace SilverSim.Types.Grid
         public UUID ParcelMapTexture = UUID.Zero;
         public RegionAccess Access;
         public string RegionSecret = string.Empty;
-        public UUI Owner = UUI.Unknown;
+        public UGUI Owner = UGUI.Unknown;
         public RegionFlags Flags;
         public string ProductName = string.Empty; /* e.g. "Mainland" */
         public string ProtocolVariant = string.Empty; /* see ProtocolVariantId */
@@ -105,7 +105,7 @@ namespace SilverSim.Types.Grid
         #endregion
 
         #region Authentication Info
-        public UUI AuthenticatingPrincipal = UUI.Unknown;
+        public UGUI AuthenticatingPrincipal = UGUI.Unknown;
         public string AuthenticatingToken = string.Empty;
         #endregion
 

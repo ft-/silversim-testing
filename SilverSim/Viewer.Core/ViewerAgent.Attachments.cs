@@ -48,15 +48,9 @@ namespace SilverSim.Viewer.Core
                         {
                             return;
                         }
-#if DEBUG
-                        m_Log.DebugFormat("RezMultipleAttachmentsFromInv for agent {0}", Owner.FullName);
-#endif
                         if (req.FirstDetachAll)
                         {
                             /* get rid of all current attachments */
-#if DEBUG
-                            m_Log.DebugFormat("Detach previous attachments of agent {0}", Owner.FullName);
-#endif
                             DetachAllAttachments();
                         }
 
@@ -74,9 +68,6 @@ namespace SilverSim.Viewer.Core
                         {
                             return;
                         }
-#if DEBUG
-                        m_Log.DebugFormat("RezSingleAttachmentFromInv for agent {0}", Owner.FullName);
-#endif
                         RezAttachment(req.ItemID, req.AttachmentPoint);
                     }
                     break;
@@ -93,9 +84,6 @@ namespace SilverSim.Viewer.Core
             var detachList = new List<DetachEntry>();
             if(m.Number == MessageType.ObjectDetach)
             {
-#if DEBUG
-                m_Log.DebugFormat("ObjectDetach: Detach attachment to inv received for {0}", Owner.FullName);
-#endif
                 var req = (Messages.Object.ObjectDetach)m;
                 if (req.SessionID != SessionID || req.AgentID != ID)
                 {
@@ -113,18 +101,11 @@ namespace SilverSim.Viewer.Core
             }
             else if(m.Number == MessageType.DetachAttachmentIntoInv)
             {
-#if DEBUG
-                m_Log.DebugFormat("DetachAttachmentIntoInv: Detach attachment to inv received for {0}", Owner.FullName);
-#endif
                 var req = (Messages.Object.DetachAttachmentIntoInv)m;
                 if (req.AgentID != ID)
                 {
                     return;
                 }
-
-#if DEBUG
-                m_Log.DebugFormat("Detach attachment {1} into inventory of {0}", Owner.FullName, req.ItemID);
-#endif
 
                 ObjectGroup grp;
                 if(Attachments.TryGetValueByInventoryID(req.ItemID, out grp))
@@ -157,9 +138,6 @@ namespace SilverSim.Viewer.Core
                 SendAlertMessage("ALERT: InvalidObjectParams", SceneID);
                 return;
             }
-#if DEBUG
-            m_Log.DebugFormat("Attaching item {0} / asset {1} to agent {2}", item.ID, item.AssetID, Owner.FullName);
-#endif
 
             var accessFailed = false;
             try

@@ -31,12 +31,12 @@ namespace SilverSim.Viewer.Profile
     {
         public sealed class DummyClassifieds : IClassifiedsInterface
         {
-            public Dictionary<UUID, string> GetClassifieds(UUI user)
+            public Dictionary<UUID, string> GetClassifieds(UGUI user)
             {
                 return new Dictionary<UUID, string>();
             }
 
-            public ProfileClassified this[UUI user, UUID id]
+            public ProfileClassified this[UGUI user, UUID id]
             {
                 get { throw new KeyNotFoundException(); }
             }
@@ -46,13 +46,13 @@ namespace SilverSim.Viewer.Profile
                 throw new NotSupportedException();
             }
 
-            public bool TryGetValue(UUI user, UUID id, out ProfileClassified classified)
+            public bool TryGetValue(UGUI user, UUID id, out ProfileClassified classified)
             {
                 classified = default(ProfileClassified);
                 return false;
             }
 
-            public bool ContainsKey(UUI user, UUID id)
+            public bool ContainsKey(UGUI user, UUID id)
             {
                 return false;
             }
@@ -65,23 +65,23 @@ namespace SilverSim.Viewer.Profile
 
         public sealed class DummyPicks : IPicksInterface
         {
-            public Dictionary<UUID, string> GetPicks(UUI user)
+            public Dictionary<UUID, string> GetPicks(UGUI user)
             {
                 return new Dictionary<UUID, string>();
             }
 
-            public ProfilePick this[UUI user, UUID id]
+            public ProfilePick this[UGUI user, UUID id]
             {
                 get { throw new KeyNotFoundException(); }
             }
 
-            public bool TryGetValue(UUI user, UUID id, out ProfilePick pick)
+            public bool TryGetValue(UGUI user, UUID id, out ProfilePick pick)
             {
                 pick = default(ProfilePick);
                 return false;
             }
 
-            public bool ContainsKey(UUI user, UUID id)
+            public bool ContainsKey(UGUI user, UUID id)
             {
                 return false;
             }
@@ -99,20 +99,20 @@ namespace SilverSim.Viewer.Profile
 
         public sealed class DummyNotes : INotesInterface
         {
-            public string this[UUI user, UUI target]
+            public string this[UGUI user, UGUI target]
             {
                 get { return string.Empty; }
 
                 set { throw new NotSupportedException(); }
             }
 
-            public bool TryGetValue(UUI user, UUI target, out string notes)
+            public bool TryGetValue(UGUI user, UGUI target, out string notes)
             {
                 notes = string.Empty;
                 return false;
             }
 
-            public bool ContainsKey(UUI user, UUI target)
+            public bool ContainsKey(UGUI user, UGUI target)
             {
                 return false;
             }
@@ -120,7 +120,7 @@ namespace SilverSim.Viewer.Profile
 
         public sealed class DummyUserPrefs : IUserPreferencesInterface
         {
-            public ProfilePreferences this[UUI user]
+            public ProfilePreferences this[UGUI user]
             {
                 get
                 {
@@ -134,13 +134,13 @@ namespace SilverSim.Viewer.Profile
                 set { throw new NotSupportedException(); }
             }
 
-            public bool TryGetValue(UUI user, out ProfilePreferences prefs)
+            public bool TryGetValue(UGUI user, out ProfilePreferences prefs)
             {
                 prefs = default(ProfilePreferences);
                 return false;
             }
 
-            public bool ContainsKey(UUI user)
+            public bool ContainsKey(UGUI user)
             {
                 return false;
             }
@@ -148,14 +148,14 @@ namespace SilverSim.Viewer.Profile
 
         public sealed class DummyProperties : IPropertiesInterface
         {
-            public ProfileProperties this[UUI user]
+            public ProfileProperties this[UGUI user]
             {
                 get
                 {
                     return new ProfileProperties
                     {
                         User = user,
-                        Partner = UUI.Unknown,
+                        Partner = UGUI.Unknown,
                         PublishProfile = false,
                         PublishMature = false,
                         WebUrl = string.Empty,
@@ -172,7 +172,7 @@ namespace SilverSim.Viewer.Profile
                 }
             }
 
-            public ProfileProperties this[UUI user, PropertiesUpdateFlags flags]
+            public ProfileProperties this[UGUI user, PropertiesUpdateFlags flags]
             {
                 set { throw new NotSupportedException(); }
             }

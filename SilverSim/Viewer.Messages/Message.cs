@@ -144,7 +144,7 @@ namespace SilverSim.Viewer.Messages
         public UUID CircuitSessionID = UUID.Zero;
         public UUID CircuitAgentID = UUID.Zero;
         public UUID CircuitSceneID = UUID.Zero;
-        public UUI CircuitAgentOwner = UUI.Unknown;
+        public UGUI CircuitAgentOwner = UGUI.Unknown;
         /** <summary>only used to be filled on rx path to guard for certain viewer specific issues</summary> */
         public uint CircuitSequenceNumber;
 

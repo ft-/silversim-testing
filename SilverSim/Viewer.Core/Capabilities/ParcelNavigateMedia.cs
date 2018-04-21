@@ -31,11 +31,11 @@ namespace SilverSim.Viewer.Core.Capabilities
 {
     public class ParcelNavigateMedia : ICapabilityInterface
     {
-        private readonly UUI m_Agent;
+        private readonly UGUI m_Agent;
         private readonly SceneInterface m_Scene;
         private readonly string m_RemoteIP;
 
-        public ParcelNavigateMedia(UUI agent, SceneInterface scene, string remoteip)
+        public ParcelNavigateMedia(UGUI agent, SceneInterface scene, string remoteip)
         {
             m_Agent = agent;
             m_Scene = scene;

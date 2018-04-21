@@ -35,8 +35,8 @@ namespace SilverSim.ServiceInterfaces.Presence
 
     public struct NpcPresenceInfo
     {
-        public UUI Npc;
-        public UUI Owner;
+        public UGUIWithName Npc;
+        public UGUI Owner;
         public UGI Group;
         public NpcOptions Options;
         public UUID RegionID;

@@ -26,8 +26,8 @@ namespace SilverSim.ServiceInterfaces.Estate
 {
     public interface IEstateOwnerServiceInterface
     {
-        UUI this[uint estateID] { get; set; }
-        bool TryGetValue(uint estateID, out UUI uui);
-        List<uint> this[UUI owner] { get; }
+        UGUI this[uint estateID] { get; set; }
+        bool TryGetValue(uint estateID, out UGUI uui);
+        List<uint> this[UGUI owner] { get; }
     }
 }

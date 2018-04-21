@@ -31,7 +31,7 @@ namespace SilverSim.Database.Memory.Profile
     {
         private readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, ProfileClassified>> m_Classifieds = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, ProfileClassified>>(() => new RwLockedDictionary<UUID, ProfileClassified>());
 
-        public ProfileClassified this[UUI user, UUID id]
+        public ProfileClassified this[UGUI user, UUID id]
         {
             get
             {
@@ -44,7 +44,7 @@ namespace SilverSim.Database.Memory.Profile
             }
         }
 
-        public bool ContainsKey(UUI user, UUID id)
+        public bool ContainsKey(UGUI user, UUID id)
         {
             RwLockedDictionary<UUID, ProfileClassified> classifieds;
             return m_Classifieds.TryGetValue(user.ID, out classifieds) && classifieds.ContainsKey(id);
@@ -61,7 +61,7 @@ namespace SilverSim.Database.Memory.Profile
             }
         }
 
-        public Dictionary<UUID, string> GetClassifieds(UUI user)
+        public Dictionary<UUID, string> GetClassifieds(UGUI user)
         {
             RwLockedDictionary<UUID, ProfileClassified> classifieds;
             var names = new Dictionary<UUID, string>();
@@ -75,7 +75,7 @@ namespace SilverSim.Database.Memory.Profile
             return names;
         }
 
-        public bool TryGetValue(UUI user, UUID id, out ProfileClassified classified)
+        public bool TryGetValue(UGUI user, UUID id, out ProfileClassified classified)
         {
             classified = default(ProfileClassified);
             RwLockedDictionary<UUID, ProfileClassified> classifieds;

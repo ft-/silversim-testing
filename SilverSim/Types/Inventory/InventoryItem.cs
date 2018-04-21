@@ -57,19 +57,19 @@ namespace SilverSim.Types.Inventory
 
         public InventoryType InventoryType = InventoryType.Unknown;
         public InventoryFlags Flags;
-        public UUI Owner = new UUI();
-        public UUI LastOwner = new UUI();
+        public UGUI Owner = UGUI.Unknown;
+        public UGUI LastOwner = UGUI.Unknown;
         #endregion
 
         #region Creator Info
-        public UUI Creator = new UUI();
+        public UGUI Creator = UGUI.Unknown;
         public Date CreationDate = new Date();
         #endregion
 
         #region Permissions
         public readonly InventoryPermissionsData Permissions = new InventoryPermissionsData();
 
-        public bool CheckPermissions(UUI accessor, UGI accessorgroup, InventoryPermissionsMask wanted) => (IsGroupOwned) ?
+        public bool CheckPermissions(UGUI accessor, UGI accessorgroup, InventoryPermissionsMask wanted) => (IsGroupOwned) ?
                 Permissions.CheckGroupPermissions(Creator, Group, accessor, accessorgroup, wanted) :
                 Permissions.CheckAgentPermissions(Creator, Owner, accessor, wanted);
         #endregion
@@ -156,16 +156,16 @@ namespace SilverSim.Types.Inventory
             AssetID = new UUID(item.AssetID);
             AssetType = item.AssetType;
             CreationDate = new Date(item.CreationDate);
-            Creator = new UUI(item.Creator);
+            Creator = new UGUI(item.Creator);
             Description = item.Description;
             Flags = item.Flags;
             Group = new UGI(item.Group);
             IsGroupOwned = item.IsGroupOwned;
             ID = item.ID;
             InventoryType = item.InventoryType;
-            LastOwner = new UUI(item.LastOwner);
+            LastOwner = new UGUI(item.LastOwner);
             Name = item.Name;
-            Owner = new UUI(item.Owner);
+            Owner = new UGUI(item.Owner);
             ParentFolderID = new UUID(item.ParentFolderID);
             Permissions = new InventoryPermissionsData(item.Permissions);
             SaleInfo = item.SaleInfo;
@@ -176,16 +176,16 @@ namespace SilverSim.Types.Inventory
             AssetID = new UUID(item.AssetID);
             AssetType = item.AssetType;
             CreationDate = new Date(item.CreationDate);
-            Creator = new UUI(item.Creator);
+            Creator = new UGUI(item.Creator);
             Description = item.Description;
             Flags = item.Flags;
             Group = new UGI(item.Group);
             IsGroupOwned = item.IsGroupOwned;
             ID = id;
             InventoryType = item.InventoryType;
-            LastOwner = new UUI(item.LastOwner);
+            LastOwner = new UGUI(item.LastOwner);
             Name = item.Name;
-            Owner = new UUI(item.Owner);
+            Owner = new UGUI(item.Owner);
             ParentFolderID = new UUID(item.ParentFolderID);
             Permissions = new InventoryPermissionsData(item.Permissions);
             SaleInfo = item.SaleInfo;

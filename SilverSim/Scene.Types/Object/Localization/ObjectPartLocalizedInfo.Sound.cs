@@ -91,8 +91,6 @@ namespace SilverSim.Scene.Types.Object.Localization
 
         private CollisionSoundParam m_CollisionSound;
 
-        private bool m_IsSoundQueueing;
-
         public CollisionSoundParam CollisionSound
         {
             get

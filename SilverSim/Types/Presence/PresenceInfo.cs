@@ -23,7 +23,7 @@ namespace SilverSim.Types.Presence
 {
     public class PresenceInfo
     {
-        public UUI UserID = UUI.Unknown;
+        public UGUI UserID = UGUI.Unknown;
         public UUID RegionID = UUID.Zero;
         public UUID SessionID = UUID.Zero;
         public UUID SecureSessionID = UUID.Zero;
@@ -34,7 +34,7 @@ namespace SilverSim.Types.Presence
 
         public PresenceInfo(PresenceInfo src)
         {
-            UserID = new UUI(src.UserID);
+            UserID = new UGUI(src.UserID);
             RegionID = src.RegionID;
             SessionID = src.SessionID;
             SecureSessionID = src.SecureSessionID;

@@ -27,7 +27,7 @@ namespace SilverSim.Types.GridUser
         {
         }
 
-        public UUI User = UUI.Unknown;
+        public UGUI User = UGUI.Unknown;
         public UUID HomeRegionID = UUID.Zero;
         public Vector3 HomePosition = Vector3.Zero;
         public Vector3 HomeLookAt = Vector3.Zero;
@@ -40,7 +40,7 @@ namespace SilverSim.Types.GridUser
 
         public GridUserInfo(GridUserInfo src)
         {
-            User = new UUI(src.User);
+            User = new UGUI(src.User);
             HomeRegionID = src.HomeRegionID;
             HomePosition = src.HomePosition;
             HomeLookAt = src.HomeLookAt;

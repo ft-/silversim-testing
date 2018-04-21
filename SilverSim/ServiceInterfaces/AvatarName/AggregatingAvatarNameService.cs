@@ -34,7 +34,7 @@ namespace SilverSim.ServiceInterfaces.AvatarName
             m_ServiceList = serviceList;
         }
 
-        public override bool TryGetValue(string firstName, string lastName, out UUI uui)
+        public override bool TryGetValue(string firstName, string lastName, out UGUIWithName uui)
         {
             uui = null;
             bool notFoundFirst = false;
@@ -84,11 +84,11 @@ namespace SilverSim.ServiceInterfaces.AvatarName
             return true;
         }
 
-        public override UUI this[string firstName, string lastName]
+        public override UGUIWithName this[string firstName, string lastName]
         {
             get
             {
-                UUI uui;
+                UGUIWithName uui;
                 if (!TryGetValue(firstName, lastName, out uui))
                 {
                     throw new KeyNotFoundException();
@@ -97,9 +97,9 @@ namespace SilverSim.ServiceInterfaces.AvatarName
             }
         }
 
-        public override List<UUI> Search(string[] names)
+        public override List<UGUIWithName> Search(string[] names)
         {
-            Dictionary<UUID, UUI> results = new Dictionary<UUID, UUI>();
+            Dictionary<UUID, UGUIWithName> results = new Dictionary<UUID, UGUIWithName>();
             foreach (AvatarNameServiceInterface service in m_ServiceList)
             {
                 try
@@ -117,10 +117,10 @@ namespace SilverSim.ServiceInterfaces.AvatarName
                     /* no action required */
                 }
             }
-            return new List<UUI>(results.Values);
+            return new List<UGUIWithName>(results.Values);
         }
 
-        public override bool TryGetValue(UUID key, out UUI uui)
+        public override bool TryGetValue(UUID key, out UGUIWithName uui)
         {
             uui = null;
             bool notFoundFirst = false;
@@ -171,11 +171,11 @@ namespace SilverSim.ServiceInterfaces.AvatarName
             return true;
         }
 
-        public override UUI this[UUID key]
+        public override UGUIWithName this[UUID key]
         {
             get
             {
-                UUI uui = null;
+                UGUIWithName uui = null;
                 if (!TryGetValue(key, out uui))
                 {
                     throw new KeyNotFoundException();
@@ -184,7 +184,7 @@ namespace SilverSim.ServiceInterfaces.AvatarName
             }
         }
 
-        public override void Store(UUI uui)
+        public override void Store(UGUIWithName uui)
         {
             foreach (var service in m_ServiceList)
             {

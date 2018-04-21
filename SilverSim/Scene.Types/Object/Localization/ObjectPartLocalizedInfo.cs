@@ -357,7 +357,7 @@ namespace SilverSim.Scene.Types.Object.Localization
             }
         }
 
-        internal void SetCreator(UUI id)
+        internal void SetCreator(UGUI id)
         {
             lock (m_DataLock)
             {

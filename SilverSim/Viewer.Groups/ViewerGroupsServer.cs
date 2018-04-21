@@ -124,9 +124,9 @@ namespace SilverSim.Viewer.Groups
                 adu.GroupTitle = string.Empty;
                 adu.GroupPowers = GroupPowers.None;
             }
-            adu.AgentID = agent.Owner.ID;
-            adu.FirstName = agent.Owner.FirstName;
-            adu.LastName = agent.Owner.LastName;
+            adu.AgentID = agent.NamedOwner.ID;
+            adu.FirstName = agent.NamedOwner.FirstName;
+            adu.LastName = agent.NamedOwner.LastName;
             foreach(var cagent in scene.Agents)
             {
                 cagent.SendMessageAlways(adu, scene.ID);
@@ -859,7 +859,7 @@ namespace SilverSim.Viewer.Groups
                 return;
             }
 
-            UUI principalUUI;
+            UGUI principalUUI;
             try
             {
                 principalUUI = scene.AvatarNameService[req.MemberID];
@@ -1454,7 +1454,7 @@ namespace SilverSim.Viewer.Groups
         #endregion
 
         #region Utility
-        private GroupPowers GetGroupPowers(UUI agent, GroupsServiceInterface groupsService, UGI group)
+        private GroupPowers GetGroupPowers(UGUI agent, GroupsServiceInterface groupsService, UGI group)
         {
             if(groupsService == null)
             {

@@ -24,7 +24,7 @@ namespace SilverSim.Types.Economy.Transactions
     public sealed class GroupCreateTransaction : BaseTransaction
     {
         public UGI Group = UGI.Unknown;
-        public UUI Founder = UUI.Unknown;
+        public UGUI Founder = UGUI.Unknown;
 
         public GroupCreateTransaction(GridVector regionHandle, UUID regionID, string regionName) 
             : base(regionHandle, regionID, regionName)

@@ -28,13 +28,13 @@ namespace SilverSim.Groups.Common.Permissions
 {
     partial class DefaultPermissionsGroupsService : GroupsServiceInterface.IGroupNoticesInterface
     {
-        List<GroupNotice> IGroupNoticesInterface.GetNotices(UUI requestingAgent, UGI group)
+        List<GroupNotice> IGroupNoticesInterface.GetNotices(UGUI requestingAgent, UGI group)
         {
             VerifyAgentPowers(group, requestingAgent, GroupPowers.ReceiveNotices);
             return m_InnerService.Notices.GetNotices(requestingAgent, group);
         }
 
-        GroupNotice IGroupNoticesInterface.this[UUI requestingAgent, UUID groupNoticeID]
+        GroupNotice IGroupNoticesInterface.this[UGUI requestingAgent, UUID groupNoticeID]
         {
             get
             {
@@ -47,7 +47,7 @@ namespace SilverSim.Groups.Common.Permissions
             }
         }
 
-        bool IGroupNoticesInterface.TryGetValue(UUI requestingAgent, UUID groupNoticeID, out GroupNotice groupNotice)
+        bool IGroupNoticesInterface.TryGetValue(UGUI requestingAgent, UUID groupNoticeID, out GroupNotice groupNotice)
         {
             GroupNotice gnot;
             if(m_InnerService.Notices.TryGetValue(requestingAgent, groupNoticeID, out gnot))
@@ -60,7 +60,7 @@ namespace SilverSim.Groups.Common.Permissions
             return false;
         }
 
-        bool IGroupNoticesInterface.ContainsKey(UUI requestingAgent, UUID groupNoticeID)
+        bool IGroupNoticesInterface.ContainsKey(UGUI requestingAgent, UUID groupNoticeID)
         {
             GroupNotice gnot;
             if (m_InnerService.Notices.TryGetValue(requestingAgent, groupNoticeID, out gnot))
@@ -71,13 +71,13 @@ namespace SilverSim.Groups.Common.Permissions
             return false;
         }
 
-        void IGroupNoticesInterface.Add(UUI requestingAgent, GroupNotice notice)
+        void IGroupNoticesInterface.Add(UGUI requestingAgent, GroupNotice notice)
         {
             VerifyAgentPowers(notice.Group, requestingAgent, GroupPowers.SendNotices);
             m_InnerService.Notices.Add(requestingAgent, notice);
         }
 
-        void IGroupNoticesInterface.Delete(UUI requestingAgent, UUID groupNoticeID)
+        void IGroupNoticesInterface.Delete(UGUI requestingAgent, UUID groupNoticeID)
         {
             GroupNotice gnot;
             if (m_InnerService.Notices.TryGetValue(requestingAgent, groupNoticeID, out gnot))

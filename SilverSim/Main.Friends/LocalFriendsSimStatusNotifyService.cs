@@ -35,9 +35,9 @@ namespace SilverSim.Main.Friends
     public sealed class LocalFriendsSimStatusNotifyService : IFriendsSimStatusNotifyService, IPlugin, IFriendsStatusNotifyServiceInterface
     {
         private SceneList m_Scenes;
-        public void NotifyAsOffline(UUID regionid, UUI notifier, List<UUI> list)
+        public void NotifyAsOffline(UUID regionid, UGUI notifier, List<UGUI> list)
         {
-            foreach(UUI id in list)
+            foreach(UGUI id in list)
             {
                 IAgent agent;
                 if(m_Scenes.TryFindRootAgent(regionid, id.ID, out agent))
@@ -49,9 +49,9 @@ namespace SilverSim.Main.Friends
             }
         }
 
-        public void NotifyAsOffline(UUI notifier, List<KeyValuePair<UUI, string>> list)
+        public void NotifyAsOffline(UGUI notifier, List<KeyValuePair<UGUI, string>> list)
         {
-            foreach (KeyValuePair<UUI, string> kvp in list)
+            foreach (KeyValuePair<UGUI, string> kvp in list)
             {
                 IAgent agent;
                 UUID sceneID;
@@ -64,9 +64,9 @@ namespace SilverSim.Main.Friends
             }
         }
 
-        public void NotifyAsOnline(UUID regionid, UUI notifier, List<UUI> list)
+        public void NotifyAsOnline(UUID regionid, UGUI notifier, List<UGUI> list)
         {
-            foreach (UUI id in list)
+            foreach (UGUI id in list)
             {
                 IAgent agent;
                 if (m_Scenes.TryFindRootAgent(regionid, id.ID, out agent))
@@ -78,9 +78,9 @@ namespace SilverSim.Main.Friends
             }
         }
 
-        public void NotifyAsOnline(UUI notifier, List<KeyValuePair<UUI, string>> list)
+        public void NotifyAsOnline(UGUI notifier, List<KeyValuePair<UGUI, string>> list)
         {
-            foreach (KeyValuePair<UUI, string> kvp in list)
+            foreach (KeyValuePair<UGUI, string> kvp in list)
             {
                 IAgent agent;
                 UUID sceneID;

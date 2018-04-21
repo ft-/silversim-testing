@@ -69,8 +69,8 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        public static readonly Dictionary<StandardTerrainEffect, Action<UUI, SceneInterface, ModifyLand, ModifyLand.Data>> PaintEffects = new Dictionary<StandardTerrainEffect, Action<UUI, SceneInterface, ModifyLand, ModifyLand.Data>>();
-        public static readonly Dictionary<StandardTerrainEffect, Action<UUI, SceneInterface, ModifyLand, ModifyLand.Data>> FloodEffects = new Dictionary<StandardTerrainEffect, Action<UUI, SceneInterface, ModifyLand, ModifyLand.Data>>();
+        public static readonly Dictionary<StandardTerrainEffect, Action<UGUI, SceneInterface, ModifyLand, ModifyLand.Data>> PaintEffects = new Dictionary<StandardTerrainEffect, Action<UGUI, SceneInterface, ModifyLand, ModifyLand.Data>>();
+        public static readonly Dictionary<StandardTerrainEffect, Action<UGUI, SceneInterface, ModifyLand, ModifyLand.Data>> FloodEffects = new Dictionary<StandardTerrainEffect, Action<UGUI, SceneInterface, ModifyLand, ModifyLand.Data>>();
 
         static Terraforming()
         {
@@ -93,7 +93,7 @@ namespace SilverSim.Scene.Types.Scene
                 {
                     m_Log.FatalFormat("Method {0} does not match in parameter count", mi.Name);
                 }
-                else if (mi.GetParameters()[0].ParameterType != typeof(UUI) ||
+                else if (mi.GetParameters()[0].ParameterType != typeof(UGUI) ||
                         mi.GetParameters()[1].ParameterType != typeof(SceneInterface) ||
                         mi.GetParameters()[2].ParameterType != typeof(ModifyLand) ||
                         mi.GetParameters()[3].ParameterType != typeof(ModifyLand.Data))
@@ -102,8 +102,8 @@ namespace SilverSim.Scene.Types.Scene
                 }
                 else
                 {
-                    PaintEffects.Add(pe.Effect, (Action<UUI, SceneInterface, ModifyLand, ModifyLand.Data>)
-                        Delegate.CreateDelegate(typeof(Action<UUI, SceneInterface, ModifyLand, ModifyLand.Data>), null, mi));
+                    PaintEffects.Add(pe.Effect, (Action<UGUI, SceneInterface, ModifyLand, ModifyLand.Data>)
+                        Delegate.CreateDelegate(typeof(Action<UGUI, SceneInterface, ModifyLand, ModifyLand.Data>), null, mi));
                 }
                 var fe = (FloodEffectAttribute)Attribute.GetCustomAttribute(mi, typeof(FloodEffectAttribute));
                 if (fe == null)
@@ -122,7 +122,7 @@ namespace SilverSim.Scene.Types.Scene
                 {
                     m_Log.FatalFormat("Method {0} does not match in parameter count", mi.Name);
                 }
-                else if (mi.GetParameters()[0].ParameterType != typeof(UUI) ||
+                else if (mi.GetParameters()[0].ParameterType != typeof(UGUI) ||
                         mi.GetParameters()[1].ParameterType != typeof(SceneInterface) ||
                         mi.GetParameters()[2].ParameterType != typeof(ModifyLand) ||
                         mi.GetParameters()[3].ParameterType != typeof(ModifyLand.Data))
@@ -131,15 +131,15 @@ namespace SilverSim.Scene.Types.Scene
                 }
                 else
                 {
-                    PaintEffects.Add(fe.Effect, (Action<UUI, SceneInterface, ModifyLand, ModifyLand.Data>)
-                        Delegate.CreateDelegate(typeof(Action<UUI, SceneInterface, ModifyLand, ModifyLand.Data>), null, mi));
+                    PaintEffects.Add(fe.Effect, (Action<UGUI, SceneInterface, ModifyLand, ModifyLand.Data>)
+                        Delegate.CreateDelegate(typeof(Action<UGUI, SceneInterface, ModifyLand, ModifyLand.Data>), null, mi));
                 }
             }
         }
 
         #region Paint Effects
         [PaintEffect(StandardTerrainEffect.Raise)]
-        public static void RaiseSphere(UUI agentOwner, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
+        public static void RaiseSphere(UGUI agentOwner, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             var changed = new List<LayerPatch>();
 
@@ -208,7 +208,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PaintEffect(StandardTerrainEffect.Lower)]
-        public static void LowerSphere(UUI agentOwner, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
+        public static void LowerSphere(UGUI agentOwner, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             var changed = new List<LayerPatch>();
 
@@ -273,7 +273,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PaintEffect(StandardTerrainEffect.Flatten)]
-        public static void FlattenSphere(UUI agentOwner, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
+        public static void FlattenSphere(UGUI agentOwner, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             var changed = new List<LayerPatch>();
 
@@ -354,7 +354,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PaintEffect(StandardTerrainEffect.Smooth)]
-        public static void SmoothSphere(UUI agentOwner, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
+        public static void SmoothSphere(UGUI agentOwner, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             var changed = new List<LayerPatch>();
 
@@ -425,7 +425,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PaintEffect(StandardTerrainEffect.Noise)]
-        public static void NoiseSphere(UUI agentOwner, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
+        public static void NoiseSphere(UGUI agentOwner, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             var changed = new List<LayerPatch>();
 
@@ -499,7 +499,7 @@ namespace SilverSim.Scene.Types.Scene
 
         #region Flood Effects
         [FloodEffect(StandardTerrainEffect.Raise)]
-        public static void RaiseArea(UUI agentOwner, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
+        public static void RaiseArea(UGUI agentOwner, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             List<LayerPatch> changed = new List<LayerPatch>();
             for (int x = (int)data.West; x < (int)data.East; x++)
@@ -529,7 +529,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [FloodEffect(StandardTerrainEffect.Lower)]
-        public static void LowerArea(UUI agentOwner, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
+        public static void LowerArea(UGUI agentOwner, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             var changed = new List<LayerPatch>();
             for (int x = (int)data.West; x < (int)data.East; x++)
@@ -559,7 +559,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [FloodEffect(StandardTerrainEffect.Flatten)]
-        public static void FlattenArea(UUI agentOwner, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
+        public static void FlattenArea(UGUI agentOwner, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             var changed = new List<LayerPatch>();
 
@@ -610,7 +610,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [FloodEffect(StandardTerrainEffect.Smooth)]
-        public static void SmoothArea(UUI agentOwner, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
+        public static void SmoothArea(UGUI agentOwner, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             var changed = new List<LayerPatch>();
 
@@ -658,7 +658,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [FloodEffect(StandardTerrainEffect.Noise)]
-        public static void NoiseArea(UUI agentOwner, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
+        public static void NoiseArea(UGUI agentOwner, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             var changed = new List<LayerPatch>();
 

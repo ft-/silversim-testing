@@ -60,7 +60,7 @@ namespace SilverSim.Viewer.GroupChat
         private readonly BlockingQueue<KeyValuePair<SceneInterface, GridInstantMessage>> IMGroupNoticeQueue = new BlockingQueue<KeyValuePair<SceneInterface, GridInstantMessage>>();
         private IMRouter m_IMRouter;
 
-        private readonly RwLockedDictionary<UUID, RwLockedDictionary<UUID, UUI>> ActiveSessions = new RwLockedDictionary<UUID, RwLockedDictionary<UUID, UUI>>();
+        private readonly RwLockedDictionary<UUID, RwLockedDictionary<UUID, UGUI>> ActiveSessions = new RwLockedDictionary<UUID, RwLockedDictionary<UUID, UGUI>>();
 
         private bool m_ShutdownGroupChat;
 
@@ -269,7 +269,7 @@ namespace SilverSim.Viewer.GroupChat
             {
                 ID = UUID.Random,
                 Group = group,
-                FromName = agent.Owner.FullName
+                FromName = agent.NamedOwner.FullName
             };
             var submsg = m.Message.Split(new char[] { '|' }, 2);
             gn.Subject = submsg.Length > 1 ? submsg[0] : string.Empty;
@@ -278,11 +278,11 @@ namespace SilverSim.Viewer.GroupChat
             gn.AttachmentType = item != null ? item.AssetType : Types.Asset.AssetType.Unknown;
             gn.AttachmentName = item != null ? item.Name : string.Empty;
             gn.AttachmentItemID = item != null ? item.ID : UUID.Zero;
-            gn.AttachmentOwner = item != null ? item.Owner : UUI.Unknown;
+            gn.AttachmentOwner = item != null ? item.Owner : UGUI.Unknown;
 
             var gim = new GridInstantMessage
             {
-                FromAgent = agent.Owner,
+                FromAgent = agent.NamedOwner,
                 Dialog = GridInstantMessageDialog.GroupNotice,
                 IsFromGroup = true,
                 Message = m.Message,
@@ -351,7 +351,7 @@ namespace SilverSim.Viewer.GroupChat
         }
 
         #region Utility
-        private GroupPowers GetGroupPowers(UUI agent, GroupsServiceInterface groupsService, UGI group)
+        private GroupPowers GetGroupPowers(UGUI agent, GroupsServiceInterface groupsService, UGI group)
         {
             if (groupsService == null)
             {

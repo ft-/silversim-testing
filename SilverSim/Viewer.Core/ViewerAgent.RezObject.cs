@@ -37,12 +37,12 @@ namespace SilverSim.Viewer.Core
     {
         private sealed class AgentRezObjectHandler  : RezObjectHandler
         {
-            public AgentRezObjectHandler(SceneInterface scene, Vector3 targetpos, UUID assetid, AssetServiceInterface source, UUI rezzingagent, SceneInterface.RezObjectParams rezparams, InventoryPermissionsMask itemOwnerPermissions = InventoryPermissionsMask.Every)
+            public AgentRezObjectHandler(SceneInterface scene, Vector3 targetpos, UUID assetid, AssetServiceInterface source, UGUI rezzingagent, SceneInterface.RezObjectParams rezparams, InventoryPermissionsMask itemOwnerPermissions = InventoryPermissionsMask.Every)
                 : base(scene, targetpos, assetid, source, rezzingagent, rezparams, itemOwnerPermissions)
             {
             }
 
-            public AgentRezObjectHandler(SceneInterface scene, Vector3 targetpos, List<UUID> assetids, AssetServiceInterface source, UUI rezzingagent, SceneInterface.RezObjectParams rezparams, InventoryPermissionsMask itemOwnerPermissions = InventoryPermissionsMask.Every)
+            public AgentRezObjectHandler(SceneInterface scene, Vector3 targetpos, List<UUID> assetids, AssetServiceInterface source, UGUI rezzingagent, SceneInterface.RezObjectParams rezparams, InventoryPermissionsMask itemOwnerPermissions = InventoryPermissionsMask.Every)
                 : base(scene, targetpos, assetids, source, rezzingagent, rezparams, itemOwnerPermissions)
             {
             }
@@ -50,7 +50,7 @@ namespace SilverSim.Viewer.Core
 
         private sealed class AgentRezRestoreObjectHandler : RezRestoreObjectHandler
         {
-            public AgentRezRestoreObjectHandler(SceneInterface scene, UUID assetid, AssetServiceInterface source, UUI rezzingagent, UGI rezzinggroup, InventoryPermissionsMask itemOwnerPermissions = InventoryPermissionsMask.Every)
+            public AgentRezRestoreObjectHandler(SceneInterface scene, UUID assetid, AssetServiceInterface source, UGUI rezzingagent, UGI rezzinggroup, InventoryPermissionsMask itemOwnerPermissions = InventoryPermissionsMask.Every)
                 : base(scene, assetid, source, rezzingagent, rezzinggroup, itemOwnerPermissions)
             {
             }

@@ -51,7 +51,7 @@ namespace SilverSim.Scene.Agent
             }
         }
 
-        private void ApplyNextOwner(ObjectGroup grp, UUI newOwner)
+        private void ApplyNextOwner(ObjectGroup grp, UGUI newOwner)
         {
             grp.LastOwner = grp.Owner;
             grp.Owner = newOwner;
@@ -257,7 +257,7 @@ namespace SilverSim.Scene.Agent
         {
             private readonly SceneInterface m_Scene;
             private readonly UUID m_ItemID;
-            private readonly UUI m_RezzingAgent;
+            private readonly UGUI m_RezzingAgent;
             private readonly AttachmentPoint m_AttachPoint;
             private readonly AgentAttachments m_AttachmentsList;
 
@@ -266,7 +266,7 @@ namespace SilverSim.Scene.Agent
                 UUID itemid,
                 UUID assetid,
                 AssetServiceInterface source,
-                UUI rezzingagent,
+                UGUI rezzingagent,
                 AttachmentPoint attachPoint,
                 AgentAttachments attachmentsList)
                 : base(scene.AssetService, source, assetid, ReferenceSource.Destination)
@@ -303,7 +303,7 @@ namespace SilverSim.Scene.Agent
                 }
 
 #if DEBUG
-                m_Log.DebugFormat("Deserializing object asset {0} for agent {1} {2} ({3})", data.ID, m_RezzingAgent.FirstName, m_RezzingAgent.LastName, m_RezzingAgent.ID);
+                m_Log.DebugFormat("Deserializing object asset {0} for agent {1}", data.ID, m_RezzingAgent.ToString());
 #endif
                 try
                 {
@@ -311,8 +311,8 @@ namespace SilverSim.Scene.Agent
                 }
                 catch (Exception e)
                 {
-                    m_Log.WarnFormat("Deserialization error for object asset {0} for agent {1} {2} ({3}): {4}: {5}",
-                        data.ID, m_RezzingAgent.FirstName, m_RezzingAgent.LastName, m_RezzingAgent.ID, e.GetType().FullName, e.ToString());
+                    m_Log.WarnFormat("Deserialization error for object asset {0} for agent {1}: {2}: {3}",
+                        data.ID, m_RezzingAgent.ToString(), e.GetType().FullName, e.ToString());
                     SendAlertMessage("ALERT: InvalidObjectParams");
                     return;
                 }
@@ -368,7 +368,7 @@ namespace SilverSim.Scene.Agent
                 }
 
 #if DEBUG
-                m_Log.DebugFormat("Adding attachment asset {0} at {4} for agent {1} {2} ({3})", data.ID, m_RezzingAgent.FirstName, m_RezzingAgent.LastName, m_RezzingAgent.ID, grp.AttachPoint.ToString());
+                m_Log.DebugFormat("Adding attachment asset {0} at {4} for agent {1}", data.ID, m_RezzingAgent.ToString());
 #endif
                 try
                 {

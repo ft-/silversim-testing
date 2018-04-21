@@ -89,7 +89,7 @@ namespace SilverSim.Scene.Types.Transfer
                     switch (data.Type)
                     {
                         case AssetType.Object:
-                            List<ObjectGroup> grps = ObjectXML.FromAsset(data, UUI.Unknown);
+                            List<ObjectGroup> grps = ObjectXML.FromAsset(data, UGUI.Unknown);
                             foreach (ObjectGroup grp in grps)
                             {
                                 foreach (ObjectPart part in grp.Values)
@@ -108,8 +108,8 @@ namespace SilverSim.Scene.Types.Transfer
                             }
 
                             newAsset = (grps.Count == 1) ?
-                                grps[0].Asset(UUI.Unknown, XmlSerializationOptions.AdjustForNextOwner | XmlSerializationOptions.WriteXml2) :
-                                grps.Asset(UUI.Unknown, XmlSerializationOptions.AdjustForNextOwner | XmlSerializationOptions.WriteXml2);
+                                grps[0].Asset(UGUI.Unknown, XmlSerializationOptions.AdjustForNextOwner | XmlSerializationOptions.WriteXml2) :
+                                grps.Asset(UGUI.Unknown, XmlSerializationOptions.AdjustForNextOwner | XmlSerializationOptions.WriteXml2);
 
                             newAsset.ID = replaceAssets[objectid];
                             newAsset.CreateTime = data.CreateTime;
@@ -154,7 +154,7 @@ namespace SilverSim.Scene.Types.Transfer
                 }
             }
 
-            AssetData data = grp.Asset(UUI.Unknown, XmlSerializationOptions.AdjustForNextOwner | XmlSerializationOptions.WriteXml2);
+            AssetData data = grp.Asset(UGUI.Unknown, XmlSerializationOptions.AdjustForNextOwner | XmlSerializationOptions.WriteXml2);
             data.ID = UUID.Random;
             assetService.Store(data);
             grp.NextOwnerAssetID = data.ID;

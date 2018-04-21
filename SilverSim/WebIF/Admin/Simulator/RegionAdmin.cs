@@ -225,8 +225,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             RegionInfo rInfo;
             if(m_RegionStorage.TryGetValue(regionid, out rInfo))
             {
-                rInfo.Owner = m_WebIF.ResolveName(rInfo.Owner);
-                Map m = rInfo.ToJsonMap();
+                Map m = rInfo.ToJsonMap(m_WebIF);
                 GetRegionDetails(rInfo.ID, m);
                 var res = new Map
                 {
@@ -291,8 +290,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             var regionsRes = new AnArray();
             foreach (var region in regions)
             {
-                var m = region.ToJsonMap();
-                region.Owner = m_WebIF.ResolveName(region.Owner);
+                var m = region.ToJsonMap(m_WebIF);
                 GetRegionDetails(region.ID, m);
                 regionsRes.Add(m);
             }

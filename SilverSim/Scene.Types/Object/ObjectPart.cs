@@ -117,7 +117,7 @@ namespace SilverSim.Scene.Types.Object
         private PassEventMode m_PassTouchMode = PassEventMode.Always;
         private ReferenceBoxed<Vector3> m_AngularVelocity = Vector3.Zero;
         private ReferenceBoxed<Vector3> m_Velocity = Vector3.Zero;
-        private UUI m_Creator = UUI.Unknown;
+        private UGUI m_Creator = UGUI.Unknown;
         private Date m_CreationDate = Date.Now;
         private Date m_RezDate = Date.Now;
         private PrimitiveFlags m_PrimitiveFlags;
@@ -531,7 +531,7 @@ namespace SilverSim.Scene.Types.Object
         #region Permissions
         public bool IsLocked => (m_Permissions.Current & InventoryPermissionsMask.Modify) == 0;
 
-        public bool CheckPermissions(UUI accessor, UGI accessorgroup, InventoryPermissionsMask wanted) => (ObjectGroup.IsGroupOwned) ?
+        public bool CheckPermissions(UGUI accessor, UGI accessorgroup, InventoryPermissionsMask wanted) => (ObjectGroup.IsGroupOwned) ?
                 m_Permissions.CheckGroupPermissions(Creator, ObjectGroup.Group, accessor, accessorgroup, wanted) :
                 m_Permissions.CheckAgentPermissions(Creator, Owner, accessor, wanted);
         #endregion
@@ -1007,15 +1007,15 @@ namespace SilverSim.Scene.Types.Object
             TriggerOnUpdate(0);
         }
 
-        public UUI Creator
+        public UGUI Creator
         {
             get
             {
-                    return new UUI(m_Creator);
+                    return new UGUI(m_Creator);
             }
             set
             {
-                var uui = new UUI(value);
+                var uui = new UGUI(value);
                 lock (m_DataLock)
                 {
                     m_Creator = uui;
@@ -1321,7 +1321,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        public UUI Owner
+        public UGUI Owner
         {
             get
             {
@@ -1329,7 +1329,7 @@ namespace SilverSim.Scene.Types.Object
                 {
                     return ObjectGroup.Owner;
                 }
-                return UUI.Unknown;
+                return UGUI.Unknown;
             }
             set
             {

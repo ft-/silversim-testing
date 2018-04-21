@@ -32,7 +32,7 @@ namespace SilverSim.Viewer.Profile
     {
         public override IDisplayNameAccessor DisplayName => this;
 
-        string IDisplayNameAccessor.this[UUI agent]
+        string IDisplayNameAccessor.this[UGUI agent]
         {
             get { return string.Empty; }
 
@@ -49,52 +49,52 @@ namespace SilverSim.Viewer.Profile
             throw new NotSupportedException();
         }
 
-        public override List<UUID> NotifyStatus(List<KeyValuePair<UUI, string>> friends, UUI user, bool online)
+        public override List<UUID> NotifyStatus(List<KeyValuePair<UGUI, string>> friends, UGUI user, bool online)
         {
             throw new NotSupportedException();
         }
 
-        public override bool IsOnline(UUI user)
+        public override bool IsOnline(UGUI user)
         {
             return false;
         }
 
-        public override DestinationInfo GetHomeRegion(UUI user)
+        public override DestinationInfo GetHomeRegion(UGUI user)
         {
             throw new NotSupportedException();
         }
 
-        public override UserInfo GetUserInfo(UUI user) => new UserInfo
+        public override UserInfo GetUserInfo(UGUI user) => new UserInfo
         {
-            FirstName = user.FirstName,
-            LastName = user.LastName,
+            FirstName = string.Empty,
+            LastName = string.Empty,
             UserTitle = string.Empty,
             UserFlags = 0,
             UserCreated = new Date()
         };
 
-        public override ServerURIs GetServerURLs(UUI user)
+        public override ServerURIs GetServerURLs(UGUI user)
         {
             throw new NotSupportedException();
         }
 
-        public override string LocateUser(UUI user)
+        public override string LocateUser(UGUI user)
         {
             throw new NotSupportedException();
         }
 
-        public override UUI GetUUI(UUI user, UUI targetUserID)
+        public override UGUIWithName GetUUI(UGUI user, UGUI targetUserID)
         {
             throw new NotSupportedException();
         }
 
-        bool IDisplayNameAccessor.TryGetValue(UUI agent, out string displayname)
+        bool IDisplayNameAccessor.TryGetValue(UGUI agent, out string displayname)
         {
             displayname = string.Empty;
             return false;
         }
 
-        bool IDisplayNameAccessor.ContainsKey(UUI agent)
+        bool IDisplayNameAccessor.ContainsKey(UGUI agent)
         {
             return false;
         }

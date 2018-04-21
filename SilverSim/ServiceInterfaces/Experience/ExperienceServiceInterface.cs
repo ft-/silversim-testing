@@ -30,30 +30,30 @@ namespace SilverSim.ServiceInterfaces.Experience
         public abstract ExperienceInfo this[UUID experienceID] { get; }
         public abstract bool TryGetValue(UUID experienceID, out ExperienceInfo experienceInfo);
         public abstract void Add(ExperienceInfo info);
-        public abstract void Update(UUI requestingAgent, ExperienceInfo info);
-        public abstract bool Remove(UUI requestingAgent, UUID id);
+        public abstract void Update(UGUI requestingAgent, ExperienceInfo info);
+        public abstract bool Remove(UGUI requestingAgent, UUID id);
 
         public abstract List<UUID> GetGroupExperiences(UGI group);
-        public abstract List<UUID> GetCreatorExperiences(UUI creator);
-        public abstract List<UUID> GetOwnerExperiences(UUI owner);
+        public abstract List<UUID> GetCreatorExperiences(UGUI creator);
+        public abstract List<UUID> GetOwnerExperiences(UGUI owner);
         public abstract List<UUID> FindExperienceByName(string query);
         public abstract List<ExperienceInfo> FindExperienceInfoByName(string query);
 
         public interface IExperiencePermissionsInterface
         {
-            bool this[UUID experienceID, UUI agent] { get; set; }
-            bool TryGetValue(UUID experienceID, UUI agent, out bool allowed);
-            bool Remove(UUID experienceID, UUI agent);
-            Dictionary<UUID, bool> this[UUI agent] { get; }
+            bool this[UUID experienceID, UGUI agent] { get; set; }
+            bool TryGetValue(UUID experienceID, UGUI agent, out bool allowed);
+            bool Remove(UUID experienceID, UGUI agent);
+            Dictionary<UUID, bool> this[UGUI agent] { get; }
         }
 
         public abstract IExperiencePermissionsInterface Permissions { get; }
 
         public interface IExperienceAdminInterface
         {
-            bool this[UUID experienceID, UUI agent] { get; set; }
-            bool TryGetValue(UUID experienceID, UUI agent, out bool allowed);
-            List<UUID> this[UUI agent] { get; }
+            bool this[UUID experienceID, UGUI agent] { get; set; }
+            bool TryGetValue(UUID experienceID, UGUI agent, out bool allowed);
+            List<UUID> this[UGUI agent] { get; }
         }
 
         public abstract IExperienceAdminInterface Admins { get; }

@@ -64,12 +64,12 @@ namespace SilverSim.Main.Friends
 #if DEBUG
         private void SendOnlineCmd(List<string> args, TTY io, UUID limitedToScene)
         {
-            UUI id;
+            UGUI id;
             if (limitedToScene != UUID.Zero)
             {
                 io.Write("Command not allowed");
             }
-            else if (args.Count < 3 || args[0] == "help" || !UUI.TryParse(args[2], out id))
+            else if (args.Count < 3 || args[0] == "help" || !UGUI.TryParse(args[2], out id))
             {
                 io.Write("debug send-online-status <uui>");
             }
@@ -82,12 +82,12 @@ namespace SilverSim.Main.Friends
 
         private void SendOfflineCmd(List<string> args, TTY io, UUID limitedToScene)
         {
-            UUI id;
+            UGUI id;
             if (limitedToScene != UUID.Zero)
             {
                 io.Write("Command not allowed");
             }
-            else if (args.Count < 3 || args[0] == "help" || !UUI.TryParse(args[2], out id))
+            else if (args.Count < 3 || args[0] == "help" || !UGUI.TryParse(args[2], out id))
             {
                 io.Write("debug send-offline-status <uui>");
             }
@@ -122,7 +122,7 @@ namespace SilverSim.Main.Friends
         public override void Store(TravelingDataInfo data)
         {
             m_TravelingDataService.Store(data);
-            UUI uui;
+            UGUI uui;
             if(m_AvatarNameService.TryGetValue(data.UserID, out uui))
             {
                 m_FriendsStatusNotifierService.NotifyAsOnline(uui);
@@ -135,7 +135,7 @@ namespace SilverSim.Main.Friends
             {
                 return false;
             }
-            UUI uui;
+            UGUI uui;
             if (m_AvatarNameService.TryGetValue(info.UserID, out uui))
             {
                 m_FriendsStatusNotifierService.NotifyAsOffline(uui);
@@ -149,7 +149,7 @@ namespace SilverSim.Main.Friends
             {
                 return false;
             }
-            UUI uui;
+            UGUI uui;
             if (m_AvatarNameService.TryGetValue(info.UserID, out uui))
             {
                 m_FriendsStatusNotifierService.NotifyAsOffline(uui);

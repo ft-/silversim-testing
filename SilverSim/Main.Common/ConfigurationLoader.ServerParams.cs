@@ -178,7 +178,7 @@ namespace SilverSim.Main.Common
                 {
                     io.Write("=" + GetServerParamStorage()[UUID.Zero, args[2]]);
                 }
-                catch (Exception e)
+                catch
                 {
                     io.Write("Server parameter not available");
                 }
@@ -200,7 +200,7 @@ namespace SilverSim.Main.Common
                 {
                     io.Write("=" + GetServerParamStorage()[regionId, args[3]]);
                 }
-                catch (Exception e)
+                catch
                 {
                     io.Write("Server parameter not available");
                 }

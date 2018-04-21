@@ -29,26 +29,26 @@ namespace SilverSim.Database.Memory.Estate
 {
     public partial class MemoryEstateService : IEstateOwnerServiceInterface
     {
-        bool IEstateOwnerServiceInterface.TryGetValue(uint estateID, out UUI uui)
+        bool IEstateOwnerServiceInterface.TryGetValue(uint estateID, out UGUI uui)
         {
             EstateInfo estate;
             if(TryGetValue(estateID, out estate))
             {
-                uui = new UUI(estate.Owner);
+                uui = new UGUI(estate.Owner);
                 return true;
             }
-            uui = default(UUI);
+            uui = default(UGUI);
             return false;
         }
 
-        List<uint> IEstateOwnerServiceInterface.this[UUI owner] =>
+        List<uint> IEstateOwnerServiceInterface.this[UGUI owner] =>
             new List<uint>(from data in m_Data where data.Value.Owner.EqualsGrid(owner) select data.Key);
 
-        UUI IEstateOwnerServiceInterface.this[uint estateID]
+        UGUI IEstateOwnerServiceInterface.this[uint estateID]
         {
             get
             {
-                UUI uui;
+                UGUI uui;
                 if (!EstateOwner.TryGetValue(estateID, out uui))
                 {
                     throw new KeyNotFoundException();
@@ -56,7 +56,7 @@ namespace SilverSim.Database.Memory.Estate
                 return uui;
             }
 
-            set { m_Data[estateID].Owner = new UUI(value); }
+            set { m_Data[estateID].Owner = new UGUI(value); }
         }
     }
 }

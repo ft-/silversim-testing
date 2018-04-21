@@ -24,7 +24,7 @@ namespace SilverSim.Types.Groups
     public class GroupMember
     {
         public UGI Group = UGI.Unknown;
-        public UUI Principal = UUI.Unknown;
+        public UGUI Principal = UGUI.Unknown;
         public UUID SelectedRoleID = UUID.Zero;
         public int Contribution;
         public bool IsListInProfile;

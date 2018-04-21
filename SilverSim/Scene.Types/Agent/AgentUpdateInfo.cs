@@ -37,7 +37,7 @@ namespace SilverSim.Scene.Types.Agent
 
         public bool IsAlwaysFull => true;
 
-        public UUI Owner => Agent.Owner;
+        public UGUI Owner => Agent.Owner;
 
         private readonly byte[] m_UpdateDataBlock;
 

@@ -175,7 +175,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                             { "id", grp.ID },
                             { "name", grp.Name },
                             { "owner_id", grp.Owner.ID },
-                            { "owner_name", grp.Owner.FullName },
+                            { "owner_name", m_Scene.AvatarNameService.ResolveName(grp.Owner).FullName },
                             { "location", new Map
                                 {
                                     { "x", loc.X },

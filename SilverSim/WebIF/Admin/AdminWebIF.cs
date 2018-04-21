@@ -260,10 +260,10 @@ namespace SilverSim.WebIF.Admin
 
         public ShutdownOrder ShutdownOrder => ShutdownOrder.Any;
 
-        public UUI ResolveName(UUI resolveuui)
+        public UGUIWithName ResolveName(UGUIWithName resolveuui)
         {
-            UUI uui = resolveuui;
-            UUI resultUui = uui;
+            UGUIWithName uui = resolveuui;
+            UGUIWithName resultUui = uui;
             if (m_AvatarNameService.TryGetValue(uui, out resultUui))
             {
                 uui = resultUui;
@@ -271,7 +271,14 @@ namespace SilverSim.WebIF.Admin
             return uui;
         }
 
-        public bool TranslateToUUI(string arg, out UUI uui)
+        public UGUIWithName ResolveName(UGUI ugui) => ResolveName((UGUIWithName)ugui);
+
+        public bool TranslateToUUI(string arg, out UGUIWithName uui)
+        {
+            return m_AvatarNameService.TranslateToUUI(arg, out uui);
+        }
+
+        public bool TranslateToUUI(string arg, out UGUI uui)
         {
             return m_AvatarNameService.TranslateToUUI(arg, out uui);
         }
@@ -1320,7 +1327,7 @@ namespace SilverSim.WebIF.Admin
                 return;
             }
 
-            UUI uui;
+            UGUIWithName uui;
             if(!m_AvatarNameService.TryGetValue(q1, q2, out uui))
             {
                 ErrorResponse(req, AdminWebIfErrorResult.NotFound);
@@ -1343,7 +1350,7 @@ namespace SilverSim.WebIF.Admin
         {
             string q1;
             string q2;
-            List<UUI> uuis;
+            List<UGUIWithName> uuis;
 
             if(jsondata.TryGetValue("firstname", out q1) && jsondata.TryGetValue("lastname", out q2))
             {
@@ -1382,7 +1389,7 @@ namespace SilverSim.WebIF.Admin
                 return;
             }
 
-            UUI uui;
+            UGUIWithName uui;
             if(!m_AvatarNameService.TryGetValue(id, out uui))
             {
                 ErrorResponse(req, AdminWebIfErrorResult.NotFound);

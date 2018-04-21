@@ -70,6 +70,6 @@ namespace SilverSim.ServiceInterfaces.Authorization
          * cannot be granted to be validating correctly at all times.
          */
         /* throws NotAuthorizedException when not allowed */
-        public abstract void QueryAccess(UUI agent, UUID regionID);
+        public abstract void QueryAccess(UGUI agent, UUID regionID);
     }
 }

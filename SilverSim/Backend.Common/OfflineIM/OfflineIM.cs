@@ -83,7 +83,7 @@ namespace SilverSim.Backend.Common.OfflineIM
                     throw new IMSendFailedException();
             }
 
-            UUI uui;
+            UGUIWithName uui;
             try
             {
                 uui = m_AvatarNameService[im.ToAgent];
@@ -116,7 +116,7 @@ namespace SilverSim.Backend.Common.OfflineIM
                 {
                     var response_im = new GridInstantMessage
                     {
-                        FromAgent = im.ToAgent,
+                        FromAgent = uui,
                         ToAgent = im.FromAgent,
                         Dialog = GridInstantMessageDialog.BusyAutoResponse,
                         IsFromGroup = false,

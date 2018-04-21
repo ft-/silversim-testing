@@ -28,13 +28,13 @@ namespace SilverSim.Database.Memory.Experience
 {
     public sealed partial class MemoryExperienceService : ExperienceServiceInterface.IExperienceAdminInterface
     {
-        private readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUI, bool>> m_Admins = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUI, bool>>(() => new RwLockedDictionary<UUI, bool>());
+        private readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UGUI, bool>> m_Admins = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UGUI, bool>>(() => new RwLockedDictionary<UGUI, bool>());
 
-        bool IExperienceAdminInterface.this[UUID experienceID, UUI agent]
+        bool IExperienceAdminInterface.this[UUID experienceID, UGUI agent]
         {
             get
             {
-                RwLockedDictionary<UUI, bool> k;
+                RwLockedDictionary<UGUI, bool> k;
                 return m_Admins.TryGetValue(experienceID, out k) && k.ContainsKey(agent);
             }
             set
@@ -50,9 +50,9 @@ namespace SilverSim.Database.Memory.Experience
             }
         }
 
-        bool IExperienceAdminInterface.TryGetValue(UUID experienceID, UUI agent, out bool allowed)
+        bool IExperienceAdminInterface.TryGetValue(UUID experienceID, UGUI agent, out bool allowed)
         {
-            RwLockedDictionary<UUI, bool> k;
+            RwLockedDictionary<UGUI, bool> k;
             if (m_Admins.TryGetValue(experienceID, out k))
             {
                 allowed = k.ContainsKey(agent);
@@ -62,12 +62,12 @@ namespace SilverSim.Database.Memory.Experience
             return false;
         }
 
-        List<UUID> IExperienceAdminInterface.this[UUI agent]
+        List<UUID> IExperienceAdminInterface.this[UGUI agent]
         {
             get
             {
                 var res = new List<UUID>();
-                foreach(KeyValuePair<UUID, RwLockedDictionary<UUI, bool>> kvp in m_Admins)
+                foreach(KeyValuePair<UUID, RwLockedDictionary<UGUI, bool>> kvp in m_Admins)
                 {
                     if(kvp.Value[agent])
                     {

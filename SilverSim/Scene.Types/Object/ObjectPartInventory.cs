@@ -423,7 +423,7 @@ namespace SilverSim.Scene.Types.Object
         }
 
 
-        private ObjectPartInventoryItem FromXML(XmlTextReader reader, UUI currentOwner, XmlDeserializationOptions options, out UUID origid)
+        private ObjectPartInventoryItem FromXML(XmlTextReader reader, UGUI currentOwner, XmlDeserializationOptions options, out UUID origid)
         {
             origid = UUID.Zero;
             var item = new ObjectPartInventoryItem
@@ -560,7 +560,7 @@ namespace SilverSim.Scene.Types.Object
                         }
                         if(ownerChanged)
                         {
-                            item.Owner = UUI.Unknown;
+                            item.Owner = UGUI.Unknown;
                         }
                         return item;
 
@@ -570,7 +570,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        public void FillFromXml(XmlTextReader reader, UUI currentOwner, XmlDeserializationOptions options)
+        public void FillFromXml(XmlTextReader reader, UGUI currentOwner, XmlDeserializationOptions options)
         {
             var part = new ObjectPart
             {
@@ -638,10 +638,10 @@ namespace SilverSim.Scene.Types.Object
         #region XML Serialization
         public void ToXml(XmlTextWriter writer, XmlSerializationOptions options)
         {
-            ToXml(writer, UUI.Unknown, options);
+            ToXml(writer, UGUI.Unknown, options);
         }
 
-        public void ToXml(XmlTextWriter writer, UUI nextOwner, XmlSerializationOptions options)
+        public void ToXml(XmlTextWriter writer, UGUI nextOwner, XmlSerializationOptions options)
         {
             writer.WriteNamedValue("InventorySerial", InventorySerial);
             writer.WriteStartElement("TaskInventory");

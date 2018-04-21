@@ -59,7 +59,7 @@ namespace SilverSim.Scene.Registration
             RegionInfo ri = scene.GetRegionInfo();
             if(ri.Owner == null)
             {
-                ri.Owner = new UUI();
+                ri.Owner = UGUI.Unknown;
             }
 
             Dictionary<string, string> gridFeatures = scene.GridService.GetGridExtraFeatures();

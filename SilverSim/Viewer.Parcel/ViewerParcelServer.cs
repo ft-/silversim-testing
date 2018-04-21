@@ -216,7 +216,7 @@ namespace SilverSim.Viewer.Parcel
         public void HandleParcelGodForceOwner(AgentCircuit circuit, SceneInterface scene, Message m)
         {
             var req = (ParcelGodForceOwner)m;
-            UUI agentID;
+            UGUIWithName agentID;
             ParcelInfo pInfo;
             IAgent godAgent = circuit.Agent;
 
@@ -236,7 +236,7 @@ namespace SilverSim.Viewer.Parcel
             pInfo.GroupOwned = false;
             pInfo.ClaimDate = Date.Now;
             pInfo.SalePrice = 0;
-            pInfo.AuthBuyer = UUI.Unknown;
+            pInfo.AuthBuyer = UGUI.Unknown;
             pInfo.Owner = agentID;
             pInfo.Flags &= ~(ParcelFlags.ForSale | ParcelFlags.ForSaleObjects | ParcelFlags.SellParcelObjects | ParcelFlags.ShowDirectory);
             scene.TriggerParcelUpdate(pInfo);
@@ -257,7 +257,7 @@ namespace SilverSim.Viewer.Parcel
             if (scene.Parcels.TryGetValue(req.LocalID, out pInfo) &&
                 scene.CanDeedParcel(agent.Owner, pInfo))
             {
-                if (!pInfo.Group.Equals(UUI.Unknown))
+                if (!pInfo.Group.Equals(UGUI.Unknown))
                 {
                     pInfo.GroupOwned = true;
                 }
@@ -285,7 +285,7 @@ namespace SilverSim.Viewer.Parcel
                 pInfo.GroupOwned = false;
                 pInfo.ClaimDate = Date.Now;
                 pInfo.SalePrice = 0;
-                pInfo.AuthBuyer = UUI.Unknown;
+                pInfo.AuthBuyer = UGUI.Unknown;
                 pInfo.Owner = scene.Owner;
                 pInfo.Flags &= ~(ParcelFlags.ForSale | ParcelFlags.ForSaleObjects | ParcelFlags.SellParcelObjects | ParcelFlags.ShowDirectory);
                 scene.TriggerParcelUpdate(pInfo);
@@ -310,9 +310,9 @@ namespace SilverSim.Viewer.Parcel
             {
                 pInfo.Group = UGI.Unknown;
                 pInfo.GroupOwned = false;
-                pInfo.Owner = UUI.Unknown;
+                pInfo.Owner = UGUI.Unknown;
                 pInfo.SalePrice = 0;
-                pInfo.AuthBuyer = UUI.Unknown;
+                pInfo.AuthBuyer = UGUI.Unknown;
                 pInfo.Flags &= ~(ParcelFlags.ForSale | ParcelFlags.ForSaleObjects | ParcelFlags.SellParcelObjects | ParcelFlags.ShowDirectory);
                 scene.TriggerParcelUpdate(pInfo);
             }
@@ -365,7 +365,7 @@ namespace SilverSim.Viewer.Parcel
                 pInfo.GroupOwned = false;
                 pInfo.ClaimDate = Date.Now;
                 pInfo.SalePrice = 0;
-                pInfo.AuthBuyer = UUI.Unknown;
+                pInfo.AuthBuyer = UGUI.Unknown;
                 pInfo.Owner = scene.Owner;
                 pInfo.Flags &= ~(ParcelFlags.ForSale | ParcelFlags.ForSaleObjects | ParcelFlags.SellParcelObjects | ParcelFlags.ShowDirectory);
                 scene.TriggerParcelUpdate(pInfo);
@@ -436,7 +436,7 @@ namespace SilverSim.Viewer.Parcel
                 if (req.AuthBuyerID == UUID.Zero ||
                     !scene.AvatarNameService.TryGetValue(req.AuthBuyerID, out pInfo.AuthBuyer))
                 {
-                    pInfo.AuthBuyer = UUI.Unknown;
+                    pInfo.AuthBuyer = UGUI.Unknown;
                 }
 
                 pInfo.SnapshotID = req.SnapshotID;
@@ -520,7 +520,7 @@ namespace SilverSim.Viewer.Parcel
             ParcelInfo pinfo;
             if(scene.Parcels.TryGetValue(req.LocalID, out pinfo) && (pinfo.Flags & ParcelFlags.ForSale) != 0)
             {
-                if(pinfo.AuthBuyer.EqualsGrid(agent.Owner) || pinfo.AuthBuyer == UUI.Unknown)
+                if(pinfo.AuthBuyer.EqualsGrid(agent.Owner) || pinfo.AuthBuyer == UGUI.Unknown)
                 {
                     if(pinfo.SalePrice != 0)
                     {
@@ -554,10 +554,10 @@ namespace SilverSim.Viewer.Parcel
             }
         }
 
-        private void ChangeParcelOwnership(SceneInterface scene, ParcelInfo pinfo, UUI newOwner, int soldforprice, ParcelBuy req)
+        private void ChangeParcelOwnership(SceneInterface scene, ParcelInfo pinfo, UGUI newOwner, int soldforprice, ParcelBuy req)
         {
             bool sellParcelObjects = (pinfo.Flags & ParcelFlags.SellParcelObjects) != 0;
-            UUI oldOwner = pinfo.Owner;
+            UGUI oldOwner = pinfo.Owner;
             UGI oldGroup = pinfo.Group;
             bool wasGroupOwned = pinfo.GroupOwned;
 
@@ -567,7 +567,7 @@ namespace SilverSim.Viewer.Parcel
             pinfo.ClaimDate = Date.Now;
             pinfo.ClaimPrice = soldforprice;
             pinfo.SalePrice = 0;
-            pinfo.AuthBuyer = UUI.Unknown;
+            pinfo.AuthBuyer = UGUI.Unknown;
             pinfo.Flags &= ~(ParcelFlags.ForSale | ParcelFlags.ForSaleObjects | ParcelFlags.SellParcelObjects | ParcelFlags.ShowDirectory);
             scene.TriggerParcelUpdate(pinfo);
 

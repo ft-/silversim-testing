@@ -120,7 +120,7 @@ namespace SilverSim.Scene.Npc
             {
                 LinkNumber = linkNum,
                 TouchFace = -1,
-                Name = Owner.FullName,
+                Name = NamedOwner.FullName,
                 GrabOffset = part.LocalPosition * -1f,
                 Group = Group,
                 Key = ID,

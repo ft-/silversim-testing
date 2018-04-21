@@ -41,10 +41,10 @@ namespace SilverSim.Scene.Types.Object
         #region XML Serialization
         public void ToXml(XmlTextWriter writer, XmlSerializationOptions options = XmlSerializationOptions.None)
         {
-            ToXml(writer, UUI.Unknown, options);
+            ToXml(writer, UGUI.Unknown, options);
         }
 
-        public void ToXml(XmlTextWriter writer, UUI nextOwner, XmlSerializationOptions options = XmlSerializationOptions.None)
+        public void ToXml(XmlTextWriter writer, UGUI nextOwner, XmlSerializationOptions options = XmlSerializationOptions.None)
         {
             lock (m_DataLock)
             {
@@ -1091,7 +1091,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        public static ObjectPart FromXml(XmlTextReader reader, ObjectGroup rootGroup, UUI currentOwner, XmlDeserializationOptions options)
+        public static ObjectPart FromXml(XmlTextReader reader, ObjectGroup rootGroup, UGUI currentOwner, XmlDeserializationOptions options)
         {
             var part = new ObjectPart
             {

@@ -57,9 +57,9 @@ namespace SilverSim.Types.Asset.Format
         public WearableType Type = WearableType.Invalid;
         public Dictionary<uint, double> Params = new Dictionary<uint,double>();
         public Dictionary<AvatarTextureIndex, UUID> Textures = new Dictionary<AvatarTextureIndex, UUID>();
-        public UUI Creator = new UUI();
-        public UUI LastOwner = new UUI();
-        public UUI Owner = new UUI();
+        public UGUI Creator = new UGUI();
+        public UGUI LastOwner = new UGUI();
+        public UGUI Owner = new UGUI();
         public UGI Group = new UGI();
         private readonly InventoryPermissionsData Permissions = new InventoryPermissionsData();
         private InventoryItem.SaleInfoData SaleInfo;

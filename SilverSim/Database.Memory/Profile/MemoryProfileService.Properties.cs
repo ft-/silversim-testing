@@ -33,7 +33,7 @@ namespace SilverSim.Database.Memory.Profile
         private readonly Dictionary<UUID, ProfileProperties> m_Properties = new Dictionary<UUID, ProfileProperties>();
         private readonly ReaderWriterLock m_PropertiesLock = new ReaderWriterLock();
 
-        public ProfileProperties this[UUI user, PropertiesUpdateFlags flags]
+        public ProfileProperties this[UGUI user, PropertiesUpdateFlags flags]
         {
             set
             {
@@ -70,7 +70,7 @@ namespace SilverSim.Database.Memory.Profile
             }
         }
 
-        ProfileProperties IPropertiesInterface.this[UUI user] => m_PropertiesLock.AcquireReaderLock(() =>
+        ProfileProperties IPropertiesInterface.this[UGUI user] => m_PropertiesLock.AcquireReaderLock(() =>
         {
             ProfileProperties props;
             if (!m_Properties.TryGetValue(user.ID, out props))
@@ -78,7 +78,7 @@ namespace SilverSim.Database.Memory.Profile
                 props = new ProfileProperties
                 {
                     User = user,
-                    Partner = UUI.Unknown,
+                    Partner = UGUI.Unknown,
                     WebUrl = string.Empty,
                     WantToText = string.Empty,
                     SkillsText = string.Empty,

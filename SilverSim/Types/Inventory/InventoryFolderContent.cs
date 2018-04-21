@@ -29,7 +29,7 @@ namespace SilverSim.Types.Inventory
         public List<InventoryItem> Items = new List<InventoryItem>();
 
         public UUID FolderID = UUID.Zero;
-        public UUI Owner = UUI.Unknown;
+        public UGUI Owner = UGUI.Unknown;
         public int Version;
     }
 }

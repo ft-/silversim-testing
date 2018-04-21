@@ -33,7 +33,7 @@ namespace SilverSim.Database.Memory.AvatarName
     [PluginName("AvatarNames")]
     public sealed class MemoryAvatarNameService : AvatarNameServiceInterface, IPlugin
     {
-        private readonly RwLockedDictionary<UUID, UUI> m_Data = new RwLockedDictionary<UUID, UUI>();
+        private readonly RwLockedDictionary<UUID, UGUIWithName> m_Data = new RwLockedDictionary<UUID, UGUIWithName>();
 
         #region Constructor
         public void Startup(ConfigurationLoader loader)
@@ -43,22 +43,22 @@ namespace SilverSim.Database.Memory.AvatarName
         #endregion
 
         #region Accessors
-        public override bool TryGetValue(string firstName, string lastName, out UUI uui)
+        public override bool TryGetValue(string firstName, string lastName, out UGUIWithName uui)
         {
-            foreach(UUI entry in from data in m_Data where data.Value.FirstName.ToLower() == firstName.ToLower() && data.Value.LastName.ToLower() == lastName.ToLower() select data.Value)
+            foreach(UGUIWithName entry in from data in m_Data where data.Value.FirstName.ToLower() == firstName.ToLower() && data.Value.LastName.ToLower() == lastName.ToLower() select data.Value)
             {
-                uui = new UUI(entry);
+                uui = new UGUIWithName(entry);
                 return true;
             }
-            uui = UUI.Unknown;
+            uui = UGUIWithName.Unknown;
             return false;
         }
 
-        public override UUI this[string firstName, string lastName]
+        public override UGUIWithName this[string firstName, string lastName]
         {
             get
             {
-                UUI uui;
+                UGUIWithName uui;
                 if(!TryGetValue(firstName, lastName, out uui))
                 {
                     throw new KeyNotFoundException();
@@ -67,13 +67,13 @@ namespace SilverSim.Database.Memory.AvatarName
             }
         }
 
-        public override bool TryGetValue(UUID key, out UUI uui) => m_Data.TryGetValue(key, out uui);
+        public override bool TryGetValue(UUID key, out UGUIWithName uui) => m_Data.TryGetValue(key, out uui);
 
-        public override UUI this[UUID key]
+        public override UGUIWithName this[UUID key]
         {
             get
             {
-                UUI uui;
+                UGUIWithName uui;
                 if(!TryGetValue(key, out uui))
                 {
                     throw new KeyNotFoundException();
@@ -83,27 +83,27 @@ namespace SilverSim.Database.Memory.AvatarName
         }
         #endregion
 
-        public override void Store(UUI value)
+        public override void Store(UGUIWithName value)
         {
             if (value.IsAuthoritative) /* do not store non-authoritative entries */
             {
-                m_Data[value.ID] = new UUI(value);
+                m_Data[value.ID] = new UGUIWithName(value);
             }
         }
 
         public override bool Remove(UUID key) => m_Data.Remove(key);
 
-        public override List<UUI> Search(string[] names)
+        public override List<UGUIWithName> Search(string[] names)
         {
             if(names.Length < 1 || names.Length > 2)
             {
-                return new List<UUI>();
+                return new List<UGUIWithName>();
             }
 
-            IEnumerable<UUI> res = (names.Length == 1) ?
-                from data in m_Data.Values where data.FirstName.ToLower().Contains(names[0].ToLower()) || data.LastName.ToLower().Contains(names[0].ToLower()) select new UUI(data) :
-                from data in m_Data.Values where data.FirstName.ToLower().Contains(names[0].ToLower()) && data.LastName.ToLower().Contains(names[1].ToLower()) select new UUI(data);
-            return new List<UUI>(res);
+            IEnumerable<UGUIWithName> res = (names.Length == 1) ?
+                from data in m_Data.Values where data.FirstName.ToLower().Contains(names[0].ToLower()) || data.LastName.ToLower().Contains(names[0].ToLower()) select new UGUIWithName(data) :
+                from data in m_Data.Values where data.FirstName.ToLower().Contains(names[0].ToLower()) && data.LastName.ToLower().Contains(names[1].ToLower()) select new UGUIWithName(data);
+            return new List<UGUIWithName>(res);
         }
     }
 }

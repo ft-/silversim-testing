@@ -92,7 +92,7 @@ namespace SilverSim.Viewer.Profile
         }
 
         private readonly RwLockedDictionary<string, ProfileServiceData> m_LastKnownProfileServices = new RwLockedDictionary<string, ProfileServiceData>();
-        private readonly RwLockedDictionary<UUID, KeyValuePair<UUI, int>> m_ClassifiedQueryCache = new RwLockedDictionary<UUID, KeyValuePair<UUI, int>>();
+        private readonly RwLockedDictionary<UUID, KeyValuePair<UGUI, int>> m_ClassifiedQueryCache = new RwLockedDictionary<UUID, KeyValuePair<UGUI, int>>();
 
         public void CleanupTimer(object sender, ElapsedEventArgs e)
         {
@@ -248,19 +248,19 @@ namespace SilverSim.Viewer.Profile
         }
 
         #region Lookup actual service for profile
-        private ProfileServiceData LookupProfileService(SceneInterface scene, UUID agentID, out UUI agentUUI)
+        private ProfileServiceData LookupProfileService(SceneInterface scene, UUID agentID, out UGUI agentUUI)
         {
             ProfileServiceData serviceData = null;
             ProfileServiceInterface profileService = null;
             UserAgentServiceInterface userAgentService = null;
-            agentUUI = UUI.Unknown;
+            agentUUI = UGUI.Unknown;
 
             if(profileService == null)
             {
                 try
                 {
                     IAgent agent = scene.Agents[agentID];
-                    agentUUI = agent.Owner;
+                    agentUUI = agent.NamedOwner;
                     profileService = agent.ProfileService;
                     userAgentService = agent.UserAgentService;
                     if(profileService == null)
@@ -275,13 +275,13 @@ namespace SilverSim.Viewer.Profile
                 }
                 catch
                 {
-                    agentUUI = UUI.Unknown;
+                    agentUUI = UGUI.Unknown;
                 }
             }
 
             if(profileService == null && userAgentService == null)
             {
-                UUI uui;
+                UGUI uui;
                 try
                 {
                     uui = scene.AvatarNameService[agentID];
@@ -325,7 +325,7 @@ namespace SilverSim.Viewer.Profile
                 }
                 catch
                 {
-                    agentUUI = UUI.Unknown;
+                    agentUUI = UGUI.Unknown;
                 }
             }
 
@@ -365,7 +365,7 @@ namespace SilverSim.Viewer.Profile
             }
 
             ProfileServiceData serviceData;
-            UUI uui;
+            UGUI uui;
             try
             {
                 serviceData = LookupProfileService(scene, targetuuid, out uui);
@@ -417,7 +417,7 @@ namespace SilverSim.Viewer.Profile
                     Name = classified.Value
                 };
                 reply.Data.Add(d);
-                m_ClassifiedQueryCache[classified.Key] = new KeyValuePair<UUI, int>(uui, Environment.TickCount);
+                m_ClassifiedQueryCache[classified.Key] = new KeyValuePair<UGUI, int>(uui, Environment.TickCount);
                 messageFill += entryLen;
             }
 
@@ -436,14 +436,14 @@ namespace SilverSim.Viewer.Profile
                 return;
             }
 
-            KeyValuePair<UUI, int> kvp;
+            KeyValuePair<UGUI, int> kvp;
             if(!m_ClassifiedQueryCache.TryGetValue(req.ClassifiedID, out kvp))
             {
                 return;
             }
 
             ProfileServiceData serviceData;
-            UUI uui;
+            UGUI uui;
             try
             {
                 serviceData = LookupProfileService(scene, kvp.Key.ID, out uui);
@@ -575,14 +575,14 @@ namespace SilverSim.Viewer.Profile
                 return;
             }
 
-            UUI targetuui;
+            UGUI targetuui;
             try
             {
                 targetuui = scene.AvatarNameService[targetuuid];
             }
             catch
             {
-                targetuui = new UUI(targetuuid);
+                targetuui = new UGUI(targetuuid);
             }
 
             var reply = new AvatarNotesReply
@@ -617,7 +617,7 @@ namespace SilverSim.Viewer.Profile
 
             try
             {
-                agent.ProfileService.Notes[agent.Owner, new UUI(req.TargetID)] = req.Notes;
+                agent.ProfileService.Notes[agent.Owner, new UGUI(req.TargetID)] = req.Notes;
             }
             catch
             {
@@ -647,7 +647,7 @@ namespace SilverSim.Viewer.Profile
             }
 
             ProfileServiceData serviceData;
-            UUI uui;
+            UGUI uui;
             try
             {
                 serviceData = LookupProfileService(scene, targetuuid, out uui);
@@ -735,7 +735,7 @@ namespace SilverSim.Viewer.Profile
             }
 
             ProfileServiceData serviceData;
-            UUI uui;
+            UGUI uui;
             try
             {
                 serviceData = LookupProfileService(scene, targetuuid, out uui);
@@ -920,7 +920,7 @@ namespace SilverSim.Viewer.Profile
             }
 
             ProfileServiceData serviceData;
-            UUI uui;
+            UGUI uui;
             try
             {
                 serviceData = LookupProfileService(scene, req.AvatarID, out uui);
@@ -947,8 +947,8 @@ namespace SilverSim.Viewer.Profile
 #endif
                 userInfo = new UserAgentServiceInterface.UserInfo
                 {
-                    FirstName = uui.FirstName,
-                    LastName = uui.LastName,
+                    FirstName = string.Empty,
+                    LastName = string.Empty,
                     UserFlags = 0,
                     UserCreated = new Date(),
                     UserTitle = string.Empty
@@ -972,7 +972,7 @@ namespace SilverSim.Viewer.Profile
                     ImageID = "5748decc-f629-461c-9a36-a35a221fe21f",
                     FirstLifeImageID = "5748decc-f629-461c-9a36-a35a221fe21f",
                     User = uui,
-                    Partner = UUI.Unknown,
+                    Partner = UGUI.Unknown,
                     AboutText = string.Empty,
                     FirstLifeText = string.Empty,
                     Language = string.Empty,
@@ -1061,7 +1061,7 @@ namespace SilverSim.Viewer.Profile
             {
                 ImageID = UUID.Zero,
                 FirstLifeImageID = UUID.Zero,
-                Partner = UUI.Unknown,
+                Partner = UGUI.Unknown,
                 User = agent.Owner,
                 SkillsText = string.Empty,
                 WantToText = string.Empty,
@@ -1105,7 +1105,7 @@ namespace SilverSim.Viewer.Profile
                 FirstLifeImageID = UUID.Zero,
                 FirstLifeText = string.Empty,
                 AboutText = string.Empty,
-                Partner = UUI.Unknown,
+                Partner = UGUI.Unknown,
                 User = agent.Owner,
                 SkillsMask = req.SkillsMask,
                 SkillsText = req.SkillsText,

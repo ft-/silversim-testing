@@ -51,11 +51,11 @@ namespace SilverSim.Main.Friends
 
         private class FriendsStatusRequest
         {
-            public readonly UUI Notifier;
+            public readonly UGUI Notifier;
             public readonly bool IsOnline;
             public readonly FriendsServiceInterface FriendsService;
 
-            public FriendsStatusRequest(UUI notifier, bool isOnline, FriendsServiceInterface friendsService)
+            public FriendsStatusRequest(UGUI notifier, bool isOnline, FriendsServiceInterface friendsService)
             {
                 Notifier = notifier;
                 IsOnline = isOnline;
@@ -69,10 +69,10 @@ namespace SilverSim.Main.Friends
             m_LocalFriendsStatusNotifyServiceName = config.GetString("LocalFriendsNotifyService", string.Empty);
         }
 
-        public void NotifyAsOffline(UUI notifier, FriendsServiceInterface friendsService = null) =>
+        public void NotifyAsOffline(UGUI notifier, FriendsServiceInterface friendsService = null) =>
             m_NotificationQueue.Enqueue(new FriendsStatusRequest(notifier, false, friendsService ?? m_FriendsService));
 
-        public void NotifyAsOnline(UUI notifier, FriendsServiceInterface friendsService = null) =>
+        public void NotifyAsOnline(UGUI notifier, FriendsServiceInterface friendsService = null) =>
             m_NotificationQueue.Enqueue(new FriendsStatusRequest(notifier, true, friendsService ?? m_FriendsService));
 
         private readonly BlockingQueue<FriendsStatusRequest> m_NotificationQueue = new BlockingQueue<FriendsStatusRequest>();
@@ -105,32 +105,29 @@ namespace SilverSim.Main.Friends
             }
         }
 
-        private void Notify(UUI notifier, bool isOnline, FriendsServiceInterface friendsService)
+        private void Notify(UGUI notifier, bool isOnline, FriendsServiceInterface friendsService)
         {
-            var friendsPerHomeUri = new Dictionary<Uri, List<KeyValuePair<UUI, string>>>();
+            var friendsPerHomeUri = new Dictionary<Uri, List<KeyValuePair<UGUI, string>>>();
 
             if(friendsService != null)
             {
-#if DEBUG
-                m_Log.DebugFormat("Signaling {0} to friends for {1}", isOnline ? "online" : "offline", notifier.FullName);
-#endif
                 foreach(FriendInfo fi in friendsService[notifier])
                 {
                     if((fi.FriendGivenFlags & FriendRightFlags.SeeOnline) != 0)
                     {
                         Uri homeURI = fi.Friend.HomeURI;
-                        List <KeyValuePair<UUI, string>> list;
+                        List <KeyValuePair<UGUI, string>> list;
                         if(!friendsPerHomeUri.TryGetValue(homeURI, out list))
                         {
-                            list = new List<KeyValuePair<UUI, string>>();
+                            list = new List<KeyValuePair<UGUI, string>>();
                             friendsPerHomeUri.Add(homeURI, list);
                         }
 
-                        list.Add(new KeyValuePair<UUI, string>(fi.Friend, fi.Secret));
+                        list.Add(new KeyValuePair<UGUI, string>(fi.Friend, fi.Secret));
                     }
                 }
 
-                foreach(KeyValuePair<Uri, List<KeyValuePair<UUI, string>>> kvp in friendsPerHomeUri)
+                foreach(KeyValuePair<Uri, List<KeyValuePair<UGUI, string>>> kvp in friendsPerHomeUri)
                 {
                     Uri uri = kvp.Key ?? new Uri(m_HomeURI);
                     try
@@ -145,7 +142,7 @@ namespace SilverSim.Main.Friends
             }
         }
 
-        private void InnerNotify(UUI notifier, Uri uri, List<KeyValuePair<UUI, string>> list, bool isOnline)
+        private void InnerNotify(UGUI notifier, Uri uri, List<KeyValuePair<UGUI, string>> list, bool isOnline)
         {
             string url = uri?.ToString() ?? m_HomeURI;
             if (url.Equals(m_HomeURI, StringComparison.InvariantCultureIgnoreCase))
@@ -162,7 +159,7 @@ namespace SilverSim.Main.Friends
             else
             {
                 var serverurls = new ServerURIs();
-                serverurls.GetServerURLs(UUI.Unknown, url);
+                serverurls.GetServerURLs(UGUI.Unknown, url);
 
                 Dictionary<string, string> cachedheaders = ServicePluginHelo.HeloRequest(serverurls.FriendsServerURI);
                 foreach (IFriendsStatusNotifyServicePlugin plugin in m_Plugins)

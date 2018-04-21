@@ -39,7 +39,7 @@ namespace SilverSim.Viewer.Core.Capabilities
         public override int ActiveUploads => m_Transactions.Count;
 
         public UploadBakedTexture(
-            UUI creator,
+            UGUI creator,
             AssetServiceInterface assetService,
             string serverURI,
             string remoteip)
@@ -71,7 +71,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 try
                 {
                     m_AssetService.Store(data);
-                    m_Log.InfoFormat("Uploaded baked texture {1} for {0}", Creator.FullName, data.ID);
+                    m_Log.InfoFormat("Uploaded baked texture {1} for {0}", Creator.ToString(), data.ID);
                 }
                 catch
                 {

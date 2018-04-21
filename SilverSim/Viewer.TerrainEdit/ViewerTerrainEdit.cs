@@ -57,7 +57,7 @@ namespace SilverSim.Viewer.TerrainEdit
                 return;
             }
 
-            Action<UUI, SceneInterface, ModifyLand, ModifyLand.Data> modifier;
+            Action<UGUI, SceneInterface, ModifyLand, ModifyLand.Data> modifier;
 
             foreach (var data in req.ParcelData)
             {

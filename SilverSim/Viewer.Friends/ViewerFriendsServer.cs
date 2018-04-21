@@ -209,7 +209,7 @@ namespace SilverSim.Viewer.Friends
             }
 
             IAgent testagent;
-            UUI destagent;
+            UGUIWithName destagent;
             FriendInfo friendInfo;
             IFriendsStatusNotifyServiceInterface otherFriendsStatusNotifyService;
             if (scene.Agents.TryGetValue(destid, out testagent))
@@ -228,7 +228,7 @@ namespace SilverSim.Viewer.Friends
             }
             else if(agent.FriendsService.TryGetValue(agent.Owner, destagent, out friendInfo) && (friendInfo.FriendGivenFlags & FriendRightFlags.SeeOnline) != 0)
             {
-                otherFriendsStatusNotifyService.NotifyAsOnline(agent.Owner, new List<KeyValuePair<UUI, string>> { new KeyValuePair<UUI, string>(destagent, friendInfo.Secret) });
+                otherFriendsStatusNotifyService.NotifyAsOnline(agent.Owner, new List<KeyValuePair<UGUI, string>> { new KeyValuePair<UGUI, string>(destagent, friendInfo.Secret) });
             }
         }
 
@@ -253,7 +253,7 @@ namespace SilverSim.Viewer.Friends
                 return;
             }
 
-            UUI destagent;
+            UGUIWithName destagent;
             if (scene.AvatarNameService.TryGetValue(req.DestID, out destagent))
             {
                 if (agent.IsActiveGod && agent.IsInScene(scene))
@@ -267,7 +267,7 @@ namespace SilverSim.Viewer.Friends
                     var gim = new GridInstantMessage
                     {
                         RegionID = req.CircuitSceneID,
-                        FromAgent = agent.Owner,
+                        FromAgent = agent.NamedOwner,
                         ToAgent = destagent,
                         Dialog = GridInstantMessageDialog.OfferCallingCard,
                         OnResult = (im, success) => { }
@@ -343,8 +343,8 @@ namespace SilverSim.Viewer.Friends
                 return;
             }
 
-            var thisAgent = agent.Owner;
-            UUI otherAgent;
+            var thisAgent = agent.NamedOwner;
+            UGUIWithName otherAgent;
             var foreignagent = true;
 
             if(!scene.AvatarNameService.TryGetValue(m.ToAgentID, out otherAgent))
@@ -418,8 +418,8 @@ namespace SilverSim.Viewer.Friends
             }
 
             FriendsServiceInterface otherFriendsService;
-            var thisAgent = agent.Owner;
-            UUI otherAgent;
+            var thisAgent = agent.NamedOwner;
+            UGUIWithName otherAgent;
             var foreignagent = true;
 
             /* the transaction id is re-used for storing the agent */
@@ -497,8 +497,8 @@ namespace SilverSim.Viewer.Friends
             }
 
             FriendsServiceInterface otherFriendsService;
-            var thisAgent = agent.Owner;
-            UUI otherAgent;
+            var thisAgent = agent.NamedOwner;
+            UGUIWithName otherAgent;
             var foreignagent = true;
 
             /* the transaction id is re-used for storing the agent */
@@ -577,7 +577,7 @@ namespace SilverSim.Viewer.Friends
 
             FriendsServiceInterface otherFriendsService;
             var thisAgent = agent.Owner;
-            UUI otherAgent;
+            UGUIWithName otherAgent;
             var foreignagent = true;
 
             /* the transaction id is re-used for storing the agent */
@@ -646,7 +646,7 @@ namespace SilverSim.Viewer.Friends
 
             FriendsServiceInterface otherFriendsService;
             var thisAgent = agent.Owner;
-            UUI otherAgent;
+            UGUIWithName otherAgent;
             var foreignagent = true;
             GrantUserRights.RightsEntry rightsEntry;
 
@@ -701,7 +701,7 @@ namespace SilverSim.Viewer.Friends
             m_ShutdownFriends = true;
         }
 
-        public bool TryGetFriendsService(UUI agent, out FriendsServiceInterface friendsService)
+        public bool TryGetFriendsService(UGUI agent, out FriendsServiceInterface friendsService)
         {
             friendsService = null;
             if(agent.HomeURI == null)
@@ -773,7 +773,7 @@ namespace SilverSim.Viewer.Friends
             return false;
         }
 
-        public bool TryGetFriendsStatusNotifyService(UUI agent, out IFriendsStatusNotifyServiceInterface friendsService)
+        public bool TryGetFriendsStatusNotifyService(UGUI agent, out IFriendsStatusNotifyServiceInterface friendsService)
         {
             friendsService = null;
             if (agent.HomeURI == null)

@@ -34,6 +34,6 @@ namespace SilverSim.Types.Groups
         public AssetType AttachmentType;
         public string AttachmentName = string.Empty;
         public UUID AttachmentItemID = UUID.Zero;
-        public UUI AttachmentOwner = UUI.Unknown;
+        public UGUI AttachmentOwner = UGUI.Unknown;
     }
 }

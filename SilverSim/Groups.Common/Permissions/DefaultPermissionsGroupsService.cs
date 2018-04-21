@@ -65,9 +65,9 @@ namespace SilverSim.Groups.Common.Permissions
             }
         }
 
-        public override GroupPowers GetAgentPowers(UGI group, UUI agent) => m_InnerService.GetAgentPowers(group, agent);
+        public override GroupPowers GetAgentPowers(UGI group, UGUI agent) => m_InnerService.GetAgentPowers(group, agent);
 
-        private bool IsGroupOwner(UGI group, UUI agent)
+        private bool IsGroupOwner(UGI group, UGUI agent)
         {
             GroupInfo groupInfo;
             try

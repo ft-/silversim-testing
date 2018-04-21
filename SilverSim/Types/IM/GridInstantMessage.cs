@@ -25,9 +25,9 @@ namespace SilverSim.Types.IM
     public class GridInstantMessage
     {
         public ulong ID;
-        public UUI FromAgent = UUI.Unknown;
+        public UGUIWithName FromAgent = UGUIWithName.Unknown;
         public UGI FromGroup = UGI.Unknown;
-        public UUI ToAgent = UUI.Unknown;
+        public UGUI ToAgent = UGUI.Unknown;
         public GridInstantMessageDialog Dialog;
         public bool IsFromGroup;
         public string Message = string.Empty;

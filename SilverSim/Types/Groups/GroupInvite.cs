@@ -26,7 +26,7 @@ namespace SilverSim.Types.Groups
         public UUID ID = UUID.Zero;
         public UGI Group = UGI.Unknown;
         public UUID RoleID = UUID.Zero;
-        public UUI Principal = UUI.Unknown;
+        public UGUI Principal = UGUI.Unknown;
         public Date Timestamp = new Date();
     }
 }

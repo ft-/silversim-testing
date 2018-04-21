@@ -30,7 +30,7 @@ namespace SilverSim.Database.Memory.Profile
     partial class MemoryProfileService : ProfileServiceInterface.IUserPreferencesInterface
     {
         private readonly RwLockedDictionary<UUID, ProfilePreferences> m_Preferences = new RwLockedDictionary<UUID, ProfilePreferences>();
-        public ProfilePreferences this[UUI user]
+        public ProfilePreferences this[UGUI user]
         {
             get
             {
@@ -45,10 +45,10 @@ namespace SilverSim.Database.Memory.Profile
             set { m_Preferences[user.ID] = value; }
         }
 
-        public bool ContainsKey(UUI user) =>
+        public bool ContainsKey(UGUI user) =>
             m_Preferences.ContainsKey(user.ID);
 
-        public bool TryGetValue(UUI user, out ProfilePreferences profilePrefs) =>
+        public bool TryGetValue(UGUI user, out ProfilePreferences profilePrefs) =>
             m_Preferences.TryGetValue(user.ID, out profilePrefs);
     }
 }

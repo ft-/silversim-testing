@@ -107,13 +107,13 @@ namespace SilverSim.Scene.Types.Scene
 
     public interface IParcelAccessList
     {
-        bool this[UUID regionID, UUID parcelID, UUI accessor] { get; }
+        bool this[UUID regionID, UUID parcelID, UGUI accessor] { get; }
         List<ParcelAccessEntry> this[UUID regionID, UUID parcelID] { get; }
-        bool TryGetValue(UUID regionID, UUID parcelID, UUI accessor, out ParcelAccessEntry e);
+        bool TryGetValue(UUID regionID, UUID parcelID, UGUI accessor, out ParcelAccessEntry e);
         void Store(ParcelAccessEntry entry);
-        void ExtendExpiry(UUID regionID, UUID parcelID, UUI accessor, ulong extendseconds);
+        void ExtendExpiry(UUID regionID, UUID parcelID, UGUI accessor, ulong extendseconds);
         bool Remove(UUID regionID, UUID parcelID);
-        bool Remove(UUID regionID, UUID parcelID, UUI accessor);
+        bool Remove(UUID regionID, UUID parcelID, UGUI accessor);
     }
 
     public interface IParcelExperienceList
@@ -438,7 +438,7 @@ namespace SilverSim.Scene.Types.Scene
 
         public RegionAccess Access { get; set; }
 
-        public UUI Owner { get; set; }
+        public UGUI Owner { get; set; }
 
         protected virtual object GetService(Type service)
         {
@@ -515,7 +515,7 @@ namespace SilverSim.Scene.Types.Scene
             RegionMapTexture = TextureConstant.DefaultTerrainTexture2; /* set Default terrain Texture 2 as initial RegionMapTexture */
             SizeX = sizeX;
             SizeY = sizeY;
-            Owner = UUI.Unknown;
+            Owner = UGUI.Unknown;
             AssetService = new DefaultAssetService(this);
             AvatarNameService = new AggregatingAvatarNameService(AvatarNameServices);
             CapabilitiesConfig = new Dictionary<string, string>();

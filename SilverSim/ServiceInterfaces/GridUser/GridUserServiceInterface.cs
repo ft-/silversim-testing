@@ -102,18 +102,18 @@ namespace SilverSim.ServiceInterfaces.GridUser
 
         public abstract bool TryGetValue(UUID userID, out GridUserInfo userInfo);
 
-        public abstract GridUserInfo this[UUI userID] { get; }
+        public abstract GridUserInfo this[UGUI userID] { get; }
 
-        public abstract bool TryGetValue(UUI userID, out GridUserInfo userInfo);
+        public abstract bool TryGetValue(UGUI userID, out GridUserInfo userInfo);
 
-        public abstract void LoggedInAdd(UUI userID); /* LoggedInAdd is only supported by DB services */
-        public abstract void LoggedIn(UUI userID);
-        public abstract void LoggedOut(UUI userID, UUID lastRegionID, Vector3 lastPosition, Vector3 lastLookAt);
-        public virtual void LoggedOut(UUI userID)
+        public abstract void LoggedInAdd(UGUI userID); /* LoggedInAdd is only supported by DB services */
+        public abstract void LoggedIn(UGUI userID);
+        public abstract void LoggedOut(UGUI userID, UUID lastRegionID, Vector3 lastPosition, Vector3 lastLookAt);
+        public virtual void LoggedOut(UGUI userID)
         {
             /* intentionally left empty */
         }
-        public abstract void SetHome(UUI userID, UUID homeRegionID, Vector3 homePosition, Vector3 homeLookAt);
-        public abstract void SetPosition(UUI userID, UUID lastRegionID, Vector3 lastPosition, Vector3 lastLookAt);
+        public abstract void SetHome(UGUI userID, UUID homeRegionID, Vector3 homePosition, Vector3 homeLookAt);
+        public abstract void SetPosition(UGUI userID, UUID lastRegionID, Vector3 lastPosition, Vector3 lastLookAt);
     }
 }

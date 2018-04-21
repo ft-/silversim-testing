@@ -116,7 +116,7 @@ namespace SilverSim.Viewer.Core.Capabilities
             pInfo.PassPrice = reqmap["pass_price"].AsInt;
             pInfo.PassHours = reqmap["pass_hours"].AsReal;
             pInfo.Category = (ParcelCategory)reqmap["category"].AsInt;
-            pInfo.AuthBuyer = new UUI(reqmap["auth_buyer_id"].AsUUID);
+            pInfo.AuthBuyer = new UGUIWithName(reqmap["auth_buyer_id"].AsUUID);
             pInfo.SnapshotID = reqmap["snapshot_id"].AsUUID;
             pInfo.LandingPosition = reqmap["user_location"].AsVector3;
             pInfo.LandingLookAt = reqmap["user_look_at"].AsVector3;

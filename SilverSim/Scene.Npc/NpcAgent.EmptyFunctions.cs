@@ -66,7 +66,7 @@ namespace SilverSim.Scene.Npc
             /* ignored */
         }
 
-        public override void SendRegionNotice(UUI fromAvatar, string message, UUID fromSceneID)
+        public override void SendRegionNotice(UGUI fromAvatar, string message, UUID fromSceneID)
         {
             /* ignored */
         }

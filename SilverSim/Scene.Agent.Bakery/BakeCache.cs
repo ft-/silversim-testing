@@ -173,7 +173,7 @@ namespace SilverSim.Scene.Agent.Bakery
             return 0;
         }
 
-        public void LoadFromCurrentOutfit(UUI principal, InventoryServiceInterface inventoryService, AssetServiceInterface assetService, Action<string> logOutput = null)
+        public void LoadFromCurrentOutfit(UGUI principal, InventoryServiceInterface inventoryService, AssetServiceInterface assetService, Action<string> logOutput = null)
         {
             lock (m_Lock)
             {
@@ -187,14 +187,8 @@ namespace SilverSim.Scene.Agent.Bakery
                     CurrentOutfitFolderID = folder.ID;
                 }
 
-#if DEBUG
-                m_Log.DebugFormat("Using current outfit folder {0} for {1}", CurrentOutfitFolderID, principal.FullName);
-#endif
                 InventoryFolderContent folderContent = inventoryService.Folder.Content[principal.ID, CurrentOutfitFolderID];
                 AppearanceSerial = folderContent.Version;
-#if DEBUG
-                logOutput?.Invoke(string.Format("New appearance serial for {0} at {1}", principal.FullName, AppearanceSerial));
-#endif
 
                 var items = new List<InventoryItem>();
                 var itemlinks = new List<UUID>();
@@ -206,17 +200,8 @@ namespace SilverSim.Scene.Agent.Bakery
                         items.Add(item);
                         itemlinks.Add(item.AssetID);
                     }
-#if DEBUG
-                    else
-                    {
-                        m_Log.DebugFormat("Skipped {0} (id {1}, type {2}) of {3}", item.Name, item.ID, item.InventoryType.ToString(), principal.FullName);
-                    }
-#endif
                 }
 
-#if DEBUG
-                logOutput?.Invoke(string.Format("Using {0} outfit items", items.Count));
-#endif
                 var actualItems = inventoryService.Item[principal.ID, itemlinks];
                 var actualItemsInDict = new Dictionary<UUID, InventoryItem>();
                 foreach (var item in actualItems)
@@ -226,7 +211,7 @@ namespace SilverSim.Scene.Agent.Bakery
 
                 var outfitItems = new Dictionary<UUID, OutfitItem>();
 
-                logOutput?.Invoke(string.Format("Processing assets for baking agent {0}", principal.FullName));
+                logOutput?.Invoke(string.Format("Processing assets for baking agent {0}", principal.ToString()));
 
                 AvatarWearables.Clear();
 
@@ -248,7 +233,7 @@ namespace SilverSim.Scene.Agent.Bakery
                             }
                             catch (Exception e)
                             {
-                                string info = string.Format("Asset {0} for agent {1} ({2}) failed to decode as wearable", actualItem.AssetID, principal.FullName, principal.ID);
+                                string info = string.Format("Asset {0} for agent {1} ({2}) failed to decode as wearable", actualItem.AssetID, principal.ToString(), principal.ID);
                                 m_Log.ErrorFormat(info, e);
                                 throw new BakeErrorException(info, e);
                             }
@@ -274,7 +259,7 @@ namespace SilverSim.Scene.Agent.Bakery
                     }
                 }
 
-                logOutput?.Invoke(string.Format("Setting current outfit for baking agent {0}", principal.FullName));
+                logOutput?.Invoke(string.Format("Setting current outfit for baking agent {0}", principal.ToString()));
                 SetCurrentOutfit(outfitItems);
             }
         }

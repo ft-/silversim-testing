@@ -82,14 +82,14 @@ namespace SilverSim.Main.Cmd.Estate
             m_AvatarNameService = new AggregatingAvatarNameService(avatarNameServicesList);
         }
 
-        private UUI ResolveName(UUI uui)
+        private UGUIWithName ResolveName(UGUI uui)
         {
-            UUI resultUui;
+            UGUIWithName resultUui;
             if (m_AvatarNameService.TryGetValue(uui, out resultUui))
             {
                 return resultUui;
             }
-            return uui;
+            return (UGUIWithName)uui;
         }
 
         public void ShowEstatesCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
@@ -348,7 +348,7 @@ namespace SilverSim.Main.Cmd.Estate
                         if (m_RegionStorage.TryGetValue(UUID.Zero, rID, out rInfo))
                         {
                             Vector3 gridcoord = rInfo.Location;
-                            output.AppendFormat("\nRegion {0} [{1}]:\n  Location={2} (grid coordinate {5})\n  Size={3}\n  Owner={4}\n", rInfo.Name, rInfo.ID, gridcoord.ToString(), rInfo.Size.ToString(), rInfo.Owner.FullName, gridcoord.X_String + "," + gridcoord.Y_String);
+                            output.AppendFormat("\nRegion {0} [{1}]:\n  Location={2} (grid coordinate {5})\n  Size={3}\n  Owner={4}\n", rInfo.Name, rInfo.ID, gridcoord.ToString(), rInfo.Size.ToString(), ResolveName(rInfo.Owner).FullName, gridcoord.X_String + "," + gridcoord.Y_String);
                         }
                     }
                     io.Write(output.ToString());

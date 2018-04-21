@@ -34,12 +34,12 @@ namespace SilverSim.Viewer.Core.Capabilities
     public class ObjectAdd : ICapabilityInterface
     {
         private readonly SceneInterface m_Scene;
-        private readonly UUI m_Creator;
+        private readonly UGUI m_Creator;
         private readonly string m_RemoteIP;
 
         public string CapabilityName => "ObjectAdd";
 
-        public ObjectAdd(SceneInterface scene, UUI creator, string remoteip)
+        public ObjectAdd(SceneInterface scene, UGUI creator, string remoteip)
         {
             m_Scene = scene;
             m_Creator = creator;

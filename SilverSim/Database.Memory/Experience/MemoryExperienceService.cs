@@ -89,7 +89,7 @@ namespace SilverSim.Database.Memory.Experience
             return res;
         }
 
-        public override List<UUID> GetCreatorExperiences(UUI creator)
+        public override List<UUID> GetCreatorExperiences(UGUI creator)
         {
             var res = new List<UUID>();
             foreach (KeyValuePair<UUID, ExperienceInfo> kvp in m_Experiences)
@@ -102,7 +102,7 @@ namespace SilverSim.Database.Memory.Experience
             return res;
         }
 
-        public override List<UUID> GetOwnerExperiences(UUI creator)
+        public override List<UUID> GetOwnerExperiences(UGUI creator)
         {
             var res = new List<UUID>();
             foreach (KeyValuePair<UUID, ExperienceInfo> kvp in m_Experiences)
@@ -128,7 +128,7 @@ namespace SilverSim.Database.Memory.Experience
             return res;
         }
 
-        public override bool Remove(UUI requestingAgent, UUID id)
+        public override bool Remove(UGUI requestingAgent, UUID id)
         {
             ExperienceInfo info;
             if(!m_Experiences.TryGetValue(id, out info))
@@ -159,7 +159,7 @@ namespace SilverSim.Database.Memory.Experience
             return false;
         }
 
-        public override void Update(UUI requestingAgent, ExperienceInfo info)
+        public override void Update(UGUI requestingAgent, ExperienceInfo info)
         {
             if(!m_Experiences.ContainsKey(info.ID))
             {

@@ -135,7 +135,7 @@ namespace SilverSim.Viewer.Core
                         m.CircuitAgentID = new UUID(RemoteSceneID);
                         try
                         {
-                            m.CircuitAgentOwner = UUI.Unknown;
+                            m.CircuitAgentOwner = UGUI.Unknown;
                             m.CircuitSessionID = SessionID;
                             m.CircuitSceneID = new UUID(RemoteSceneID);
                         }

@@ -52,7 +52,7 @@ namespace SilverSim.Scene.Types.Scene
             group.Add(1, part.ID, part);
             group.Name = "Primitive";
             IAgent agent = Agents[p.AgentID];
-            UUI agentOwner = agent.Owner;
+            UGUI agentOwner = agent.Owner;
             group.LastOwner = agentOwner;
             part.Creator = agentOwner;
             rezparams.RezzingAgent = agentOwner;

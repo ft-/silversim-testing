@@ -602,7 +602,7 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            UUI owner;
+            UGUI owner;
             UGI group = UGI.Unknown;
 
             if(!AvatarNameService.TryGetValue(req.OwnerID, out owner))

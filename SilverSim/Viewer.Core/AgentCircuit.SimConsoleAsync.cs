@@ -66,7 +66,7 @@ namespace SilverSim.Viewer.Core
             var tty = new SimConsoleAsyncTTY(this);
             if (!Scene.IsSimConsoleAllowed(Agent.Owner))
             {
-                tty.WriteFormatted(this.GetLanguageString(Agent.CurrentCulture, "SimConsoleNotAllowedForAgent", "SimConsole not allowed") + "\n", Agent.Owner.FirstName, Agent.Owner.LastName);
+                tty.WriteFormatted(this.GetLanguageString(Agent.CurrentCulture, "SimConsoleNotAllowedForAgent", "SimConsole not allowed") + "\n", Agent.NamedOwner.FirstName, Agent.NamedOwner.LastName);
             }
             else
             {

@@ -24,7 +24,7 @@ using System;
 namespace SilverSim.Types
 {
     /** <summary> Universal User Identifier </summary> */
-    public sealed class UUI : IEquatable<UUI>
+    public sealed class UGUIWithName : IEquatable<UGUIWithName>
     {
         public UUID ID = UUID.Zero;
         public string FirstName = string.Empty;
@@ -32,19 +32,19 @@ namespace SilverSim.Types
         public Uri HomeURI;
         public bool IsAuthoritative; /* false means User Data has been validated through any available resolving service */
 
-        public static explicit operator string(UUI v) => (v.HomeURI != null) ?
+        public static explicit operator string(UGUIWithName v) => (v.HomeURI != null) ?
                 string.Format("{0};{1};{2} {3}", v.ID.ToString(), v.HomeURI.ToString(), v.FirstName, v.LastName) :
                 string.Format("{0}", v.ID.ToString());
 
         public override bool Equals(object obj)
         {
-            var u = obj as UUI;
+            var u = obj as UGUIWithName;
             return u != null && EqualsGrid(u);
         }
 
-        public bool Equals(UUI uui) => EqualsGrid(uui);
+        public bool Equals(UGUIWithName uui) => EqualsGrid(uui);
 
-        public bool EqualsGrid(UUI uui)
+        public bool EqualsGrid(UGUIWithName uui)
         {
             if((uui.HomeURI != null && HomeURI == null) ||
                 (uui.HomeURI == null && HomeURI != null))
@@ -149,11 +149,11 @@ namespace SilverSim.Types
             }
         }
 
-        public UUI()
+        public UGUIWithName()
         {
         }
 
-        public UUI(UUI uui)
+        public UGUIWithName(UGUIWithName uui)
         {
             ID = uui.ID;
             FirstName = uui.FirstName;
@@ -161,12 +161,12 @@ namespace SilverSim.Types
             HomeURI = uui.HomeURI;
         }
 
-        public UUI(UUID ID)
+        public UGUIWithName(UUID ID)
         {
             this.ID = ID;
         }
 
-        public UUI(UUID ID, string FirstName, string LastName, Uri HomeURI)
+        public UGUIWithName(UUID ID, string FirstName, string LastName, Uri HomeURI)
         {
             this.ID = ID;
             this.FirstName = FirstName;
@@ -174,14 +174,14 @@ namespace SilverSim.Types
             this.HomeURI = HomeURI;
         }
 
-        public UUI(UUID ID, string FirstName, string LastName)
+        public UGUIWithName(UUID ID, string FirstName, string LastName)
         {
             this.ID = ID;
             this.FirstName = FirstName;
             this.LastName = LastName;
         }
 
-        public UUI(UUID ID, string creatorData)
+        public UGUIWithName(UUID ID, string creatorData)
         {
             this.ID = ID;
             var parts = creatorData.Split(Semicolon, 2);
@@ -198,7 +198,7 @@ namespace SilverSim.Types
             HomeURI = new Uri(parts[0]);
         }
 
-        public UUI(string uuiString)
+        public UGUIWithName(string uuiString)
         {
             var parts = uuiString.Split(Semicolon, 4); /* 4 allows for secret from friends entries */
             if (parts.Length < 2)
@@ -219,13 +219,13 @@ namespace SilverSim.Types
             HomeURI = new Uri(parts[1]);
         }
 
-        public static bool TryParse(string uuiString, out UUI uui)
+        public static bool TryParse(string uuiString, out UGUIWithName uui)
         {
             UUID id;
             var firstName = string.Empty;
             var lastName = string.Empty;
             Uri homeURI;
-            uui = default(UUI);
+            uui = default(UGUIWithName);
             var parts = uuiString.Split(Semicolon, 4); /* 4 allows for secrets from friends entries */
             if (parts.Length < 2)
             {
@@ -233,7 +233,7 @@ namespace SilverSim.Types
                 {
                     return false;
                 }
-                uui = new UUI(id);
+                uui = new UGUIWithName(id);
                 return true;
             }
             if (!UUID.TryParse(parts[0], out id))
@@ -253,7 +253,7 @@ namespace SilverSim.Types
             {
                 return false;
             }
-            uui = new UUI(id, firstName, lastName, homeURI);
+            uui = new UGUIWithName(id, firstName, lastName, homeURI);
             return true;
         }
 
@@ -264,9 +264,9 @@ namespace SilverSim.Types
         private static readonly char[] Semicolon = new char[1] { ';' };
         private static readonly char[] Whitespace = new char[1] { ' ' };
 
-        public static UUI Unknown => new UUI();
+        public static UGUIWithName Unknown => new UGUIWithName();
 
-        public static bool operator ==(UUI l, UUI r)
+        public static bool operator ==(UGUIWithName l, UGUIWithName r)
         {
             /* get rid of type specifics */
             object lo = l;
@@ -282,7 +282,7 @@ namespace SilverSim.Types
             return l.Equals(r);
         }
 
-        public static bool operator !=(UUI l, UUI r)
+        public static bool operator !=(UGUIWithName l, UGUIWithName r)
         {
             /* get rid of type specifics */
             object lo = l;

@@ -37,12 +37,12 @@ namespace SilverSim.Scene.Types.Transfer
         private static readonly ILog m_Log = LogManager.GetLogger("REZOBJECT");
         private readonly SceneInterface m_Scene;
         private readonly Vector3 m_TargetPos;
-        private readonly UUI m_RezzingAgent;
+        private readonly UGUI m_RezzingAgent;
         private readonly InventoryPermissionsMask m_ItemOwnerPermissions;
         private readonly SceneInterface.RezObjectParams m_RezParams;
         private readonly List<UUID> m_ItemAssetIDs;
 
-        protected RezObjectHandler(SceneInterface scene, Vector3 targetpos, UUID assetid, AssetServiceInterface source, UUI rezzingagent, SceneInterface.RezObjectParams rezparams, InventoryPermissionsMask itemOwnerPermissions = InventoryPermissionsMask.Every)
+        protected RezObjectHandler(SceneInterface scene, Vector3 targetpos, UUID assetid, AssetServiceInterface source, UGUI rezzingagent, SceneInterface.RezObjectParams rezparams, InventoryPermissionsMask itemOwnerPermissions = InventoryPermissionsMask.Every)
             : base(scene.AssetService, source, assetid, ReferenceSource.Destination)
         {
             m_ItemAssetIDs = new List<UUID> { assetid };
@@ -54,7 +54,7 @@ namespace SilverSim.Scene.Types.Transfer
             m_RezParams.RezzingAgent = m_RezzingAgent;
         }
 
-        protected RezObjectHandler(SceneInterface scene, Vector3 targetpos, List<UUID> assetids, AssetServiceInterface source, UUI rezzingagent, SceneInterface.RezObjectParams rezparams, InventoryPermissionsMask itemOwnerPermissions = InventoryPermissionsMask.Every)
+        protected RezObjectHandler(SceneInterface scene, Vector3 targetpos, List<UUID> assetids, AssetServiceInterface source, UGUI rezzingagent, SceneInterface.RezObjectParams rezparams, InventoryPermissionsMask itemOwnerPermissions = InventoryPermissionsMask.Every)
             : base(scene.AssetService, source, assetids, ReferenceSource.Destination)
         {
             m_ItemAssetIDs = assetids;
@@ -132,11 +132,11 @@ namespace SilverSim.Scene.Types.Transfer
     {
         private static readonly ILog m_Log = LogManager.GetLogger("REZRESTOREOBJECT");
         private readonly SceneInterface m_Scene;
-        private readonly UUI m_RezzingAgent;
+        private readonly UGUI m_RezzingAgent;
         private readonly UGI m_RezzingGroup;
         private readonly InventoryPermissionsMask m_ItemOwnerPermissions;
 
-        protected RezRestoreObjectHandler(SceneInterface scene, UUID assetid, AssetServiceInterface source, UUI rezzingagent, UGI rezzinggroup, InventoryPermissionsMask itemOwnerPermissions = InventoryPermissionsMask.Every)
+        protected RezRestoreObjectHandler(SceneInterface scene, UUID assetid, AssetServiceInterface source, UGUI rezzingagent, UGI rezzinggroup, InventoryPermissionsMask itemOwnerPermissions = InventoryPermissionsMask.Every)
             : base(scene.AssetService, source, assetid, ReferenceSource.Destination)
         {
             m_Scene = scene;

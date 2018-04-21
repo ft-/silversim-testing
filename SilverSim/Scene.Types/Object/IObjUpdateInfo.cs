@@ -32,7 +32,7 @@ namespace SilverSim.Scene.Types.Object
 
         UUID ID { get; }
 
-        UUI Owner { get; }
+        UGUI Owner { get; }
 
         bool IsAlwaysFull { get; }
 

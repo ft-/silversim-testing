@@ -26,7 +26,7 @@ namespace SilverSim.ServiceInterfaces.Friends
 {
     public interface IFriendsSimStatusNotifyService
     {
-        void NotifyAsOnline(UUID regionid, UUI notifier, List<UUI> list);
-        void NotifyAsOffline(UUID regionid, UUI notifier, List<UUI> list);
+        void NotifyAsOnline(UUID regionid, UGUI notifier, List<UGUI> list);
+        void NotifyAsOffline(UUID regionid, UGUI notifier, List<UGUI> list);
     }
 }

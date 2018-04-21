@@ -132,7 +132,7 @@ namespace SilverSim.Scene.Npc
                         AssetID = wInfo.AssetID,
                         LastOwner = Owner,
                         Owner = Owner,
-                        Creator = UUI.Unknown,
+                        Creator = UGUI.Unknown,
                         InventoryType = InventoryType.Wearable,
                         AssetType = assetType,
                         Flags = (InventoryFlags)(uint)kvp.Key,
@@ -185,7 +185,7 @@ namespace SilverSim.Scene.Npc
                         AssetID = kvpInner.Value,
                         LastOwner = Owner,
                         Owner = Owner,
-                        Creator = UUI.Unknown,
+                        Creator = UGUI.Unknown,
                         ParentFolderID = objectFolder,
                         InventoryType = InventoryType.Object,
                         AssetType = AssetType.Object,
@@ -221,14 +221,14 @@ namespace SilverSim.Scene.Npc
                 catch (Exception e)
                 {
                     m_Log.WarnFormat("Fetch error for object asset {0} for NPC {1} {2} ({3}): {4}: {5}",
-                        item.AssetID, Owner.FirstName, Owner.LastName, Owner.ID, e.GetType().FullName, e.ToString());
+                        item.AssetID, NamedOwner.FirstName, NamedOwner.LastName, NamedOwner.ID, e.GetType().FullName, e.ToString());
                     break;
                 }
 
                 if (data.Type != AssetType.Object)
                 {
                     m_Log.WarnFormat("Wrong asset for object asset {0} for NPC {1} {2} ({3})",
-                        item.AssetID, Owner.FirstName, Owner.LastName, Owner.ID);
+                        item.AssetID, NamedOwner.FirstName, NamedOwner.LastName, NamedOwner.ID);
                     break;
                 }
 
@@ -242,7 +242,7 @@ namespace SilverSim.Scene.Npc
             catch
             {
                 m_Log.WarnFormat("Failed to rebake NPC {0} {1} ({2})",
-                    Owner.FirstName, Owner.LastName, Owner.ID);
+                    NamedOwner.FirstName, NamedOwner.LastName, NamedOwner.ID);
             }
         }
 
@@ -250,7 +250,7 @@ namespace SilverSim.Scene.Npc
         {
             List<ObjectGroup> objgroups;
 #if DEBUG
-            m_Log.DebugFormat("Deserializing object asset {0} for agent {1} {2} ({3})", data.ID, Owner.FirstName, Owner.LastName, Owner.ID);
+            m_Log.DebugFormat("Deserializing object asset {0} for agent {1} {2} ({3})", data.ID, NamedOwner.FirstName, NamedOwner.LastName, NamedOwner.ID);
 #endif
             try
             {
@@ -259,7 +259,7 @@ namespace SilverSim.Scene.Npc
             catch (Exception e)
             {
                 m_Log.WarnFormat("Deserialization error for object asset {0} for agent {1} {2} ({3}): {4}: {5}",
-                    data.ID, Owner.FirstName, Owner.LastName, Owner.ID, e.GetType().FullName, e.ToString());
+                    data.ID, NamedOwner.FirstName, NamedOwner.LastName, NamedOwner.ID, e.GetType().FullName, e.ToString());
                 return;
             }
 
@@ -294,7 +294,7 @@ namespace SilverSim.Scene.Npc
             grp.IsChangedEnabled = true;
 
 #if DEBUG
-            m_Log.DebugFormat("Adding attachment asset {0} at {4} for agent {1} {2} ({3})", data.ID, Owner.FirstName, Owner.LastName, Owner.ID, grp.AttachPoint.ToString());
+            m_Log.DebugFormat("Adding attachment asset {0} at {4} for agent {1} {2} ({3})", data.ID, NamedOwner.FirstName, NamedOwner.LastName, NamedOwner.ID, grp.AttachPoint.ToString());
 #endif
             SceneInterface scene = CurrentScene;
             try

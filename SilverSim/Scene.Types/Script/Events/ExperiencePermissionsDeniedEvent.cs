@@ -25,7 +25,7 @@ namespace SilverSim.Scene.Types.Script.Events
 {
     public struct ExperiencePermissionsDeniedEvent : IScriptEvent
     {
-        public UUI AgentId;
+        public UGUI AgentId;
         public int Reason;
     }
 }

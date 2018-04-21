@@ -47,7 +47,7 @@ namespace SilverSim.Viewer.Core
             {
                 return;
             }
-            UUI agentOwner = thisAgent.Owner;
+            UGUIWithName agentOwner = thisAgent.NamedOwner;
             foreach (var agent in scene.Agents)
             {
                 if (agent.Owner.Equals(agentOwner))
