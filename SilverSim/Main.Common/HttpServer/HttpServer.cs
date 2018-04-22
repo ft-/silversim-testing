@@ -345,7 +345,7 @@ namespace SilverSim.Main.Common.HttpServer
                     string remoteAddr = AddressToString(ep.Address);
                     Thread.CurrentThread.Name = Scheme.ToUpper() + " Server for " + remoteAddr + " at " + Port.ToString();
 
-                    AcceptedConnection_Internal(new HttpStream(socket), remoteAddr, false);
+                    AcceptedConnection_Internal(new HttpStream(socket), remoteAddr, false, null);
                 }
                 catch (HttpResponse.DisconnectFromThreadException)
                 {
@@ -402,7 +402,7 @@ namespace SilverSim.Main.Common.HttpServer
                         return;
                     }
 
-                    AcceptedConnection_Internal(sslstream, remoteAddr, true);
+                    AcceptedConnection_Internal(sslstream, remoteAddr, true, sslstream.RemoteCertificate);
                 }
                 catch (HttpResponse.DisconnectFromThreadException)
                 {
@@ -440,7 +440,7 @@ namespace SilverSim.Main.Common.HttpServer
             }
         }
 
-        private void AcceptedConnection_Internal(Stream httpstream, string remoteAddr, bool isSsl)
+        private void AcceptedConnection_Internal(Stream httpstream, string remoteAddr, bool isSsl, X509Certificate remoteCertificate)
         {
             Interlocked.Increment(ref m_AcceptedConnectionsCount);
             try
@@ -450,7 +450,7 @@ namespace SilverSim.Main.Common.HttpServer
                     HttpRequest req;
                     try
                     {
-                        req = new Http1Request(httpstream, remoteAddr, m_IsBehindProxy, isSsl);
+                        req = new Http1Request(httpstream, remoteAddr, m_IsBehindProxy, isSsl, remoteCertificate);
                     }
                     catch (HttpResponse.ConnectionCloseException)
                     {
@@ -496,8 +496,9 @@ namespace SilverSim.Main.Common.HttpServer
                         }
                         else
                         {
+                            X509Certificate cert = req.RemoteCertificate;
                             req = null; /* no need for the initial request data */
-                            HandleHttp2(new Http2Connection(httpstream, true), remoteAddr, isSsl);
+                            HandleHttp2(new Http2Connection(httpstream, true), remoteAddr, isSsl, cert);
                         }
                         return;
                     }
@@ -529,9 +530,9 @@ namespace SilverSim.Main.Common.HttpServer
                         }
                         var h2con = new Http2Connection(httpstream, true);
                         Http2Connection.Http2Stream h2stream = h2con.UpgradeStream(settingsdata, !req.IsH2CUpgradableAfterReadingBody && req.Expect100Continue);
-                        req = new Http2Request(h2stream, req.CallerIP, m_IsBehindProxy, isSsl, req, upgradeStream);
+                        req = new Http2Request(h2stream, req.CallerIP, m_IsBehindProxy, isSsl, req.RemoteCertificate, req, upgradeStream);
                         ThreadPool.UnsafeQueueUserWorkItem(HandleHttp2WorkItem, req);
-                        HandleHttp2(h2con, remoteAddr, isSsl);
+                        HandleHttp2(h2con, remoteAddr, isSsl, req.RemoteCertificate);
                         return;
                     }
 
@@ -593,14 +594,14 @@ namespace SilverSim.Main.Common.HttpServer
         private byte[] FromUriBase64(string val) =>
             Convert.FromBase64String(val.Replace('_', '+').Replace('_', '/').PadRight(val.Length % 4 == 0 ? val.Length : val.Length + 4 - (val.Length % 4), '='));
 
-        private void HandleHttp2(Http2Connection http2Connection, string remoteAddr, bool isSsl)
+        private void HandleHttp2(Http2Connection http2Connection, string remoteAddr, bool isSsl, X509Certificate remoteCertificate)
         {
             http2Connection.Run((ht2stream) =>
             {
                 HttpRequest req;
                 try
                 {
-                    req = new Http2Request(ht2stream, remoteAddr, m_IsBehindProxy, isSsl);
+                    req = new Http2Request(ht2stream, remoteAddr, m_IsBehindProxy, isSsl, remoteCertificate);
                 }
                 catch (Http2Connection.StreamErrorException)
                 {

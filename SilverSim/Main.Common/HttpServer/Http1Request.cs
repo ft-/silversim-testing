@@ -25,7 +25,9 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
+using System.Net.Security;
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
 namespace SilverSim.Main.Common.HttpServer
@@ -109,8 +111,8 @@ namespace SilverSim.Main.Common.HttpServer
             return headerLine.ToString();
         }
 
-        public Http1Request(Stream httpStream, string callerIP, bool isBehindProxy, bool isSsl)
-            : base(isSsl)
+        public Http1Request(Stream httpStream, string callerIP, bool isBehindProxy, bool isSsl, X509Certificate remoteCertificate)
+            : base(isSsl, remoteCertificate)
         {
             m_HttpStream = httpStream;
             m_Body = null;

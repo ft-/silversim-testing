@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
+using System.Security.Cryptography.X509Certificates;
 
 namespace SilverSim.Main.Common.HttpServer
 {
@@ -52,8 +53,8 @@ namespace SilverSim.Main.Common.HttpServer
 
         Http2Connection.Http2Stream m_Stream;
 
-        public Http2Request(Http2Connection.Http2Stream stream, string callerIP, bool isBehindProxy, bool isSsl, HttpRequest upgradeReq = null, Stream upgradeBody = null)
-            : base(isSsl)
+        public Http2Request(Http2Connection.Http2Stream stream, string callerIP, bool isBehindProxy, bool isSsl, X509Certificate remoteCertificate, HttpRequest upgradeReq = null, Stream upgradeBody = null)
+            : base(isSsl, remoteCertificate)
         {
             MajorVersion = 2;
             MinorVersion = 0;

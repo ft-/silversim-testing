@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Security.Cryptography.X509Certificates;
 
 namespace SilverSim.Main.Common.HttpServer
 {
@@ -53,6 +54,7 @@ namespace SilverSim.Main.Common.HttpServer
         public bool IsH2CUpgradable { get; protected set; }
         public bool IsH2CUpgradableAfterReadingBody { get; protected set; }
         public bool IsSsl { get; }
+        public X509Certificate RemoteCertificate { get; }
 
         static protected readonly Dictionary<HttpStatusCode, string> m_StatusCodeMap = new Dictionary<HttpStatusCode, string>();
         static HttpRequest()
@@ -190,9 +192,10 @@ namespace SilverSim.Main.Common.HttpServer
 
         public abstract void SetConnectionClose();
 
-        protected HttpRequest(bool isSsl)
+        protected HttpRequest(bool isSsl, X509Certificate remoteCertificate)
         {
             IsSsl = isSsl;
+            RemoteCertificate = remoteCertificate;
         }
 
         public abstract HttpResponse BeginResponse();
