@@ -315,7 +315,10 @@ namespace SilverSim.Main.Common.HttpServer.WebDAV
 
         private void HandlePropFind(WebDAVResource resource, HttpRequest req)
         {
-            var doc = new XmlDocument();
+            var doc = new XmlDocument
+            {
+                XmlResolver = null
+            };
             using (Stream s = req.Body)
             {
                 doc.Load(s);
@@ -339,7 +342,10 @@ namespace SilverSim.Main.Common.HttpServer.WebDAV
             }
 
             var prop = (XmlElement)doc.DocumentElement.GetElementsByTagName("prop")[0];
-            var resDoc = new XmlDocument();
+            var resDoc = new XmlDocument
+            {
+                XmlResolver = null
+            };
             XmlElement elem = resDoc.CreateElement("DAV", "multistatus");
             resDoc.AppendChild(elem);
             elem.AppendChild(PropFindProcess(req.RawUrl, resource, resDoc, prop));
@@ -409,7 +415,10 @@ namespace SilverSim.Main.Common.HttpServer.WebDAV
 
         private void HandlePropPatch(WebDAVResource resource, HttpRequest req)
         {
-            var doc = new XmlDocument();
+            var doc = new XmlDocument
+            {
+                XmlResolver = null
+            };
             using (Stream s = req.Body)
             {
                 doc.Load(s);
@@ -423,7 +432,10 @@ namespace SilverSim.Main.Common.HttpServer.WebDAV
 
             var prop = (XmlElement)doc.DocumentElement.GetElementsByTagName("set")[0];
             prop = (XmlElement)prop.GetElementsByTagName("prop")[0];
-            var resDoc = new XmlDocument();
+            var resDoc = new XmlDocument
+            {
+                XmlResolver = null
+            };
             XmlElement elem = resDoc.CreateElement("DAV", "multistatus");
             resDoc.AppendChild(elem);
             XmlElement responseElem = resDoc.CreateElement("DAV", "response");

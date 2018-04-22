@@ -138,7 +138,10 @@ namespace SilverSim.Scene.Agent.Bakery
 
         private void Load(Stream s)
         {
-            var doc = new XmlDocument();
+            var doc = new XmlDocument
+            {
+                XmlResolver = null
+            };
             doc.Load(s);
             var rootelem = doc.GetElementsByTagName("linden_skeleton")[0] as XmlElement;
             if(rootelem == null)
