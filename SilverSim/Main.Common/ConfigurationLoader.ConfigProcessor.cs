@@ -21,6 +21,7 @@
 
 using Nini.Config;
 using SilverSim.Http.Client;
+using SilverSim.Types;
 using SilverSim.Types.Assembly;
 using System;
 using System.Collections.Generic;
@@ -93,7 +94,7 @@ namespace SilverSim.Main.Common
             {
                 get
                 {
-                    using (XmlReader r = new XmlTextReader(new HttpClient.Get(Name).ExecuteStreamRequest()))
+                    using (XmlReader r = new HttpClient.Get(Name).ExecuteStreamRequest().CreateXmlReader())
                     {
                         return new XmlConfigSource(r);
                     }
@@ -238,7 +239,7 @@ namespace SilverSim.Main.Common
                     {
                         throw new FileNotFoundException(assemblyName + ".Resources." + m_Name);
                     }
-                    using (XmlReader r = new XmlTextReader(resource))
+                    using (XmlReader r = resource.CreateXmlReader())
                     {
                         return new XmlConfigSource(r);
                     }

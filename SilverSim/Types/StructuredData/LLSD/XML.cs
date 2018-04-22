@@ -373,7 +373,7 @@ namespace SilverSim.Types.StructuredData.Llsd
 
         public static IValue Deserialize(Stream input)
         {
-            using (var r = new XmlTextReader(input))
+            using (XmlTextReader r = input.CreateXmlReader())
             {
                 return Deserialize(r);
             }

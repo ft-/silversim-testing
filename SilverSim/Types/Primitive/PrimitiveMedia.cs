@@ -340,7 +340,7 @@ namespace SilverSim.Types.Primitive
                             /* this is stringified version */
                             using (MemoryStream ms = new MemoryStream(textNode.ToString().ToUTF8Bytes()))
                             {
-                                using (XmlTextReader insetReader = new XmlTextReader(ms))
+                                using (XmlTextReader insetReader = ms.CreateXmlReader())
                                 {
                                     FromStringifiedXmlOSMedia(media, insetReader);
                                 }

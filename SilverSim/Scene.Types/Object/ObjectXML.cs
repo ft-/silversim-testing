@@ -103,7 +103,7 @@ namespace SilverSim.Scene.Types.Object
 
         public static List<ObjectGroup> FromXml(Stream xmlstream, UGUI currentOwner, XmlDeserializationOptions options = XmlDeserializationOptions.None)
         {
-            using (var reader = new XmlTextReader(new ObjectXmlStreamFilter(xmlstream)))
+            using (XmlTextReader reader = new ObjectXmlStreamFilter(xmlstream).CreateXmlReader())
             {
                 return FromXml(reader, currentOwner, options);
             }

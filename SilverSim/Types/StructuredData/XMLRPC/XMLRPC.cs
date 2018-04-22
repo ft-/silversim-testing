@@ -465,7 +465,7 @@ namespace SilverSim.Types.StructuredData.XmlRpc
 
         public static XmlRpcRequest DeserializeRequest(Stream o)
         {
-            using (var reader = new XmlTextReader(o))
+            using (XmlTextReader reader = o.CreateXmlReader())
             {
                 return DeserializeRequest(reader);
             }
@@ -512,7 +512,7 @@ namespace SilverSim.Types.StructuredData.XmlRpc
             {
                 throw new ArgumentNullException(nameof(o));
             }
-            using (var reader = new XmlTextReader(o))
+            using (XmlTextReader reader = o.CreateXmlReader())
             {
                 return DeserializeResponse(reader);
             }

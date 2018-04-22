@@ -195,7 +195,7 @@ namespace SilverSim.Types.StructuredData.AssetXml
 
         public static AssetData ParseAssetData(Stream input)
         {
-            using (var reader = new XmlTextReader(input))
+            using (XmlTextReader reader = input.CreateXmlReader())
             {
                 while (true)
                 {
@@ -337,7 +337,7 @@ namespace SilverSim.Types.StructuredData.AssetXml
 
         public static AssetMetadata ParseAssetMetadata(Stream input)
         {
-            using (var reader = new XmlTextReader(input))
+            using (XmlTextReader reader = input.CreateXmlReader())
             {
                 while (true)
                 {

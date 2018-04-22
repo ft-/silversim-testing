@@ -190,7 +190,7 @@ retry:
 
             using (var fs = new FileStream(filename, FileMode.Open))
             {
-                using (var reader = new XmlTextReader(fs))
+                using (XmlTextReader reader = fs.CreateXmlReader())
                 {
                     for (;;)
                     {

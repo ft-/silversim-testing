@@ -21,6 +21,7 @@
 
 using System;
 using System.Globalization;
+using System.IO;
 using System.Xml;
 
 namespace SilverSim.Types
@@ -626,5 +627,11 @@ namespace SilverSim.Types
                 return int.TryParse(val, out ival) && ival != 0;
             }
         }
+
+        public static XmlTextReader CreateXmlReader(this Stream s) => new XmlTextReader(s)
+        {
+            DtdProcessing = DtdProcessing.Ignore,
+            XmlResolver = null
+        };
     }
 }

@@ -48,7 +48,7 @@ namespace SilverSim.Scene.Agent.Bakery
             var assembly = typeof(AvatarLad).Assembly;
             using (Stream resource = assembly.GetManifestResourceStream(assembly.GetName().Name + ".Resources.avatar_lad.xml"))
             {
-                using (var reader = new XmlTextReader(resource))
+                using (var reader = resource.CreateXmlReader())
                 {
                     while (reader.Read())
                     {

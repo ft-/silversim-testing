@@ -158,7 +158,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                     try
                     {
                         using (var ms = new MemoryStream(value))
-                        using (var reader = new XmlTextReader(ms))
+                        using (XmlTextReader reader = ms.CreateXmlReader())
                         {
                             DeserializeRoot(reader);
                         }

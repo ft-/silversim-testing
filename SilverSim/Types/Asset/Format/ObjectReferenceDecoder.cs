@@ -40,7 +40,7 @@ namespace SilverSim.Types.Asset.Format
 
         public static void GetReferences(Stream xmlstream, string parentNodeName, List<UUID> reflist)
         {
-            using (var reader = new XmlTextReader(new ObjectXmlStreamFilter(xmlstream)))
+            using (XmlTextReader reader = new ObjectXmlStreamFilter(xmlstream).CreateXmlReader())
             {
                 GetReferences(reader, parentNodeName, reflist);
             }

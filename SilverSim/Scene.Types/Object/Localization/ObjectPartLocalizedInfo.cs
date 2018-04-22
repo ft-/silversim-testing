@@ -170,7 +170,7 @@ namespace SilverSim.Scene.Types.Object.Localization
                     if (value.TryGetValue("media", out d))
                     {
                         using (var ms = new MemoryStream(d))
-                        using (var r = new XmlTextReader(ms))
+                        using (XmlTextReader r = ms.CreateXmlReader())
                         {
                             m_Media = PrimitiveMedia.FromXml(r);
                         }
