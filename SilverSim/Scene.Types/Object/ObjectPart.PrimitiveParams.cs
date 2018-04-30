@@ -1135,7 +1135,7 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.Rotation:
-                    paramList.Add(Rotation);
+                    paramList.Add(GlobalRotation);
                     break;
 
                 case PrimitiveParamsType.RotLocal:
@@ -1405,7 +1405,7 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.Rotation:
-                    Rotation = ParamsHelper.GetRotation(enumerator, "PRIM_ROTATION").Normalize();
+                    GlobalRotation = ParamsHelper.GetRotation(enumerator, "PRIM_ROTATION").Normalize();
                     break;
 
                 case PrimitiveParamsType.RotLocal:
