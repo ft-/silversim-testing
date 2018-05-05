@@ -49,9 +49,9 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
 
     internal static class TimescaleExtensionMethods
     {
-        public static TimescaleData<Vector3> ToTimescale(this Vector3 value) => TimescaleData<Vector3>.Create(value);
+        public static TimescaleData<Vector3> ToTimescale(this Vector3 value) => TimescaleData<Vector3>.Create(value.ComponentMax(0.01));
 
-        public static TimescaleData<double> ToTimescale(this double value) => TimescaleData<double>.Create(value);
+        public static TimescaleData<double> ToTimescale(this double value) => TimescaleData<double>.Create(Math.Max(value, 0.01));
     }
 
     public sealed class VehicleParams
@@ -644,7 +644,7 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                 switch (id)
                 {
                     case VehicleFloatParamId.AngularDeflectionEfficiency:
-                        m_AngularDeflectionEfficiency = value;
+                        m_AngularDeflectionEfficiency = value.Clamp(0, 1);
                         break;
 
                     case VehicleFloatParamId.AngularDeflectionTimescale:
@@ -652,7 +652,7 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                         break;
 
                     case VehicleFloatParamId.LinearDeflectionEfficiency:
-                        m_LinearDeflectionEfficiency = value.Clamp(0f, 1f);
+                        m_LinearDeflectionEfficiency = value.Clamp(0, 1);
                         break;
 
                     case VehicleFloatParamId.LinearDeflectionTimescale:

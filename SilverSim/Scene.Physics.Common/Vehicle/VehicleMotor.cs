@@ -178,7 +178,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             VEHICLE_FLAG_LIMIT_ROLL_ONLY affects this one to be only affected on roll axis
             */
             Vector3 angularPos = angularOrientaton.GetEulerAngles();
-            Vector3 vertAttractorTorque = angularPos * m_Params[VehicleFloatParamId.VerticalAttractionEfficiency] * m_Params[VehicleFloatParamId.VerticalAttractionTimescale] * dt;
+            Vector3 vertAttractorTorque = angularPos * m_Params[VehicleFloatParamId.VerticalAttractionEfficiency] * m_Params.OneByVerticalAttractionTimescale * dt;
             if((flags & VehicleFlags.LimitRollOnly) !=0)
             {
                 vertAttractorTorque.Y = 0;
@@ -269,7 +269,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             {
                 invertedBankModifier = m_Params[VehicleFloatParamId.InvertedBankingModifier];
             }
-            angularTorque.Z -= (AngularTorque.X.Mix(velocity.X, m_Params[VehicleFloatParamId.BankingMix])) * m_Params[VehicleFloatParamId.BankingEfficiency] * invertedBankModifier * m_Params.OneByBankingTimescale * dt;
+            angularTorque.Z -= (AngularTorque.X * 1.0.Mix(velocity.X, m_Params[VehicleFloatParamId.BankingMix])) * m_Params[VehicleFloatParamId.BankingEfficiency] * invertedBankModifier * m_Params.OneByBankingTimescale * dt;
             #endregion
 
             #region Buoyancy
