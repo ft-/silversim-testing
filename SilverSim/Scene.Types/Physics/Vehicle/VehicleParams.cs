@@ -74,7 +74,7 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
         private TimescaleData<double> m_AngularDeflectionTimescale = 0.0.ToTimescale();
         public double OneByAngularDeflectionTimescale => m_AngularDeflectionTimescale.OneByTimescale;
 
-        private TimescaleData<Vector3> m_AngularMotorDecayTimescale = Vector3.Zero.ToTimescale();
+        private TimescaleData<Vector3> m_AngularMotorDecayTimescale = new Vector3(120, 120, 120).ToTimescale();
         public Vector3 OneByAngularMotorDecayTimescale => m_AngularMotorDecayTimescale.OneByTimescale;
 
         private TimescaleData<Vector3> m_AngularMotorTimescale = Vector3.Zero.ToTimescale();
@@ -95,7 +95,7 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
         private TimescaleData<double> m_LinearDeflectionTimescale = 0.0.ToTimescale();
         public double OneByLinearDeflectionTimescale => m_LinearDeflectionTimescale.OneByTimescale;
 
-        private TimescaleData<Vector3> m_LinearMotorDecayTimescale = Vector3.Zero.ToTimescale();
+        private TimescaleData<Vector3> m_LinearMotorDecayTimescale = new Vector3(120, 120, 120).ToTimescale();
         public Vector3 OneByLinearMotorDecayTimescale => m_LinearMotorDecayTimescale.OneByTimescale;
 
         private TimescaleData<Vector3> m_LinearMotorTimescale = Vector3.Zero.ToTimescale();
@@ -122,6 +122,8 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
             m_AngularMotorDirection = m_AngularMotorDirection.ElementDivide(m_AngularMotorDecayTimescale.OneByTimescale * dt);
             m_LinearMotorDirection = m_LinearMotorDirection.ElementDivide(m_LinearMotorDecayTimescale.OneByTimescale * dt);
         }
+
+        public bool IsHoverMotorEnabled => m_HoverTimescale.Timescale < 300;
 
         public VehicleType VehicleType
         {
@@ -541,7 +543,7 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                         break;
 
                     case VehicleVectorParamId.AngularMotorDecayTimescale:
-                        m_AngularMotorDecayTimescale = value.ToTimescale();
+                        m_AngularMotorDecayTimescale = value.ComponentMin(120).ToTimescale();
                         break;
 
                     case VehicleVectorParamId.AngularMotorTimescale:
@@ -549,7 +551,7 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                         break;
 
                     case VehicleVectorParamId.LinearMotorDecayTimescale:
-                        m_LinearMotorDecayTimescale = value.ToTimescale();
+                        m_LinearMotorDecayTimescale = value.ComponentMin(120).ToTimescale();
                         break;
 
                     case VehicleVectorParamId.LinearMotorTimescale:
