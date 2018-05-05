@@ -240,6 +240,10 @@ namespace SilverSim.Types
         {
             return ((Vector3)boxed).ElementDivide(value);
         }
+        public static Vector3 ElementMultiply(this ReferenceBoxed<Vector3> boxed, Vector3 value)
+        {
+            return ((Vector3)boxed).ElementMultiply(value);
+        }
         #endregion
     }
 }
