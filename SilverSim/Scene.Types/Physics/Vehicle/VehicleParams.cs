@@ -19,193 +19,108 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Threading;
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace SilverSim.Scene.Types.Physics.Vehicle
 {
+    internal class TimescaleData<T>
+    {
+        public T Timescale { get; }
+        public T OneByTimescale { get; }
+
+        private TimescaleData(T timescale, T onebytimescale)
+        {
+            Timescale = timescale;
+            OneByTimescale = onebytimescale;
+        }
+
+        public static TimescaleData<Vector3> Create(Vector3 value) => new TimescaleData<Vector3>(
+            value,
+            Vector3.One.ElementDivide(value.ComponentMax(double.Epsilon)));
+
+        public static TimescaleData<double> Create(double value) => new TimescaleData<double>(
+            value,
+            1.0 / Math.Max(double.Epsilon, value));
+    }
+
+    internal static class TimescaleExtensionMethods
+    {
+        public static TimescaleData<Vector3> ToTimescale(this Vector3 value) => TimescaleData<Vector3>.Create(value);
+
+        public static TimescaleData<double> ToTimescale(this double value) => TimescaleData<double>.Create(value);
+    }
+
     public sealed class VehicleParams
     {
         private VehicleType m_VehicleType;
 
-        private Quaternion m_ReferenceFrame;
-        private Vector3 m_AngularFrictionTimescale;
-        private Vector3 m_OneByAngularFrictonTimescale = Vector3.One;
-        public Vector3 OneByAngularFrictionTimescale
-        {
-            get
-            {
-                lock(m_VehicleParamLock)
-                {
-                    return m_OneByAngularFrictonTimescale;
-                }
-            }
-        }
+        private ReferenceBoxed<Quaternion> m_ReferenceFrame;
 
-        private Vector3 m_AngularMotorDirection;
-        private Vector3 m_LinearFrictionTimescale;
-        private Vector3 m_OneByLinearFrictionTimescale = Vector3.One;
-        public Vector3 OneByLinearFrictionTimescale
-        {
-            get
-            {
-                lock(m_VehicleParamLock)
-                {
-                    return m_OneByLinearFrictionTimescale;
-                }
-            }
-        }
+        private TimescaleData<Vector3> m_AngularFrictionTimescale = TimescaleData<Vector3>.Create(Vector3.Zero);
+        public Vector3 OneByAngularFrictionTimescale => m_AngularFrictionTimescale.OneByTimescale;
 
-        private Vector3 m_LinearMotorDirection;
-        private Vector3 m_LinearMotorOffset;
+        private ReferenceBoxed<Vector3> m_AngularMotorDirection;
+        private TimescaleData<Vector3> m_LinearFrictionTimescale = TimescaleData<Vector3>.Create(Vector3.Zero);
+        public Vector3 OneByLinearFrictionTimescale => m_LinearFrictionTimescale.OneByTimescale;
 
-        private double m_AngularDeflectionEfficiency;
-        private double m_AngularDeflectionTimescale;
-        private double m_OneByAngularDeflectionTimescale = 1;
-        public double OneByAngularDeflectionTimescale
-        {
-            get
-            {
-                lock (m_VehicleParamLock)
-                {
-                    return m_OneByAngularDeflectionTimescale;
-                }
-            }
-        }
+        private ReferenceBoxed<Vector3> m_LinearMotorDirection;
+        private ReferenceBoxed<Vector3> m_LinearMotorOffset;
 
-        private Vector3 m_AngularMotorDecayTimescale;
-        private Vector3 m_OneByAngularMotorDecayTimescale = Vector3.One;
-        public Vector3 OneByAngularMotorDecayTimescale
-        {
-            get
-            {
-                lock (m_VehicleParamLock)
-                {
-                    return m_OneByAngularMotorDecayTimescale;
-                }
-            }
-        }
+        private ReferenceBoxed<double> m_AngularDeflectionEfficiency;
+        private TimescaleData<double> m_AngularDeflectionTimescale = 0.0.ToTimescale();
+        public double OneByAngularDeflectionTimescale => m_AngularDeflectionTimescale.OneByTimescale;
 
-        private Vector3 m_AngularMotorTimescale;
-        private Vector3 m_OneByAngularMotorTimescale = Vector3.One;
-        public Vector3 OneByAngularMotorTimescale
-        {
-            get
-            {
-                lock(m_VehicleParamLock)
-                {
-                    return m_OneByAngularMotorTimescale;
-                }
-            }
-        }
+        private TimescaleData<Vector3> m_AngularMotorDecayTimescale = Vector3.Zero.ToTimescale();
+        public Vector3 OneByAngularMotorDecayTimescale => m_AngularMotorDecayTimescale.OneByTimescale;
 
-        private double m_BankingEfficiency;
-        private double m_BankingMix;
-        private double m_BankingTimescale;
-        private double m_OneByBankingTimescale = 1;
-        public double OneByBankingTimescale
-        {
-            get
-            {
-                lock(m_VehicleParamLock)
-                {
-                    return m_OneByBankingTimescale;
-                }
-            }
-        }
+        private TimescaleData<Vector3> m_AngularMotorTimescale = Vector3.Zero.ToTimescale();
+        public Vector3 OneByAngularMotorTimescale => m_AngularMotorTimescale.OneByTimescale;
 
-        private double m_Buoyancy;
-        private double m_HoverHeight;
-        private double m_HoverEfficiency;
-        private double m_HoverTimescale;
-        private double m_OneByHoverTimescale = 1;
-        public double OneByHoverTimescale
-        {
-            get
-            {
-                lock(m_VehicleParamLock)
-                {
-                    return m_OneByHoverTimescale;
-                }
-            }
-        }
+        private ReferenceBoxed<double> m_BankingEfficiency;
+        private ReferenceBoxed<double> m_BankingMix;
+        private TimescaleData<double> m_BankingTimescale = TimescaleData<double>.Create(0);
+        public double OneByBankingTimescale => m_BankingTimescale.OneByTimescale;
 
-        private double m_LinearDeflectionEfficiency;
-        private double m_LinearDeflectionTimescale;
-        private double m_OneByLinearDeflectionTimescale = 1;
-        public double OneByLinearDeflectionTimescale
-        {
-            get
-            {
-                lock (m_VehicleParamLock)
-                {
-                    return m_OneByLinearDeflectionTimescale;
-                }
-            }
-        }
+        private ReferenceBoxed<double> m_Buoyancy;
+        private ReferenceBoxed<double> m_HoverHeight;
+        private ReferenceBoxed<double> m_HoverEfficiency;
+        private TimescaleData<double> m_HoverTimescale = 0.0.ToTimescale();
+        public double OneByHoverTimescale => m_HoverTimescale.OneByTimescale;
 
-        private Vector3 m_LinearMotorDecayTimescale;
-        private Vector3 m_OneByLinearMotorDecayTimescale = Vector3.One;
-        public Vector3 OneByLinearMotorDecayTimescale
-        {
-            get
-            {
-                lock(m_VehicleParamLock)
-                {
-                    return m_OneByLinearMotorDecayTimescale;
-                }
-            }
-        }
+        private ReferenceBoxed<double> m_LinearDeflectionEfficiency;
+        private TimescaleData<double> m_LinearDeflectionTimescale = 0.0.ToTimescale();
+        public double OneByLinearDeflectionTimescale => m_LinearDeflectionTimescale.OneByTimescale;
 
-        private Vector3 m_LinearMotorTimescale;
-        private Vector3 m_OneByLinearMotorTimescale = Vector3.One;
-        public Vector3 OneByLinearMotorTimescale
-        {
-            get
-            {
-                lock(m_VehicleParamLock)
-                {
-                    return m_OneByLinearMotorTimescale;
-                }
-            }
-        }
+        private TimescaleData<Vector3> m_LinearMotorDecayTimescale = Vector3.Zero.ToTimescale();
+        public Vector3 OneByLinearMotorDecayTimescale => m_LinearMotorDecayTimescale.OneByTimescale;
 
-        private double m_VerticalAttractionEfficiency;
-        private double m_VerticalAttractionTimescale;
-        private double m_OneByVerticalAttractionTimescale = 1;
-        public double OneByVerticalAttractionTimescale
-        {
-            get
-            {
-                lock(m_VehicleParamLock)
-                {
-                    return m_OneByVerticalAttractionTimescale;
-                }
-            }
-        }
+        private TimescaleData<Vector3> m_LinearMotorTimescale = Vector3.Zero.ToTimescale();
+        public Vector3 OneByLinearMotorTimescale => m_LinearMotorTimescale.OneByTimescale;
 
-        private VehicleFlags m_Flags;
+        private ReferenceBoxed<double> m_VerticalAttractionEfficiency;
+        private TimescaleData<double> m_VerticalAttractionTimescale = 0.0.ToTimescale();
+        public double OneByVerticalAttractionTimescale => m_VerticalAttractionTimescale.OneByTimescale;
 
-        private Vector3 m_LinearWindEfficiency;
-        private Vector3 m_AngularWindEfficiency;
+        private int m_FlagsStore;
 
-        private double m_MouselookAzimuth;
-        private double m_MouselookAltitude;
-        private double m_BankingAzimuth;
-        private double m_DisableMotorsAbove;
-        private double m_DisableMotorsAfter;
-        private double m_InvertedBankingModifier;
+        private ReferenceBoxed<Vector3> m_LinearWindEfficiency;
+        private ReferenceBoxed<Vector3> m_AngularWindEfficiency;
 
-        private readonly object m_VehicleParamLock = new object();
+        private ReferenceBoxed<double> m_MouselookAzimuth;
+        private ReferenceBoxed<double> m_MouselookAltitude;
+        private ReferenceBoxed<double> m_BankingAzimuth;
+        private ReferenceBoxed<double> m_DisableMotorsAbove;
+        private ReferenceBoxed<double> m_DisableMotorsAfter;
+        private ReferenceBoxed<double> m_InvertedBankingModifier;
 
         public void DecayDirections(double dt)
         {
-            lock(m_VehicleParamLock)
-            {
-                m_AngularMotorDirection = m_AngularMotorDirection.ElementDivide(Vector3.One.ElementDivide(m_AngularMotorDecayTimescale) * dt);
-                m_LinearMotorDirection = m_LinearMotorDirection.ElementDivide(Vector3.One.ElementDivide(m_LinearMotorDecayTimescale) * dt);
-            }
+            m_AngularMotorDirection = m_AngularMotorDirection.ElementDivide(m_AngularMotorDecayTimescale.OneByTimescale * dt);
+            m_LinearMotorDirection = m_LinearMotorDirection.ElementDivide(m_LinearMotorDecayTimescale.OneByTimescale * dt);
         }
 
         public VehicleType VehicleType
@@ -214,364 +129,346 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
 
             set
             {
-                lock (m_VehicleParamLock)
+                switch (value)
                 {
-                    switch (value)
-                    {
-                        case VehicleType.None:
-                            break;
+                    case VehicleType.None:
+                        break;
 
-                        case VehicleType.Sled:
-                            m_LinearFrictionTimescale = new Vector3(30, 1, 1000);
-                            m_AngularFrictionTimescale = new Vector3(1000, 1000, 1000);
-                            m_LinearMotorDirection = new Vector3(0, 0, 0);
-                            m_LinearMotorTimescale = new Vector3(1000, 1000, 1000);
-                            m_LinearMotorDecayTimescale = new Vector3(120, 120, 120);
-                            m_AngularMotorDirection = new Vector3(0, 0, 0);
-                            m_AngularMotorTimescale = new Vector3(1000, 1000, 1000);
-                            m_AngularMotorDecayTimescale = new Vector3(120, 120, 120);
-                            m_HoverHeight = 0;
-                            m_HoverEfficiency = 10;
-                            m_HoverTimescale = 10;
-                            m_Buoyancy = 0;
-                            m_LinearDeflectionEfficiency = 1;
-                            m_LinearDeflectionTimescale = 1;
-                            m_AngularDeflectionEfficiency = 0;
-                            m_AngularDeflectionTimescale = 10;
-                            m_VerticalAttractionEfficiency = 1;
-                            m_VerticalAttractionTimescale = 1000;
-                            m_BankingEfficiency = 0;
-                            m_BankingMix = 1;
-                            m_BankingTimescale = 10;
-                            m_ReferenceFrame = Quaternion.Identity;
-                            m_AngularWindEfficiency = Vector3.Zero;
-                            m_LinearWindEfficiency = Vector3.Zero;
+                    case VehicleType.Sled:
+                        m_LinearFrictionTimescale = new Vector3(30, 1, 1000).ToTimescale();
+                        m_AngularFrictionTimescale = new Vector3(1000, 1000, 1000).ToTimescale();
+                        m_LinearMotorDirection = Vector3.Zero;
+                        m_LinearMotorTimescale = new Vector3(1000, 1000, 1000).ToTimescale();
+                        m_LinearMotorDecayTimescale = new Vector3(120, 120, 120).ToTimescale();
+                        m_AngularMotorDirection = Vector3.Zero;
+                        m_AngularMotorTimescale = new Vector3(1000, 1000, 1000).ToTimescale();
+                        m_AngularMotorDecayTimescale = new Vector3(120, 120, 120).ToTimescale();
+                        m_HoverHeight = 0;
+                        m_HoverEfficiency = 10;
+                        m_HoverTimescale = 10.0.ToTimescale();
+                        m_Buoyancy = 0;
+                        m_LinearDeflectionEfficiency = 1;
+                        m_LinearDeflectionTimescale = 1.0.ToTimescale();
+                        m_AngularDeflectionEfficiency = 0;
+                        m_AngularDeflectionTimescale = 10.0.ToTimescale();
+                        m_VerticalAttractionEfficiency = 1;
+                        m_VerticalAttractionTimescale = 1000.0.ToTimescale();
+                        m_BankingEfficiency = 0;
+                        m_BankingMix = 1;
+                        m_BankingTimescale = 10.0.ToTimescale();
+                        m_ReferenceFrame = Quaternion.Identity;
+                        m_AngularWindEfficiency = Vector3.Zero;
+                        m_LinearWindEfficiency = Vector3.Zero;
 
-                            m_InvertedBankingModifier = 1.0f;
-                            m_BankingMix = 1.0f;
-                            m_BankingTimescale = 10.0f;
-                            m_MouselookAltitude = Math.PI / 4.0f;
-                            m_MouselookAzimuth = Math.PI / 4.0f;
-                            m_BankingAzimuth = (float)Math.PI / 2.0f;
-                            m_DisableMotorsAbove = 0.0f;
-                            m_DisableMotorsAfter = 0.0f;
+                        m_InvertedBankingModifier = 1.0;
+                        m_BankingMix = 1.0;
+                        m_BankingTimescale = 10.0.ToTimescale();
+                        m_MouselookAltitude = Math.PI / 4.0;
+                        m_MouselookAzimuth = Math.PI / 4.0;
+                        m_BankingAzimuth = (float)Math.PI / 2.0;
+                        m_DisableMotorsAbove = 0.0;
+                        m_DisableMotorsAfter = 0.0;
 
-                            m_Flags = VehicleFlags.NoDeflectionUp | VehicleFlags.LimitRollOnly | VehicleFlags.LimitMotorUp;
-                            break;
+                        Flags = VehicleFlags.NoDeflectionUp | VehicleFlags.LimitRollOnly | VehicleFlags.LimitMotorUp;
+                        break;
 
-                        case VehicleType.Car:
-                            m_LinearFrictionTimescale = new Vector3(100, 2, 1000);
-                            m_AngularFrictionTimescale = new Vector3(1000, 1000, 1000);
-                            m_LinearMotorDirection = new Vector3(0, 0, 0);
-                            m_LinearMotorTimescale = new Vector3(1, 1, 1);
-                            m_LinearMotorDecayTimescale = new Vector3(60, 60, 60);
-                            m_AngularMotorDirection = new Vector3(0, 0, 0);
-                            m_AngularMotorTimescale = new Vector3(1, 1, 1);
-                            m_AngularMotorDecayTimescale = new Vector3(0.8, 0.8, 0.8);
-                            m_HoverHeight = 0;
-                            m_HoverEfficiency = 0;
-                            m_HoverTimescale = 1000;
-                            m_Buoyancy = 0;
-                            m_LinearDeflectionEfficiency = 1;
-                            m_LinearDeflectionTimescale = 2;
-                            m_AngularDeflectionEfficiency = 0;
-                            m_AngularDeflectionTimescale = 10;
-                            m_VerticalAttractionEfficiency = 1;
-                            m_VerticalAttractionTimescale = 10;
-                            m_BankingEfficiency = -0.2;
-                            m_BankingMix = 1;
-                            m_BankingTimescale = 1;
-                            m_ReferenceFrame = Quaternion.Identity;
-                            m_AngularWindEfficiency = Vector3.Zero;
-                            m_LinearWindEfficiency = Vector3.Zero;
+                    case VehicleType.Car:
+                        m_LinearFrictionTimescale = new Vector3(100, 2, 1000).ToTimescale();
+                        m_AngularFrictionTimescale = new Vector3(1000, 1000, 1000).ToTimescale();
+                        m_LinearMotorDirection = Vector3.Zero;
+                        m_LinearMotorTimescale = new Vector3(1, 1, 1).ToTimescale();
+                        m_LinearMotorDecayTimescale = new Vector3(60, 60, 60).ToTimescale();
+                        m_AngularMotorDirection = Vector3.Zero;
+                        m_AngularMotorTimescale = new Vector3(1, 1, 1).ToTimescale();
+                        m_AngularMotorDecayTimescale = new Vector3(0.8, 0.8, 0.8).ToTimescale();
+                        m_HoverHeight = 0;
+                        m_HoverEfficiency = 0;
+                        m_HoverTimescale = 1000.0.ToTimescale();
+                        m_Buoyancy = 0;
+                        m_LinearDeflectionEfficiency = 1;
+                        m_LinearDeflectionTimescale = 2.0.ToTimescale();
+                        m_AngularDeflectionEfficiency = 0;
+                        m_AngularDeflectionTimescale = 10.0.ToTimescale();
+                        m_VerticalAttractionEfficiency = 1;
+                        m_VerticalAttractionTimescale = 10.0.ToTimescale();
+                        m_BankingEfficiency = -0.2;
+                        m_BankingMix = 1;
+                        m_BankingTimescale = 1.0.ToTimescale();
+                        m_ReferenceFrame = Quaternion.Identity;
+                        m_AngularWindEfficiency = Vector3.Zero;
+                        m_LinearWindEfficiency = Vector3.Zero;
 
-                            m_InvertedBankingModifier = 1.0f;
-                            m_BankingMix = 1.0f;
-                            m_BankingTimescale = 1.0f;
-                            m_MouselookAltitude = (float)Math.PI / 4.0f;
-                            m_MouselookAzimuth = (float)Math.PI / 4.0f;
-                            m_BankingAzimuth = (float)Math.PI / 2.0f;
-                            m_DisableMotorsAbove = 0.75f;
-                            m_DisableMotorsAfter = 2.5f;
+                        m_InvertedBankingModifier = 1.0;
+                        m_BankingMix = 1.0;
+                        m_BankingTimescale = 1.0.ToTimescale();
+                        m_MouselookAltitude = (float)Math.PI / 4.0;
+                        m_MouselookAzimuth = (float)Math.PI / 4.0;
+                        m_BankingAzimuth = (float)Math.PI / 2.0;
+                        m_DisableMotorsAbove = 0.75;
+                        m_DisableMotorsAfter = 2.5f;
 
-                            m_Flags = VehicleFlags.NoDeflectionUp | VehicleFlags.LimitRollOnly | VehicleFlags.HoverUpOnly | VehicleFlags.LimitMotorUp;
-                            break;
+                        Flags = VehicleFlags.NoDeflectionUp | VehicleFlags.LimitRollOnly | VehicleFlags.HoverUpOnly | VehicleFlags.LimitMotorUp;
+                        break;
 
-                        case VehicleType.Boat:
-                            m_LinearFrictionTimescale = new Vector3(10, 3, 2);
-                            m_AngularFrictionTimescale = new Vector3(10, 10, 10);
-                            m_LinearMotorDirection = new Vector3(0, 0, 0);
-                            m_LinearMotorTimescale = new Vector3(5, 5, 5);
-                            m_LinearMotorDecayTimescale = new Vector3(60, 60, 60);
-                            m_AngularMotorDirection = new Vector3(0, 0, 0);
-                            m_AngularMotorTimescale = new Vector3(4, 4, 4);
-                            m_AngularMotorDecayTimescale = new Vector3(4, 4, 4);
-                            m_HoverHeight = 0;
-                            m_HoverEfficiency = 0.4;
-                            m_HoverTimescale = 2;
-                            m_Buoyancy = 1;
-                            m_LinearDeflectionEfficiency = 0.5;
-                            m_LinearDeflectionTimescale = 3;
-                            m_AngularDeflectionEfficiency = 0.5;
-                            m_AngularDeflectionTimescale = 5;
-                            m_VerticalAttractionEfficiency = 0.5;
-                            m_VerticalAttractionTimescale = 5;
-                            m_BankingEfficiency = -0.3;
-                            m_BankingMix = 0.8;
-                            m_BankingTimescale = 1;
-                            m_ReferenceFrame = Quaternion.Identity;
-                            m_AngularWindEfficiency = Vector3.Zero;
-                            m_LinearWindEfficiency = Vector3.Zero;
+                    case VehicleType.Boat:
+                        m_LinearFrictionTimescale = new Vector3(10, 3, 2).ToTimescale();
+                        m_AngularFrictionTimescale = new Vector3(10, 10, 10).ToTimescale();
+                        m_LinearMotorDirection = Vector3.Zero;
+                        m_LinearMotorTimescale = new Vector3(5, 5, 5).ToTimescale();
+                        m_LinearMotorDecayTimescale = new Vector3(60, 60, 60).ToTimescale();
+                        m_AngularMotorDirection = Vector3.Zero;
+                        m_AngularMotorTimescale = new Vector3(4, 4, 4).ToTimescale();
+                        m_AngularMotorDecayTimescale = new Vector3(4, 4, 4).ToTimescale();
+                        m_HoverHeight = 0;
+                        m_HoverEfficiency = 0.4;
+                        m_HoverTimescale = 2.0.ToTimescale();
+                        m_Buoyancy = 1;
+                        m_LinearDeflectionEfficiency = 0.5;
+                        m_LinearDeflectionTimescale = 3.0.ToTimescale();
+                        m_AngularDeflectionEfficiency = 0.5;
+                        m_AngularDeflectionTimescale = 5.0.ToTimescale();
+                        m_VerticalAttractionEfficiency = 0.5;
+                        m_VerticalAttractionTimescale = 5.0.ToTimescale();
+                        m_BankingEfficiency = -0.3;
+                        m_BankingMix = 0.8;
+                        m_BankingTimescale = 1.0.ToTimescale();
+                        m_ReferenceFrame = Quaternion.Identity;
+                        m_AngularWindEfficiency = Vector3.Zero;
+                        m_LinearWindEfficiency = Vector3.Zero;
 
-                            m_InvertedBankingModifier = 1.0f;
-                            m_BankingMix = 0.5f;
-                            m_BankingTimescale = 0.2f;
-                            m_MouselookAltitude = (float)Math.PI / 4.0f;
-                            m_MouselookAzimuth = (float)Math.PI / 4.0f;
-                            m_BankingAzimuth = (float)Math.PI / 2.0f;
-                            m_DisableMotorsAbove = 0.0f;
-                            m_DisableMotorsAfter = 0.0f;
+                        m_InvertedBankingModifier = 1.0;
+                        m_BankingMix = 0.5;
+                        m_BankingTimescale = 0.2.ToTimescale();
+                        m_MouselookAltitude = (float)Math.PI / 4.0;
+                        m_MouselookAzimuth = (float)Math.PI / 4.0;
+                        m_BankingAzimuth = (float)Math.PI / 2.0;
+                        m_DisableMotorsAbove = 0.0;
+                        m_DisableMotorsAfter = 0.0;
 
-                            m_Flags = VehicleFlags.NoDeflectionUp | VehicleFlags.HoverWaterOnly | VehicleFlags.HoverUpOnly | VehicleFlags.LimitMotorUp;
-                            break;
+                        Flags = VehicleFlags.NoDeflectionUp | VehicleFlags.HoverWaterOnly | VehicleFlags.HoverUpOnly | VehicleFlags.LimitMotorUp;
+                        break;
 
-                        case VehicleType.Airplane:
-                            m_LinearFrictionTimescale = new Vector3(200, 10, 5);
-                            m_AngularFrictionTimescale = new Vector3(20, 20, 20);
-                            m_LinearMotorDirection = new Vector3(0, 0, 0);
-                            m_LinearMotorTimescale = new Vector3(2, 2, 2);
-                            m_LinearMotorDecayTimescale = new Vector3(60, 60, 60);
-                            m_AngularMotorDirection = new Vector3(0, 0, 0);
-                            m_AngularMotorTimescale = new Vector3(4, 4, 4);
-                            m_AngularMotorDecayTimescale = new Vector3(8, 8, 8);
-                            m_HoverHeight = 0;
-                            m_HoverEfficiency = 0.5;
-                            m_HoverTimescale = 1000;
-                            m_Buoyancy = 0;
-                            m_LinearDeflectionEfficiency = 0.5;
-                            m_LinearDeflectionTimescale = 0.5;
-                            m_AngularDeflectionEfficiency = 1;
-                            m_AngularDeflectionTimescale = 2;
-                            m_VerticalAttractionEfficiency = 0.9;
-                            m_VerticalAttractionTimescale = 2;
-                            m_BankingEfficiency = 1;
-                            m_BankingMix = 0.7;
-                            m_BankingTimescale = 2;
-                            m_ReferenceFrame = Quaternion.Identity;
-                            m_AngularWindEfficiency = Vector3.Zero;
-                            m_LinearWindEfficiency = Vector3.Zero;
+                    case VehicleType.Airplane:
+                        m_LinearFrictionTimescale = new Vector3(200, 10, 5).ToTimescale();
+                        m_AngularFrictionTimescale = new Vector3(20, 20, 20).ToTimescale();
+                        m_LinearMotorDirection = Vector3.Zero;
+                        m_LinearMotorTimescale = new Vector3(2, 2, 2).ToTimescale();
+                        m_LinearMotorDecayTimescale = new Vector3(60, 60, 60).ToTimescale();
+                        m_AngularMotorDirection = Vector3.Zero;
+                        m_AngularMotorTimescale = new Vector3(4, 4, 4).ToTimescale();
+                        m_AngularMotorDecayTimescale = new Vector3(8, 8, 8).ToTimescale();
+                        m_HoverHeight = 0;
+                        m_HoverEfficiency = 0.5;
+                        m_HoverTimescale = 1000.0.ToTimescale();
+                        m_Buoyancy = 0;
+                        m_LinearDeflectionEfficiency = 0.5;
+                        m_LinearDeflectionTimescale = 0.5.ToTimescale();
+                        m_AngularDeflectionEfficiency = 1;
+                        m_AngularDeflectionTimescale = 2.0.ToTimescale();
+                        m_VerticalAttractionEfficiency = 0.9;
+                        m_VerticalAttractionTimescale = 2.0.ToTimescale();
+                        m_BankingEfficiency = 1;
+                        m_BankingMix = 0.7;
+                        m_BankingTimescale = 2.0.ToTimescale();
+                        m_ReferenceFrame = Quaternion.Identity;
+                        m_AngularWindEfficiency = Vector3.Zero;
+                        m_LinearWindEfficiency = Vector3.Zero;
 
-                            m_InvertedBankingModifier = 1.0f;
-                            m_BankingMix = 0.7f;
-                            m_BankingTimescale = 1.0f;
-                            m_MouselookAltitude = Math.PI / 4.0f;
-                            m_MouselookAzimuth = Math.PI / 4.0f;
-                            m_BankingAzimuth = Math.PI / 2.0f;
-                            m_DisableMotorsAbove = 0.0f;
-                            m_DisableMotorsAfter = 0.0f;
+                        m_InvertedBankingModifier = 1.0;
+                        m_BankingMix = 0.7;
+                        m_BankingTimescale = 1.0.ToTimescale();
+                        m_MouselookAltitude = Math.PI / 4.0;
+                        m_MouselookAzimuth = Math.PI / 4.0;
+                        m_BankingAzimuth = Math.PI / 2.0;
+                        m_DisableMotorsAbove = 0.0;
+                        m_DisableMotorsAfter = 0.0;
 
-                            m_Flags = VehicleFlags.LimitRollOnly | VehicleFlags.TorqueWorldZ;
-                            break;
+                        Flags = VehicleFlags.LimitRollOnly | VehicleFlags.TorqueWorldZ;
+                        break;
 
-                        case VehicleType.Balloon:
-                            m_LinearFrictionTimescale = new Vector3(5, 5, 5);
-                            m_AngularFrictionTimescale = new Vector3(10, 10, 10);
-                            m_LinearMotorDirection = new Vector3(0, 0, 0);
-                            m_LinearMotorTimescale = new Vector3(5, 5, 5);
-                            m_LinearMotorDecayTimescale = new Vector3(60, 60, 60);
-                            m_AngularMotorDirection = new Vector3(0, 0, 0);
-                            m_AngularMotorTimescale = new Vector3(6, 6, 6);
-                            m_AngularMotorDecayTimescale = new Vector3(10, 10, 10);
-                            m_HoverHeight = 5;
-                            m_HoverEfficiency = 0.8;
-                            m_HoverTimescale = 10;
-                            m_Buoyancy = 1;
-                            m_LinearDeflectionEfficiency = 0;
-                            m_LinearDeflectionTimescale = 5;
-                            m_AngularDeflectionEfficiency = 0;
-                            m_AngularDeflectionTimescale = 5;
-                            m_VerticalAttractionEfficiency = 1;
-                            m_VerticalAttractionTimescale = 1000;
-                            m_BankingEfficiency = 0;
-                            m_BankingMix = 0.7;
-                            m_BankingTimescale = 5;
-                            m_ReferenceFrame = Quaternion.Identity;
-                            m_AngularWindEfficiency = new Vector3(0.01, 0.01, 0.01);
-                            m_LinearWindEfficiency = new Vector3(0.1, 0.1, 0.1);
+                    case VehicleType.Balloon:
+                        m_LinearFrictionTimescale = new Vector3(5, 5, 5).ToTimescale();
+                        m_AngularFrictionTimescale = new Vector3(10, 10, 10).ToTimescale();
+                        m_LinearMotorDirection = Vector3.Zero;
+                        m_LinearMotorTimescale = new Vector3(5, 5, 5).ToTimescale();
+                        m_LinearMotorDecayTimescale = new Vector3(60, 60, 60).ToTimescale();
+                        m_AngularMotorDirection = Vector3.Zero;
+                        m_AngularMotorTimescale = new Vector3(6, 6, 6).ToTimescale();
+                        m_AngularMotorDecayTimescale = new Vector3(10, 10, 10).ToTimescale();
+                        m_HoverHeight = 5;
+                        m_HoverEfficiency = 0.8;
+                        m_HoverTimescale = 10.0.ToTimescale();
+                        m_Buoyancy = 1;
+                        m_LinearDeflectionEfficiency = 0;
+                        m_LinearDeflectionTimescale = 5.0.ToTimescale();
+                        m_AngularDeflectionEfficiency = 0;
+                        m_AngularDeflectionTimescale = 5.0.ToTimescale();
+                        m_VerticalAttractionEfficiency = 1;
+                        m_VerticalAttractionTimescale = 1000.0.ToTimescale();
+                        m_BankingEfficiency = 0;
+                        m_BankingMix = 0.7;
+                        m_BankingTimescale = 5.0.ToTimescale();
+                        m_ReferenceFrame = Quaternion.Identity;
+                        m_AngularWindEfficiency = new Vector3(0.01, 0.01, 0.01);
+                        m_LinearWindEfficiency = new Vector3(0.1, 0.1, 0.1);
 
-                            m_InvertedBankingModifier = 1.0f;
-                            m_BankingMix = 0.5f;
-                            m_BankingTimescale = 5.0f;
-                            m_MouselookAltitude = (float)Math.PI / 4.0f;
-                            m_MouselookAzimuth = (float)Math.PI / 4.0f;
-                            m_BankingAzimuth = (float)Math.PI / 2.0f;
-                            m_DisableMotorsAbove = 0.0f;
-                            m_DisableMotorsAfter = 0.0f;
+                        m_InvertedBankingModifier = 1.0;
+                        m_BankingMix = 0.5;
+                        m_BankingTimescale = 5.0.ToTimescale();
+                        m_MouselookAltitude = (float)Math.PI / 4.0;
+                        m_MouselookAzimuth = (float)Math.PI / 4.0;
+                        m_BankingAzimuth = (float)Math.PI / 2.0;
+                        m_DisableMotorsAbove = 0.0;
+                        m_DisableMotorsAfter = 0.0;
 
-                            m_Flags = VehicleFlags.ReactToWind;
-                            break;
+                        Flags = VehicleFlags.ReactToWind;
+                        break;
 
-                        case VehicleType.Motorcycle:    // Halcyon based vehicle type
-                            m_LinearFrictionTimescale = new Vector3(100.0f, 0.1f, 10.0f);
-                            m_AngularFrictionTimescale = new Vector3(3.0f, 0.2f, 10.0f);
-                            m_LinearMotorDirection = Vector3.Zero;
-                            m_AngularMotorDirection = Vector3.Zero;
-                            m_LinearMotorOffset = new Vector3(0.0f, 0.0f, -0.1f);
-                            m_LinearMotorTimescale = new Vector3(0.5f, 1.0f, 1.0f);
-                            m_AngularMotorTimescale = new Vector3(0.1f, 0.1f, 0.05f);
-                            m_LinearMotorDecayTimescale = new Vector3(10.0f, 1.0f, 1.0f);
-                            m_AngularMotorDecayTimescale = new Vector3(0.2f, 0.8f, 0.1f);
-                            m_LinearWindEfficiency = Vector3.Zero;
-                            m_AngularWindEfficiency = Vector3.Zero;
+                    case VehicleType.Motorcycle:    // Halcyon based vehicle type
+                        m_LinearFrictionTimescale = new Vector3(100.0, 0.1, 10.0).ToTimescale();
+                        m_AngularFrictionTimescale = new Vector3(3.0, 0.2, 10.0).ToTimescale();
+                        m_LinearMotorDirection = Vector3.Zero;
+                        m_AngularMotorDirection = Vector3.Zero;
+                        m_LinearMotorOffset = new Vector3(0.0, 0.0, -0.1);
+                        m_LinearMotorTimescale = new Vector3(0.5, 1.0, 1.0).ToTimescale();
+                        m_AngularMotorTimescale = new Vector3(0.1, 0.1, 0.05).ToTimescale();
+                        m_LinearMotorDecayTimescale = new Vector3(10.0, 1.0, 1.0).ToTimescale();
+                        m_AngularMotorDecayTimescale = new Vector3(0.2, 0.8, 0.1).ToTimescale();
+                        m_LinearWindEfficiency = Vector3.Zero;
+                        m_AngularWindEfficiency = Vector3.Zero;
 
-                            m_HoverHeight = 0.0f;
-                            m_HoverEfficiency = 0.0f;
-                            m_HoverTimescale = 1000.0f;
-                            m_Buoyancy = 0.0f;
-                            m_LinearDeflectionEfficiency = 1.0f;
-                            m_LinearDeflectionTimescale = 2.0f;
-                            m_AngularDeflectionEfficiency = 0.8f;
-                            m_AngularDeflectionTimescale = 2.0f;
-                            m_VerticalAttractionEfficiency = 1.0f;
-                            m_VerticalAttractionTimescale = 1.0f;
-                            m_BankingEfficiency = 0.95f;
-                            m_ReferenceFrame = Quaternion.Identity;
+                        m_HoverHeight = 0.0;
+                        m_HoverEfficiency = 0.0;
+                        m_HoverTimescale = 1000.0.ToTimescale();
+                        m_Buoyancy = 0.0;
+                        m_LinearDeflectionEfficiency = 1.0;
+                        m_LinearDeflectionTimescale = 2.0.ToTimescale();
+                        m_AngularDeflectionEfficiency = 0.8;
+                        m_AngularDeflectionTimescale = 2.0.ToTimescale();
+                        m_VerticalAttractionEfficiency = 1.0;
+                        m_VerticalAttractionTimescale = 1.0.ToTimescale();
+                        m_BankingEfficiency = 0.95;
+                        m_ReferenceFrame = Quaternion.Identity;
 
-                            m_InvertedBankingModifier = -0.5f;
-                            m_BankingMix = 0.5f;
-                            m_BankingTimescale = 0.1f;
-                            m_MouselookAltitude = (float)Math.PI / 4.0f;
-                            m_MouselookAzimuth = (float)Math.PI / 4.0f;
-                            m_BankingAzimuth = (float)Math.PI / 2.0f;
-                            m_DisableMotorsAbove = 1.5f;
-                            m_DisableMotorsAfter = 2.5f;
+                        m_InvertedBankingModifier = -0.5;
+                        m_BankingMix = 0.5;
+                        m_BankingTimescale = 0.1.ToTimescale();
+                        m_MouselookAltitude = (float)Math.PI / 4.0;
+                        m_MouselookAzimuth = (float)Math.PI / 4.0;
+                        m_BankingAzimuth = (float)Math.PI / 2.0;
+                        m_DisableMotorsAbove = 1.5;
+                        m_DisableMotorsAfter = 2.5;
 
-                            m_Flags = VehicleFlags.NoDeflectionUp | VehicleFlags.HoverUpOnly | VehicleFlags.LimitMotorUp | VehicleFlags.LimitMotorDown |
-                                            VehicleFlags.LimitRollOnly | VehicleFlags.TorqueWorldZ;
-                            break;
+                        Flags = VehicleFlags.NoDeflectionUp | VehicleFlags.HoverUpOnly | VehicleFlags.LimitMotorUp | VehicleFlags.LimitMotorDown |
+                                        VehicleFlags.LimitRollOnly | VehicleFlags.TorqueWorldZ;
+                        break;
 
-                        case VehicleType.Sailboat:  // Halcyon-based vehicle type
-                            m_LinearFrictionTimescale = new Vector3(200.0f, 0.5f, 3.0f);
-                            m_AngularFrictionTimescale = new Vector3(10.0f, 1.0f, 0.2f);
-                            m_LinearMotorDirection = Vector3.Zero;
-                            m_AngularMotorDirection = Vector3.Zero;
-                            m_LinearMotorOffset = Vector3.Zero;
-                            m_LinearMotorTimescale = new Vector3(1.0f, 5.0f, 5.0f);
-                            m_AngularMotorTimescale = new Vector3(2.0f, 2.0f, 0.1f);
-                            m_LinearMotorDecayTimescale = new Vector3(1.0f, 10.0f, 10.0f);
-                            m_AngularMotorDecayTimescale = new Vector3(0.3f, 0.3f, 0.1f);
-                            m_LinearWindEfficiency = new Vector3(0.02f, 0.001f, 0.0f);
-                            m_AngularWindEfficiency = new Vector3(0.1f, 0.01f, 0.0f);
+                    case VehicleType.Sailboat:  // Halcyon-based vehicle type
+                        m_LinearFrictionTimescale = new Vector3(200.0, 0.5, 3.0).ToTimescale();
+                        m_AngularFrictionTimescale = new Vector3(10.0, 1.0, 0.2).ToTimescale();
+                        m_LinearMotorDirection = Vector3.Zero;
+                        m_AngularMotorDirection = Vector3.Zero;
+                        m_LinearMotorOffset = Vector3.Zero;
+                        m_LinearMotorTimescale = new Vector3(1.0, 5.0, 5.0).ToTimescale();
+                        m_AngularMotorTimescale = new Vector3(2.0, 2.0, 0.1).ToTimescale();
+                        m_LinearMotorDecayTimescale = new Vector3(1.0, 10.0, 10.0).ToTimescale();
+                        m_AngularMotorDecayTimescale = new Vector3(0.3, 0.3, 0.1).ToTimescale();
+                        m_LinearWindEfficiency = new Vector3(0.02, 0.001, 0.0);
+                        m_AngularWindEfficiency = new Vector3(0.1, 0.01, 0.0);
 
-                            m_HoverHeight = 0.0001f;
-                            m_HoverEfficiency = 0.8f;
-                            m_HoverTimescale = 0.5f;
-                            m_Buoyancy = 0.0f;
-                            m_LinearDeflectionEfficiency = 0.5f;
-                            m_LinearDeflectionTimescale = 3.0f;
-                            m_AngularDeflectionEfficiency = 0.5f;
-                            m_AngularDeflectionTimescale = 5.0f;
-                            m_VerticalAttractionEfficiency = 0.5f;
-                            m_VerticalAttractionTimescale = 0.3f;
-                            m_BankingEfficiency = 0.8f;
-                            m_InvertedBankingModifier = -0.2f;
-                            m_BankingMix = 0.5f;
-                            m_BankingTimescale = 0.5f;
-                            m_MouselookAltitude = Math.PI / 4.0f;
-                            m_MouselookAzimuth = Math.PI / 4.0f;
-                            m_BankingAzimuth = Math.PI / 2.0f;
-                            m_DisableMotorsAbove = 0.0f;
-                            m_DisableMotorsAfter = 0.0f;
+                        m_HoverHeight = 0.0001;
+                        m_HoverEfficiency = 0.8;
+                        m_HoverTimescale = 0.5.ToTimescale();
+                        m_Buoyancy = 0.0;
+                        m_LinearDeflectionEfficiency = 0.5;
+                        m_LinearDeflectionTimescale = 3.0.ToTimescale();
+                        m_AngularDeflectionEfficiency = 0.5;
+                        m_AngularDeflectionTimescale = 5.0.ToTimescale();
+                        m_VerticalAttractionEfficiency = 0.5;
+                        m_VerticalAttractionTimescale = 0.3.ToTimescale();
+                        m_BankingEfficiency = 0.8;
+                        m_InvertedBankingModifier = -0.2;
+                        m_BankingMix = 0.5f;
+                        m_BankingTimescale = 0.5.ToTimescale();
+                        m_MouselookAltitude = Math.PI / 4.0f;
+                        m_MouselookAzimuth = Math.PI / 4.0f;
+                        m_BankingAzimuth = Math.PI / 2.0f;
+                        m_DisableMotorsAbove = 0.0f;
+                        m_DisableMotorsAfter = 0.0f;
 
-                            m_ReferenceFrame = Quaternion.Identity;
+                        m_ReferenceFrame = Quaternion.Identity;
 
-                            m_Flags = VehicleFlags.NoDeflectionUp | VehicleFlags.HoverWaterOnly |
-                                VehicleFlags.LimitMotorUp | VehicleFlags.LimitMotorDown |
-                                VehicleFlags.ReactToWind | VehicleFlags.ReactToCurrents |
-                                VehicleFlags.TorqueWorldZ;
-                            break;
+                        Flags = VehicleFlags.NoDeflectionUp | VehicleFlags.HoverWaterOnly |
+                            VehicleFlags.LimitMotorUp | VehicleFlags.LimitMotorDown |
+                            VehicleFlags.ReactToWind | VehicleFlags.ReactToCurrents |
+                            VehicleFlags.TorqueWorldZ;
+                        break;
 
-                        default:
-                            throw new InvalidOperationException();
-                    }
-
-                    if (value != VehicleType.None)
-                    {
-                        m_OneByAngularDeflectionTimescale = 1 / m_AngularDeflectionEfficiency;
-                        m_OneByAngularFrictonTimescale = Vector3.One.ElementDivide(m_AngularFrictionTimescale);
-                        m_OneByAngularMotorDecayTimescale = Vector3.One.ElementDivide(m_AngularMotorDecayTimescale);
-                        m_OneByAngularMotorTimescale = Vector3.One.ElementDivide(m_AngularMotorTimescale);
-                        m_OneByBankingTimescale = 1 / m_BankingTimescale;
-                        m_OneByHoverTimescale = 1 / m_HoverTimescale;
-                        m_OneByLinearDeflectionTimescale = 1 / m_LinearDeflectionTimescale;
-                        m_OneByLinearFrictionTimescale = Vector3.One.ElementDivide(m_LinearFrictionTimescale);
-                        m_OneByLinearMotorDecayTimescale = Vector3.One.ElementDivide(m_LinearMotorDecayTimescale);
-                        m_OneByLinearMotorTimescale = Vector3.One.ElementDivide(m_LinearMotorTimescale);
-                        m_OneByVerticalAttractionTimescale = 1 / m_VerticalAttractionTimescale;
-                    }
-                    m_VehicleType = value;
+                    default:
+                        throw new InvalidOperationException();
                 }
+
+                m_VehicleType = value;
             }
         }
 
         public VehicleFlags Flags
         {
-            get { return m_Flags; }
+            get { return (VehicleFlags)m_FlagsStore; }
 
             set
             {
-                lock (m_VehicleParamLock)
-                {
-                    m_Flags = value;
-                }
+                m_FlagsStore = (int)value;
             }
         }
 
         public void SetFlags(VehicleFlags value)
         {
-            lock (m_VehicleParamLock)
+            int setflags = (int)value;
+            int oldFlagsStore = m_FlagsStore;
+            int newFlagsStore;
+            do
             {
-                m_Flags |= value;
-            }
+                newFlagsStore = oldFlagsStore | setflags;
+                oldFlagsStore = Interlocked.CompareExchange(ref m_FlagsStore, newFlagsStore, oldFlagsStore) | setflags;
+            } while (newFlagsStore != oldFlagsStore);
         }
 
         public void ClearFlags(VehicleFlags value)
         {
-            lock (m_VehicleParamLock)
+            int clrflags = ~(int)value;
+            int oldFlagsStore = m_FlagsStore;
+            int newFlagsStore;
+            do
             {
-                m_Flags &= ~value;
-            }
+                newFlagsStore = oldFlagsStore & ~clrflags;
+                oldFlagsStore = Interlocked.CompareExchange(ref m_FlagsStore, newFlagsStore, oldFlagsStore) & ~clrflags;
+            } while (newFlagsStore != oldFlagsStore);
         }
 
         public Quaternion this[VehicleRotationParamId id]
         {
             get
             {
-                lock(m_VehicleParamLock)
+                switch (id)
                 {
-                    switch (id)
-                    {
-                        case VehicleRotationParamId.ReferenceFrame:
-                            return m_ReferenceFrame;
+                    case VehicleRotationParamId.ReferenceFrame:
+                        return m_ReferenceFrame;
 
-                        default:
-                            throw new KeyNotFoundException();
-                    }
+                    default:
+                        throw new KeyNotFoundException();
                 }
             }
             set
             {
-                lock (m_VehicleParamLock)
+                switch (id)
                 {
-                    switch (id)
-                    {
-                        case VehicleRotationParamId.ReferenceFrame:
-                            m_ReferenceFrame = value;
-                            break;
+                    case VehicleRotationParamId.ReferenceFrame:
+                        m_ReferenceFrame = value;
+                        break;
 
-                        default:
-                            throw new KeyNotFoundException();
-                    }
+                    default:
+                        throw new KeyNotFoundException();
                 }
             }
         }
@@ -580,119 +477,95 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
         {
             get
             {
-                lock(m_VehicleParamLock)
+                switch (id)
                 {
-                    switch (id)
-                    {
-                        case VehicleVectorParamId.AngularFrictionTimescale:
-                            return m_AngularFrictionTimescale;
+                    case VehicleVectorParamId.AngularFrictionTimescale:
+                        return m_AngularFrictionTimescale.Timescale;
 
-                        case VehicleVectorParamId.AngularMotorDirection:
-                            return m_AngularMotorDirection;
+                    case VehicleVectorParamId.AngularMotorDirection:
+                        return m_AngularMotorDirection;
 
-                        case VehicleVectorParamId.LinearFrictionTimescale:
-                            return m_LinearFrictionTimescale;
+                    case VehicleVectorParamId.LinearFrictionTimescale:
+                        return m_LinearFrictionTimescale.Timescale;
 
-                        case VehicleVectorParamId.LinearMotorDirection:
-                            return m_LinearMotorDirection;
+                    case VehicleVectorParamId.LinearMotorDirection:
+                        return m_LinearMotorDirection;
 
-                        case VehicleVectorParamId.LinearMotorOffset:
-                            return m_LinearMotorOffset;
+                    case VehicleVectorParamId.LinearMotorOffset:
+                        return m_LinearMotorOffset;
 
-                        case VehicleVectorParamId.AngularMotorDecayTimescale:
-                            return m_AngularMotorDecayTimescale;
+                    case VehicleVectorParamId.AngularMotorDecayTimescale:
+                        return m_AngularMotorDecayTimescale.Timescale;
 
-                        case VehicleVectorParamId.AngularMotorTimescale:
-                            return m_AngularMotorTimescale;
+                    case VehicleVectorParamId.AngularMotorTimescale:
+                        return m_AngularMotorTimescale.Timescale;
 
-                        case VehicleVectorParamId.LinearMotorDecayTimescale:
-                            return m_LinearMotorDecayTimescale;
+                    case VehicleVectorParamId.LinearMotorDecayTimescale:
+                        return m_LinearMotorDecayTimescale.Timescale;
 
-                        case VehicleVectorParamId.LinearMotorTimescale:
-                            return m_LinearMotorTimescale;
+                    case VehicleVectorParamId.LinearMotorTimescale:
+                        return m_LinearMotorTimescale.Timescale;
 
-                        case VehicleVectorParamId.AngularWindEfficiency:
-                            return m_AngularWindEfficiency;
+                    case VehicleVectorParamId.AngularWindEfficiency:
+                        return m_AngularWindEfficiency;
 
-                        case VehicleVectorParamId.LinearWindEfficiency:
-                            return m_LinearWindEfficiency;
+                    case VehicleVectorParamId.LinearWindEfficiency:
+                        return m_LinearWindEfficiency;
 
-                        default:
-                            throw new KeyNotFoundException();
-                    }
+                    default:
+                        throw new KeyNotFoundException();
                 }
             }
             set
             {
-                lock (m_VehicleParamLock)
+                switch (id)
                 {
-                    switch (id)
-                    {
-                        case VehicleVectorParamId.AngularFrictionTimescale:
-                            if (value.X > double.Epsilon && value.Y > double.Epsilon && value.Z > double.Epsilon)
-                            {
-                                m_OneByAngularFrictonTimescale = Vector3.One.ElementDivide(value);
-                                m_AngularFrictionTimescale = value;
-                            }
-                            break;
+                    case VehicleVectorParamId.AngularFrictionTimescale:
+                        m_AngularFrictionTimescale = value.ToTimescale();
+                        break;
 
-                        case VehicleVectorParamId.AngularMotorDirection:
-                            m_AngularMotorDirection = value;
-                            break;
+                    case VehicleVectorParamId.AngularMotorDirection:
+                        m_AngularMotorDirection = value;
+                        break;
 
-                        case VehicleVectorParamId.LinearFrictionTimescale:
-                            m_OneByLinearFrictionTimescale = Vector3.One.ElementDivide(value);
-                            m_LinearFrictionTimescale = value;
-                            break;
+                    case VehicleVectorParamId.LinearFrictionTimescale:
+                        m_LinearFrictionTimescale = value.ToTimescale();
+                        break;
 
-                        case VehicleVectorParamId.LinearMotorDirection:
-                            m_LinearMotorDirection = value;
-                            break;
+                    case VehicleVectorParamId.LinearMotorDirection:
+                        m_LinearMotorDirection = value;
+                        break;
 
-                        case VehicleVectorParamId.LinearMotorOffset:
-                            m_LinearMotorOffset = value;
-                            break;
+                    case VehicleVectorParamId.LinearMotorOffset:
+                        m_LinearMotorOffset = value;
+                        break;
 
-                        case VehicleVectorParamId.AngularMotorDecayTimescale:
-                            m_OneByLinearMotorDecayTimescale = Vector3.One.ElementDivide(value);
-                            m_AngularMotorDecayTimescale = value;
-                            break;
+                    case VehicleVectorParamId.AngularMotorDecayTimescale:
+                        m_AngularMotorDecayTimescale = value.ToTimescale();
+                        break;
 
-                        case VehicleVectorParamId.AngularMotorTimescale:
-                            if (value.X > double.Epsilon && value.Y > double.Epsilon && value.Z > double.Epsilon)
-                            {
-                                m_OneByAngularMotorTimescale = Vector3.One.ElementDivide(value);
-                                m_AngularMotorTimescale = value;
-                            }
-                            break;
+                    case VehicleVectorParamId.AngularMotorTimescale:
+                        m_AngularMotorTimescale = value.ToTimescale();
+                        break;
 
-                        case VehicleVectorParamId.LinearMotorDecayTimescale:
-                            if (value.X > double.Epsilon && value.Y > double.Epsilon && value.Z > double.Epsilon)
-                            {
-                                m_OneByLinearMotorDecayTimescale = Vector3.One.ElementDivide(value);
-                                m_LinearMotorDecayTimescale = value;
-                            }
-                            break;
+                    case VehicleVectorParamId.LinearMotorDecayTimescale:
+                        m_LinearMotorDecayTimescale = value.ToTimescale();
+                        break;
 
-                        case VehicleVectorParamId.LinearMotorTimescale:
-                            if (value.X > double.Epsilon && value.Y > double.Epsilon && value.Z > double.Epsilon)
-                            {
-                                m_OneByLinearMotorTimescale = Vector3.One.ElementDivide(value);
-                                m_LinearMotorTimescale = value;
-                            }
-                            break;
+                    case VehicleVectorParamId.LinearMotorTimescale:
+                        m_LinearMotorTimescale = value.ToTimescale();
+                        break;
 
-                        case VehicleVectorParamId.AngularWindEfficiency:
-                            m_AngularWindEfficiency = value;
-                            break;
+                    case VehicleVectorParamId.AngularWindEfficiency:
+                        m_AngularWindEfficiency = value;
+                        break;
 
-                        case VehicleVectorParamId.LinearWindEfficiency:
-                            m_LinearWindEfficiency = value;
-                            break;
+                    case VehicleVectorParamId.LinearWindEfficiency:
+                        m_LinearWindEfficiency = value;
+                        break;
 
-                        default:
-                            throw new KeyNotFoundException();
-                    }
+                    default:
+                        throw new KeyNotFoundException();
                 }
             }
         }
@@ -701,174 +574,151 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
         {
             get
             {
-                lock(m_VehicleParamLock)
+                switch (id)
                 {
-                    switch (id)
-                    {
-                        case VehicleFloatParamId.AngularDeflectionEfficiency:
-                            return m_AngularDeflectionEfficiency;
+                    case VehicleFloatParamId.AngularDeflectionEfficiency:
+                        return m_AngularDeflectionEfficiency;
 
-                        case VehicleFloatParamId.AngularDeflectionTimescale:
-                            return m_AngularDeflectionTimescale;
+                    case VehicleFloatParamId.AngularDeflectionTimescale:
+                        return m_AngularDeflectionTimescale.Timescale;
 
-                        case VehicleFloatParamId.LinearDeflectionTimescale:
-                            return m_LinearDeflectionTimescale;
+                    case VehicleFloatParamId.LinearDeflectionTimescale:
+                        return m_LinearDeflectionTimescale.Timescale;
 
-                        case VehicleFloatParamId.LinearDeflectionEfficiency:
-                            return m_LinearDeflectionEfficiency;
+                    case VehicleFloatParamId.LinearDeflectionEfficiency:
+                        return m_LinearDeflectionEfficiency;
 
-                        case VehicleFloatParamId.BankingEfficiency:
-                            return m_BankingEfficiency;
+                    case VehicleFloatParamId.BankingEfficiency:
+                        return m_BankingEfficiency;
 
-                        case VehicleFloatParamId.BankingMix:
-                            return m_BankingMix;
+                    case VehicleFloatParamId.BankingMix:
+                        return m_BankingMix;
 
-                        case VehicleFloatParamId.BankingTimescale:
-                            return m_BankingTimescale;
+                    case VehicleFloatParamId.BankingTimescale:
+                        return m_BankingTimescale.Timescale;
 
-                        case VehicleFloatParamId.Buoyancy:
-                            return m_Buoyancy;
+                    case VehicleFloatParamId.Buoyancy:
+                        return m_Buoyancy;
 
-                        case VehicleFloatParamId.HoverHeight:
-                            return m_HoverHeight;
+                    case VehicleFloatParamId.HoverHeight:
+                        return m_HoverHeight;
 
-                        case VehicleFloatParamId.HoverEfficiency:
-                            return m_HoverEfficiency;
+                    case VehicleFloatParamId.HoverEfficiency:
+                        return m_HoverEfficiency;
 
-                        case VehicleFloatParamId.HoverTimescale:
-                            return m_HoverTimescale;
+                    case VehicleFloatParamId.HoverTimescale:
+                        return m_HoverTimescale.Timescale;
 
-                        case VehicleFloatParamId.VerticalAttractionEfficiency:
-                            return m_VerticalAttractionEfficiency;
+                    case VehicleFloatParamId.VerticalAttractionEfficiency:
+                        return m_VerticalAttractionEfficiency;
 
-                        case VehicleFloatParamId.VerticalAttractionTimescale:
-                            return m_VerticalAttractionTimescale;
+                    case VehicleFloatParamId.VerticalAttractionTimescale:
+                        return m_VerticalAttractionTimescale.Timescale;
 
-                        case VehicleFloatParamId.MouselookAzimuth:
-                            return m_MouselookAzimuth;
+                    case VehicleFloatParamId.MouselookAzimuth:
+                        return m_MouselookAzimuth;
 
-                        case VehicleFloatParamId.MouselookAltitude:
-                            return m_MouselookAltitude;
+                    case VehicleFloatParamId.MouselookAltitude:
+                        return m_MouselookAltitude;
 
-                        case VehicleFloatParamId.BankingAzimuth:
-                            return m_BankingAzimuth;
+                    case VehicleFloatParamId.BankingAzimuth:
+                        return m_BankingAzimuth;
 
-                        case VehicleFloatParamId.DisableMotorsAbove:
-                            return m_DisableMotorsAbove;
+                    case VehicleFloatParamId.DisableMotorsAbove:
+                        return m_DisableMotorsAbove;
 
-                        case VehicleFloatParamId.DisableMotorsAfter:
-                            return m_DisableMotorsAfter;
+                    case VehicleFloatParamId.DisableMotorsAfter:
+                        return m_DisableMotorsAfter;
 
-                        case VehicleFloatParamId.InvertedBankingModifier:
-                            return m_InvertedBankingModifier;
+                    case VehicleFloatParamId.InvertedBankingModifier:
+                        return m_InvertedBankingModifier;
 
-                        default:
-                            throw new KeyNotFoundException();
-                    }
+                    default:
+                        throw new KeyNotFoundException();
                 }
             }
             set
             {
-                lock (m_VehicleParamLock)
+                switch (id)
                 {
-                    switch (id)
-                    {
-                        case VehicleFloatParamId.AngularDeflectionEfficiency:
-                            m_AngularDeflectionEfficiency = value;
-                            break;
+                    case VehicleFloatParamId.AngularDeflectionEfficiency:
+                        m_AngularDeflectionEfficiency = value;
+                        break;
 
-                        case VehicleFloatParamId.AngularDeflectionTimescale:
-                            m_OneByAngularDeflectionTimescale = 1 / value;
-                            m_AngularDeflectionTimescale = value;
-                            break;
+                    case VehicleFloatParamId.AngularDeflectionTimescale:
+                        m_AngularDeflectionTimescale = value.ToTimescale();
+                        break;
 
-                        case VehicleFloatParamId.LinearDeflectionEfficiency:
-                            m_LinearDeflectionEfficiency = value.Clamp(0f, 1f);
-                            break;
+                    case VehicleFloatParamId.LinearDeflectionEfficiency:
+                        m_LinearDeflectionEfficiency = value.Clamp(0f, 1f);
+                        break;
 
-                        case VehicleFloatParamId.LinearDeflectionTimescale:
-                            if (value > double.Epsilon)
-                            {
-                                m_OneByLinearDeflectionTimescale = 1 / value;
-                                m_LinearDeflectionTimescale = value;
-                            }
-                            break;
+                    case VehicleFloatParamId.LinearDeflectionTimescale:
+                        m_LinearDeflectionTimescale = value.ToTimescale();
+                        break;
 
-                        case VehicleFloatParamId.BankingEfficiency:
-                            m_BankingEfficiency = value.Clamp(-1f, 1f);
-                            break;
+                    case VehicleFloatParamId.BankingEfficiency:
+                        m_BankingEfficiency = value.Clamp(-1f, 1f);
+                        break;
 
-                        case VehicleFloatParamId.BankingMix:
-                            m_BankingMix = value.Clamp(0f, 1f);
-                            break;
+                    case VehicleFloatParamId.BankingMix:
+                        m_BankingMix = value.Clamp(0f, 1f);
+                        break;
 
-                        case VehicleFloatParamId.BankingTimescale:
-                            if (value > double.Epsilon)
-                            {
-                                m_OneByBankingTimescale = 1 / value;
-                                m_BankingTimescale = value;
-                            }
-                            break;
+                    case VehicleFloatParamId.BankingTimescale:
+                        m_BankingTimescale = value.ToTimescale();
+                        break;
 
-                        case VehicleFloatParamId.Buoyancy:
-                            m_Buoyancy = value.Clamp(-1f, 1f);
-                            break;
+                    case VehicleFloatParamId.Buoyancy:
+                        m_Buoyancy = value.Clamp(-1f, 1f);
+                        break;
 
-                        case VehicleFloatParamId.HoverHeight:
-                            m_HoverHeight = value;
-                            break;
+                    case VehicleFloatParamId.HoverHeight:
+                        m_HoverHeight = value;
+                        break;
 
-                        case VehicleFloatParamId.HoverEfficiency:
-                            m_HoverEfficiency = value.Clamp(0f, 1f);
-                            break;
+                    case VehicleFloatParamId.HoverEfficiency:
+                        m_HoverEfficiency = value.Clamp(0f, 1f);
+                        break;
 
-                        case VehicleFloatParamId.HoverTimescale:
-                            if (value > double.Epsilon)
-                            {
-                                m_OneByHoverTimescale = 1 / value;
-                                m_HoverTimescale = value;
-                            }
-                            break;
+                    case VehicleFloatParamId.HoverTimescale:
+                        m_HoverTimescale = value.ToTimescale();
+                        break;
 
-                        case VehicleFloatParamId.VerticalAttractionEfficiency:
-                            m_VerticalAttractionEfficiency = value.Clamp(0f, 1f);
-                            break;
+                    case VehicleFloatParamId.VerticalAttractionEfficiency:
+                        m_VerticalAttractionEfficiency = value.Clamp(0f, 1f);
+                        break;
 
-                        case VehicleFloatParamId.VerticalAttractionTimescale:
-                            if (value > double.Epsilon)
-                            {
-                                m_OneByVerticalAttractionTimescale = 1 / value;
-                                m_VerticalAttractionTimescale = value;
-                            }
-                            break;
+                    case VehicleFloatParamId.VerticalAttractionTimescale:
+                        m_VerticalAttractionTimescale = value.ToTimescale();
+                        break;
 
-                        case VehicleFloatParamId.MouselookAzimuth:
-                            m_MouselookAzimuth = value;
-                            break;
+                    case VehicleFloatParamId.MouselookAzimuth:
+                        m_MouselookAzimuth = value;
+                        break;
 
-                        case VehicleFloatParamId.MouselookAltitude:
-                            m_MouselookAltitude = value;
-                            break;
+                    case VehicleFloatParamId.MouselookAltitude:
+                        m_MouselookAltitude = value;
+                        break;
 
-                        case VehicleFloatParamId.BankingAzimuth:
-                            m_BankingAzimuth = value;
-                            break;
+                    case VehicleFloatParamId.BankingAzimuth:
+                        m_BankingAzimuth = value;
+                        break;
 
-                        case VehicleFloatParamId.DisableMotorsAbove:
-                            m_DisableMotorsAbove = value;
-                            break;
+                    case VehicleFloatParamId.DisableMotorsAbove:
+                        m_DisableMotorsAbove = value;
+                        break;
 
-                        case VehicleFloatParamId.DisableMotorsAfter:
-                            m_DisableMotorsAfter = value;
-                            break;
+                    case VehicleFloatParamId.DisableMotorsAfter:
+                        m_DisableMotorsAfter = value;
+                        break;
 
-                        case VehicleFloatParamId.InvertedBankingModifier:
-                            m_InvertedBankingModifier = value;
-                            break;
+                    case VehicleFloatParamId.InvertedBankingModifier:
+                        m_InvertedBankingModifier = value;
+                        break;
 
-                        default:
-                            throw new KeyNotFoundException();
-                    }
+                    default:
+                        throw new KeyNotFoundException();
                 }
             }
         }

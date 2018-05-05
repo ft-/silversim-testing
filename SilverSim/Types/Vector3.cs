@@ -252,9 +252,20 @@ namespace SilverSim.Types
                 Math.Min(Y, b.Y),
                 Math.Min(Z, b.Z));
 
-        public Vector3 ComponentMax(Vector3 b) => new Vector3(Math.Max(X, b.X),
+        public Vector3 ComponentMin(double b) => new Vector3(
+                Math.Min(X, b),
+                Math.Min(Y, b),
+                Math.Min(Z, b));
+
+        public Vector3 ComponentMax(Vector3 b) => new Vector3(
+                Math.Max(X, b.X),
                 Math.Max(Y, b.Y),
                 Math.Max(Z, b.Z));
+
+        public Vector3 ComponentMax(double b) => new Vector3(
+                Math.Max(X, b),
+                Math.Max(Y, b),
+                Math.Max(Z, b));
 
         /// <summary>
         /// Get a formatted string representation of the vector

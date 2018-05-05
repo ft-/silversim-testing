@@ -208,7 +208,7 @@ namespace SilverSim.Scene.Physics.Common
             if (vehicleParams.VehicleType != VehicleType.None)
             {
                 m_Vehicle.Process(dt, m_StateData, grp.Scene, Mass, m_Part.PhysicsGravityMultiplier * CombinedGravityAccelerationConstant);
-                forces.Add(new PositionalForce("LinearForce", m_Vehicle.LinearForce, Vector3.Zero));
+                forces.Add(new PositionalForce("VehicleLinearForce", m_Vehicle.LinearForce, Vector3.Zero));
                 vehicleTorque = m_Vehicle.AngularTorque;
             }
 

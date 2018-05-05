@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Threading;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -233,5 +234,12 @@ namespace SilverSim.Types
             }
             return finalData;
         }
+
+        #region ReferenceBoxed<Vector3>
+        public static Vector3 ElementDivide(this ReferenceBoxed<Vector3> boxed, Vector3 value)
+        {
+            return ((Vector3)boxed).ElementDivide(value);
+        }
+        #endregion
     }
 }
