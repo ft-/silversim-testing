@@ -58,19 +58,19 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
     {
         private VehicleType m_VehicleType;
 
-        private ReferenceBoxed<Quaternion> m_ReferenceFrame;
+        private ReferenceBoxed<Quaternion> m_ReferenceFrame = Quaternion.Identity;
 
         private TimescaleData<Vector3> m_AngularFrictionTimescale = TimescaleData<Vector3>.Create(Vector3.Zero);
         public Vector3 OneByAngularFrictionTimescale => m_AngularFrictionTimescale.OneByTimescale;
 
-        private ReferenceBoxed<Vector3> m_AngularMotorDirection;
+        private ReferenceBoxed<Vector3> m_AngularMotorDirection = Vector3.Zero;
         private TimescaleData<Vector3> m_LinearFrictionTimescale = TimescaleData<Vector3>.Create(Vector3.Zero);
         public Vector3 OneByLinearFrictionTimescale => m_LinearFrictionTimescale.OneByTimescale;
 
-        private ReferenceBoxed<Vector3> m_LinearMotorDirection;
-        private ReferenceBoxed<Vector3> m_LinearMotorOffset;
+        private ReferenceBoxed<Vector3> m_LinearMotorDirection = Vector3.Zero;
+        private ReferenceBoxed<Vector3> m_LinearMotorOffset = Vector3.Zero;
 
-        private ReferenceBoxed<double> m_AngularDeflectionEfficiency;
+        private ReferenceBoxed<double> m_AngularDeflectionEfficiency = 0;
         private TimescaleData<double> m_AngularDeflectionTimescale = 0.0.ToTimescale();
         public double OneByAngularDeflectionTimescale => m_AngularDeflectionTimescale.OneByTimescale;
 
@@ -80,18 +80,18 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
         private TimescaleData<Vector3> m_AngularMotorTimescale = Vector3.Zero.ToTimescale();
         public Vector3 OneByAngularMotorTimescale => m_AngularMotorTimescale.OneByTimescale;
 
-        private ReferenceBoxed<double> m_BankingEfficiency;
-        private ReferenceBoxed<double> m_BankingMix;
+        private ReferenceBoxed<double> m_BankingEfficiency = 0;
+        private ReferenceBoxed<double> m_BankingMix = 0;
         private TimescaleData<double> m_BankingTimescale = TimescaleData<double>.Create(0);
         public double OneByBankingTimescale => m_BankingTimescale.OneByTimescale;
 
-        private ReferenceBoxed<double> m_Buoyancy;
-        private ReferenceBoxed<double> m_HoverHeight;
-        private ReferenceBoxed<double> m_HoverEfficiency;
+        private ReferenceBoxed<double> m_Buoyancy = 0;
+        private ReferenceBoxed<double> m_HoverHeight = 0;
+        private ReferenceBoxed<double> m_HoverEfficiency = 0;
         private TimescaleData<double> m_HoverTimescale = 0.0.ToTimescale();
         public double OneByHoverTimescale => m_HoverTimescale.OneByTimescale;
 
-        private ReferenceBoxed<double> m_LinearDeflectionEfficiency;
+        private ReferenceBoxed<double> m_LinearDeflectionEfficiency = 0;
         private TimescaleData<double> m_LinearDeflectionTimescale = 0.0.ToTimescale();
         public double OneByLinearDeflectionTimescale => m_LinearDeflectionTimescale.OneByTimescale;
 
@@ -101,21 +101,21 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
         private TimescaleData<Vector3> m_LinearMotorTimescale = Vector3.Zero.ToTimescale();
         public Vector3 OneByLinearMotorTimescale => m_LinearMotorTimescale.OneByTimescale;
 
-        private ReferenceBoxed<double> m_VerticalAttractionEfficiency;
+        private ReferenceBoxed<double> m_VerticalAttractionEfficiency = 0;
         private TimescaleData<double> m_VerticalAttractionTimescale = 0.0.ToTimescale();
         public double OneByVerticalAttractionTimescale => m_VerticalAttractionTimescale.OneByTimescale;
 
         private int m_FlagsStore;
 
-        private ReferenceBoxed<Vector3> m_LinearWindEfficiency;
-        private ReferenceBoxed<Vector3> m_AngularWindEfficiency;
+        private ReferenceBoxed<Vector3> m_LinearWindEfficiency = Vector3.Zero;
+        private ReferenceBoxed<Vector3> m_AngularWindEfficiency = Vector3.Zero;
 
-        private ReferenceBoxed<double> m_MouselookAzimuth;
-        private ReferenceBoxed<double> m_MouselookAltitude;
-        private ReferenceBoxed<double> m_BankingAzimuth;
-        private ReferenceBoxed<double> m_DisableMotorsAbove;
-        private ReferenceBoxed<double> m_DisableMotorsAfter;
-        private ReferenceBoxed<double> m_InvertedBankingModifier;
+        private ReferenceBoxed<double> m_MouselookAzimuth = 0;
+        private ReferenceBoxed<double> m_MouselookAltitude = 0;
+        private ReferenceBoxed<double> m_BankingAzimuth = 0;
+        private ReferenceBoxed<double> m_DisableMotorsAbove = 0;
+        private ReferenceBoxed<double> m_DisableMotorsAfter = 0;
+        private ReferenceBoxed<double> m_InvertedBankingModifier = 0;
 
         public void DecayDirections(double dt)
         {
