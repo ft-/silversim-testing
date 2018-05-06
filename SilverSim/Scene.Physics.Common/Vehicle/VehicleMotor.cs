@@ -115,18 +115,26 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             #region Hover Height Influence Calculation
             double hoverForce;
             Vector3 pos = currentState.Position;
+            double paramHoverHeight = m_Params[VehicleFloatParamId.HoverHeight];
             double hoverHeight = scene.Terrain[pos];
             double waterHeight = scene.RegionSettings.WaterHeight;
 
-            if((flags & VehicleFlags.HoverGlobalHeight) != 0)
+            if ((flags & VehicleFlags.HoverGlobalHeight) != 0)
             {
-                hoverHeight = m_Params[VehicleFloatParamId.HoverHeight];
+                hoverHeight = paramHoverHeight;
             }
-            else if((flags & VehicleFlags.HoverWaterOnly) != 0 ||
-                ((flags & VehicleFlags.HoverTerrainOnly) == 0 &&
-                hoverHeight < waterHeight))
+            else
             {
-                hoverHeight = waterHeight;
+                paramHoverHeight = Math.Min(100, paramHoverHeight);
+                hoverHeight += paramHoverHeight;
+                double waterHoverHeight = waterHeight + paramHoverHeight;
+
+                if ((flags & VehicleFlags.HoverWaterOnly) != 0 ||
+                    ((flags & VehicleFlags.HoverTerrainOnly) == 0 &&
+                    hoverHeight < waterHoverHeight))
+                {
+                    hoverHeight = waterHoverHeight;
+                }
             }
 
             if (Math.Abs(hoverHeight) > double.Epsilon && m_Params.IsHoverMotorEnabled)
