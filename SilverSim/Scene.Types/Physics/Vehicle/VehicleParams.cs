@@ -119,8 +119,10 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
 
         public void DecayDirections(double dt)
         {
-            m_AngularMotorDirection -= m_AngularMotorDirection.ElementMultiply(m_AngularMotorDecayTimescale.OneByTimescale * dt);
-            m_LinearMotorDirection -= m_LinearMotorDirection.ElementMultiply(m_LinearMotorDecayTimescale.OneByTimescale * dt);
+            Vector3 angularMotorDirection = m_AngularMotorDirection;
+            Vector3 linearMotorDirection = m_LinearMotorDirection;
+            m_AngularMotorDirection = angularMotorDirection - angularMotorDirection.ElementMultiply(m_AngularMotorDecayTimescale.OneByTimescale * dt);
+            m_LinearMotorDirection = linearMotorDirection - linearMotorDirection.ElementMultiply(m_LinearMotorDecayTimescale.OneByTimescale * dt);
         }
 
         public bool IsHoverMotorEnabled => m_HoverTimescale.Timescale < 300;

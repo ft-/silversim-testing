@@ -122,6 +122,10 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             if ((flags & VehicleFlags.HoverGlobalHeight) != 0)
             {
                 hoverHeight = paramHoverHeight;
+                if(hoverHeight < waterHeight)
+                {
+                    hoverHeight = waterHeight;
+                }
             }
             else
             {
@@ -142,7 +146,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
                 /* The definition does not include negative hover height.
                  * But since we are allowing negative terain height, it makes an useful feature.
                  */
-                hoverForce = (hoverHeight - pos.Z) * m_Params[VehicleFloatParamId.HoverEfficiency] * m_Params.OneByHoverTimescale * dt;
+                hoverForce = (hoverHeight + 0.21728 - pos.Z) * m_Params[VehicleFloatParamId.HoverEfficiency] * m_Params.OneByHoverTimescale * dt;
                 if ((m_Params.Flags & VehicleFlags.HoverUpOnly) != 0 && hoverForce < 0)
                 {
                     hoverForce = 0;
@@ -185,14 +189,17 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             /* vertical attractor is a angular motor 
             VEHICLE_FLAG_LIMIT_ROLL_ONLY affects this one to be only affected on roll axis
             */
-            Vector3 angularPos = angularOrientaton.GetEulerAngles();
-            Vector3 vertAttractorTorque = angularPos * m_Params[VehicleFloatParamId.VerticalAttractionEfficiency] * m_Params.OneByVerticalAttractionTimescale * dt;
-            if((flags & VehicleFlags.LimitRollOnly) !=0)
+            if (m_Params[VehicleFloatParamId.VerticalAttractionTimescale] < 300)
             {
-                vertAttractorTorque.Y = 0;
-                vertAttractorTorque.Z = 0;
+                Vector3 angularPos = angularOrientaton.GetEulerAngles();
+                Vector3 vertAttractorTorque = angularPos * m_Params[VehicleFloatParamId.VerticalAttractionEfficiency] * m_Params.OneByVerticalAttractionTimescale * dt;
+                if ((flags & VehicleFlags.LimitRollOnly) != 0)
+                {
+                    vertAttractorTorque.Y = 0;
+                    vertAttractorTorque.Z = 0;
+                }
+                angularTorque += vertAttractorTorque;
             }
-            angularTorque += vertAttractorTorque;
             #endregion
 
             if ((flags & (VehicleFlags.ReactToWind | VehicleFlags.ReactToCurrents)) != 0)
@@ -272,12 +279,15 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             }
 
             #region Banking Motor
-            double invertedBankModifier = 1f;
-            if((Vector3.UnitZ * angularOrientaton).Z < 0)
+            if (m_Params[VehicleFloatParamId.VerticalAttractionTimescale] < 300)
             {
-                invertedBankModifier = m_Params[VehicleFloatParamId.InvertedBankingModifier];
+                double invertedBankModifier = 1f;
+                if ((Vector3.UnitZ * angularOrientaton).Z < 0)
+                {
+                    invertedBankModifier = m_Params[VehicleFloatParamId.InvertedBankingModifier];
+                }
+                angularTorque.Z -= (AngularTorque.X * 1.0.Mix(velocity.X, m_Params[VehicleFloatParamId.BankingMix])) * m_Params[VehicleFloatParamId.BankingEfficiency] * invertedBankModifier * m_Params.OneByBankingTimescale * dt;
             }
-            angularTorque.Z -= (AngularTorque.X * 1.0.Mix(velocity.X, m_Params[VehicleFloatParamId.BankingMix])) * m_Params[VehicleFloatParamId.BankingEfficiency] * invertedBankModifier * m_Params.OneByBankingTimescale * dt;
             #endregion
 
             #region Buoyancy
@@ -287,15 +297,28 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
 
             #region Angular Deflection
             /* Angular deflection reorients the vehicle to the velocity vector */
-            Vector3 deflect = Quaternion.RotBetween(Vector3.UnitX, velocity).AsVector3;
-            angularTorque -= deflect * m_Params[VehicleFloatParamId.AngularDeflectionEfficiency] * m_Params.OneByAngularDeflectionTimescale * dt;
+            Vector3 deflect = velocity * Math.Sign(velocity.X);
+            if(Math.Abs(deflect.X) < 0.01)
+            {
+                deflect.X = 0.01;
+                deflect.Y = velocity.Y;
+                deflect.Z = velocity.Z;
+            }
+            double angdeflecteff = m_Params[VehicleFloatParamId.AngularDeflectionEfficiency] * m_Params.OneByAngularDeflectionTimescale * dt;
+            if(Math.Abs(deflect.Z) > 0.01)
+            {
+                angularTorque.Y -= Math.Atan2(deflect.Z, deflect.X) * angdeflecteff;
+            }
+            if(Math.Abs(deflect.Y) > 0.01)
+            {
+                angularTorque.Z += Math.Atan2(deflect.Y, deflect.X) * angdeflecteff;
+            }
             #endregion
 
             #region Linear Deflection
             /* Linear deflection deflects the affecting force along the reference x-axis */
-            Vector3 naturalVelocity = velocity;
             Vector3 linearDeflect;
-            naturalVelocity = (naturalVelocity.X < 0 ? -Vector3.UnitX : Vector3.UnitX) * naturalVelocity.Length;
+            Vector3 naturalVelocity = Vector3.UnitX * velocity.Length;
             linearDeflect = (naturalVelocity - velocity) * m_Params[VehicleFloatParamId.LinearDeflectionEfficiency] * m_Params.OneByLinearDeflectionTimescale * dt;
 
             if((flags & VehicleFlags.NoDeflectionUp) != 0 && linearDeflect.Z >= 0)
