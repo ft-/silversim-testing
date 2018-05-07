@@ -304,7 +304,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
                 deflect.Y = velocity.Y;
                 deflect.Z = velocity.Z;
             }
-            double angdeflecteff = m_Params[VehicleFloatParamId.AngularDeflectionEfficiency] * m_Params.OneByAngularDeflectionTimescale * dt;
+            double angdeflecteff = Math.Min(m_Params[VehicleFloatParamId.AngularDeflectionEfficiency] * m_Params.OneByAngularDeflectionTimescale * dt, 1);
             if(Math.Abs(deflect.Z) > 0.01)
             {
                 angularTorque.Y -= Math.Atan2(deflect.Z, deflect.X) * angdeflecteff;
@@ -317,15 +317,19 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
 
             #region Linear Deflection
             /* Linear deflection deflects the affecting force along the reference x-axis */
-            Vector3 linearDeflect = velocity;
-            if((flags & VehicleFlags.NoDeflectionUp) != 0)
+            var eulerDiff = new Vector3
             {
-                linearDeflect.Z = 0;
+                Z = -Math.Atan2(velocity.Y, velocity.X)
+            };
+            if ((flags & VehicleFlags.NoDeflectionUp) != 0)
+            {
+                eulerDiff.Y = -Math.Atan2(velocity.Z, velocity.X);
             }
-            Vector3 naturalVelocity = Vector3.UnitX * linearDeflect.Length * Math.Sign(linearDeflect.X);
-            linearDeflect = (linearDeflect - velocity) * m_Params[VehicleFloatParamId.LinearDeflectionEfficiency] * m_Params.OneByLinearDeflectionTimescale * dt;
-            linearForce += linearDeflect;
-            #endregion  
+
+            eulerDiff *= Math.Min(m_Params[VehicleFloatParamId.LinearDeflectionEfficiency] * m_Params.OneByLinearDeflectionTimescale * dt, 1);
+
+            linearForce += velocity * Quaternion.CreateFromEulers(eulerDiff) - velocity;
+            #endregion
 
             #region Motor Decay
             m_Params.DecayDirections(dt);
