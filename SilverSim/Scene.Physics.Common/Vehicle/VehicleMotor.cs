@@ -317,14 +317,13 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
 
             #region Linear Deflection
             /* Linear deflection deflects the affecting force along the reference x-axis */
-            Vector3 linearDeflect;
-            Vector3 naturalVelocity = Vector3.UnitX * velocity.Length;
-            linearDeflect = (naturalVelocity - velocity) * m_Params[VehicleFloatParamId.LinearDeflectionEfficiency] * m_Params.OneByLinearDeflectionTimescale * dt;
-
-            if((flags & VehicleFlags.NoDeflectionUp) != 0 && linearDeflect.Z >= 0)
+            Vector3 linearDeflect = velocity;
+            if((flags & VehicleFlags.NoDeflectionUp) != 0)
             {
                 linearDeflect.Z = 0;
             }
+            Vector3 naturalVelocity = Vector3.UnitX * linearDeflect.Length * Math.Sign(linearDeflect.X);
+            linearDeflect = (linearDeflect - velocity) * m_Params[VehicleFloatParamId.LinearDeflectionEfficiency] * m_Params.OneByLinearDeflectionTimescale * dt;
             linearForce += linearDeflect;
             #endregion  
 
