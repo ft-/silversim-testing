@@ -312,6 +312,7 @@ namespace SilverSim.Scene.Types.Object
 
         public ObjectPart(UUID id)
         {
+            VehicleParams = new VehicleParams(this);
             m_DefaultLocalization = new ObjectPartLocalizedInfo(this);
             m_Permissions.Base = InventoryPermissionsMask.All;
             m_Permissions.Current = InventoryPermissionsMask.All;
@@ -408,7 +409,7 @@ namespace SilverSim.Scene.Types.Object
             TouchText = fromPart.TouchText;
             VehicleType = fromPart.VehicleType;
             VehicleFlags = fromPart.VehicleFlags;
-            VehicleParams = fromPart.VehicleParams;
+            VehicleParams = new VehicleParams(this, fromPart.VehicleParams);
             WalkableCoefficientA = fromPart.WalkableCoefficientA;
             WalkableCoefficientAvatar = fromPart.WalkableCoefficientAvatar;
             WalkableCoefficientB = fromPart.WalkableCoefficientB;

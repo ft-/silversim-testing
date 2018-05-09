@@ -66,6 +66,44 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
             m_Part = part;
         }
 
+        public VehicleParams(ObjectPart part, VehicleParams src)
+        {
+            m_Part = part;
+            m_VehicleType = src.m_VehicleType;
+            m_ReferenceFrame = src.m_ReferenceFrame;
+            m_AngularFrictionTimescale = src.m_AngularFrictionTimescale.Timescale.ToTimescale();
+            m_AngularMotorDirection = src.m_AngularMotorDirection;
+            m_LinearFrictionTimescale = src.m_LinearFrictionTimescale.Timescale.ToTimescale();
+            m_LinearMotorDirection = src.m_LinearMotorDirection;
+            m_LinearMotorOffset = src.m_LinearMotorOffset;
+            m_AngularDeflectionEfficiency = src.m_AngularDeflectionEfficiency;
+            m_AngularDeflectionTimescale = src.m_AngularDeflectionTimescale.Timescale.ToTimescale();
+            m_AngularMotorDecayTimescale = src.m_AngularMotorDecayTimescale.Timescale.ToTimescale();
+            m_AngularMotorTimescale = src.m_AngularMotorTimescale.Timescale.ToTimescale();
+            m_BankingEfficiency = src.m_BankingEfficiency;
+            m_BankingMix = src.m_BankingMix;
+            m_BankingTimescale = src.m_BankingTimescale.Timescale.ToTimescale();
+            m_Buoyancy = src.m_Buoyancy;
+            m_HoverHeight = src.m_HoverHeight;
+            m_HoverEfficiency = src.m_HoverEfficiency;
+            m_HoverTimescale = src.m_HoverTimescale.Timescale.ToTimescale();
+            m_LinearDeflectionEfficiency = src.m_LinearDeflectionEfficiency;
+            m_LinearDeflectionTimescale = src.m_LinearDeflectionTimescale.Timescale.ToTimescale();
+            m_LinearMotorDecayTimescale = src.m_LinearMotorDecayTimescale.Timescale.ToTimescale();
+            m_LinearMotorTimescale = src.m_LinearMotorTimescale.Timescale.ToTimescale();
+            m_VerticalAttractionEfficiency = src.m_VerticalAttractionEfficiency;
+            m_VerticalAttractionTimescale = src.m_VerticalAttractionTimescale.Timescale.ToTimescale();
+            m_FlagsStore = src.m_FlagsStore;
+            m_LinearWindEfficiency = src.m_LinearWindEfficiency;
+            m_AngularWindEfficiency = src.m_AngularWindEfficiency;
+            m_MouselookAzimuth = src.m_MouselookAzimuth;
+            m_MouselookAltitude = src.m_MouselookAltitude;
+            m_BankingAzimuth = src.m_BankingAzimuth;
+            m_DisableMotorsAbove = src.m_DisableMotorsAbove;
+            m_DisableMotorsAfter = src.m_DisableMotorsAfter;
+            m_InvertedBankingModifier = src.m_InvertedBankingModifier;
+        }
+
         private VehicleType m_VehicleType;
 
         private ReferenceBoxed<Quaternion> m_ReferenceFrame = Quaternion.Identity;
