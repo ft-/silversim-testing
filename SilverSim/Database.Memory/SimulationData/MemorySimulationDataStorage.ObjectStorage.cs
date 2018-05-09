@@ -22,6 +22,7 @@
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Object.Parameters;
+using SilverSim.Scene.Types.Physics.Vehicle;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
@@ -227,7 +228,7 @@ namespace SilverSim.Database.Memory.SimulationData
             objpart.UnSitTargetOrientation = map["UnSitTargetOrientation"].AsQuaternion;
 
             objpart.LocalizationSerialization = (BinaryData)map["LocalizationData"];
-
+            objpart.LoadFromVehicleSerialization((BinaryData)map["VehicleData"]);
             return objpart;
         }
 

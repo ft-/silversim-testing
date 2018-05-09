@@ -21,8 +21,10 @@
 
 using SilverSim.Threading;
 using SilverSim.Types;
+using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 
 namespace SilverSim.Scene.Types.Physics.Vehicle
@@ -102,7 +104,7 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
         public Vector3 OneByLinearMotorTimescale => m_LinearMotorTimescale.OneByTimescale;
 
         private ReferenceBoxed<double> m_VerticalAttractionEfficiency = 0;
-        private TimescaleData<double> m_VerticalAttractionTimescale = 0.0.ToTimescale();
+        private TimescaleData<double> m_VerticalAttractionTimescale = 1000.0.ToTimescale();
         public double OneByVerticalAttractionTimescale => m_VerticalAttractionTimescale.OneByTimescale;
 
         private int m_FlagsStore;
@@ -724,6 +726,52 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                     default:
                         throw new KeyNotFoundException();
                 }
+            }
+        }
+
+        public byte[] ToSerialization()
+        {
+            Map m = new Map
+            {
+                { "Type", (int)m_VehicleType },
+                { "Flags", m_FlagsStore },
+                { "ReferenceFrame", (Quaternion)m_ReferenceFrame },
+                { "AngularFrictionTimescale", m_AngularFrictionTimescale.Timescale },
+                { "AngularMotorDirection", (Vector3)m_AngularMotorDirection },
+                { "LinearFrictionTimescale", m_LinearFrictionTimescale.Timescale },
+                { "LinearMotorDirection", (Vector3)m_LinearMotorDirection },
+                { "LinearMotorOffset", (Vector3)m_LinearMotorOffset },
+                { "AngularDeflectionEfficiency", m_AngularDeflectionEfficiency },
+                { "AngularDeflectionTimescale", m_AngularDeflectionTimescale.Timescale },
+                { "AngularMotorDecayTimescale", m_AngularMotorDecayTimescale.Timescale },
+                { "AngularMotorTimescale", m_AngularMotorTimescale.Timescale },
+                { "BankingEfficiency", m_BankingEfficiency },
+                { "BankingMix", m_BankingMix },
+                { "BankingTimescale", m_BankingTimescale.Timescale },
+                { "Buoyancy", m_Buoyancy },
+                { "HoverHeight", m_HoverHeight },
+                { "HoverEfficiency", m_HoverEfficiency },
+                { "HoverTimescale", m_HoverTimescale.Timescale },
+                { "LinearDeflectionEfficiency", m_LinearDeflectionEfficiency },
+                { "LinearDeflectionTimescale", m_LinearDeflectionTimescale.Timescale },
+                { "LinearMotorDecayTimescale", m_LinearMotorDecayTimescale.Timescale },
+                { "LinearMotorTimescale", m_LinearMotorTimescale.Timescale },
+                { "VerticalAttractionEfficiency", m_VerticalAttractionEfficiency },
+                { "VerticalAttractionTimescale", m_VerticalAttractionTimescale.Timescale },
+                { "LinearWindEfficiency", (Vector3)m_LinearWindEfficiency },
+                { "AngularWindEfficiency", (Vector3)m_AngularWindEfficiency },
+                { "MouselookAzimuth", m_MouselookAzimuth },
+                { "MouselookAltitude", m_MouselookAltitude },
+                { "BankingAzimuth", m_BankingAzimuth },
+                { "DisableMotorsAbove", m_DisableMotorsAbove },
+                { "DisableMotorsAfter", m_DisableMotorsAfter },
+                { "InvertedBankingModifier", m_InvertedBankingModifier }
+            };
+
+            using (var ms = new MemoryStream())
+            {
+                LlsdBinary.Serialize(m, ms);
+                return ms.ToArray();
             }
         }
     }
