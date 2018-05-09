@@ -182,7 +182,7 @@ namespace SilverSim.Scene.Types.Object
         private bool m_IsRotateYEnabled = true;
         private bool m_IsRotateZEnabled = true;
 
-        public readonly VehicleParams VehicleParams = new VehicleParams();
+        public readonly VehicleParams VehicleParams;
 
         #endregion
 

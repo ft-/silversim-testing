@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Scene.Types.Object;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.StructuredData.Llsd;
@@ -58,6 +59,13 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
 
     public sealed class VehicleParams
     {
+        private readonly ObjectPart m_Part;
+
+        public VehicleParams(ObjectPart part)
+        {
+            m_Part = part;
+        }
+
         private VehicleType m_VehicleType;
 
         private ReferenceBoxed<Quaternion> m_ReferenceFrame = Quaternion.Identity;
@@ -415,6 +423,7 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                 }
 
                 m_VehicleType = value;
+                m_Part.IncSerialNumber();
             }
         }
 
@@ -425,6 +434,7 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
             set
             {
                 m_FlagsStore = (int)value;
+                m_Part.IncSerialNumber();
             }
         }
 
@@ -438,6 +448,7 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                 newFlagsStore = oldFlagsStore | setflags;
                 oldFlagsStore = Interlocked.CompareExchange(ref m_FlagsStore, newFlagsStore, oldFlagsStore) | setflags;
             } while (newFlagsStore != oldFlagsStore);
+            m_Part.IncSerialNumber();
         }
 
         public void ClearFlags(VehicleFlags value)
@@ -450,6 +461,7 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                 newFlagsStore = oldFlagsStore & ~clrflags;
                 oldFlagsStore = Interlocked.CompareExchange(ref m_FlagsStore, newFlagsStore, oldFlagsStore) & ~clrflags;
             } while (newFlagsStore != oldFlagsStore);
+            m_Part.IncSerialNumber();
         }
 
         public Quaternion this[VehicleRotationParamId id]
@@ -471,6 +483,7 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                 {
                     case VehicleRotationParamId.ReferenceFrame:
                         m_ReferenceFrame = value;
+                        m_Part.IncSerialNumber();
                         break;
 
                     default:
@@ -528,46 +541,57 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                 {
                     case VehicleVectorParamId.AngularFrictionTimescale:
                         m_AngularFrictionTimescale = value.ToTimescale();
+                        m_Part.IncSerialNumber();
                         break;
 
                     case VehicleVectorParamId.AngularMotorDirection:
                         m_AngularMotorDirection = value;
+                        m_Part.IncSerialNumber();
                         break;
 
                     case VehicleVectorParamId.LinearFrictionTimescale:
                         m_LinearFrictionTimescale = value.ToTimescale();
+                        m_Part.IncSerialNumber();
                         break;
 
                     case VehicleVectorParamId.LinearMotorDirection:
                         m_LinearMotorDirection = value;
+                        m_Part.IncSerialNumber();
                         break;
 
                     case VehicleVectorParamId.LinearMotorOffset:
                         m_LinearMotorOffset = value;
+                        m_Part.IncSerialNumber();
                         break;
 
                     case VehicleVectorParamId.AngularMotorDecayTimescale:
                         m_AngularMotorDecayTimescale = value.ComponentMin(120).ToTimescale();
+                        m_Part.IncSerialNumber();
                         break;
 
                     case VehicleVectorParamId.AngularMotorTimescale:
                         m_AngularMotorTimescale = value.ToTimescale();
+                        m_Part.IncSerialNumber();
                         break;
 
                     case VehicleVectorParamId.LinearMotorDecayTimescale:
                         m_LinearMotorDecayTimescale = value.ComponentMin(120).ToTimescale();
+                        m_Part.IncSerialNumber();
                         break;
 
                     case VehicleVectorParamId.LinearMotorTimescale:
                         m_LinearMotorTimescale = value.ToTimescale();
+                        m_Part.IncSerialNumber();
                         break;
 
                     case VehicleVectorParamId.AngularWindEfficiency:
                         m_AngularWindEfficiency = value;
+                        m_Part.IncSerialNumber();
                         break;
 
                     case VehicleVectorParamId.LinearWindEfficiency:
                         m_LinearWindEfficiency = value;
+                        m_Part.IncSerialNumber();
                         break;
 
                     default:
@@ -649,78 +673,97 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                 {
                     case VehicleFloatParamId.AngularDeflectionEfficiency:
                         m_AngularDeflectionEfficiency = value.Clamp(0, 1);
+                        m_Part.IncSerialNumber();
                         break;
 
                     case VehicleFloatParamId.AngularDeflectionTimescale:
                         m_AngularDeflectionTimescale = value.ToTimescale();
+                        m_Part.IncSerialNumber();
                         break;
 
                     case VehicleFloatParamId.LinearDeflectionEfficiency:
                         m_LinearDeflectionEfficiency = value.Clamp(0, 1);
+                        m_Part.IncSerialNumber();
                         break;
 
                     case VehicleFloatParamId.LinearDeflectionTimescale:
                         m_LinearDeflectionTimescale = value.ToTimescale();
+                        m_Part.IncSerialNumber();
                         break;
 
                     case VehicleFloatParamId.BankingEfficiency:
                         m_BankingEfficiency = value.Clamp(-1f, 1f);
+                        m_Part.IncSerialNumber();
                         break;
 
                     case VehicleFloatParamId.BankingMix:
                         m_BankingMix = value.Clamp(0f, 1f);
+                        m_Part.IncSerialNumber();
                         break;
 
                     case VehicleFloatParamId.BankingTimescale:
                         m_BankingTimescale = value.ToTimescale();
+                        m_Part.IncSerialNumber();
                         break;
 
                     case VehicleFloatParamId.Buoyancy:
                         m_Buoyancy = value.Clamp(-1f, 1f);
+                        m_Part.IncSerialNumber();
                         break;
 
                     case VehicleFloatParamId.HoverHeight:
                         m_HoverHeight = value;
+                        m_Part.IncSerialNumber();
                         break;
 
                     case VehicleFloatParamId.HoverEfficiency:
                         m_HoverEfficiency = value.Clamp(0f, 1f);
+                        m_Part.IncSerialNumber();
                         break;
 
                     case VehicleFloatParamId.HoverTimescale:
                         m_HoverTimescale = value.ToTimescale();
+                        m_Part.IncSerialNumber();
                         break;
 
                     case VehicleFloatParamId.VerticalAttractionEfficiency:
                         m_VerticalAttractionEfficiency = value.Clamp(0f, 1f);
+                        m_Part.IncSerialNumber();
                         break;
 
                     case VehicleFloatParamId.VerticalAttractionTimescale:
                         m_VerticalAttractionTimescale = value.ToTimescale();
+                        m_Part.IncSerialNumber();
                         break;
 
                     case VehicleFloatParamId.MouselookAzimuth:
                         m_MouselookAzimuth = value;
+                        m_Part.IncSerialNumber();
                         break;
 
                     case VehicleFloatParamId.MouselookAltitude:
                         m_MouselookAltitude = value;
+                        m_Part.IncSerialNumber();
                         break;
 
                     case VehicleFloatParamId.BankingAzimuth:
                         m_BankingAzimuth = value;
+                        m_Part.IncSerialNumber();
                         break;
 
                     case VehicleFloatParamId.DisableMotorsAbove:
                         m_DisableMotorsAbove = value;
+                        m_Part.IncSerialNumber();
                         break;
 
                     case VehicleFloatParamId.DisableMotorsAfter:
                         m_DisableMotorsAfter = value;
+                        m_Part.IncSerialNumber();
                         break;
 
                     case VehicleFloatParamId.InvertedBankingModifier:
                         m_InvertedBankingModifier = value;
+                        m_Part.IncSerialNumber();
                         break;
 
                     default:

@@ -21,6 +21,7 @@
 
 using log4net;
 using SilverSim.Scene.Types.Object.Localization;
+using SilverSim.Scene.Types.Physics.Vehicle;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Scene.Types.Script.Events;
@@ -292,6 +293,7 @@ namespace SilverSim.Scene.Types.Object
         #region Constructor
         public ObjectPart()
         {
+            VehicleParams = new VehicleParams(this);
             m_DefaultLocalization = new ObjectPartLocalizedInfo(this);
             m_Permissions.Base = InventoryPermissionsMask.All;
             m_Permissions.Current = InventoryPermissionsMask.All;
