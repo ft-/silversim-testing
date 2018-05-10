@@ -189,25 +189,26 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             /* vertical attractor is a angular motor 
             VEHICLE_FLAG_LIMIT_ROLL_ONLY affects this one to be only affected on roll axis
             */
-            if (m_Params[VehicleFloatParamId.VerticalAttractionTimescale] < 300)
+            Vector3 vaTimescale = m_Params[VehicleVectorParamId.AngularDeflectionTimescale];
+            if (vaTimescale.X < 300 || vaTimescale.Y < 300)
             {
                 Vector3 forwardDirection = Vector3.UnitZ * angularOrientaton;
                 double roll = Math.Atan2(forwardDirection.Y, forwardDirection.Z);
                 double pitch =  Math.Atan2(forwardDirection.X, forwardDirection.Z);
                 Vector3 angularError = new Vector3(roll, pitch, 0);
-                Vector3 vertAttractorTorque = -angularError * m_Params[VehicleFloatParamId.VerticalAttractionEfficiency] * m_Params.OneByVerticalAttractionTimescale * dt;
-                double rollboundary = Math.Min(Math.Abs(angularError.X), Math.Abs(vertAttractorTorque.X));
-                vertAttractorTorque.X = vertAttractorTorque.X.Clamp(-rollboundary, rollboundary);
-                if ((flags & VehicleFlags.LimitRollOnly) != 0)
+                Vector3 vertAttractorTorque = -angularError.ElementMultiply(m_Params[VehicleVectorParamId.VerticalAttractionEfficiency].ElementMultiply(m_Params.OneByVerticalAttractionTimescale) * dt);
+
+                if (vaTimescale.X < 300)
                 {
-                    vertAttractorTorque.Y = 0;
+                    double rollboundary = Math.Min(Math.Abs(angularError.X), Math.Abs(vertAttractorTorque.X));
+                    angularTorque.X = angularTorque.X + vertAttractorTorque.X.Clamp(-rollboundary, rollboundary);
                 }
-                else
+
+                if ((flags & VehicleFlags.LimitRollOnly) == 0 && vaTimescale.Y < 300)
                 {
                     double pitchboundary = Math.Min(Math.Abs(angularError.Y), Math.Abs(vertAttractorTorque.Y));
-                    vertAttractorTorque.Y = vertAttractorTorque.Y.Clamp(-pitchboundary, pitchboundary);
+                    angularTorque.Y = angularTorque.Y + vertAttractorTorque.Y.Clamp(-pitchboundary, pitchboundary);
                 }
-                angularTorque += vertAttractorTorque;
             }
             #endregion
 
@@ -288,14 +289,14 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             }
 
             #region Banking Motor
-            if (m_Params[VehicleFloatParamId.VerticalAttractionTimescale] < 300)
+            if (m_Params[VehicleVectorParamId.VerticalAttractionTimescale].X < 300)
             {
                 double invertedBankModifier = 1f;
                 if ((Vector3.UnitZ * angularOrientaton).Z < 0)
                 {
                     invertedBankModifier = m_Params[VehicleFloatParamId.InvertedBankingModifier];
                 }
-                angularTorque.Z -= (AngularTorque.X * 1.0.Mix(velocity.X, m_Params[VehicleFloatParamId.BankingMix])) * m_Params[VehicleFloatParamId.BankingEfficiency] * invertedBankModifier * m_Params.OneByBankingTimescale * dt;
+                angularTorque.X -= (AngularTorque.Z * 1.0.Mix(velocity.X, m_Params[VehicleFloatParamId.BankingMix])) * m_Params[VehicleFloatParamId.BankingEfficiency] * invertedBankModifier * m_Params.OneByBankingTimescale * dt;
             }
             #endregion
 
@@ -308,14 +309,14 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
                 deflect.Y = velocity.Y;
                 deflect.Z = velocity.Z;
             }
-            double angdeflecteff = Math.Min(m_Params[VehicleFloatParamId.AngularDeflectionEfficiency] * m_Params.OneByAngularDeflectionTimescale * dt, 1);
+            Vector3 angdeflecteff = (m_Params[VehicleVectorParamId.AngularDeflectionEfficiency].ElementMultiply(m_Params.OneByAngularDeflectionTimescale) * dt).ComponentMin(1);
             if(Math.Abs(deflect.Z) > 0.01)
             {
-                angularTorque.Y -= Math.Atan2(deflect.Z, deflect.X) * angdeflecteff;
+                angularTorque.Y -= Math.Atan2(deflect.Z, deflect.X) * angdeflecteff.Y;
             }
             if(Math.Abs(deflect.Y) > 0.01)
             {
-                angularTorque.Z += Math.Atan2(deflect.Y, deflect.X) * angdeflecteff;
+                angularTorque.Z += Math.Atan2(deflect.Y, deflect.X) * angdeflecteff.Z;
             }
             #endregion
 
@@ -330,7 +331,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
                 eulerDiff.Y = -Math.Atan2(velocity.Z, velocity.X);
             }
 
-            eulerDiff *= Math.Min(m_Params[VehicleFloatParamId.LinearDeflectionEfficiency] * m_Params.OneByLinearDeflectionTimescale * dt, 1);
+            eulerDiff = eulerDiff.ElementMultiply((m_Params[VehicleVectorParamId.LinearDeflectionEfficiency].ElementMultiply(m_Params.OneByLinearDeflectionTimescale) * dt).ComponentMin(1));
 
             linearForce += velocity * Quaternion.CreateFromEulers(eulerDiff) - velocity;
             #endregion

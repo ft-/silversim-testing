@@ -29,12 +29,17 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
         LinearMotorDirection = 18,
         LinearMotorOffset = 20,
 
-        /* enable use of these as vector parameters */
-        LinearMotorDecayTimescale = 31,
+        /* some of these are not vector based but we make them so */
+        LinearDeflectionEfficiency = 28,
+        LinearDeflectionTimescale = 29,
         LinearMotorTimescale = 30,
-
-        AngularMotorDecayTimescale = 35,
+        LinearMotorDecayTimescale = 31,
+        AngularDeflectionEfficiency = 32,
+        AngularDeflectionTimescale = 33,
         AngularMotorTimescale = 34,
+        AngularMotorDecayTimescale = 35,
+        VerticalAttractionEfficiency = 36,
+        VerticalAttractionTimescale = 37,
 
         LinearWindEfficiency = 12001,
         AngularWindEfficiency = 12002,

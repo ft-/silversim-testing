@@ -118,11 +118,11 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
         private ReferenceBoxed<Vector3> m_LinearMotorDirection = Vector3.Zero;
         private ReferenceBoxed<Vector3> m_LinearMotorOffset = Vector3.Zero;
 
-        private ReferenceBoxed<double> m_AngularDeflectionEfficiency = 0;
-        private TimescaleData<double> m_AngularDeflectionTimescale = 0.0.ToTimescale();
-        public double OneByAngularDeflectionTimescale => m_AngularDeflectionTimescale.OneByTimescale;
+        private ReferenceBoxed<Vector3> m_AngularDeflectionEfficiency = Vector3.Zero;
+        private TimescaleData<Vector3> m_AngularDeflectionTimescale = Vector3.One.ToTimescale();
+        public Vector3 OneByAngularDeflectionTimescale => m_AngularDeflectionTimescale.OneByTimescale;
 
-        private TimescaleData<Vector3> m_AngularMotorDecayTimescale = new Vector3(120, 120, 120).ToTimescale();
+        private TimescaleData<Vector3> m_AngularMotorDecayTimescale = new Vector3(120).ToTimescale();
         public Vector3 OneByAngularMotorDecayTimescale => m_AngularMotorDecayTimescale.OneByTimescale;
 
         private TimescaleData<Vector3> m_AngularMotorTimescale = Vector3.Zero.ToTimescale();
@@ -139,19 +139,19 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
         private TimescaleData<double> m_HoverTimescale = 0.0.ToTimescale();
         public double OneByHoverTimescale => m_HoverTimescale.OneByTimescale;
 
-        private ReferenceBoxed<double> m_LinearDeflectionEfficiency = 0;
-        private TimescaleData<double> m_LinearDeflectionTimescale = 0.0.ToTimescale();
-        public double OneByLinearDeflectionTimescale => m_LinearDeflectionTimescale.OneByTimescale;
+        private ReferenceBoxed<Vector3> m_LinearDeflectionEfficiency = Vector3.Zero;
+        private TimescaleData<Vector3> m_LinearDeflectionTimescale = Vector3.One.ToTimescale();
+        public Vector3 OneByLinearDeflectionTimescale => m_LinearDeflectionTimescale.OneByTimescale;
 
-        private TimescaleData<Vector3> m_LinearMotorDecayTimescale = new Vector3(120, 120, 120).ToTimescale();
+        private TimescaleData<Vector3> m_LinearMotorDecayTimescale = new Vector3(120).ToTimescale();
         public Vector3 OneByLinearMotorDecayTimescale => m_LinearMotorDecayTimescale.OneByTimescale;
 
         private TimescaleData<Vector3> m_LinearMotorTimescale = Vector3.Zero.ToTimescale();
         public Vector3 OneByLinearMotorTimescale => m_LinearMotorTimescale.OneByTimescale;
 
-        private ReferenceBoxed<double> m_VerticalAttractionEfficiency = 0;
-        private TimescaleData<double> m_VerticalAttractionTimescale = 1000.0.ToTimescale();
-        public double OneByVerticalAttractionTimescale => m_VerticalAttractionTimescale.OneByTimescale;
+        private ReferenceBoxed<Vector3> m_VerticalAttractionEfficiency = Vector3.Zero;
+        private TimescaleData<Vector3> m_VerticalAttractionTimescale = new Vector3(1000).ToTimescale();
+        public Vector3 OneByVerticalAttractionTimescale => m_VerticalAttractionTimescale.OneByTimescale;
 
         private int m_FlagsStore;
 
@@ -188,23 +188,23 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
 
                     case VehicleType.Sled:
                         m_LinearFrictionTimescale = new Vector3(30, 1, 1000).ToTimescale();
-                        m_AngularFrictionTimescale = new Vector3(1000, 1000, 1000).ToTimescale();
+                        m_AngularFrictionTimescale = new Vector3(1000).ToTimescale();
                         m_LinearMotorDirection = Vector3.Zero;
-                        m_LinearMotorTimescale = new Vector3(1000, 1000, 1000).ToTimescale();
-                        m_LinearMotorDecayTimescale = new Vector3(120, 120, 120).ToTimescale();
+                        m_LinearMotorTimescale = new Vector3(1000).ToTimescale();
+                        m_LinearMotorDecayTimescale = new Vector3(120).ToTimescale();
                         m_AngularMotorDirection = Vector3.Zero;
-                        m_AngularMotorTimescale = new Vector3(1000, 1000, 1000).ToTimescale();
-                        m_AngularMotorDecayTimescale = new Vector3(120, 120, 120).ToTimescale();
+                        m_AngularMotorTimescale = new Vector3(1000).ToTimescale();
+                        m_AngularMotorDecayTimescale = new Vector3(120).ToTimescale();
                         m_HoverHeight = 0;
                         m_HoverEfficiency = 10;
                         m_HoverTimescale = 10.0.ToTimescale();
                         m_Buoyancy = 0;
-                        m_LinearDeflectionEfficiency = 1;
-                        m_LinearDeflectionTimescale = 1.0.ToTimescale();
-                        m_AngularDeflectionEfficiency = 0;
-                        m_AngularDeflectionTimescale = 10.0.ToTimescale();
-                        m_VerticalAttractionEfficiency = 1;
-                        m_VerticalAttractionTimescale = 1000.0.ToTimescale();
+                        m_LinearDeflectionEfficiency = Vector3.One;
+                        m_LinearDeflectionTimescale = Vector3.One.ToTimescale();
+                        m_AngularDeflectionEfficiency = Vector3.Zero;
+                        m_AngularDeflectionTimescale = new Vector3(10.0).ToTimescale();
+                        m_VerticalAttractionEfficiency = Vector3.One;
+                        m_VerticalAttractionTimescale = new Vector3(1000).ToTimescale();
                         m_BankingEfficiency = 0;
                         m_BankingMix = 1;
                         m_BankingTimescale = 10.0.ToTimescale();
@@ -226,23 +226,23 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
 
                     case VehicleType.Car:
                         m_LinearFrictionTimescale = new Vector3(100, 2, 1000).ToTimescale();
-                        m_AngularFrictionTimescale = new Vector3(1000, 1000, 1000).ToTimescale();
+                        m_AngularFrictionTimescale = new Vector3(1000).ToTimescale();
                         m_LinearMotorDirection = Vector3.Zero;
-                        m_LinearMotorTimescale = new Vector3(1, 1, 1).ToTimescale();
-                        m_LinearMotorDecayTimescale = new Vector3(60, 60, 60).ToTimescale();
+                        m_LinearMotorTimescale = new Vector3(1).ToTimescale();
+                        m_LinearMotorDecayTimescale = new Vector3(60).ToTimescale();
                         m_AngularMotorDirection = Vector3.Zero;
-                        m_AngularMotorTimescale = new Vector3(1, 1, 1).ToTimescale();
-                        m_AngularMotorDecayTimescale = new Vector3(0.8, 0.8, 0.8).ToTimescale();
+                        m_AngularMotorTimescale = new Vector3(1).ToTimescale();
+                        m_AngularMotorDecayTimescale = new Vector3(0.8).ToTimescale();
                         m_HoverHeight = 0;
                         m_HoverEfficiency = 0;
                         m_HoverTimescale = 1000.0.ToTimescale();
                         m_Buoyancy = 0;
-                        m_LinearDeflectionEfficiency = 1;
-                        m_LinearDeflectionTimescale = 2.0.ToTimescale();
-                        m_AngularDeflectionEfficiency = 0;
-                        m_AngularDeflectionTimescale = 10.0.ToTimescale();
-                        m_VerticalAttractionEfficiency = 1;
-                        m_VerticalAttractionTimescale = 10.0.ToTimescale();
+                        m_LinearDeflectionEfficiency = Vector3.One;
+                        m_LinearDeflectionTimescale = new Vector3(2.0).ToTimescale();
+                        m_AngularDeflectionEfficiency = Vector3.Zero;
+                        m_AngularDeflectionTimescale = new Vector3(10.0).ToTimescale();
+                        m_VerticalAttractionEfficiency = Vector3.One;
+                        m_VerticalAttractionTimescale = new Vector3(10).ToTimescale();
                         m_BankingEfficiency = -0.2;
                         m_BankingMix = 1;
                         m_BankingTimescale = 1.0.ToTimescale();
@@ -275,12 +275,12 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                         m_HoverEfficiency = 0.4;
                         m_HoverTimescale = 2.0.ToTimescale();
                         m_Buoyancy = 1;
-                        m_LinearDeflectionEfficiency = 0.5;
-                        m_LinearDeflectionTimescale = 3.0.ToTimescale();
-                        m_AngularDeflectionEfficiency = 0.5;
-                        m_AngularDeflectionTimescale = 5.0.ToTimescale();
-                        m_VerticalAttractionEfficiency = 0.5;
-                        m_VerticalAttractionTimescale = 5.0.ToTimescale();
+                        m_LinearDeflectionEfficiency = new Vector3(0.5);
+                        m_LinearDeflectionTimescale = new Vector3(3.0).ToTimescale();
+                        m_AngularDeflectionEfficiency = new Vector3(0.5);
+                        m_AngularDeflectionTimescale = new Vector3(5.0).ToTimescale();
+                        m_VerticalAttractionEfficiency = new Vector3(0.5);
+                        m_VerticalAttractionTimescale = new Vector3(5.0, 5.0, 5.0).ToTimescale();
                         m_BankingEfficiency = -0.3;
                         m_BankingMix = 0.8;
                         m_BankingTimescale = 1.0.ToTimescale();
@@ -313,12 +313,12 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                         m_HoverEfficiency = 0.5;
                         m_HoverTimescale = 1000.0.ToTimescale();
                         m_Buoyancy = 0;
-                        m_LinearDeflectionEfficiency = 0.5;
-                        m_LinearDeflectionTimescale = 0.5.ToTimescale();
-                        m_AngularDeflectionEfficiency = 1;
-                        m_AngularDeflectionTimescale = 2.0.ToTimescale();
-                        m_VerticalAttractionEfficiency = 0.9;
-                        m_VerticalAttractionTimescale = 2.0.ToTimescale();
+                        m_LinearDeflectionEfficiency = new Vector3(0.5);
+                        m_LinearDeflectionTimescale = new Vector3(0.5).ToTimescale();
+                        m_AngularDeflectionEfficiency = Vector3.One;
+                        m_AngularDeflectionTimescale = new Vector3(2.0).ToTimescale();
+                        m_VerticalAttractionEfficiency = new Vector3(0.9);
+                        m_VerticalAttractionTimescale = new Vector3(2.0).ToTimescale();
                         m_BankingEfficiency = 1;
                         m_BankingMix = 0.7;
                         m_BankingTimescale = 2.0.ToTimescale();
@@ -351,12 +351,12 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                         m_HoverEfficiency = 0.8;
                         m_HoverTimescale = 10.0.ToTimescale();
                         m_Buoyancy = 1;
-                        m_LinearDeflectionEfficiency = 0;
-                        m_LinearDeflectionTimescale = 5.0.ToTimescale();
-                        m_AngularDeflectionEfficiency = 0;
-                        m_AngularDeflectionTimescale = 5.0.ToTimescale();
-                        m_VerticalAttractionEfficiency = 1;
-                        m_VerticalAttractionTimescale = 1000.0.ToTimescale();
+                        m_LinearDeflectionEfficiency = Vector3.Zero;
+                        m_LinearDeflectionTimescale = new Vector3(5.0).ToTimescale();
+                        m_AngularDeflectionEfficiency = Vector3.Zero;
+                        m_AngularDeflectionTimescale = new Vector3(5.0).ToTimescale();
+                        m_VerticalAttractionEfficiency = Vector3.One;
+                        m_VerticalAttractionTimescale = new Vector3(1000.0).ToTimescale();
                         m_BankingEfficiency = 0;
                         m_BankingMix = 0.7;
                         m_BankingTimescale = 5.0.ToTimescale();
@@ -393,12 +393,12 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                         m_HoverEfficiency = 0.0;
                         m_HoverTimescale = 1000.0.ToTimescale();
                         m_Buoyancy = 0.0;
-                        m_LinearDeflectionEfficiency = 1.0;
-                        m_LinearDeflectionTimescale = 2.0.ToTimescale();
-                        m_AngularDeflectionEfficiency = 0.8;
-                        m_AngularDeflectionTimescale = 2.0.ToTimescale();
-                        m_VerticalAttractionEfficiency = 1.0;
-                        m_VerticalAttractionTimescale = 1.0.ToTimescale();
+                        m_LinearDeflectionEfficiency = Vector3.One;
+                        m_LinearDeflectionTimescale = new Vector3(2.0).ToTimescale();
+                        m_AngularDeflectionEfficiency = new Vector3(0.8);
+                        m_AngularDeflectionTimescale = new Vector3(2.0).ToTimescale();
+                        m_VerticalAttractionEfficiency = Vector3.One;
+                        m_VerticalAttractionTimescale = new Vector3(1.0).ToTimescale();
                         m_BankingEfficiency = 0.95;
                         m_ReferenceFrame = Quaternion.Identity;
 
@@ -432,12 +432,12 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                         m_HoverEfficiency = 0.8;
                         m_HoverTimescale = 0.5.ToTimescale();
                         m_Buoyancy = 0.0;
-                        m_LinearDeflectionEfficiency = 0.5;
-                        m_LinearDeflectionTimescale = 3.0.ToTimescale();
-                        m_AngularDeflectionEfficiency = 0.5;
-                        m_AngularDeflectionTimescale = 5.0.ToTimescale();
-                        m_VerticalAttractionEfficiency = 0.5;
-                        m_VerticalAttractionTimescale = 0.3.ToTimescale();
+                        m_LinearDeflectionEfficiency = new Vector3(0.5);
+                        m_LinearDeflectionTimescale = new Vector3(3.0).ToTimescale();
+                        m_AngularDeflectionEfficiency = new Vector3(0.5);
+                        m_AngularDeflectionTimescale = new Vector3(5.0).ToTimescale();
+                        m_VerticalAttractionEfficiency = new Vector3(0.5);
+                        m_VerticalAttractionTimescale = new Vector3(0.3).ToTimescale();
                         m_BankingEfficiency = 0.8;
                         m_InvertedBankingModifier = -0.2;
                         m_BankingMix = 0.5f;
@@ -536,6 +536,24 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
             {
                 switch (id)
                 {
+                    case VehicleVectorParamId.AngularDeflectionEfficiency:
+                        return m_AngularDeflectionEfficiency;
+
+                    case VehicleVectorParamId.AngularDeflectionTimescale:
+                        return m_AngularDeflectionTimescale.Timescale;
+
+                    case VehicleVectorParamId.LinearDeflectionTimescale:
+                        return m_LinearDeflectionTimescale.Timescale;
+
+                    case VehicleVectorParamId.LinearDeflectionEfficiency:
+                        return m_LinearDeflectionEfficiency;
+
+                    case VehicleVectorParamId.VerticalAttractionEfficiency:
+                        return m_VerticalAttractionEfficiency;
+
+                    case VehicleVectorParamId.VerticalAttractionTimescale:
+                        return m_VerticalAttractionTimescale.Timescale;
+
                     case VehicleVectorParamId.AngularFrictionTimescale:
                         return m_AngularFrictionTimescale.Timescale;
 
@@ -577,6 +595,36 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
             {
                 switch (id)
                 {
+                    case VehicleVectorParamId.AngularDeflectionEfficiency:
+                        m_AngularDeflectionEfficiency = value.ComponentClamp(0, 1);
+                        m_Part.IncSerialNumber();
+                        break;
+
+                    case VehicleVectorParamId.AngularDeflectionTimescale:
+                        m_AngularDeflectionTimescale = value.ToTimescale();
+                        m_Part.IncSerialNumber();
+                        break;
+
+                    case VehicleVectorParamId.LinearDeflectionEfficiency:
+                        m_LinearDeflectionEfficiency = value.ComponentClamp(0, 1);
+                        m_Part.IncSerialNumber();
+                        break;
+
+                    case VehicleVectorParamId.LinearDeflectionTimescale:
+                        m_LinearDeflectionTimescale = value.ToTimescale();
+                        m_Part.IncSerialNumber();
+                        break;
+
+                    case VehicleVectorParamId.VerticalAttractionEfficiency:
+                        m_VerticalAttractionEfficiency = value.ComponentClamp(0f, 1f);
+                        m_Part.IncSerialNumber();
+                        break;
+
+                    case VehicleVectorParamId.VerticalAttractionTimescale:
+                        m_VerticalAttractionTimescale = value.ToTimescale();
+                        m_Part.IncSerialNumber();
+                        break;
+
                     case VehicleVectorParamId.AngularFrictionTimescale:
                         m_AngularFrictionTimescale = value.ToTimescale();
                         m_Part.IncSerialNumber();
@@ -644,18 +692,6 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
             {
                 switch (id)
                 {
-                    case VehicleFloatParamId.AngularDeflectionEfficiency:
-                        return m_AngularDeflectionEfficiency;
-
-                    case VehicleFloatParamId.AngularDeflectionTimescale:
-                        return m_AngularDeflectionTimescale.Timescale;
-
-                    case VehicleFloatParamId.LinearDeflectionTimescale:
-                        return m_LinearDeflectionTimescale.Timescale;
-
-                    case VehicleFloatParamId.LinearDeflectionEfficiency:
-                        return m_LinearDeflectionEfficiency;
-
                     case VehicleFloatParamId.BankingEfficiency:
                         return m_BankingEfficiency;
 
@@ -676,12 +712,6 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
 
                     case VehicleFloatParamId.HoverTimescale:
                         return m_HoverTimescale.Timescale;
-
-                    case VehicleFloatParamId.VerticalAttractionEfficiency:
-                        return m_VerticalAttractionEfficiency;
-
-                    case VehicleFloatParamId.VerticalAttractionTimescale:
-                        return m_VerticalAttractionTimescale.Timescale;
 
                     case VehicleFloatParamId.MouselookAzimuth:
                         return m_MouselookAzimuth;
@@ -709,26 +739,6 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
             {
                 switch (id)
                 {
-                    case VehicleFloatParamId.AngularDeflectionEfficiency:
-                        m_AngularDeflectionEfficiency = value.Clamp(0, 1);
-                        m_Part.IncSerialNumber();
-                        break;
-
-                    case VehicleFloatParamId.AngularDeflectionTimescale:
-                        m_AngularDeflectionTimescale = value.ToTimescale();
-                        m_Part.IncSerialNumber();
-                        break;
-
-                    case VehicleFloatParamId.LinearDeflectionEfficiency:
-                        m_LinearDeflectionEfficiency = value.Clamp(0, 1);
-                        m_Part.IncSerialNumber();
-                        break;
-
-                    case VehicleFloatParamId.LinearDeflectionTimescale:
-                        m_LinearDeflectionTimescale = value.ToTimescale();
-                        m_Part.IncSerialNumber();
-                        break;
-
                     case VehicleFloatParamId.BankingEfficiency:
                         m_BankingEfficiency = value.Clamp(-1f, 1f);
                         m_Part.IncSerialNumber();
@@ -761,16 +771,6 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
 
                     case VehicleFloatParamId.HoverTimescale:
                         m_HoverTimescale = value.ToTimescale();
-                        m_Part.IncSerialNumber();
-                        break;
-
-                    case VehicleFloatParamId.VerticalAttractionEfficiency:
-                        m_VerticalAttractionEfficiency = value.Clamp(0f, 1f);
-                        m_Part.IncSerialNumber();
-                        break;
-
-                    case VehicleFloatParamId.VerticalAttractionTimescale:
-                        m_VerticalAttractionTimescale = value.ToTimescale();
                         m_Part.IncSerialNumber();
                         break;
 
@@ -822,7 +822,7 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                 { "LinearFrictionTimescale", m_LinearFrictionTimescale.Timescale },
                 { "LinearMotorDirection", (Vector3)m_LinearMotorDirection },
                 { "LinearMotorOffset", (Vector3)m_LinearMotorOffset },
-                { "AngularDeflectionEfficiency", m_AngularDeflectionEfficiency },
+                { "AngularDeflectionEfficiency", (Vector3)m_AngularDeflectionEfficiency },
                 { "AngularDeflectionTimescale", m_AngularDeflectionTimescale.Timescale },
                 { "AngularMotorDecayTimescale", m_AngularMotorDecayTimescale.Timescale },
                 { "AngularMotorTimescale", m_AngularMotorTimescale.Timescale },
@@ -833,11 +833,11 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                 { "HoverHeight", m_HoverHeight },
                 { "HoverEfficiency", m_HoverEfficiency },
                 { "HoverTimescale", m_HoverTimescale.Timescale },
-                { "LinearDeflectionEfficiency", m_LinearDeflectionEfficiency },
+                { "LinearDeflectionEfficiency", (Vector3)m_LinearDeflectionEfficiency },
                 { "LinearDeflectionTimescale", m_LinearDeflectionTimescale.Timescale },
                 { "LinearMotorDecayTimescale", m_LinearMotorDecayTimescale.Timescale },
                 { "LinearMotorTimescale", m_LinearMotorTimescale.Timescale },
-                { "VerticalAttractionEfficiency", m_VerticalAttractionEfficiency },
+                { "VerticalAttractionEfficiency", (Vector3)m_VerticalAttractionEfficiency },
                 { "VerticalAttractionTimescale", m_VerticalAttractionTimescale.Timescale },
                 { "LinearWindEfficiency", (Vector3)m_LinearWindEfficiency },
                 { "AngularWindEfficiency", (Vector3)m_AngularWindEfficiency },

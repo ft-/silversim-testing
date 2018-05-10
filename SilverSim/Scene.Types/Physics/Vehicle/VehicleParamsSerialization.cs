@@ -36,6 +36,12 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
 
         private readonly static Dictionary<string, VehicleVectorParamId> m_VectorParams = new Dictionary<string, VehicleVectorParamId>
         {
+            ["AngularDeflectionEfficiency"] = VehicleVectorParamId.AngularDeflectionEfficiency,
+            ["AngularDeflectionTimescale"] = VehicleVectorParamId.AngularDeflectionTimescale,
+            ["LinearDeflectionEfficiency"] = VehicleVectorParamId.LinearDeflectionEfficiency,
+            ["LinearDeflectionTimescale"] = VehicleVectorParamId.LinearDeflectionTimescale,
+            ["VerticalAttractionEfficiency"] = VehicleVectorParamId.VerticalAttractionEfficiency,
+            ["VerticalAttractionTimescale"] = VehicleVectorParamId.VerticalAttractionTimescale,
             ["AngularFrictionTimescale"] = VehicleVectorParamId.AngularFrictionTimescale,
             ["AngularMotorDirection"] = VehicleVectorParamId.AngularMotorDirection,
             ["LinearFrictionTimescale"] = VehicleVectorParamId.LinearFrictionTimescale,
@@ -51,8 +57,6 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
 
         private readonly static Dictionary<string, VehicleFloatParamId> m_FloatParams = new Dictionary<string, VehicleFloatParamId>
         {
-            ["AngularDeflectionEfficiency"] = VehicleFloatParamId.AngularDeflectionEfficiency,
-            ["AngularDeflectionTimescale"] = VehicleFloatParamId.AngularDeflectionTimescale,
             ["BankingEfficiency"] = VehicleFloatParamId.BankingEfficiency,
             ["BankingMix"] = VehicleFloatParamId.BankingMix,
             ["BankingTimescale"] = VehicleFloatParamId.BankingTimescale,
@@ -60,10 +64,6 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
             ["HoverHeight"] = VehicleFloatParamId.HoverHeight,
             ["HoverEfficiency"] = VehicleFloatParamId.HoverEfficiency,
             ["HoverTimescale"] = VehicleFloatParamId.HoverTimescale,
-            ["LinearDeflectionEfficiency"] = VehicleFloatParamId.LinearDeflectionEfficiency,
-            ["LinearDeflectionTimescale"] = VehicleFloatParamId.LinearDeflectionTimescale,
-            ["VerticalAttractionEfficiency"] = VehicleFloatParamId.VerticalAttractionEfficiency,
-            ["VerticalAttractionTimescale"] = VehicleFloatParamId.VerticalAttractionTimescale,
             ["MouselookAzimuth"] = VehicleFloatParamId.MouselookAzimuth,
             ["MouselookAltitude"] = VehicleFloatParamId.MouselookAltitude,
             ["BankingAzimuth"] = VehicleFloatParamId.BankingAzimuth,

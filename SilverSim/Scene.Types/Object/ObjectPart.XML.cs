@@ -346,10 +346,16 @@ namespace SilverSim.Scene.Types.Object
                             writer.WriteNamedValue("AngularMotorDecayTimescaleVector", VehicleParams[VehicleVectorParamId.AngularMotorDecayTimescale]);
 
                             /* deflection */
-                            writer.WriteNamedValue("ADEFF", VehicleParams[VehicleFloatParamId.AngularDeflectionEfficiency]);
-                            writer.WriteNamedValue("ADTIME", VehicleParams[VehicleFloatParamId.AngularDeflectionTimescale]);
-                            writer.WriteNamedValue("LDEFF", VehicleParams[VehicleFloatParamId.LinearDeflectionEfficiency]);
-                            writer.WriteNamedValue("LDTIME", VehicleParams[VehicleFloatParamId.LinearDeflectionTimescale]);
+                            writer.WriteNamedValue("ADEFF", VehicleParams[VehicleVectorParamId.AngularDeflectionEfficiency].Length);
+                            writer.WriteNamedValue("ADTIME", VehicleParams[VehicleVectorParamId.AngularDeflectionTimescale].Length);
+                            writer.WriteNamedValue("LDEFF", VehicleParams[VehicleVectorParamId.LinearDeflectionEfficiency].Length);
+                            writer.WriteNamedValue("LDTIME", VehicleParams[VehicleVectorParamId.LinearDeflectionTimescale].Length);
+
+                            /* extension (must be written after float value due to loading concept) */
+                            writer.WriteNamedValue("AngularDeflectionEfficiencyVector", VehicleParams[VehicleVectorParamId.AngularDeflectionEfficiency]);
+                            writer.WriteNamedValue("AngularDeflectionTimescaleVector", VehicleParams[VehicleVectorParamId.AngularDeflectionTimescale]);
+                            writer.WriteNamedValue("LinearDeflectionEfficiencyVector", VehicleParams[VehicleVectorParamId.LinearDeflectionEfficiency]);
+                            writer.WriteNamedValue("LinearDeflectionTimescaleVector", VehicleParams[VehicleVectorParamId.LinearDeflectionTimescale]);
 
                             /* banking */
                             writer.WriteNamedValue("BEFF", VehicleParams[VehicleFloatParamId.BankingEfficiency]);
@@ -365,8 +371,12 @@ namespace SilverSim.Scene.Types.Object
                             writer.WriteNamedValue("VBUO", VehicleParams[VehicleFloatParamId.Buoyancy]);
 
                             /* attractor */
-                            writer.WriteNamedValue("VAEFF", VehicleParams[VehicleFloatParamId.VerticalAttractionEfficiency]);
-                            writer.WriteNamedValue("VATIME", VehicleParams[VehicleFloatParamId.VerticalAttractionTimescale]);
+                            writer.WriteNamedValue("VAEFF", VehicleParams[VehicleVectorParamId.VerticalAttractionEfficiency].Length);
+                            writer.WriteNamedValue("VATIME", VehicleParams[VehicleVectorParamId.VerticalAttractionTimescale].Length);
+
+                            /* extension (must be written after float value due to loading concept) */
+                            writer.WriteNamedValue("VerticalAttractorEfficiencyVector", VehicleParams[VehicleVectorParamId.VerticalAttractionEfficiency]);
+                            writer.WriteNamedValue("VerticalAttractorTimescaleVector", VehicleParams[VehicleVectorParamId.VerticalAttractionTimescale]);
 
                             /* reference */
                             writer.WriteNamedValue("REF_FRAME", VehicleParams[VehicleRotationParamId.ReferenceFrame]);
@@ -988,19 +998,35 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "ADEFF":
-                                part.VehicleParams[VehicleFloatParamId.AngularDeflectionEfficiency] = reader.ReadElementValueAsDouble();
+                                part.VehicleParams[VehicleVectorParamId.AngularDeflectionEfficiency] = new Vector3(reader.ReadElementValueAsDouble());
+                                break;
+
+                            case "AngularDeflectionEfficiencyVector":
+                                part.VehicleParams[VehicleVectorParamId.AngularDeflectionEfficiency] = reader.ReadElementChildsAsVector3();
                                 break;
 
                             case "ADTIME":
-                                part.VehicleParams[VehicleFloatParamId.AngularDeflectionTimescale] = reader.ReadElementValueAsDouble();
+                                part.VehicleParams[VehicleVectorParamId.AngularDeflectionTimescale] = new Vector3(reader.ReadElementValueAsDouble());
+                                break;
+
+                            case "AngularDeflectionTimescaleVector":
+                                part.VehicleParams[VehicleVectorParamId.AngularDeflectionTimescale] = reader.ReadElementChildsAsVector3();
                                 break;
 
                             case "LDEFF":
-                                part.VehicleParams[VehicleFloatParamId.LinearDeflectionEfficiency] = reader.ReadElementValueAsDouble();
+                                part.VehicleParams[VehicleVectorParamId.LinearDeflectionEfficiency] = new Vector3(reader.ReadElementValueAsDouble());
+                                break;
+
+                            case "LinearDeflectionEfficiencyVector":
+                                part.VehicleParams[VehicleVectorParamId.LinearDeflectionEfficiency] = reader.ReadElementChildsAsVector3();
                                 break;
 
                             case "LDTIME":
-                                part.VehicleParams[VehicleFloatParamId.LinearDeflectionTimescale] = reader.ReadElementValueAsDouble();
+                                part.VehicleParams[VehicleVectorParamId.LinearDeflectionTimescale] = new Vector3(reader.ReadElementValueAsDouble());
+                                break;
+
+                            case "LinearDeflectionTimescaleVector":
+                                part.VehicleParams[VehicleVectorParamId.LinearDeflectionTimescale] = reader.ReadElementChildsAsVector3();
                                 break;
 
                             case "BEFF":
@@ -1040,11 +1066,19 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "VAEFF":
-                                part.VehicleParams[VehicleFloatParamId.VerticalAttractionEfficiency] = reader.ReadElementValueAsDouble();
+                                part.VehicleParams[VehicleVectorParamId.VerticalAttractionEfficiency] = new Vector3(reader.ReadElementValueAsDouble());
+                                break;
+
+                            case "VerticalAttractionEfficiencyVector":
+                                part.VehicleParams[VehicleVectorParamId.VerticalAttractionEfficiency] = reader.ReadElementChildsAsVector3();
                                 break;
 
                             case "VATIME":
-                                part.VehicleParams[VehicleFloatParamId.VerticalAttractionTimescale] = reader.ReadElementValueAsDouble();
+                                part.VehicleParams[VehicleVectorParamId.VerticalAttractionTimescale] = new Vector3(reader.ReadElementValueAsDouble());
+                                break;
+
+                            case "VerticalAttractionTimescaleVector":
+                                part.VehicleParams[VehicleVectorParamId.VerticalAttractionTimescale] = reader.ReadElementChildsAsVector3();
                                 break;
 
                             case "REF_FRAME":

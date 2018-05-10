@@ -23,8 +23,6 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
 {
     public enum VehicleFloatParamId
     {
-        AngularDeflectionEfficiency = 32,
-        AngularDeflectionTimescale = 33,
         BankingEfficiency = 38,
         BankingMix = 39,
         BankingTimescale = 40,
@@ -32,10 +30,6 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
         HoverHeight = 24,
         HoverEfficiency = 25,
         HoverTimescale = 26,
-        LinearDeflectionEfficiency = 28,
-        LinearDeflectionTimescale = 29,
-        VerticalAttractionEfficiency = 36,
-        VerticalAttractionTimescale = 37,
 
         MouselookAzimuth = 11001,
         MouselookAltitude = 11002,
