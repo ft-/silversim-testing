@@ -51,7 +51,7 @@ namespace SilverSim.Scene.Physics.Common
 
         #region Gravity and Buoyancy
         protected double GravityConstant(IPhysicsObject actor, IPhysicalObject obj) =>
-            CombinedGravityAccelerationConstant * obj.PhysicsGravityMultiplier / actor.Mass;
+            CombinedGravityAccelerationConstant * obj.PhysicsGravityMultiplier;
 
         protected PositionalForce GravityMotor(IPhysicsObject actor, IPhysicalObject obj, Vector3 pos) =>
             new PositionalForce("GravityMotor", new Vector3(0, 0, -GravityConstant(actor, obj)), pos);

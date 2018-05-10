@@ -267,6 +267,16 @@ namespace SilverSim.Types
                 Math.Max(Y, b),
                 Math.Max(Z, b));
 
+        public Vector3 ComponentClamp(double min, double max) => new Vector3(
+            X.Clamp(min, max),
+            Y.Clamp(min, max),
+            Z.Clamp(min, max));
+
+        public Vector3 ComponentClamp(Vector3 min, Vector3 max) => new Vector3(
+            X.Clamp(min.X, max.X),
+            Y.Clamp(min.Y, max.Y),
+            Z.Clamp(min.Z, max.Z));
+
         /// <summary>
         /// Get a formatted string representation of the vector
         /// </summary>

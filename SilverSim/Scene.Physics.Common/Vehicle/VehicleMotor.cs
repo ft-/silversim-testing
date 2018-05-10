@@ -45,7 +45,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             ((flags & VehicleFlags.MouselookBank) != 0 && currentState.IsAgentInMouselook) ||
                 (flags & VehicleFlags.MousePointBank) != 0;
 
-        public void Process(double dt, PhysicsStateData currentState, SceneInterface scene, double mass, double multgravity)
+        public void Process(double dt, PhysicsStateData currentState, SceneInterface scene, double mass, double gravityConstant)
         {
             if(m_Params.VehicleType == VehicleType.None)
             {
@@ -191,12 +191,21 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             */
             if (m_Params[VehicleFloatParamId.VerticalAttractionTimescale] < 300)
             {
-                Vector3 angularPos = angularOrientaton.GetEulerAngles();
-                Vector3 vertAttractorTorque = angularPos * m_Params[VehicleFloatParamId.VerticalAttractionEfficiency] * m_Params.OneByVerticalAttractionTimescale * dt;
+                Vector3 forwardDirection = Vector3.UnitZ * angularOrientaton;
+                double roll = Math.Atan2(forwardDirection.Y, forwardDirection.Z);
+                double pitch =  Math.Atan2(forwardDirection.X, forwardDirection.Z);
+                Vector3 angularError = new Vector3(roll, pitch, 0);
+                Vector3 vertAttractorTorque = -angularError * m_Params[VehicleFloatParamId.VerticalAttractionEfficiency] * m_Params.OneByVerticalAttractionTimescale * dt;
+                double rollboundary = Math.Min(Math.Abs(angularError.X), Math.Abs(vertAttractorTorque.X));
+                vertAttractorTorque.X = vertAttractorTorque.X.Clamp(-rollboundary, rollboundary);
                 if ((flags & VehicleFlags.LimitRollOnly) != 0)
                 {
                     vertAttractorTorque.Y = 0;
-                    vertAttractorTorque.Z = 0;
+                }
+                else
+                {
+                    double pitchboundary = Math.Min(Math.Abs(angularError.Y), Math.Abs(vertAttractorTorque.Y));
+                    vertAttractorTorque.Y = vertAttractorTorque.Y.Clamp(-pitchboundary, pitchboundary);
                 }
                 angularTorque += vertAttractorTorque;
             }
@@ -290,11 +299,6 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             }
             #endregion
 
-            #region Buoyancy
-            /* we simply act against the physics effect of the BuoyancyMotor */
-            linearForce.Z -= m_Params[VehicleFloatParamId.Buoyancy] * mass * multgravity;
-            #endregion
-
             #region Angular Deflection
             /* Angular deflection reorients the vehicle to the velocity vector */
             Vector3 deflect = velocity * Math.Sign(velocity.X);
@@ -333,6 +337,13 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
 
             #region Motor Decay
             m_Params.DecayDirections(dt);
+            #endregion
+
+            LinearForce /= mass;
+
+            #region Buoyancy
+            /* we simply act against the physics effect of the BuoyancyMotor */
+            linearForce.Z += m_Params[VehicleFloatParamId.Buoyancy] * gravityConstant;
             #endregion
 
             LinearForce = linearForce;
