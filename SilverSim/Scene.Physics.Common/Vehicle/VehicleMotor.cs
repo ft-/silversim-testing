@@ -367,11 +367,9 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             m_Params.DecayDirections(dt);
             #endregion
 
-            LinearForce /= mass;
-
             #region Buoyancy
             /* we simply act against the physics effect of the BuoyancyMotor */
-            linearForce.Z += m_Params[VehicleFloatParamId.Buoyancy] * gravityConstant;
+            linearForce.Z += m_Params[VehicleFloatParamId.Buoyancy] * mass * gravityConstant;
             #endregion
 
             LinearForce = linearForce;
