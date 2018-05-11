@@ -218,8 +218,25 @@ namespace SilverSim.Types
         /// <returns>Quaternion representation of the euler angles</returns>
         public static Quaternion CreateFromEulers(double roll, double pitch, double yaw)
         {
-            Matrix4 m = Matrix4.CreateFromEulers(roll, pitch, yaw);
-            return CreateFromRotationMatrix(m);
+            const double twopi = Math.PI * 2;
+            roll = roll % twopi;
+            pitch = pitch % twopi;
+            yaw = yaw % twopi;
+
+            double atCos = Math.Cos(roll / 2f);
+            double atSin = Math.Sin(roll / 2f);
+            double leftCos = Math.Cos(pitch / 2f);
+            double leftSin = Math.Sin(pitch / 2f);
+            double upCos = Math.Cos(yaw / 2f);
+            double upSin = Math.Sin(yaw / 2f);
+            double atLeftCos = atCos * leftCos;
+            double atLeftSin = atSin * leftSin;
+            return new Quaternion(
+                atSin * leftCos * upCos + atCos * leftSin * upSin,
+                atCos * leftSin * upCos - atSin * leftCos * upSin,
+                atLeftCos * upSin + atLeftSin * upCos,
+                atLeftCos * upCos - atLeftSin * upSin
+            );
         }
 
         public static Quaternion CreateFromRotationMatrix(Matrix4 m)
@@ -493,7 +510,7 @@ namespace SilverSim.Types
             }
             return true;
         }
-        #endregion Static Methods
+#endregion Static Methods
 
         #region Axes
         public static Quaternion Axes2Rot(Vector3 fwd, Vector3 left, Vector3 up)

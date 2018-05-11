@@ -259,20 +259,27 @@ namespace SilverSim.Types
             // Return only positive angles in [0,360]
             if (angleX < 0)
             {
-                angleX += 360d;
+                angleX += 2 * Math.PI;
             }
             if (angleY < 0)
             {
-                angleY += 360d;
+                angleY += 2 * Math.PI;
             }
             if (angleZ < 0)
             {
-                angleZ += 360d;
+                angleZ += 2* Math.PI;
             }
 
             roll = angleX;
             pitch = angleY;
             yaw = angleZ;
+        }
+
+        public Vector3 GetEulerAngles()
+        {
+            Vector3 v = Vector3.Zero;
+            GetEulerAngles(out v.X, out v.Y, out v.Z);
+            return v;
         }
 
         public double Trace()

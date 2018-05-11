@@ -62,31 +62,31 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
 
         public void Process(double dt, PhysicsStateData currentState, SceneInterface scene, double mass, double gravityConstant)
         {
-            if(m_Params.VehicleType == VehicleType.None)
+            LinearForce = Vector3.Zero;
+            AngularTorque = Vector3.Zero;
+            if (m_Params.VehicleType == VehicleType.None)
             {
                 /* disable vehicle */
-                LinearForce = Vector3.Zero;
-                AngularTorque = Vector3.Zero;
                 HeightExceededTime = 0f;
                 return;
             }
 
             VehicleFlags flags = m_Params.Flags;
-            Vector3 linearForce = Vector3.Zero;
-            Vector3 angularTorque = Vector3.Zero;
+            Vector3 linearBodyForce = Vector3.Zero;
+            Vector3 angularBodyTorque = Vector3.Zero;
 
             #region Transform Reference Frame
             Quaternion referenceFrame = m_Params[VehicleRotationParamId.ReferenceFrame];
             Vector3 velocity = currentState.Velocity / referenceFrame;
             Vector3 angularVelocity = currentState.AngularVelocity / referenceFrame;
-            Quaternion angularOrientaton = currentState.Rotation / referenceFrame;
+            Quaternion angularOrientation = currentState.Rotation / referenceFrame;
             #endregion
 
             Vector3 mouselookAngularInput = Vector3.Zero;
             if ((flags & (VehicleFlags.MouselookBank | VehicleFlags.MouselookSteer | VehicleFlags.MousePointBank | VehicleFlags.MousePointSteer)) != 0)
             {
                 Quaternion localCam = currentState.CameraRotation / referenceFrame;
-                mouselookAngularInput = (localCam / angularOrientaton).GetEulerAngles();
+                mouselookAngularInput = (localCam / angularOrientation).GetEulerAngles();
                 mouselookAngularInput.Y = 0;
                 mouselookAngularInput.X = (IsMouselookBankActive(flags, currentState)) ?
                     mouselookAngularInput.Z * m_Params[VehicleFloatParamId.MouselookAltitude] :
@@ -227,27 +227,27 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             }
             #endregion
 
-            linearForce += LinearMotorForce = (m_Params[VehicleVectorParamId.LinearMotorDirection] - velocity).ElementMultiply(oneByLinearMotorTimescale * dt);
-            angularTorque += AngularMotorTorque = (m_Params[VehicleVectorParamId.AngularMotorDirection] - angularVelocity + mouselookAngularInput).ElementMultiply(oneByAngularMotorTimescale * dt);
+            linearBodyForce += LinearMotorForce = (m_Params[VehicleVectorParamId.LinearMotorDirection] - velocity).ElementMultiply(oneByLinearMotorTimescale * dt);
+            angularBodyTorque += AngularMotorTorque = (m_Params[VehicleVectorParamId.AngularMotorDirection] - angularVelocity + mouselookAngularInput).ElementMultiply(oneByAngularMotorTimescale * dt);
 
             if((m_Params.Flags & VehicleFlags.TorqueWorldZ) != 0)
             {
                 /* translate Z to world (needed for motorcycles based on halcyon design) */
-                double angZ = angularTorque.Z;
-                angularTorque.Z = 0;
+                double angZ = angularBodyTorque.Z;
+                angularBodyTorque.Z = 0;
                 Quaternion q = Quaternion.CreateFromEulers(0, 0, angZ);
-                angularTorque += WorldZTorque = (q * angularOrientaton).GetEulerAngles();
+                angularBodyTorque += WorldZTorque = (q * angularOrientation).GetEulerAngles();
             }
             #endregion
 
             #region Motor Limiting
-            if ((m_Params.Flags & VehicleFlags.LimitMotorDown) != 0 && linearForce.Z < 0)
+            if ((m_Params.Flags & VehicleFlags.LimitMotorDown) != 0 && linearBodyForce.Z < 0)
             {
-                linearForce.Z = 0;
+                linearBodyForce.Z = 0;
             }
-            if ((m_Params.Flags & VehicleFlags.LimitMotorUp) != 0 && linearForce.Z > 0)
+            if ((m_Params.Flags & VehicleFlags.LimitMotorUp) != 0 && linearBodyForce.Z > 0)
             {
-                linearForce.Z = 0;
+                linearBodyForce.Z = 0;
             }
             #endregion
 
@@ -303,8 +303,8 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
                 HeightExceededTime += dt;
                 if(disableMotorsAfter <= HeightExceededTime)
                 {
-                    angularTorque = Vector3.Zero;
-                    linearForce = Vector3.Zero;
+                    angularBodyTorque = Vector3.Zero;
+                    linearBodyForce = Vector3.Zero;
                 }
             }
             else
@@ -314,12 +314,12 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             #endregion
 
             #region Add Hover Height Force
-            linearForce.Z += HoverMotorForce = hoverForce;
+            linearBodyForce.Z += HoverMotorForce = hoverForce;
             #endregion
 
             #region Friction
-            linearForce -= LinearFrictionForce = (currentState.Velocity).ElementMultiply(m_Params.OneByLinearFrictionTimescale * dt);
-            angularTorque -= AngularFrictionTorque = (currentState.AngularVelocity).ElementMultiply(m_Params.OneByAngularFrictionTimescale * dt);
+            linearBodyForce -= LinearFrictionForce = (currentState.Velocity).ElementMultiply(m_Params.OneByLinearFrictionTimescale * dt);
+            angularBodyTorque -= AngularFrictionTorque = (currentState.AngularVelocity).ElementMultiply(m_Params.OneByAngularFrictionTimescale * dt);
             #endregion
 
             #region Vertical Attractor
@@ -330,28 +330,22 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             double roll = 0;
             if (vaTimescale.X < 300 || vaTimescale.Y < 300)
             {
-                Vector3 upwardDirection = Vector3.UnitZ * angularOrientaton;
-                Vector3 forwardDirection = Vector3.UnitX * angularOrientaton;
-                roll = Math.Atan2(upwardDirection.Y, upwardDirection.Z);
-                double pitch = 0;
-                if ((flags & VehicleFlags.LimitRollOnly) == 0 && vaTimescale.Y < 300)
+                Vector3 angularError = angularOrientation.GetEulerAngles();
+                if(angularError.X > Math.PI)
                 {
-                    if (upwardDirection.Y < 0)
-                    {
-                        pitch = Math.Atan2(-forwardDirection.Y, forwardDirection.X);
-                    }
-                    else
-                    {
-                        pitch = Math.Atan2(forwardDirection.Y, forwardDirection.X);
-                    }
+                    angularError.X -= Math.PI;
                 }
-                Vector3 angularError = new Vector3(roll, pitch, 0) - angularVelocity;
-                Vector3 vertAttractorTorque = angularError.ElementMultiply(m_Params[VehicleVectorParamId.VerticalAttractionEfficiency].ElementMultiply(m_Params.OneByVerticalAttractionTimescale) * dt);
+                if (angularError.Y > Math.PI)
+                {
+                    angularError.Y -= Math.PI;
+                }
+                roll = angularError.X;
+                angularError = -angularError-angularVelocity;
+                Vector3 vertAttractorTorque = angularError.ElementMultiply((m_Params[VehicleVectorParamId.VerticalAttractionEfficiency].ElementMultiply(m_Params.OneByVerticalAttractionTimescale) * dt).ComponentMin(1));
 
                 if (vaTimescale.X < 300)
                 {
-                    double rollboundary = Math.Min(Math.Abs(roll), Math.Abs(vertAttractorTorque.X));
-                    angularTorque.X = angularTorque.X + vertAttractorTorque.X.Clamp(-rollboundary, rollboundary);
+                    angularBodyTorque.X = angularBodyTorque.X + vertAttractorTorque.X;
                 }
                 else
                 {
@@ -360,8 +354,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
 
                 if ((flags & VehicleFlags.LimitRollOnly) == 0 && vaTimescale.Y < 300)
                 {
-                    double pitchboundary = Math.Min(Math.Abs(pitch), Math.Abs(vertAttractorTorque.Y));
-                    angularTorque.Y = angularTorque.Y + vertAttractorTorque.Y.Clamp(-pitchboundary, pitchboundary);
+                    angularBodyTorque.Y = angularBodyTorque.Y + vertAttractorTorque.Y;
                 }
                 else
                 {
@@ -395,7 +388,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
                     Vector3 windvelocity = scene.Environment.Wind[pos + new Vector3(0, 0, halfBoundBoxSizeZ / 2)];
 
                     #region Linear Wind Affector
-                    linearForce += LinearWindForce = (windvelocity - velocity).ElementMultiply(m_Params[VehicleVectorParamId.LinearWindEfficiency]) * dt;
+                    linearBodyForce += LinearWindForce = (windvelocity - velocity).ElementMultiply(m_Params[VehicleVectorParamId.LinearWindEfficiency]) * dt;
                     #endregion
 
                     #region Angular Wind Affector
@@ -423,7 +416,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
                     Vector3 currentvelocity = scene.Environment.Wind[pos - new Vector3(0, 0, halfBoundBoxSizeZ / 2)];
 
                     #region Linear Current Affector
-                    linearForce += LinearCurrentForce = (currentvelocity - velocity).ElementMultiply(m_Params[VehicleVectorParamId.LinearWindEfficiency]) * dt;
+                    linearBodyForce += LinearCurrentForce = (currentvelocity - velocity).ElementMultiply(m_Params[VehicleVectorParamId.LinearWindEfficiency]) * dt;
                     #endregion
 
                     #region Angular Current Affector
@@ -451,11 +444,11 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             if (m_Params[VehicleVectorParamId.VerticalAttractionTimescale].X < 300)
             {
                 double invertedBankModifier = 1f;
-                if ((Vector3.UnitZ * angularOrientaton).Z < 0)
+                if ((Vector3.UnitZ * angularOrientation).Z < 0)
                 {
                     invertedBankModifier = m_Params[VehicleFloatParamId.InvertedBankingModifier];
                 }
-                angularTorque.Z += BankingTorque = (roll * 1.0.Mix(velocity.X, m_Params[VehicleFloatParamId.BankingMix])) * m_Params[VehicleFloatParamId.BankingEfficiency] * invertedBankModifier * m_Params.OneByBankingTimescale * dt;
+                angularBodyTorque.Z += BankingTorque = (roll * 1.0.Mix(velocity.X, m_Params[VehicleFloatParamId.BankingMix])) * m_Params[VehicleFloatParamId.BankingEfficiency] * invertedBankModifier * m_Params.OneByBankingTimescale * dt;
             }
             #endregion
 
@@ -483,7 +476,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
                 angularDeflectionTorque.Z = Math.Atan2(deflect.Y, deflect.X) * angdeflecteff.Z;
             }
             AngularDeflectionTorque = angularDeflectionTorque;
-            angularTorque += angularDeflectionTorque;
+            angularBodyTorque += angularDeflectionTorque;
             #endregion
 
             #region Linear Deflection
@@ -499,7 +492,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
 
             eulerDiff = eulerDiff.ElementMultiply((m_Params[VehicleVectorParamId.LinearDeflectionEfficiency].ElementMultiply(m_Params.OneByLinearDeflectionTimescale) * dt).ComponentMin(1));
 
-            linearForce += LinearDeflectionForce = velocity * Quaternion.CreateFromEulers(eulerDiff) - velocity;
+            linearBodyForce += LinearDeflectionForce = velocity * Quaternion.CreateFromEulers(eulerDiff) - velocity;
             #endregion
 
             #region Motor Decay
@@ -508,11 +501,11 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
 
             #region Buoyancy
             /* we simply act against the physics effect of the BuoyancyMotor */
-            linearForce.Z += m_Params[VehicleFloatParamId.Buoyancy] * mass * gravityConstant;
+            linearBodyForce.Z += m_Params[VehicleFloatParamId.Buoyancy] * mass * gravityConstant;
             #endregion
 
-            LinearForce = linearForce;
-            AngularTorque = angularTorque * referenceFrame;
+            LinearForce += linearBodyForce;
+            AngularTorque += angularBodyTorque * referenceFrame;
         }
 
         public Vector3 LinearForce { get; private set; }
