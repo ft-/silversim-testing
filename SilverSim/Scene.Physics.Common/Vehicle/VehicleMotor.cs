@@ -327,11 +327,12 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             VEHICLE_FLAG_LIMIT_ROLL_ONLY affects this one to be only affected on roll axis
             */
             Vector3 vaTimescale = m_Params[VehicleVectorParamId.VerticalAttractionTimescale];
+            double roll = 0;
             if (vaTimescale.X < 300 || vaTimescale.Y < 300)
             {
                 Vector3 upwardDirection = Vector3.UnitZ * angularOrientaton;
                 Vector3 forwardDirection = Vector3.UnitX * angularOrientaton;
-                double roll = Math.Atan2(upwardDirection.Y, upwardDirection.Z);
+                roll = Math.Atan2(upwardDirection.Y, upwardDirection.Z);
                 double pitch = 0;
                 if ((flags & VehicleFlags.LimitRollOnly) == 0 && vaTimescale.Y < 300)
                 {
@@ -454,7 +455,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
                 {
                     invertedBankModifier = m_Params[VehicleFloatParamId.InvertedBankingModifier];
                 }
-                angularTorque.X -= BankingTorque = (AngularTorque.Z * 1.0.Mix(velocity.X, m_Params[VehicleFloatParamId.BankingMix])) * m_Params[VehicleFloatParamId.BankingEfficiency] * invertedBankModifier * m_Params.OneByBankingTimescale * dt;
+                angularTorque.Z -= BankingTorque = (roll * 1.0.Mix(velocity.X, m_Params[VehicleFloatParamId.BankingMix])) * m_Params[VehicleFloatParamId.BankingEfficiency] * invertedBankModifier * m_Params.OneByBankingTimescale * dt;
             }
             #endregion
 
