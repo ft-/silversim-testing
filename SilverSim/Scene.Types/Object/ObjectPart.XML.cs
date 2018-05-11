@@ -334,6 +334,10 @@ namespace SilverSim.Scene.Types.Object
                             /* linear extension (must be written after float value due to loading concept) */
                             writer.WriteNamedValue("LinearMotorDecayTimescaleVector", VehicleParams[VehicleVectorParamId.LinearMotorDecayTimescale]);
                             writer.WriteNamedValue("LinearMotorTimescaleVector", VehicleParams[VehicleVectorParamId.LinearMotorTimescale]);
+                            writer.WriteNamedValue("LinearMotorAccelPosTimescaleVector", VehicleParams[VehicleVectorParamId.LinearMotorAccelPosTimescale]);
+                            writer.WriteNamedValue("LinearMotorDecelPosTimescaleVector", VehicleParams[VehicleVectorParamId.LinearMotorDecelNegTimescale]);
+                            writer.WriteNamedValue("LinearMotorAccelNegTimescaleVector", VehicleParams[VehicleVectorParamId.LinearMotorAccelPosTimescale]);
+                            writer.WriteNamedValue("LinearMotorDecelNegTimescaleVector", VehicleParams[VehicleVectorParamId.LinearMotorDecelNegTimescale]);
 
                             /* angular */
                             writer.WriteNamedValue("AMDIR", VehicleParams[VehicleVectorParamId.AngularMotorDirection]);
@@ -342,8 +346,12 @@ namespace SilverSim.Scene.Types.Object
                             writer.WriteNamedValue("AMFTIME", VehicleParams[VehicleVectorParamId.AngularFrictionTimescale]);
 
                             /* angular extension (must be written after float value due to loading concept) */
-                            writer.WriteNamedValue("AngularMotorTimescaleVector", VehicleParams[VehicleVectorParamId.AngularMotorTimescale]);
                             writer.WriteNamedValue("AngularMotorDecayTimescaleVector", VehicleParams[VehicleVectorParamId.AngularMotorDecayTimescale]);
+                            writer.WriteNamedValue("AngularMotorTimescaleVector", VehicleParams[VehicleVectorParamId.AngularMotorTimescale]);
+                            writer.WriteNamedValue("AngularMotorAccelPosTimescaleVector", VehicleParams[VehicleVectorParamId.AngularMotorAccelPosTimescale]);
+                            writer.WriteNamedValue("AngularMotorDecelPosTimescaleVector", VehicleParams[VehicleVectorParamId.AngularMotorDecelPosTimescale]);
+                            writer.WriteNamedValue("AngularMotorAccelNegTimescaleVector", VehicleParams[VehicleVectorParamId.AngularMotorAccelNegTimescale]);
+                            writer.WriteNamedValue("AngularMotorDecelNegTimescaleVector", VehicleParams[VehicleVectorParamId.AngularMotorDecelNegTimescale]);
 
                             /* deflection */
                             writer.WriteNamedValue("ADEFF", VehicleParams[VehicleVectorParamId.AngularDeflectionEfficiency].Length);
@@ -973,6 +981,22 @@ namespace SilverSim.Scene.Types.Object
                                 part.VehicleParams[VehicleVectorParamId.LinearMotorTimescale] = reader.ReadElementChildsAsVector3();
                                 break;
 
+                            case "LinearMotorAccelPosTimescaleVector":
+                                part.VehicleParams[VehicleVectorParamId.LinearMotorAccelPosTimescale] = reader.ReadElementChildsAsVector3();
+                                break;
+
+                            case "LinearMotorDecelPosTimescaleVector":
+                                part.VehicleParams[VehicleVectorParamId.LinearMotorDecelPosTimescale] = reader.ReadElementChildsAsVector3();
+                                break;
+
+                            case "LinearMotorAccelNegTimescaleVector":
+                                part.VehicleParams[VehicleVectorParamId.LinearMotorAccelNegTimescale] = reader.ReadElementChildsAsVector3();
+                                break;
+
+                            case "LinearMotorDecelNegTimescaleVector":
+                                part.VehicleParams[VehicleVectorParamId.LinearMotorDecelNegTimescale] = reader.ReadElementChildsAsVector3();
+                                break;
+
                             case "AMDIR":
                                 part.VehicleParams[VehicleVectorParamId.AngularMotorDirection] = reader.ReadElementChildsAsVector3();
                                 break;
@@ -991,6 +1015,22 @@ namespace SilverSim.Scene.Types.Object
 
                             case "AngularMotorTimescaleVector":
                                 part.VehicleParams[VehicleVectorParamId.AngularMotorTimescale] = reader.ReadElementChildsAsVector3();
+                                break;
+
+                            case "AngularMotorAccelPosTimescaleVector":
+                                part.VehicleParams[VehicleVectorParamId.AngularMotorAccelPosTimescale] = reader.ReadElementChildsAsVector3();
+                                break;
+
+                            case "AngularMotorDecelPosTimescaleVector":
+                                part.VehicleParams[VehicleVectorParamId.AngularMotorDecelPosTimescale] = reader.ReadElementChildsAsVector3();
+                                break;
+
+                            case "AngularMotorAccelNegTimescaleVector":
+                                part.VehicleParams[VehicleVectorParamId.AngularMotorAccelNegTimescale] = reader.ReadElementChildsAsVector3();
+                                break;
+
+                            case "AngularMotorDecelNegTimescaleVector":
+                                part.VehicleParams[VehicleVectorParamId.AngularMotorDecelNegTimescale] = reader.ReadElementChildsAsVector3();
                                 break;
 
                             case "AngularMotorDecayTimescaleVector":

@@ -103,8 +103,108 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             }
 
             #region Motor Inputs
-            linearForce += LinearMotorForce = (m_Params[VehicleVectorParamId.LinearMotorDirection] - velocity).ElementMultiply(m_Params.OneByLinearMotorTimescale * dt);
-            angularTorque += AngularMotorTorque = (m_Params[VehicleVectorParamId.AngularMotorDirection] - angularVelocity + mouselookAngularInput).ElementMultiply(m_Params.OneByAngularMotorTimescale * dt);
+            Vector3 linearMotorDirection = m_Params[VehicleVectorParamId.LinearMotorDirection];
+            Vector3 angularMotorDirection = m_Params[VehicleVectorParamId.AngularMotorDirection] + mouselookAngularInput;
+            Vector3 linearMotorError = linearMotorDirection - velocity;
+            Vector3 angularMotorError = angularMotorDirection - m_Params[VehicleVectorParamId.AngularMotorDirection] - angularVelocity;
+
+            Vector3 oneByLinearMotorTimescale = Vector3.Zero;
+            Vector3 oneByAngularMotorTimescale = Vector3.Zero;
+
+            #region Linear motor timescales
+            Vector3 oneByLinearMotorAccelPosTimescale = m_Params.OneByLinearMotorAccelPosTimescale;
+            Vector3 oneByLinearMotorDecelPosTimescale = m_Params.OneByLinearMotorDecelPosTimescale;
+            Vector3 oneByLinearMotorAccelNegTimescale = m_Params.OneByLinearMotorAccelNegTimescale;
+            Vector3 oneByLinearMotorDecelNegTimescale = m_Params.OneByLinearMotorDecelNegTimescale;
+
+            if (linearMotorDirection.X * velocity.X < 0)
+            {
+                oneByLinearMotorTimescale.X = linearMotorDirection.X < 0 ? oneByLinearMotorAccelNegTimescale.X : oneByLinearMotorAccelPosTimescale.X;
+            }
+            else if(linearMotorDirection.X >= 0)
+            {
+                oneByLinearMotorTimescale.X = linearMotorError.X * velocity.X < 0 ? oneByLinearMotorDecelPosTimescale.X : oneByLinearMotorAccelPosTimescale.X;
+            }
+            else
+            {
+                oneByLinearMotorTimescale.X = linearMotorError.X * velocity.X < 0 ? oneByLinearMotorDecelNegTimescale.X : oneByLinearMotorAccelNegTimescale.X;
+            }
+
+            if (linearMotorDirection.Y * velocity.Y < 0)
+            {
+                oneByLinearMotorTimescale.Y = linearMotorDirection.Y < 0 ? oneByLinearMotorAccelNegTimescale.Y : oneByLinearMotorAccelPosTimescale.Y;
+            }
+            else if (linearMotorDirection.Y >= 0)
+            {
+                oneByLinearMotorTimescale.Y = linearMotorError.Y * velocity.Y < 0 ? oneByLinearMotorDecelPosTimescale.Y : oneByLinearMotorAccelPosTimescale.Y;
+            }
+            else
+            {
+                oneByLinearMotorTimescale.Y = linearMotorError.Y * velocity.Y < 0 ? oneByLinearMotorDecelNegTimescale.Y : oneByLinearMotorAccelNegTimescale.Y;
+            }
+
+            if (linearMotorDirection.Z * velocity.Z < 0)
+            {
+                oneByLinearMotorTimescale.Z = linearMotorDirection.Z < 0 ? oneByLinearMotorAccelNegTimescale.Z : oneByLinearMotorAccelPosTimescale.Z;
+            }
+            else if (linearMotorDirection.Z >= 0)
+            {
+                oneByLinearMotorTimescale.Z = linearMotorError.Z * velocity.Z < 0 ? oneByLinearMotorDecelPosTimescale.Z : oneByLinearMotorAccelPosTimescale.Z;
+            }
+            else
+            {
+                oneByLinearMotorTimescale.Z = linearMotorError.Z * velocity.Z < 0 ? oneByLinearMotorDecelNegTimescale.Z : oneByLinearMotorAccelNegTimescale.Z;
+            }
+            #endregion
+
+            #region Angular motor timescales
+            Vector3 oneByAngularMotorAccelPosTimescale = m_Params.OneByAngularMotorAccelPosTimescale;
+            Vector3 oneByAngularMotorDecelPosTimescale = m_Params.OneByAngularMotorDecelPosTimescale;
+            Vector3 oneByAngularMotorAccelNegTimescale = m_Params.OneByAngularMotorAccelNegTimescale;
+            Vector3 oneByAngularMotorDecelNegTimescale = m_Params.OneByAngularMotorDecelNegTimescale;
+
+            if (angularMotorDirection.X * angularVelocity.X < 0)
+            {
+                oneByAngularMotorTimescale.X = angularMotorDirection.X < 0 ? oneByAngularMotorAccelNegTimescale.X : oneByAngularMotorAccelPosTimescale.X;
+            }
+            else if (angularMotorDirection.X >= 0)
+            {
+                oneByAngularMotorTimescale.X = angularMotorError.X * angularVelocity.X < 0 ? oneByAngularMotorDecelPosTimescale.X : oneByAngularMotorAccelPosTimescale.X;
+            }
+            else
+            {
+                oneByAngularMotorTimescale.X = angularMotorError.X * angularVelocity.X < 0 ? oneByAngularMotorDecelNegTimescale.X : oneByAngularMotorAccelNegTimescale.X;
+            }
+
+            if (angularMotorDirection.Y * angularVelocity.Y < 0)
+            {
+                oneByAngularMotorTimescale.Y = angularMotorDirection.Y < 0 ? oneByAngularMotorAccelNegTimescale.Y : oneByAngularMotorAccelPosTimescale.Y;
+            }
+            else if (angularMotorDirection.Y >= 0)
+            {
+                oneByAngularMotorTimescale.Y = angularMotorError.Y * angularVelocity.Y < 0 ? oneByAngularMotorDecelPosTimescale.Y : oneByAngularMotorAccelPosTimescale.Y;
+            }
+            else
+            {
+                oneByAngularMotorTimescale.Y = angularMotorError.Y * angularVelocity.Y < 0 ? oneByAngularMotorDecelNegTimescale.Y : oneByAngularMotorAccelNegTimescale.Y;
+            }
+
+            if (angularMotorDirection.Z * angularVelocity.Z < 0)
+            {
+                oneByAngularMotorTimescale.Z = angularMotorDirection.Z < 0 ? oneByAngularMotorAccelNegTimescale.Z : oneByAngularMotorAccelPosTimescale.Z;
+            }
+            else if (angularMotorDirection.Z >= 0)
+            {
+                oneByAngularMotorTimescale.Z = angularMotorError.Z * angularVelocity.Z < 0 ? oneByAngularMotorDecelPosTimescale.Z : oneByAngularMotorAccelPosTimescale.Z;
+            }
+            else
+            {
+                oneByAngularMotorTimescale.Z = angularMotorError.Z * angularVelocity.Z < 0 ? oneByAngularMotorDecelNegTimescale.Z : oneByAngularMotorAccelNegTimescale.Z;
+            }
+            #endregion
+
+            linearForce += LinearMotorForce = (m_Params[VehicleVectorParamId.LinearMotorDirection] - velocity).ElementMultiply(oneByLinearMotorTimescale * dt);
+            angularTorque += AngularMotorTorque = (m_Params[VehicleVectorParamId.AngularMotorDirection] - angularVelocity + mouselookAngularInput).ElementMultiply(oneByAngularMotorTimescale * dt);
 
             if((m_Params.Flags & VehicleFlags.TorqueWorldZ) != 0)
             {

@@ -49,8 +49,16 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
             ["LinearMotorOffset"] = VehicleVectorParamId.LinearMotorOffset,
             ["AngularMotorDecayTimescale"] = VehicleVectorParamId.AngularMotorDecayTimescale,
             ["AngularMotorTimescale"] = VehicleVectorParamId.AngularMotorTimescale,
+            ["AngularMotorAccelPosTimescale"] = VehicleVectorParamId.AngularMotorAccelPosTimescale,
+            ["AngularMotorDecelPosTimescale"] = VehicleVectorParamId.AngularMotorDecelPosTimescale,
+            ["AngularMotorAccelNegTimescale"] = VehicleVectorParamId.AngularMotorAccelNegTimescale,
+            ["AngularMotorDecelNegTimescale"] = VehicleVectorParamId.AngularMotorDecelNegTimescale,
             ["LinearMotorDecayTimescale"] = VehicleVectorParamId.LinearMotorDecayTimescale,
             ["LinearMotorTimescale"] = VehicleVectorParamId.LinearMotorTimescale,
+            ["LinearMotorAccelPosTimescale"] = VehicleVectorParamId.LinearMotorAccelPosTimescale,
+            ["LinearMotorDecelPosTimescale"] = VehicleVectorParamId.LinearMotorDecelPosTimescale,
+            ["LinearMotorAccelNegTimescale"] = VehicleVectorParamId.LinearMotorAccelNegTimescale,
+            ["LinearMotorDecelNegTimescale"] = VehicleVectorParamId.LinearMotorDecelNegTimescale,
             ["LinearWindEfficiency"] = VehicleVectorParamId.LinearWindEfficiency,
             ["AngularWindEfficiency"] = VehicleVectorParamId.AngularWindEfficiency
         };
