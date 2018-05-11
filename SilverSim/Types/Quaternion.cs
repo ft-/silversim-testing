@@ -218,25 +218,8 @@ namespace SilverSim.Types
         /// <returns>Quaternion representation of the euler angles</returns>
         public static Quaternion CreateFromEulers(double roll, double pitch, double yaw)
         {
-            if (roll > Math.PI * 2 || pitch > Math.PI * 2 || yaw > Math.PI * 2)
-            {
-                throw new ArgumentException("Euler angles must be in radians");
-            }
-
-            double atCos = Math.Cos(roll / 2f);
-            double atSin = Math.Sin(roll / 2f);
-            double leftCos = Math.Cos(pitch / 2f);
-            double leftSin = Math.Sin(pitch / 2f);
-            double upCos = Math.Cos(yaw / 2f);
-            double upSin = Math.Sin(yaw / 2f);
-            double atLeftCos = atCos * leftCos;
-            double atLeftSin = atSin * leftSin;
-            return new Quaternion(
-                atSin * leftCos * upCos + atCos * leftSin * upSin,
-                atCos * leftSin * upCos - atSin * leftCos * upSin,
-                atLeftCos * upSin + atLeftSin * upCos,
-                atLeftCos * upCos - atLeftSin * upSin
-            );
+            Matrix4 m = Matrix4.CreateFromEulers(roll, pitch, yaw);
+            return CreateFromRotationMatrix(m);
         }
 
         public static Quaternion CreateFromRotationMatrix(Matrix4 m)
@@ -510,9 +493,9 @@ namespace SilverSim.Types
             }
             return true;
         }
-        #endregion Static Methods
+#endregion Static Methods
 
-        #region Axes
+#region Axes
         public static Quaternion Axes2Rot(Vector3 fwd, Vector3 left, Vector3 up)
         {
             double s;
@@ -631,7 +614,7 @@ namespace SilverSim.Types
                 return new Vector3(x, y, z);
             }
         }
-        #endregion
+#endregion
 
         public Matrix4 GetMatrix()
         {
@@ -663,7 +646,7 @@ namespace SilverSim.Types
             };
         }
 
-        #region Overrides
+#region Overrides
 
         public override bool Equals(object obj) => (obj is Quaternion) && this == (Quaternion)obj;
 
@@ -684,9 +667,9 @@ namespace SilverSim.Types
 
         public string W_String => string.Format(CultureInfo.InvariantCulture, "{0}", W);
 
-        #endregion Overrides
+#endregion Overrides
 
-        #region Operators
+#region Operators
 
         public static bool operator ==(Quaternion quaternion1, Quaternion quaternion2) => quaternion1.Equals(quaternion2);
 
@@ -736,11 +719,11 @@ namespace SilverSim.Types
 
         public static explicit operator string(Quaternion val) => val.ToString();
 
-        #endregion Operators
+#endregion Operators
 
         public bool IsLSLTrue => !Equals(Identity);
 
-        #region Byte conversion
+#region Byte conversion
         public byte[] AsByte
         {
             get
@@ -855,9 +838,9 @@ namespace SilverSim.Types
                     "Quaternion {0} has been normalized to zero", ToString()));
             }
         }
-        #endregion
+#endregion
 
-        #region Helpers
+#region Helpers
         public ABoolean AsBoolean => new ABoolean(Length >= Double.Epsilon);
         public Integer AsInteger => new Integer((int)Length);
         public Quaternion AsQuaternion => new Quaternion(X, Y, Z, W);
@@ -869,7 +852,7 @@ namespace SilverSim.Types
         public int AsInt => (int)Length;
         public ulong AsULong => (ulong)Length;
         public long AsLong => (long)Length;
-        #endregion
+#endregion
 
         /// <summary>A quaternion with a value of 0,0,0,1</summary>
         public readonly static Quaternion Identity = new Quaternion(0f, 0f, 0f, 1f);

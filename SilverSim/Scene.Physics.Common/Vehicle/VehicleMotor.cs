@@ -331,9 +331,18 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             Vector3 vaTimescale = m_Params[VehicleVectorParamId.AngularDeflectionTimescale];
             if (vaTimescale.X < 300 || vaTimescale.Y < 300)
             {
-                Vector3 forwardDirection = Vector3.UnitZ * angularOrientaton;
-                double roll = Math.Atan2(forwardDirection.Y, forwardDirection.Z);
-                double pitch =  Math.Atan2(forwardDirection.X, forwardDirection.Z);
+                Vector3 upwardDirection = Vector3.UnitZ * angularOrientaton;
+                Vector3 forwardDirection = Vector3.UnitX * angularOrientaton;
+                double roll = Math.Atan2(upwardDirection.Y, upwardDirection.Z);
+                double pitch;
+                if(upwardDirection.Y < 0)
+                {
+                    pitch = 0;// Math.Atan2(-forwardDirection.Y, forwardDirection.X);
+                }
+                else
+                {
+                    pitch = Math.Atan2(forwardDirection.Y, forwardDirection.X);
+                }
                 Vector3 angularError = new Vector3(roll, pitch, 0) - angularVelocity;
                 Vector3 vertAttractorTorque = angularError.ElementMultiply(m_Params[VehicleVectorParamId.VerticalAttractionEfficiency].ElementMultiply(m_Params.OneByVerticalAttractionTimescale) * dt);
 
