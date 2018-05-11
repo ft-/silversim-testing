@@ -461,7 +461,11 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
 
             #region Angular Deflection
             /* Angular deflection reorients the vehicle to the velocity vector */
-            Vector3 deflect = velocity * Math.Sign(velocity.X);
+            Vector3 deflect = velocity;
+            if(deflect.X < 0)
+            {
+                deflect = -deflect;
+            }
             if(Math.Abs(deflect.X) < 0.01)
             {
                 deflect.X = 0.01;
@@ -472,11 +476,11 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             Vector3 angularDeflectionTorque = Vector3.Zero;
             if(Math.Abs(deflect.Z) > 0.01)
             {
-                angularDeflectionTorque.Y = -Math.Atan2(deflect.Z, deflect.X) * angdeflecteff.Y;
+                angularDeflectionTorque.Y = Math.Atan2(deflect.Z, deflect.X) * angdeflecteff.Y;
             }
             if(Math.Abs(deflect.Y) > 0.01)
             {
-                angularDeflectionTorque.Z = -Math.Atan2(deflect.Y, deflect.X) * angdeflecteff.Z;
+                angularDeflectionTorque.Z = Math.Atan2(deflect.Y, deflect.X) * angdeflecteff.Z;
             }
             AngularDeflectionTorque = angularDeflectionTorque;
             angularTorque += angularDeflectionTorque;
