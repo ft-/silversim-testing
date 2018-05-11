@@ -455,7 +455,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
                 {
                     invertedBankModifier = m_Params[VehicleFloatParamId.InvertedBankingModifier];
                 }
-                angularTorque.Z -= BankingTorque = (roll * 1.0.Mix(velocity.X, m_Params[VehicleFloatParamId.BankingMix])) * m_Params[VehicleFloatParamId.BankingEfficiency] * invertedBankModifier * m_Params.OneByBankingTimescale * dt;
+                angularTorque.Z += BankingTorque = (roll * 1.0.Mix(velocity.X, m_Params[VehicleFloatParamId.BankingMix])) * m_Params[VehicleFloatParamId.BankingEfficiency] * invertedBankModifier * m_Params.OneByBankingTimescale * dt;
             }
             #endregion
 
