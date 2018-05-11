@@ -78,7 +78,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             #region Transform Reference Frame
             Quaternion referenceFrame = m_Params[VehicleRotationParamId.ReferenceFrame];
             Vector3 velocity = currentState.Velocity / referenceFrame;
-            Vector3 angularVelocity = (Quaternion.CreateFromEulers(currentState.AngularVelocity) / referenceFrame).GetEulerAngles();
+            Vector3 angularVelocity = currentState.AngularVelocity / referenceFrame;
             Quaternion angularOrientaton = currentState.Rotation / referenceFrame;
             #endregion
 
