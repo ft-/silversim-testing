@@ -318,8 +318,8 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             #endregion
 
             #region Friction
-            linearBodyForce -= LinearFrictionForce = (currentState.Velocity).ElementMultiply(m_Params.OneByLinearFrictionTimescale * dt);
-            angularBodyTorque -= AngularFrictionTorque = (currentState.AngularVelocity).ElementMultiply(m_Params.OneByAngularFrictionTimescale * dt);
+            linearBodyForce += LinearFrictionForce = (-currentState.Velocity).ElementMultiply((m_Params.OneByLinearFrictionTimescale * dt).ComponentMin(1));
+            angularBodyTorque += AngularFrictionTorque = (-currentState.AngularVelocity).ElementMultiply((m_Params.OneByAngularFrictionTimescale * dt).ComponentMin(1));
             #endregion
 
             #region Vertical Attractor
