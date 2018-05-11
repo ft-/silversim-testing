@@ -196,7 +196,7 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                         m_AngularMotorTimescale = new Vector3(1000).ToTimescale();
                         m_AngularMotorDecayTimescale = new Vector3(120).ToTimescale();
                         m_HoverHeight = 0;
-                        m_HoverEfficiency = 10;
+                        m_HoverEfficiency = 1;
                         m_HoverTimescale = 10.0.ToTimescale();
                         m_Buoyancy = 0;
                         m_LinearDeflectionEfficiency = Vector3.One;
