@@ -328,20 +328,23 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             /* vertical attractor is a angular motor 
             VEHICLE_FLAG_LIMIT_ROLL_ONLY affects this one to be only affected on roll axis
             */
-            Vector3 vaTimescale = m_Params[VehicleVectorParamId.AngularDeflectionTimescale];
+            Vector3 vaTimescale = m_Params[VehicleVectorParamId.VerticalAttractionTimescale];
             if (vaTimescale.X < 300 || vaTimescale.Y < 300)
             {
                 Vector3 upwardDirection = Vector3.UnitZ * angularOrientaton;
                 Vector3 forwardDirection = Vector3.UnitX * angularOrientaton;
                 double roll = Math.Atan2(upwardDirection.Y, upwardDirection.Z);
-                double pitch;
-                if(upwardDirection.Y < 0)
+                double pitch = 0;
+                if ((flags & VehicleFlags.LimitRollOnly) == 0 && vaTimescale.Y < 300)
                 {
-                    pitch = Math.Atan2(-forwardDirection.Y, forwardDirection.X);
-                }
-                else
-                {
-                    pitch = Math.Atan2(forwardDirection.Y, forwardDirection.X);
+                    if (upwardDirection.Y < 0)
+                    {
+                        pitch = Math.Atan2(-forwardDirection.Y, forwardDirection.X);
+                    }
+                    else
+                    {
+                        pitch = Math.Atan2(forwardDirection.Y, forwardDirection.X);
+                    }
                 }
                 Vector3 angularError = new Vector3(roll, pitch, 0) - angularVelocity;
                 Vector3 vertAttractorTorque = angularError.ElementMultiply(m_Params[VehicleVectorParamId.VerticalAttractionEfficiency].ElementMultiply(m_Params.OneByVerticalAttractionTimescale) * dt);
