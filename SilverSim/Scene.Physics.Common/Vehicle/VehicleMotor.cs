@@ -337,7 +337,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
                 double pitch;
                 if(upwardDirection.Y < 0)
                 {
-                    pitch = 0;// Math.Atan2(-forwardDirection.Y, forwardDirection.X);
+                    pitch = Math.Atan2(-forwardDirection.Y, forwardDirection.X);
                 }
                 else
                 {
