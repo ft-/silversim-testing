@@ -255,21 +255,22 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             double hoverForce;
             Vector3 pos = currentState.Position;
             double paramHoverHeight = m_Params[VehicleFloatParamId.HoverHeight];
-            double hoverHeight = scene.Terrain[pos];
+            double hoverHeight = 0;
+            double terrainHeight = scene.Terrain[pos];
             double waterHeight = scene.RegionSettings.WaterHeight;
 
             if ((flags & VehicleFlags.HoverGlobalHeight) != 0)
             {
                 hoverHeight = paramHoverHeight;
-                if(hoverHeight < waterHeight)
+                if(hoverHeight < terrainHeight)
                 {
-                    hoverHeight = waterHeight;
+                    hoverHeight = terrainHeight;
                 }
             }
             else
             {
                 paramHoverHeight = Math.Min(100, paramHoverHeight);
-                hoverHeight += paramHoverHeight;
+                hoverHeight = terrainHeight + paramHoverHeight;
                 double waterHoverHeight = waterHeight + paramHoverHeight;
 
                 if ((flags & VehicleFlags.HoverWaterOnly) != 0 ||
