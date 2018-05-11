@@ -277,7 +277,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
                 }
             }
 
-            if (Math.Abs(hoverHeight) > double.Epsilon && m_Params.IsHoverMotorEnabled)
+            if (m_Params.IsHoverMotorEnabled)
             {
                 /* The definition does not include negative hover height.
                  * But since we are allowing negative terain height, it makes an useful feature.
