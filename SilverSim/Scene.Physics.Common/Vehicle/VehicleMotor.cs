@@ -285,7 +285,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
                 /* The definition does not include negative hover height.
                  * But since we are allowing negative terain height, it makes an useful feature.
                  */
-                hoverForce = (hoverHeight + 0.21728 - pos.Z) * m_Params[VehicleFloatParamId.HoverEfficiency] * m_Params.OneByHoverTimescale * dt;
+                hoverForce = ((hoverHeight + 0.21728 - pos.Z) - velocity.Z) * m_Params[VehicleFloatParamId.HoverEfficiency] * m_Params.OneByHoverTimescale * dt;
                 if ((m_Params.Flags & VehicleFlags.HoverUpOnly) != 0 && hoverForce < 0)
                 {
                     hoverForce = 0;
@@ -334,12 +334,12 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
                 Vector3 forwardDirection = Vector3.UnitZ * angularOrientaton;
                 double roll = Math.Atan2(forwardDirection.Y, forwardDirection.Z);
                 double pitch =  Math.Atan2(forwardDirection.X, forwardDirection.Z);
-                Vector3 angularError = new Vector3(roll, pitch, 0);
-                Vector3 vertAttractorTorque = -angularError.ElementMultiply(m_Params[VehicleVectorParamId.VerticalAttractionEfficiency].ElementMultiply(m_Params.OneByVerticalAttractionTimescale) * dt);
+                Vector3 angularError = new Vector3(roll, pitch, 0) - angularVelocity;
+                Vector3 vertAttractorTorque = angularError.ElementMultiply(m_Params[VehicleVectorParamId.VerticalAttractionEfficiency].ElementMultiply(m_Params.OneByVerticalAttractionTimescale) * dt);
 
                 if (vaTimescale.X < 300)
                 {
-                    double rollboundary = Math.Min(Math.Abs(angularError.X), Math.Abs(vertAttractorTorque.X));
+                    double rollboundary = Math.Min(Math.Abs(roll), Math.Abs(vertAttractorTorque.X));
                     angularTorque.X = angularTorque.X + vertAttractorTorque.X.Clamp(-rollboundary, rollboundary);
                 }
                 else
@@ -349,7 +349,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
 
                 if ((flags & VehicleFlags.LimitRollOnly) == 0 && vaTimescale.Y < 300)
                 {
-                    double pitchboundary = Math.Min(Math.Abs(angularError.Y), Math.Abs(vertAttractorTorque.Y));
+                    double pitchboundary = Math.Min(Math.Abs(pitch), Math.Abs(vertAttractorTorque.Y));
                     angularTorque.Y = angularTorque.Y + vertAttractorTorque.Y.Clamp(-pitchboundary, pitchboundary);
                 }
                 else
