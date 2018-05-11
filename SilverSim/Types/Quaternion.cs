@@ -493,9 +493,9 @@ namespace SilverSim.Types
             }
             return true;
         }
-#endregion Static Methods
+        #endregion Static Methods
 
-#region Axes
+        #region Axes
         public static Quaternion Axes2Rot(Vector3 fwd, Vector3 left, Vector3 up)
         {
             double s;
@@ -614,7 +614,7 @@ namespace SilverSim.Types
                 return new Vector3(x, y, z);
             }
         }
-#endregion
+        #endregion
 
         public Matrix4 GetMatrix()
         {
@@ -646,7 +646,7 @@ namespace SilverSim.Types
             };
         }
 
-#region Overrides
+        #region Overrides
 
         public override bool Equals(object obj) => (obj is Quaternion) && this == (Quaternion)obj;
 
@@ -667,9 +667,9 @@ namespace SilverSim.Types
 
         public string W_String => string.Format(CultureInfo.InvariantCulture, "{0}", W);
 
-#endregion Overrides
+        #endregion Overrides
 
-#region Operators
+        #region Operators
 
         public static bool operator ==(Quaternion quaternion1, Quaternion quaternion2) => quaternion1.Equals(quaternion2);
 
@@ -719,11 +719,11 @@ namespace SilverSim.Types
 
         public static explicit operator string(Quaternion val) => val.ToString();
 
-#endregion Operators
+        #endregion Operators
 
         public bool IsLSLTrue => !Equals(Identity);
 
-#region Byte conversion
+        #region Byte conversion
         public byte[] AsByte
         {
             get
@@ -838,9 +838,9 @@ namespace SilverSim.Types
                     "Quaternion {0} has been normalized to zero", ToString()));
             }
         }
-#endregion
+        #endregion
 
-#region Helpers
+        #region Helpers
         public ABoolean AsBoolean => new ABoolean(Length >= Double.Epsilon);
         public Integer AsInteger => new Integer((int)Length);
         public Quaternion AsQuaternion => new Quaternion(X, Y, Z, W);
@@ -852,7 +852,7 @@ namespace SilverSim.Types
         public int AsInt => (int)Length;
         public ulong AsULong => (ulong)Length;
         public long AsLong => (long)Length;
-#endregion
+        #endregion
 
         /// <summary>A quaternion with a value of 0,0,0,1</summary>
         public readonly static Quaternion Identity = new Quaternion(0f, 0f, 0f, 1f);
