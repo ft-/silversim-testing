@@ -261,11 +261,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
 
             if ((flags & VehicleFlags.HoverGlobalHeight) != 0)
             {
-                hoverHeight = paramHoverHeight;
-                if(hoverHeight < terrainHeight)
-                {
-                    hoverHeight = terrainHeight;
-                }
+                hoverHeight = Math.Max(paramHoverHeight, terrainHeight);
             }
             else
             {
