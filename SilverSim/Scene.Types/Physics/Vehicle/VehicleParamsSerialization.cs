@@ -77,7 +77,8 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
             ["BankingAzimuth"] = VehicleFloatParamId.BankingAzimuth,
             ["DisableMotorsAbove"] = VehicleFloatParamId.DisableMotorsAbove,
             ["DisableMotorsAfter"] = VehicleFloatParamId.DisableMotorsAfter,
-            ["InvertedBankingModifier"] = VehicleFloatParamId.InvertedBankingModifier
+            ["InvertedBankingModifier"] = VehicleFloatParamId.InvertedBankingModifier,
+            ["HeightExceededTime"] = VehicleFloatParamId.HeightExceededTime
         };
 
         public static void LoadFromVehicleSerialization(this ObjectPart part, byte[] data)

@@ -37,5 +37,7 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
         DisableMotorsAbove = 11004,
         DisableMotorsAfter = 11005,
         InvertedBankingModifier = 11006,
+
+        HeightExceededTime = 12000
     }
 }

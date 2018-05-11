@@ -148,6 +148,8 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
         private TimescaleData<double> m_BankingTimescale = TimescaleData<double>.Create(0);
         public double OneByBankingTimescale => m_BankingTimescale.OneByTimescale;
 
+        private ReferenceBoxed<double> m_HeightExceededTime = 0;
+
         private ReferenceBoxed<double> m_Buoyancy = 0;
         private ReferenceBoxed<double> m_HoverHeight = 0;
         private ReferenceBoxed<double> m_HoverEfficiency = 0;
@@ -205,6 +207,7 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
 
             set
             {
+                m_HeightExceededTime = 0;
                 switch (value)
                 {
                     case VehicleType.None:
@@ -863,6 +866,9 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                     case VehicleFloatParamId.InvertedBankingModifier:
                         return m_InvertedBankingModifier;
 
+                    case VehicleFloatParamId.HeightExceededTime:
+                        return m_HeightExceededTime;
+
                     default:
                         throw new KeyNotFoundException();
                 }
@@ -936,6 +942,10 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                         m_Part.IncSerialNumber();
                         break;
 
+                    case VehicleFloatParamId.HeightExceededTime:
+                        m_HeightExceededTime = value;
+                        break;
+
                     default:
                         throw new KeyNotFoundException();
                 }
@@ -984,7 +994,8 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                 { "BankingAzimuth", m_BankingAzimuth },
                 { "DisableMotorsAbove", m_DisableMotorsAbove },
                 { "DisableMotorsAfter", m_DisableMotorsAfter },
-                { "InvertedBankingModifier", m_InvertedBankingModifier }
+                { "InvertedBankingModifier", m_InvertedBankingModifier },
+                { "HeightExceededTime", m_HeightExceededTime }
             };
 
             using (var ms = new MemoryStream())

@@ -30,7 +30,6 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
     public class VehicleMotor
     {
         private readonly VehicleParams m_Params;
-        private double HeightExceededTime;
 
         public Vector3 LinearMotorForce { get; private set; }
         public Vector3 AngularMotorTorque { get; private set; }
@@ -67,7 +66,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             if (m_Params.VehicleType == VehicleType.None)
             {
                 /* disable vehicle */
-                HeightExceededTime = 0f;
+                m_Params[VehicleFloatParamId.HeightExceededTime] = 0;
                 return;
             }
 
@@ -297,11 +296,13 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
 
             #region Disable Motor Logic (neat idea based on halcyon simulator)
             double disableMotorsAfter = m_Params[VehicleFloatParamId.DisableMotorsAfter];
-            if(disableMotorsAfter > double.Epsilon &&
+            double heightExceededTime = m_Params[VehicleFloatParamId.HeightExceededTime];
+            if (disableMotorsAfter > double.Epsilon &&
                 m_Params[VehicleFloatParamId.DisableMotorsAbove] < pos.Z - hoverHeight)
             {
-                HeightExceededTime += dt;
-                if(disableMotorsAfter <= HeightExceededTime)
+                heightExceededTime += dt;
+                m_Params[VehicleFloatParamId.HeightExceededTime] = dt;
+                if(disableMotorsAfter <= heightExceededTime)
                 {
                     angularBodyTorque = Vector3.Zero;
                     linearBodyForce = Vector3.Zero;
@@ -309,7 +310,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             }
             else
             {
-                HeightExceededTime = 0;
+                m_Params[VehicleFloatParamId.HeightExceededTime] = 0;
             }
             #endregion
 
