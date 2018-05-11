@@ -121,6 +121,10 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             {
                 oneByLinearMotorTimescale.X = linearMotorDirection.X < 0 ? oneByLinearMotorAccelNegTimescale.X : oneByLinearMotorAccelPosTimescale.X;
             }
+            else if(Math.Abs(linearMotorDirection.X) <= double.Epsilon)
+            {
+                oneByLinearMotorTimescale.X = velocity.X < 0 ? oneByLinearMotorDecelNegTimescale.X : oneByLinearMotorDecelPosTimescale.X;
+            }
             else if(linearMotorDirection.X >= 0)
             {
                 oneByLinearMotorTimescale.X = linearMotorError.X * velocity.X < 0 ? oneByLinearMotorDecelPosTimescale.X : oneByLinearMotorAccelPosTimescale.X;
@@ -134,6 +138,10 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             {
                 oneByLinearMotorTimescale.Y = linearMotorDirection.Y < 0 ? oneByLinearMotorAccelNegTimescale.Y : oneByLinearMotorAccelPosTimescale.Y;
             }
+            else if (Math.Abs(linearMotorDirection.Y) <= double.Epsilon)
+            {
+                oneByLinearMotorTimescale.Y = velocity.Y < 0 ? oneByLinearMotorDecelNegTimescale.Y : oneByLinearMotorDecelPosTimescale.Y;
+            }
             else if (linearMotorDirection.Y >= 0)
             {
                 oneByLinearMotorTimescale.Y = linearMotorError.Y * velocity.Y < 0 ? oneByLinearMotorDecelPosTimescale.Y : oneByLinearMotorAccelPosTimescale.Y;
@@ -146,6 +154,10 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             if (linearMotorDirection.Z * velocity.Z < 0 && Math.Abs(linearMotorDirection.Z) > double.Epsilon)
             {
                 oneByLinearMotorTimescale.Z = linearMotorDirection.Z < 0 ? oneByLinearMotorAccelNegTimescale.Z : oneByLinearMotorAccelPosTimescale.Z;
+            }
+            else if (Math.Abs(linearMotorDirection.Z) <= double.Epsilon)
+            {
+                oneByLinearMotorTimescale.Z = velocity.Z < 0 ? oneByLinearMotorDecelNegTimescale.Z : oneByLinearMotorDecelPosTimescale.Z;
             }
             else if (linearMotorDirection.Z >= 0)
             {
@@ -167,6 +179,10 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             {
                 oneByAngularMotorTimescale.X = angularMotorDirection.X < 0 ? oneByAngularMotorAccelNegTimescale.X : oneByAngularMotorAccelPosTimescale.X;
             }
+            else if (Math.Abs(angularMotorDirection.X) <= double.Epsilon)
+            {
+                oneByAngularMotorTimescale.X = angularVelocity.X < 0 ? oneByAngularMotorDecelNegTimescale.X : oneByAngularMotorDecelPosTimescale.X;
+            }
             else if (angularMotorDirection.X >= 0)
             {
                 oneByAngularMotorTimescale.X = angularMotorError.X * angularVelocity.X < 0 ? oneByAngularMotorDecelPosTimescale.X : oneByAngularMotorAccelPosTimescale.X;
@@ -180,6 +196,10 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             {
                 oneByAngularMotorTimescale.Y = angularMotorDirection.Y < 0 ? oneByAngularMotorAccelNegTimescale.Y : oneByAngularMotorAccelPosTimescale.Y;
             }
+            else if (Math.Abs(angularMotorDirection.Y) <= double.Epsilon)
+            {
+                oneByAngularMotorTimescale.Y = angularVelocity.Y < 0 ? oneByAngularMotorDecelNegTimescale.Y : oneByAngularMotorDecelPosTimescale.Y;
+            }
             else if (angularMotorDirection.Y >= 0)
             {
                 oneByAngularMotorTimescale.Y = angularMotorError.Y * angularVelocity.Y < 0 ? oneByAngularMotorDecelPosTimescale.Y : oneByAngularMotorAccelPosTimescale.Y;
@@ -192,6 +212,10 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             if (angularMotorDirection.Z * angularVelocity.Z < 0 && Math.Abs(angularMotorDirection.Z) > double.Epsilon)
             {
                 oneByAngularMotorTimescale.Z = angularMotorDirection.Z < 0 ? oneByAngularMotorAccelNegTimescale.Z : oneByAngularMotorAccelPosTimescale.Z;
+            }
+            else if (Math.Abs(angularMotorDirection.Z) <= double.Epsilon)
+            {
+                oneByAngularMotorTimescale.Z = angularVelocity.Z < 0 ? oneByAngularMotorDecelNegTimescale.Z : oneByAngularMotorDecelPosTimescale.Z;
             }
             else if (angularMotorDirection.Z >= 0)
             {
