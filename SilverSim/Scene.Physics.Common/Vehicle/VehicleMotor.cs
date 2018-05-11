@@ -490,11 +490,11 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             /* Linear deflection deflects the affecting force along the reference x-axis */
             var eulerDiff = new Vector3
             {
-                Z = -Math.Atan2(velocity.Y, velocity.X)
+                Z = Math.Atan2(velocity.Y, velocity.X)
             };
             if ((flags & VehicleFlags.NoDeflectionUp) != 0)
             {
-                eulerDiff.Y = -Math.Atan2(velocity.Z, velocity.X);
+                eulerDiff.Y = Math.Atan2(velocity.Z, velocity.X);
             }
 
             eulerDiff = eulerDiff.ElementMultiply((m_Params[VehicleVectorParamId.LinearDeflectionEfficiency].ElementMultiply(m_Params.OneByLinearDeflectionTimescale) * dt).ComponentMin(1));
