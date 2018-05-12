@@ -425,7 +425,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
 
                 if ((flags & VehicleFlags.ReactToWind) != 0 && pos.Z + halfBoundBoxSizeZ > waterHeight)
                 {
-                    Vector3 windvelocity = scene.Environment.Wind[pos + new Vector3(0, 0, halfBoundBoxSizeZ / 2)];
+                    Vector3 windvelocity = scene.Environment.Wind[pos + new Vector3(0, 0, halfBoundBoxSizeZ / 2)] / referenceFrame;
 
                     #region Linear Wind Affector
                     linearBodyForce += LinearWindForce = (windvelocity - velocity).ElementMultiply(m_Params[VehicleVectorParamId.LinearWindEfficiency]) * dt;
@@ -453,7 +453,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
                 if ((flags & VehicleFlags.ReactToCurrents) != 0 && pos.Z - halfBoundBoxSizeZ / 2 < waterHeight)
                 {
                     /* yes, wind model also provides current model */
-                    Vector3 currentvelocity = scene.Environment.Wind[pos - new Vector3(0, 0, halfBoundBoxSizeZ / 2)];
+                    Vector3 currentvelocity = scene.Environment.Wind[pos - new Vector3(0, 0, halfBoundBoxSizeZ / 2)] / referenceFrame;
 
                     #region Linear Current Affector
                     linearBodyForce += LinearCurrentForce = (currentvelocity - velocity).ElementMultiply(m_Params[VehicleVectorParamId.LinearWindEfficiency]) * dt;
