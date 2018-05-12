@@ -21,6 +21,7 @@
 
 using log4net;
 using SilverSim.Scene.Types.Object.Localization;
+using SilverSim.Scene.Types.Pathfinding;
 using SilverSim.Scene.Types.Physics.Vehicle;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script;
@@ -158,6 +159,21 @@ namespace SilverSim.Scene.Types.Object
                     m_PathfindingType = value;
                     TriggerOnUpdate(UpdateChangedFlags.Physics);
                 }
+            }
+        }
+
+        private CharacterType m_PathfindingCharacterType;
+
+        public CharacterType PathfindingCharacterType
+        {
+            get
+            {
+                return m_PathfindingCharacterType;
+            }
+            set
+            {
+                m_PathfindingCharacterType = value;
+                TriggerOnUpdate(UpdateChangedFlags.Physics);
             }
         }
 

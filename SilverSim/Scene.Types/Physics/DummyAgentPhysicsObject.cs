@@ -117,6 +117,12 @@ namespace SilverSim.Scene.Types.Physics
         {
         }
 
+        public bool ActivateTargetList(Vector3[] targetList) => false;
+
+        public void DeactivateTargetList()
+        {
+        }
+
         public static readonly DummyAgentPhysicsObject SharedInstance = new DummyAgentPhysicsObject();
     }
 }

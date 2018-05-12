@@ -172,5 +172,11 @@ namespace SilverSim.Scene.Types.Physics
         public void StopLookAt()
         {
         }
+
+        public bool ActivateTargetList(Vector3[] targetList) => false;
+
+        public void DeactivateTargetList()
+        {
+        }
     }
 }

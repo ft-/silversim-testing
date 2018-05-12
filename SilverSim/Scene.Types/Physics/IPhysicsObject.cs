@@ -47,5 +47,8 @@ namespace SilverSim.Scene.Types.Physics
 
         void SetLookAt(Quaternion q, double strength, double damping);
         void StopLookAt();
+
+        bool ActivateTargetList(Vector3[] targetList);
+        void DeactivateTargetList();
     }
 }

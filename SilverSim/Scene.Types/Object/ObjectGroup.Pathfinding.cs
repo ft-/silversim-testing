@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Scene.Types.Pathfinding;
 using SilverSim.Types;
 using System;
 
@@ -41,6 +42,12 @@ namespace SilverSim.Scene.Types.Object
             get { return RootPart.PathfindingType; }
 
             set { RootPart.PathfindingType = value; }
+        }
+
+        public CharacterType PathfindingCharacterType
+        {
+            get { return RootPart.PathfindingCharacterType; }
+            set { RootPart.PathfindingCharacterType = value; }
         }
 
         public double WalkableCoefficientAvatar

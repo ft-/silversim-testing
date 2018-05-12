@@ -22,6 +22,7 @@
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Object.Parameters;
+using SilverSim.Scene.Types.Pathfinding;
 using SilverSim.Scene.Types.Physics.Vehicle;
 using SilverSim.Threading;
 using SilverSim.Types;
@@ -119,6 +120,7 @@ namespace SilverSim.Database.Memory.SimulationData
 
                 PhysicsShapeType = (PrimitivePhysicsShapeType)map["PhysicsShapeType"].AsInt,
                 PathfindingType = (PathfindingType)map["PathfindingType"].AsInt,
+                PathfindingCharacterType = (CharacterType)map["PathfindingCharacterType"].AsInt,
                 WalkableCoefficientAvatar = map["WalkableCoefficientAvatar"].AsReal,
                 WalkableCoefficientA = map["WalkableCoefficientA"].AsReal,
                 WalkableCoefficientB = map["WalkableCoefficientB"].AsReal,

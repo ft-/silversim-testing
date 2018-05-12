@@ -326,6 +326,12 @@ namespace SilverSim.Scene.Physics.Common
             return forces;
         }
 
+        public bool ActivateTargetList(Vector3[] targetList) => false;
+
+        public void DeactivateTargetList()
+        {
+        }
+
         public abstract void Process(double dt);
     }
 }

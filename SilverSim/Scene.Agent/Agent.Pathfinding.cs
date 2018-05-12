@@ -33,7 +33,7 @@ namespace SilverSim.Scene.Agent
 
         public void StopMoveToTarget()
         {
-            throw new NotImplementedException("StopMoveToTarget");
+            PhysicsActor?.DeactivateTargetList();
         }
     }
 }

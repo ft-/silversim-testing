@@ -595,6 +595,11 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             m_TargetList = new TargetList(moveToTargetList);
             return true;
         }
+
+        public void DeactivateTargetList()
+        {
+            m_TargetList = null;
+        }
     }
 
     public static class VehicleMotorExtension

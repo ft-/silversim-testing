@@ -227,6 +227,20 @@ namespace SilverSim.Scene.Physics.Common
             return forces;
         }
 
+        public bool ActivateTargetList(Vector3[] targetList)
+        {
+            if(m_Vehicle.ActivateTargetList(targetList))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public void DeactivateTargetList()
+        {
+            m_Vehicle.DeactivateTargetList();
+        }
+
         public abstract void Process(double dt);
 
         #endregion
