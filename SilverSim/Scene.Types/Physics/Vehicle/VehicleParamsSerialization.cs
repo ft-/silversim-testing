@@ -60,7 +60,13 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
             ["LinearMotorAccelNegTimescale"] = VehicleVectorParamId.LinearMotorAccelNegTimescale,
             ["LinearMotorDecelNegTimescale"] = VehicleVectorParamId.LinearMotorDecelNegTimescale,
             ["LinearWindEfficiency"] = VehicleVectorParamId.LinearWindEfficiency,
-            ["AngularWindEfficiency"] = VehicleVectorParamId.AngularWindEfficiency
+            ["AngularWindEfficiency"] = VehicleVectorParamId.AngularWindEfficiency,
+            ["LinearMoveToTargetEfficiency"] = VehicleVectorParamId.LinearMoveToTargetEfficiency,
+            ["LinearMoveToTargetTimescale"] = VehicleVectorParamId.LinearMoveToTargetTimescale,
+            ["LinearMoveToTargetMaxOutput"] = VehicleVectorParamId.LinearMoveToTargetMaxOutput,
+            ["AngularMoveToTargetEfficiency"] = VehicleVectorParamId.AngularMoveToTargetEfficiency,
+            ["AngularMoveToTargetTimescale"] = VehicleVectorParamId.AngularMoveToTargetTimescale,
+            ["AngularMoveToTargetMaxOutput"] = VehicleVectorParamId.AngularMoveToTargetMaxOutput
         };
 
         private readonly static Dictionary<string, VehicleFloatParamId> m_FloatParams = new Dictionary<string, VehicleFloatParamId>

@@ -56,6 +56,16 @@ namespace SilverSim.Types
             }
         }
 
+        public static double DegToRad(this int val) => val * Math.PI / 180.0;
+
+        public static double DegToRad(this double val) => val * Math.PI / 180.0;
+
+        public static double RadToDeg(this double val) => val * 180.0 / Math.PI;
+
+        public static Vector3 DegToRad(this Vector3 val) => val * Math.PI / 180.0;
+
+        public static Vector3 RadToDeg(this Vector3 val) => val * 180.0 / Math.PI;
+
         public static bool IsInRange(this double val, double min, double max) => val >= min && val <= max;
 
         public static bool IsFinite(this double value) => !(double.IsNaN(value) || double.IsInfinity(value));

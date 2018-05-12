@@ -52,6 +52,16 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
         AngularMotorAccelPosTimescale = 13100,
         AngularMotorDecelPosTimescale = 13101,
         AngularMotorAccelNegTimescale = 13102,
-        AngularMotorDecelNegTimescale = 13103
+        AngularMotorDecelNegTimescale = 13103,
+
+        LinearMoveToTargetEfficiency = 14000,
+        LinearMoveToTargetTimescale = 14001,
+        LinearMoveToTargetEpsilon = 14002,
+        LinearMoveToTargetMaxOutput = 14003,
+
+        AngularMoveToTargetEfficiency = 14100,
+        AngularMoveToTargetTimescale = 14101,
+        AngularMoveToTargetEpsilon = 14102,
+        AngularMoveToTargetMaxOutput = 14103
     }
 }

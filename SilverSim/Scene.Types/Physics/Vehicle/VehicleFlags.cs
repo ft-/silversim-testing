@@ -53,10 +53,12 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
         ReactToCurrents = 0x10000,
         /** <summary>vehicle reacts to wind force</summary> */
         ReactToWind = 0x20000,
-        /** <summary>Limit motor dirction vector from pushing the vehicle down</summary> */
+        /** <summary>Limit motor direction vector from pushing the vehicle down</summary> */
         LimitMotorDown = 0x40000,
         TorqueWorldZ = 0x80000,
         MousePointSteer = 0x100000,
         MousePointBank = 0x200000,
+
+        StopMoveToTargetAtEnd = 1U << 31
     }
 }

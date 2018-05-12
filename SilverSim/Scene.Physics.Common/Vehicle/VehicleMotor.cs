@@ -24,6 +24,7 @@ using SilverSim.Scene.Types.Physics.Vehicle;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using System;
+using System.Threading;
 
 namespace SilverSim.Scene.Physics.Common.Vehicle
 {
@@ -101,9 +102,47 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
                 }
             }
 
+            #region MoveToTarget inputs
+            Vector3 targetPos = Vector3.Zero;
+            Vector3 linearTargetDirection = Vector3.Zero;
+            Vector3 angularTargetDirection = Vector3.Zero;
+            TargetList targetList = m_TargetList;
+            if(targetList?.TryGetTarget(out targetPos) ?? false)
+            {
+                Vector3 linearError = targetPos - currentState.Position;
+                Vector3 angularError = Quaternion.RotBetween(Vector3.UnitX, linearError).GetEulerAngles();
+                Vector3 linearEpsilon = m_Params[VehicleVectorParamId.LinearMoveToTargetEpsilon];
+                Vector3 angularEpsilon = m_Params[VehicleVectorParamId.AngularMoveToTargetEpsilon];
+                Vector3 linearMaxOutput = m_Params[VehicleVectorParamId.LinearMoveToTargetMaxOutput];
+                Vector3 angularMaxOutput = m_Params[VehicleVectorParamId.AngularMoveToTargetMaxOutput];
+
+                bool linearTargetReached = (Math.Abs(linearError.X) < linearEpsilon.X || linearEpsilon.X < 0) &&
+                    (Math.Abs(linearError.Y) < linearEpsilon.Y || linearEpsilon.Y < 0) &&
+                    (Math.Abs(linearError.Z) < linearEpsilon.Z || linearEpsilon.Z < 0);
+                bool angularTargetReached = (Math.Abs(angularError.X) < angularEpsilon.X || angularEpsilon.X < 0) &&
+                    (Math.Abs(angularError.Y) < angularEpsilon.Y || angularEpsilon.Y < 0) &&
+                    (Math.Abs(angularError.Z) < angularEpsilon.Z || angularEpsilon.Z < 0);
+
+                /* limiters */
+                linearError = linearError.ComponentClamp(-linearMaxOutput, linearMaxOutput);
+                angularError = angularError.ComponentClamp(-angularMaxOutput, angularMaxOutput);
+
+                /* timescalers */
+                linearTargetDirection = linearError.ElementMultiply((m_Params[VehicleVectorParamId.LinearMoveToTargetEfficiency].ElementMultiply(m_Params.OneByLinearMoveToTargetTimescale) * dt).ComponentMin(1));
+                angularTargetDirection = angularError.ElementMultiply((m_Params[VehicleVectorParamId.AngularMoveToTargetEfficiency].ElementMultiply(m_Params.OneByAngularMoveToTargetTimescale) * dt).ComponentMin(1));
+
+                if (linearTargetReached && angularTargetReached && !m_TargetList.NextTarget() &&
+                    (m_Params.Flags & VehicleFlags.StopMoveToTargetAtEnd) != 0)
+                {
+                    /* remove target list if not already changed */
+                    Interlocked.CompareExchange(ref m_TargetList, null, targetList);
+                }
+            }
+            #endregion
+
             #region Motor Inputs
-            Vector3 linearMotorDirection = m_Params[VehicleVectorParamId.LinearMotorDirection];
-            Vector3 angularMotorDirection = m_Params[VehicleVectorParamId.AngularMotorDirection] + mouselookAngularInput;
+            Vector3 linearMotorDirection = m_Params[VehicleVectorParamId.LinearMotorDirection] + linearTargetDirection;
+            Vector3 angularMotorDirection = m_Params[VehicleVectorParamId.AngularMotorDirection] + mouselookAngularInput + angularTargetDirection;
             Vector3 linearMotorError = linearMotorDirection - velocity;
             Vector3 angularMotorError = angularMotorDirection - m_Params[VehicleVectorParamId.AngularMotorDirection] - angularVelocity;
 
@@ -511,6 +550,51 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
 
         public Vector3 LinearForce { get; private set; }
         public Vector3 AngularTorque { get; private set; }
+
+        private sealed class TargetList
+        {
+            public readonly Vector3[] m_MoveToTargetList;
+            private int m_MoveToTargetListPosition;
+
+            public TargetList(Vector3[] targetList)
+            {
+                if(targetList == null)
+                {
+                    throw new ArgumentOutOfRangeException();
+                }
+                m_MoveToTargetList = targetList;
+            }
+
+            public bool TryGetTarget(out Vector3 targetPos)
+            {
+                int pos = m_MoveToTargetListPosition;
+                if(pos < m_MoveToTargetList.Length)
+                {
+                    targetPos = m_MoveToTargetList[pos];
+                    return true;
+                }
+                else
+                {
+                    targetPos = Vector3.Zero;
+                    return false;
+                }
+            }
+
+            public bool NextTarget() => Interlocked.Increment(ref m_MoveToTargetListPosition) < m_MoveToTargetList.Length;
+        }
+
+        private TargetList m_TargetList;
+
+        public bool ActivateTargetList(Vector3[] moveToTargetList)
+        {
+            if(m_Params.VehicleType == VehicleType.None)
+            {
+                return false;
+            }
+
+            m_TargetList = new TargetList(moveToTargetList);
+            return true;
+        }
     }
 
     public static class VehicleMotorExtension
