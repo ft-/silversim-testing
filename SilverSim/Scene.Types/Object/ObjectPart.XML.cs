@@ -400,6 +400,17 @@ namespace SilverSim.Scene.Types.Object
                             /* disable motors */
                             writer.WriteNamedValue("DisableMotorsAbove", VehicleParams[VehicleFloatParamId.DisableMotorsAbove]);
                             writer.WriteNamedValue("DisableMotorsAfter", VehicleParams[VehicleFloatParamId.DisableMotorsAfter]);
+
+                            /* move to target */
+                            writer.WriteNamedValue("LinearMoveToTargetEfficiency", VehicleParams[VehicleVectorParamId.LinearMoveToTargetEfficiency]);
+                            writer.WriteNamedValue("LinearMoveToTargetTimescale", VehicleParams[VehicleVectorParamId.LinearMoveToTargetTimescale]);
+                            writer.WriteNamedValue("LinearMoveToTargetEpsilon", VehicleParams[VehicleVectorParamId.LinearMoveToTargetEpsilon]);
+                            writer.WriteNamedValue("LinearMoveToTargetMaxOutput", VehicleParams[VehicleVectorParamId.LinearMoveToTargetMaxOutput]);
+
+                            writer.WriteNamedValue("AngularMoveToTargetEfficiency", VehicleParams[VehicleVectorParamId.AngularMoveToTargetEfficiency]);
+                            writer.WriteNamedValue("AngularMoveToTargetTimescale", VehicleParams[VehicleVectorParamId.AngularMoveToTargetTimescale]);
+                            writer.WriteNamedValue("AngularMoveToTargetEpsilon", VehicleParams[VehicleVectorParamId.AngularMoveToTargetEpsilon]);
+                            writer.WriteNamedValue("AngularMoveToTargetMaxOutput", VehicleParams[VehicleVectorParamId.AngularMoveToTargetMaxOutput]);
                         }
                         writer.WriteEndElement();
                     }
@@ -1147,6 +1158,38 @@ namespace SilverSim.Scene.Types.Object
 
                             case "DisableMotorsAfter":
                                 part.VehicleParams[VehicleFloatParamId.DisableMotorsAfter] = reader.ReadElementValueAsDouble();
+                                break;
+
+                            case "LinearMoveToTargetEfficiency":
+                                part.VehicleParams[VehicleVectorParamId.LinearMoveToTargetEfficiency] = reader.ReadElementChildsAsVector3();
+                                break;
+
+                            case "LinearMoveToTargetTimescale":
+                                part.VehicleParams[VehicleVectorParamId.LinearMoveToTargetTimescale] = reader.ReadElementChildsAsVector3();
+                                break;
+
+                            case "LinearMoveToTargetEpsilon":
+                                part.VehicleParams[VehicleVectorParamId.LinearMoveToTargetEpsilon] = reader.ReadElementChildsAsVector3();
+                                break;
+
+                            case "LinearMoveToTargetMaxOutput":
+                                part.VehicleParams[VehicleVectorParamId.LinearMoveToTargetMaxOutput] = reader.ReadElementChildsAsVector3();
+                                break;
+
+                            case "AngularMoveToTargetEfficiency":
+                                part.VehicleParams[VehicleVectorParamId.AngularMoveToTargetEfficiency] = reader.ReadElementChildsAsVector3();
+                                break;
+
+                            case "AngularMoveToTargetTimescale":
+                                part.VehicleParams[VehicleVectorParamId.AngularMoveToTargetTimescale] = reader.ReadElementChildsAsVector3();
+                                break;
+
+                            case "AngularMoveToTargetEpsilon":
+                                part.VehicleParams[VehicleVectorParamId.AngularMoveToTargetEpsilon] = reader.ReadElementChildsAsVector3();
+                                break;
+
+                            case "AngularMoveToTargetMaxOutput":
+                                part.VehicleParams[VehicleVectorParamId.AngularMoveToTargetMaxOutput] = reader.ReadElementChildsAsVector3();
                                 break;
 
                             default:
