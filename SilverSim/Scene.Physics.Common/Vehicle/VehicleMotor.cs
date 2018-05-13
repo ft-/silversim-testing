@@ -75,7 +75,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
 
             #region Transform Reference Frame
             Quaternion rotationalReferenceFrame = m_Params[VehicleRotationParamId.ReferenceFrame];
-            Quaternion linearReferenceFrame = currentState.Rotation * rotationalReferenceFrame;
+            Quaternion linearReferenceFrame = currentState.Rotation / rotationalReferenceFrame;
             Vector3 velocity = currentState.Velocity / linearReferenceFrame;
             Vector3 angularVelocity = currentState.AngularVelocity / rotationalReferenceFrame;
             Quaternion angularOrientation = currentState.Rotation / rotationalReferenceFrame;
