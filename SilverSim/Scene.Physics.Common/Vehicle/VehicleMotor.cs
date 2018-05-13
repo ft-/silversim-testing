@@ -402,7 +402,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             if ((flags & (VehicleFlags.ReactToWind | VehicleFlags.ReactToCurrents)) != 0)
             {
                 double windCurrentMix;
-                double halfBoundBoxSizeZ = currentState.BoundBox.Size.Z / 2;
+                double halfBoundBoxSizeZ = (currentState.BoundBox.Size * rotationalReferenceFrame).Z / 2;
 
                 if (pos.Z - halfBoundBoxSizeZ > waterHeight || currentState.BoundBox.Size.Z < double.Epsilon)
                 {
@@ -448,7 +448,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
                 if ((flags & VehicleFlags.ReactToCurrents) != 0 && pos.Z - halfBoundBoxSizeZ / 2 < waterHeight)
                 {
                     /* yes, wind model also provides current model */
-                    Vector3 currentvelocity = scene.Environment.Wind[pos - new Vector3(0, 0, halfBoundBoxSizeZ / 2)] / linearReferenceFrame;
+                    Vector3 currentvelocity = scene.Environment.Wind[pos - new Vector3(0, 0, -halfBoundBoxSizeZ / 2)] / linearReferenceFrame;
 
                     #region Linear Current Affector
                     linearBodyForce += LinearCurrentForce = (currentvelocity - velocity).ElementMultiply(m_Params[VehicleVectorParamId.LinearWindEfficiency]) * dt;
