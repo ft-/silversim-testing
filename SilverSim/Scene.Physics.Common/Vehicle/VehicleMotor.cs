@@ -76,16 +76,17 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             Vector3 angularBodyTorque = Vector3.Zero;
 
             #region Transform Reference Frame
-            Quaternion referenceFrame = m_Params[VehicleRotationParamId.ReferenceFrame];
-            Vector3 velocity = currentState.Velocity / referenceFrame;
-            Vector3 angularVelocity = currentState.AngularVelocity / referenceFrame;
-            Quaternion angularOrientation = currentState.Rotation / referenceFrame;
+            Quaternion rotationalReferenceFrame = m_Params[VehicleRotationParamId.ReferenceFrame];
+            Quaternion linearReferenceFrame = currentState.Rotation * rotationalReferenceFrame;
+            Vector3 velocity = currentState.Velocity / linearReferenceFrame;
+            Vector3 angularVelocity = currentState.AngularVelocity / rotationalReferenceFrame;
+            Quaternion angularOrientation = currentState.Rotation / rotationalReferenceFrame;
             #endregion
 
             Vector3 mouselookAngularInput = Vector3.Zero;
             if ((flags & (VehicleFlags.MouselookBank | VehicleFlags.MouselookSteer | VehicleFlags.MousePointBank | VehicleFlags.MousePointSteer)) != 0)
             {
-                Quaternion localCam = currentState.CameraRotation / referenceFrame;
+                Quaternion localCam = currentState.CameraRotation / rotationalReferenceFrame;
                 mouselookAngularInput = (localCam / angularOrientation).GetEulerAngles();
                 mouselookAngularInput.Y = 0;
                 mouselookAngularInput.X = (IsMouselookBankActive(flags, currentState)) ?
@@ -425,7 +426,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
 
                 if ((flags & VehicleFlags.ReactToWind) != 0 && pos.Z + halfBoundBoxSizeZ > waterHeight)
                 {
-                    Vector3 windvelocity = scene.Environment.Wind[pos + new Vector3(0, 0, halfBoundBoxSizeZ / 2)] / referenceFrame;
+                    Vector3 windvelocity = scene.Environment.Wind[pos + new Vector3(0, 0, halfBoundBoxSizeZ / 2)] / linearReferenceFrame;
 
                     #region Linear Wind Affector
                     linearBodyForce += LinearWindForce = (windvelocity - velocity).ElementMultiply(m_Params[VehicleVectorParamId.LinearWindEfficiency]) * dt;
@@ -453,7 +454,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
                 if ((flags & VehicleFlags.ReactToCurrents) != 0 && pos.Z - halfBoundBoxSizeZ / 2 < waterHeight)
                 {
                     /* yes, wind model also provides current model */
-                    Vector3 currentvelocity = scene.Environment.Wind[pos - new Vector3(0, 0, halfBoundBoxSizeZ / 2)] / referenceFrame;
+                    Vector3 currentvelocity = scene.Environment.Wind[pos - new Vector3(0, 0, halfBoundBoxSizeZ / 2)] / linearReferenceFrame;
 
                     #region Linear Current Affector
                     linearBodyForce += LinearCurrentForce = (currentvelocity - velocity).ElementMultiply(m_Params[VehicleVectorParamId.LinearWindEfficiency]) * dt;
@@ -544,8 +545,8 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             linearBodyForce.Z += m_Params[VehicleFloatParamId.Buoyancy] * mass * gravityConstant;
             #endregion
 
-            LinearForce += linearBodyForce;
-            AngularTorque += angularBodyTorque * referenceFrame;
+            LinearForce += linearBodyForce * linearReferenceFrame;
+            AngularTorque += angularBodyTorque * rotationalReferenceFrame;
         }
 
         public Vector3 LinearForce { get; private set; }
