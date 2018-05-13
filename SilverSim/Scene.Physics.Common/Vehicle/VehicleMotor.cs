@@ -62,8 +62,6 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
 
         public void Process(double dt, PhysicsStateData currentState, SceneInterface scene, double mass, double gravityConstant)
         {
-            LinearForce = Vector3.Zero;
-            AngularTorque = Vector3.Zero;
             if (m_Params.VehicleType == VehicleType.None)
             {
                 /* disable vehicle */
@@ -354,10 +352,6 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             }
             #endregion
 
-            #region Add Hover Height Force
-            linearBodyForce.Z += HoverMotorForce = hoverForce;
-            #endregion
-
             #region Friction
             linearBodyForce += LinearFrictionForce = (-currentState.Velocity).ElementMultiply((m_Params.OneByLinearFrictionTimescale * dt).ComponentMin(1));
             angularBodyTorque += AngularFrictionTorque = (-currentState.AngularVelocity).ElementMultiply((m_Params.OneByAngularFrictionTimescale * dt).ComponentMin(1));
@@ -447,7 +441,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
                         windvelocity.Y = 0;
                     }
 
-                    AngularTorque += AngularWindTorque = windvelocity.ElementMultiply(m_Params[VehicleVectorParamId.AngularWindEfficiency]) * dt * windCurrentMix;
+                    angularBodyTorque += AngularWindTorque = windvelocity.ElementMultiply(m_Params[VehicleVectorParamId.AngularWindEfficiency]) * dt * windCurrentMix;
                     #endregion
                 }
 
@@ -476,7 +470,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
                         currentvelocity.Y = 0;
                     }
 
-                    AngularTorque += AngularCurrentTorque = currentvelocity.ElementMultiply(m_Params[VehicleVectorParamId.AngularWindEfficiency]) * dt * (1 - windCurrentMix);
+                    angularBodyTorque += AngularCurrentTorque = currentvelocity.ElementMultiply(m_Params[VehicleVectorParamId.AngularWindEfficiency]) * dt * (1 - windCurrentMix);
                     #endregion
                 }
             }
@@ -545,8 +539,13 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             linearBodyForce.Z += m_Params[VehicleFloatParamId.Buoyancy] * mass * gravityConstant;
             #endregion
 
-            LinearForce += linearBodyForce * linearReferenceFrame;
-            AngularTorque += angularBodyTorque * rotationalReferenceFrame;
+            #region Add Hover Height Force after rotating body force
+            linearBodyForce = linearBodyForce * linearReferenceFrame;
+            linearBodyForce.Z += HoverMotorForce = hoverForce;
+            #endregion
+
+            LinearForce = linearBodyForce;
+            AngularTorque = angularBodyTorque * rotationalReferenceFrame;
         }
 
         public Vector3 LinearForce { get; private set; }
