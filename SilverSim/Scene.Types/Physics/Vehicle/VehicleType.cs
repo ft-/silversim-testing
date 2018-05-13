@@ -30,8 +30,9 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
         Airplane = 4,
         Balloon = 5,
 
-        /* additional constants based on halcyon */
+        /** <summary>Sailboat with Ra-sails based on Halcyon</summary> */
         Sailboat = 10001,
+        /** <summary>Motorcycle based on Halcyon</summary> */
         Motorcycle = 10002
     }
 }
