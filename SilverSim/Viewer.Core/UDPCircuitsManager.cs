@@ -106,7 +106,7 @@ namespace SilverSim.Viewer.Core
             {
                 const int SIO_UDP_CONNRESET = -1744830452;
 
-                m_UdpSocket.IOControl(SIO_UDP_CONNRESET, new byte[] { 0 }, null);
+                m_UdpSocket.IOControl(SIO_UDP_CONNRESET, new byte[] { 0, 0, 0, 0 }, null);
             }
             catch (SocketException)
             {
