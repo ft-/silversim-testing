@@ -270,10 +270,6 @@ namespace SilverSim.Types.StructuredData.Json
             using(var sr = new StreamReader(io))
             {
                 var c = (char)sr.Peek();
-                if(c != '{' && c != '[')
-                {
-                    throw new InvalidJsonSerializationException();
-                }
                 return ParseValue(sr);
             }
         }
