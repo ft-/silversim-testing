@@ -110,9 +110,9 @@ namespace SilverSim.LoadStore.Terrain
             {
                 io.Write("invalid parameters for load terrain\n");
             }
-            else if(!m_TerrainFileStorages.TryGetValue(args[1], out loader) || !loader.SupportsLoading)
+            else if(!m_TerrainFileStorages.TryGetValue(args[2], out loader) || !loader.SupportsLoading)
             {
-                io.WriteFormatted("unknown terrain file format {0}\n", args[1]);
+                io.WriteFormatted("unknown terrain file format {0}\n", args[2]);
             }
             else if(selectedScene == UUID.Zero)
             {
