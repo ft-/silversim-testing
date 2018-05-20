@@ -195,6 +195,7 @@ namespace SilverSim.LoadStore.Terrain
                 }
 
                 scene.Terrain.AllPatches = patches;
+                scene.StoreTerrainAsDefault();
                 io.WriteFormatted("Terrain data loaded from file {0}.\n", args[3]);
             }
         }

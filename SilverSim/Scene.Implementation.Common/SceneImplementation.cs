@@ -926,28 +926,34 @@ namespace SilverSim.Scene.Implementation.Common
 
         #endregion
 
-        public override void StoreTerrainAsDefault(IAgent agent)
+        public override void StoreTerrainAsDefault(IAgent agent = null)
         {
             m_SimulationDataStorage.Terrains.SaveAsDefault(ID);
-            agent.SendAlertMessage(typeof(SceneImplementation).GetLanguageString(agent.CurrentCulture, "DefaultTerrainSaved", "Default terrain saved."), ID);
+            if (agent != null)
+            {
+                agent.SendAlertMessage(typeof(SceneImplementation).GetLanguageString(agent.CurrentCulture, "DefaultTerrainSaved", "Default terrain saved."), ID);
+            }
         }
 
-        public override void RevertTerrainToDefault(IAgent agent)
+        public override void RevertTerrainToDefault(IAgent agent = null)
         {
             var terrainData = new List<LayerPatch>();
             if(m_SimulationDataStorage.Terrains.TryGetDefault(ID, terrainData))
             {
                 Terrain.AllPatches = terrainData;
                 Terrain.Flush();
-                agent.SendAlertMessage(typeof(SceneImplementation).GetLanguageString(agent.CurrentCulture, "RevertedTerrainToDefault", "Reverted terrain to default."), ID);
+                if (agent != null)
+                {
+                    agent.SendAlertMessage(typeof(SceneImplementation).GetLanguageString(agent.CurrentCulture, "RevertedTerrainToDefault", "Reverted terrain to default."), ID);
+                }
             }
-            else
+            else if(agent != null)
             {
                 agent.SendAlertMessage(typeof(SceneImplementation).GetLanguageString(agent.CurrentCulture, "NoDefaultTerrainStored", "No default terrain stored."), ID);
             }
         }
 
-        public override void SwapTerrainWithDefault(IAgent agent)
+        public override void SwapTerrainWithDefault(IAgent agent = null)
         {
             var terrainData = new List<LayerPatch>();
             if (m_SimulationDataStorage.Terrains.TryGetDefault(ID, terrainData))
@@ -955,9 +961,12 @@ namespace SilverSim.Scene.Implementation.Common
                 m_SimulationDataStorage.Terrains.SaveAsDefault(ID);
                 Terrain.AllPatches = terrainData;
                 Terrain.Flush();
-                agent.SendAlertMessage(typeof(SceneImplementation).GetLanguageString(agent.CurrentCulture, "SwappedTerrainWithDefault", "Swapped terrain with default."), ID);
+                if (agent != null)
+                {
+                    agent.SendAlertMessage(typeof(SceneImplementation).GetLanguageString(agent.CurrentCulture, "SwappedTerrainWithDefault", "Swapped terrain with default."), ID);
+                }
             }
-            else
+            else if(agent != null)
             {
                 agent.SendAlertMessage(typeof(SceneImplementation).GetLanguageString(agent.CurrentCulture, "NoDefaultTerrainStored", "No default terrain stored."), ID);
             }

@@ -84,11 +84,11 @@ namespace SilverSim.Scene.Types.Scene
 
         public abstract void TriggerStoreOfEnvironmentSettings();
 
-        public abstract void StoreTerrainAsDefault(IAgent agent);
+        public abstract void StoreTerrainAsDefault(IAgent agent = null);
 
-        public abstract void RevertTerrainToDefault(IAgent agent);
+        public abstract void RevertTerrainToDefault(IAgent agent = null);
 
-        public abstract void SwapTerrainWithDefault(IAgent agent);
+        public abstract void SwapTerrainWithDefault(IAgent agent = null);
 
         private EnvironmentSettings m_EnvironmentSettings;
 
