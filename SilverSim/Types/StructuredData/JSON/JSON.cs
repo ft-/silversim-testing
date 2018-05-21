@@ -63,13 +63,42 @@ namespace SilverSim.Types.StructuredData.Json
                 {
                     /* next goes straight into string when it is not \n or \r */
                     c = (char)io.Read();
-                    if(c == 'r')
+                    switch(c)
                     {
-                        c = '\r';
-                    }
-                    else if(c == 'n')
-                    {
-                        c = '\n';
+                        case 'r':
+                            c = '\r';
+                            break;
+                        case 'n':
+                            c = '\n';
+                            break;
+                        case 'b':
+                            c = '\b';
+                            break;
+                        case 'f':
+                            c = '\f';
+                            break;
+                        case 't':
+                            c = '\t';
+                            break;
+                        case '\"':
+                        case '\\':
+                        case '/':
+                            break;
+                        case 'u':
+                            char[] b = new char[4];
+                            if(4 != io.Read(b, 0, 4))
+                            {
+                                throw new InvalidJsonSerializationException();
+                            }
+                            uint cvalue;
+                            if(!uint.TryParse(new string(b), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out cvalue))
+                            {
+                                throw new InvalidJsonSerializationException();
+                            }
+                            c = (char)cvalue;
+                            break;
+                        default:
+                            throw new InvalidJsonSerializationException();
                     }
                     s.Append(c);
                 }
@@ -295,17 +324,34 @@ namespace SilverSim.Types.StructuredData.Json
                     case '\n':
                         o.Append("\\n");
                         break;
+                    case '\f':
+                        o.Append("\\f");
+                        break;
+                    case '\b':
+                        o.Append("\\b");
+                        break;
                     case '\r':
                         o.Append("\\r");
                         break;
                     case '\"':
                         o.Append("\\\"");
                         break;
-                    case '\'':
-                        o.Append("\\'");
+                    case '\t':
+                        o.Append("\\t");
+                        break;
+                    case '/':
+                        o.Append("\\/");
                         break;
                     default:
-                        o.Append(s[i]);
+                        if (s[i] < 0x20)
+                        {
+                            o.Append("\\u");
+                            o.Append(((int)s[i]).ToString("{0:x4}"));
+                        }
+                        else
+                        {
+                            o.Append(s[i]);
+                        }
                         break;
                 }
             }
