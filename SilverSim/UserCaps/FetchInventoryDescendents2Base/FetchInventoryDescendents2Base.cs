@@ -157,7 +157,7 @@ namespace SilverSim.UserCaps.FetchInventoryDescendents2Base
                         var list = new List<UUID>();
                         foreach (var fm in req.Value)
                         {
-                            if (fm["folder_id"].AsUUID != UUID.Zero)
+                            if (fm["folder_id"].AsUUID != UUID.Zero && !list.Contains(fm["folder_id"].AsUUID))
                             {
                                 list.Add(fm["folder_id"].AsUUID);
                             }
@@ -213,12 +213,12 @@ namespace SilverSim.UserCaps.FetchInventoryDescendents2Base
 
                                 WriteInventoryFolderContent(text, fc, fetch_folders, fetch_items, agentID);
                             }
-                            else
+                            else if(!badfolders.ContainsKey(folderid))
                             {
                                 badfolders.Add(folderid, "Not found");
                             }
                         }
-                        else
+                        else if (!badfolders.ContainsKey(folderid))
                         {
                             badfolders.Add(folderid, "Not found");
                         }
