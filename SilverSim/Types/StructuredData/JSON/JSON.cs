@@ -86,7 +86,13 @@ namespace SilverSim.Types.StructuredData.Json
             char c;
             for (; ;)
             {
-                c = (char)io.Peek();
+                int ci;
+                ci = io.Peek();
+                if(ci == -1)
+                {
+                    throw new InvalidJsonSerializationException();
+                }
+                c = (char)ci;
                 if(char.IsWhiteSpace(c))
                 {
                     io.Read();
@@ -118,8 +124,9 @@ namespace SilverSim.Types.StructuredData.Json
                     var inputs = new StringBuilder();
                     for (; ;)
                     {
-                        c = (char) io.Peek();
-                        if(c == ']' || c == ',' || c == '}')
+                        int ci = io.Peek();
+                        c = (char) ci;
+                        if(c == ']' || c == ',' || c == '}' || ci == -1)
                         {
                             break;
                         }
@@ -354,11 +361,26 @@ namespace SilverSim.Types.StructuredData.Json
                 var boolean = (ABoolean)val;
                 io.Write(boolean ? "true" : "false");
             }
-            else if(t == typeof(Real) || t == typeof(Integer))
+            else if(t == typeof(Real))
+            {
+                double v = (Real)val;
+                string s = v.ToString();
+                if (!s.Contains("E") && !s.Contains("e"))
+                {
+                    int pos = s.IndexOf('.');
+                    if (pos < 0)
+                    {
+                        s += ".0";
+                    }
+                }
+
+                io.Write(s);
+            }
+            else if (t == typeof(Integer))
             {
                 io.Write(val.ToString());
             }
-            else if(t == typeof(Undef))
+            else if (t == typeof(Undef))
             {
                 io.Write("null");
             }
