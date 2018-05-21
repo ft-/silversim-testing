@@ -363,8 +363,7 @@ namespace SilverSim.Types.StructuredData.Json
             }
             else if(t == typeof(Real))
             {
-                double v = (Real)val;
-                string s = v.ToString();
+                string s = val.ToString();
                 if (!s.Contains("E") && !s.Contains("e"))
                 {
                     int pos = s.IndexOf('.');
