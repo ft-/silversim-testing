@@ -1000,7 +1000,11 @@ namespace SilverSim.Viewer.Core
                             ButtonIndex = p.ReadInt32(),
                             Message = p.ReadStringLen8(),
                             ID = AgentID,
-                            Type = ListenEvent.ChatType.Say
+                            Type = ListenEvent.ChatType.Say,
+                            GlobalPosition = Agent.GlobalPosition,
+                            Name = Agent.Name,
+                            SourceType = ListenEvent.ChatSourceType.Agent,
+                            OwnerID = AgentID
                         };
                         Server.RouteChat(ev);
                     }
