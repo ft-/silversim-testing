@@ -24,11 +24,13 @@ using System.Globalization;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace SilverSim.Types.StructuredData.Json
 {
     public static class Json
     {
+        private static readonly Regex m_NumberRegex = new Regex("^-{0,1}(0|[1-9][,0-9]*)(|(|\\.[0-9]*)(|[eE][\\-+]{0,1}[0-9]+))$");
         [Serializable]
         public class InvalidJsonSerializationException : Exception
         {
@@ -178,23 +180,23 @@ namespace SilverSim.Types.StructuredData.Json
                     }
                     else
                     {
-                        if(input.IndexOf('.') >= 0)
+                        int i;
+                        double f;
+                        if(!m_NumberRegex.IsMatch(input))
                         {
-                            double f;
-                            if(!double.TryParse(input, NumberStyles.Float, CultureInfo.InvariantCulture, out f))
-                            {
-                                throw new InvalidJsonSerializationException();
-                            }
+                            throw new InvalidJsonSerializationException();
+                        }
+                        else if (int.TryParse(input, out i))
+                        {
+                            return new Integer(i);
+                        }
+                        else if (double.TryParse(input, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out f))
+                        {
                             return new Real(f);
                         }
                         else
                         {
-                            Int32 i;
-                            if(!int.TryParse(input, out i))
-                            {
-                                throw new InvalidJsonSerializationException();
-                            }
-                            return new Integer(i);
+                            throw new InvalidJsonSerializationException();
                         }
                     }
             }
