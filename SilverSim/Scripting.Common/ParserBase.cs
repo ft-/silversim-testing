@@ -200,7 +200,15 @@ namespace SilverSim.Scripting.Common
             ~ParserInput()
             {
                 Reader?.Dispose();
-                Writer?.Dispose();
+                try
+                {
+                    Writer?.Dispose();
+                    Writer = null;
+                }
+                catch
+                {
+                    /* keep this from blasting */
+                }
             }
         }
 
