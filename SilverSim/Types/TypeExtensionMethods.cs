@@ -232,7 +232,6 @@ namespace SilverSim.Types
                 {
                     segments.Add(buffer);
                 }
-                totalSize += dataSize;
             } while (dataSize != 0);
 
             int offset = 0;
