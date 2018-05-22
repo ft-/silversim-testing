@@ -35,6 +35,10 @@ namespace SilverSim.Scene.Types.Script
         private readonly string m_NlsId;
         private readonly object[] m_Param;
         private readonly string m_NlsDefMessage;
+        public string LinkName { get; set; }
+        public int LinkNumber { get; set; }
+        public string ScriptName { get; set; }
+        public int LineNumber { get; set; }
 
         public LocalizedScriptMessage(object nlsRefObject, string nlsId, string nlsDefMessage, params object[] param)
         {

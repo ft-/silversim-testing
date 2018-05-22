@@ -27,6 +27,10 @@ namespace SilverSim.Scene.Types.Script.Events
     public interface IListenEventLocalization
     {
         string Localize(ListenEvent le, CultureInfo currentCulture);
+        string LinkName { get; set; }
+        int LinkNumber { get; set; }
+        string ScriptName { get; set; }
+        int LineNumber { get; set; }
     }
 
     public struct ListenEvent : IScriptEvent

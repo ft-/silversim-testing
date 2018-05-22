@@ -250,7 +250,7 @@ namespace SilverSim.Scene.Physics.Common
             {
                 Vector3 angularVelocity = Agent.AngularVelocity;
                 double groundHeightDiff = Agent.GlobalPositionOnGround.Z - LocationInfoProvider.At(Agent.GlobalPosition).GroundHeight;
-                bool isfalling = groundHeightDiff > 0.1;
+                bool isfalling = Agent.Velocity.Z > 0.1;
                 bool standing_still = horizontalVelocity < StandstillSpeedThreshold;
                 bool iscrouching = false; // groundHeightDiff < -0.1;
 
