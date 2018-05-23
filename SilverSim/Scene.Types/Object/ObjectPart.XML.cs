@@ -68,10 +68,10 @@ namespace SilverSim.Scene.Types.Object
                     writer.WriteNamedValue("IsRotateXEnabled", ObjectGroup.IsRotateXEnabled);
                     writer.WriteNamedValue("IsRotateYEnabled", ObjectGroup.IsRotateYEnabled);
                     writer.WriteNamedValue("IsRotateZEnabled", ObjectGroup.IsRotateZEnabled);
-                    writer.WriteNamedValue("PassTouch", PassTouchMode != PassEventMode.Never);
-                    writer.WriteNamedValue("PassTouchAlways", PassTouchMode == PassEventMode.Always);
-                    writer.WriteNamedValue("PassCollisions", PassCollisionMode != PassEventMode.Never);
-                    writer.WriteNamedValue("PassCollisionsAlways", PassCollisionMode != PassEventMode.Always);
+                    writer.WriteNamedValue("PassTouches", PassTouchMode == PassEventMode.Always);
+                    writer.WriteNamedValue("PassTouchMode", PassTouchMode.ToString());
+                    writer.WriteNamedValue("PassCollisions", PassCollisionMode == PassEventMode.Always);
+                    writer.WriteNamedValue("PassCollisionMode", PassCollisionMode.ToString());
                     writer.WriteNamedValue("RegionHandle", ObjectGroup.Scene?.GridPosition.RegionHandle.ToString() ?? "0");
                     writer.WriteNamedValue("ScriptAccessPin", ScriptAccessPin);
                     writer.WriteNamedValue("GroupPosition", GlobalPosition);
@@ -1215,10 +1215,6 @@ namespace SilverSim.Scene.Types.Object
                 Owner = currentOwner
             };
             int InventorySerial = 1;
-            bool IsPassCollisionsAlways = false;
-            bool IsPassCollisions = true;
-            bool IsPassTouches = false;
-            bool IsPassTouchesAlways = true;
             bool IsVolumeDetect = false;
             bool isSitTargetActiveFound = false;
 
@@ -1354,20 +1350,45 @@ namespace SilverSim.Scene.Types.Object
 
                             case "PassTouch":
                             case "PassTouches":
-                                IsPassTouches = reader.ReadElementValueAsBoolean();
+                                part.PassTouchMode = reader.ReadElementValueAsBoolean() ? PassEventMode.Always : PassEventMode.IfNotHandled;
                                 break;
 
-                            case "PassTouchAlways":
-                            case "PassTouchesAlways":
-                                IsPassTouchesAlways = reader.ReadElementValueAsBoolean();
+                            case "PassTouchMode":
+                                switch(reader.ReadElementValueAsString().ToLower())
+                                {
+                                    case "ifnothandled":
+                                        part.PassTouchMode = PassEventMode.IfNotHandled;
+                                        break;
+
+                                    case "always":
+                                        part.PassTouchMode = PassEventMode.Always;
+                                        break;
+
+                                    case "never":
+                                        part.PassTouchMode = PassEventMode.Never;
+                                        break;
+                                }
                                 break;
 
                             case "PassCollisions":
-                                IsPassCollisions = reader.ReadElementValueAsBoolean();
+                                part.PassCollisionMode = reader.ReadElementValueAsBoolean() ? PassEventMode.Always : PassEventMode.IfNotHandled;
                                 break;
 
-                            case "PassCollisionsAlways":
-                                IsPassCollisionsAlways = reader.ReadElementValueAsBoolean();
+                            case "PassCollisionMode":
+                                switch(reader.ReadElementValueAsString().ToLower())
+                                {
+                                    case "ifnothandled":
+                                        part.PassCollisionMode = PassEventMode.IfNotHandled;
+                                        break;
+
+                                    case "always":
+                                        part.PassCollisionMode = PassEventMode.Always;
+                                        break;
+
+                                    case "never":
+                                        part.PassCollisionMode = PassEventMode.Never;
+                                        break;
+                                }
                                 break;
 
                             case "ScriptAccessPin":
@@ -1908,14 +1929,6 @@ namespace SilverSim.Scene.Types.Object
                         {
                             part.IsVolumeDetect = true;
                         }
-
-                        part.PassCollisionMode = !IsPassCollisions ?
-                            PassEventMode.Never :
-                            (IsPassCollisionsAlways ? PassEventMode.Always : PassEventMode.IfNotHandled);
-
-                        part.PassTouchMode = !IsPassTouches ?
-                            PassEventMode.Never :
-                            (IsPassTouchesAlways ? PassEventMode.Always : PassEventMode.IfNotHandled);
 
                         if (part.Inventory.CountScripts == 0)
                         {
