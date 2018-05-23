@@ -79,11 +79,11 @@ namespace SilverSim.Scene.Types.Object.Localization
 
                 case PrimitiveParamsType.Color:
                     paramList.Add(face.TextureColor.AsVector3);
-                    paramList.Add(1 - face.TextureColor.A);
+                    paramList.Add(face.TextureColor.A);
                     break;
 
                 case PrimitiveParamsType.Alpha:
-                    paramList.Add(1 - face.TextureColor.A);
+                    paramList.Add(face.TextureColor.A);
                     break;
 
                 case PrimitiveParamsType.BumpShiny:
@@ -245,7 +245,7 @@ namespace SilverSim.Scene.Types.Object.Localization
                     {
                         Vector3 color = ParamsHelper.GetVector(enumerator, "PRIM_COLOR");
                         double alpha = ParamsHelper.GetDouble(enumerator, "PRIM_COLOR").Clamp(0, 1);
-                        face.TextureColor = new ColorAlpha(color, 1 - alpha);
+                        face.TextureColor = new ColorAlpha(color, alpha);
                     }
                     flags |= UpdateChangedFlags.Color;
                     isUpdated = true;
@@ -255,7 +255,7 @@ namespace SilverSim.Scene.Types.Object.Localization
                     {
                         double alpha = ParamsHelper.GetDouble(enumerator, "PRIM_ALPHA").Clamp(0, 1);
                         ColorAlpha color = face.TextureColor;
-                        color.A = 1 - alpha;
+                        color.A = alpha;
                         face.TextureColor = color;
                     }
                     flags |= UpdateChangedFlags.Color;
