@@ -73,7 +73,6 @@ namespace SilverSim.Types
 
         public static implicit operator ABoolean(LongInteger v) => new ABoolean(v.m_Value != 0);
 
-        public static implicit operator bool(LongInteger v) => v.m_Value != 0;
         public static implicit operator long(LongInteger v) => v.m_Value;
         public static bool operator ==(LongInteger a, LongInteger b) => a.m_Value == b.m_Value;
 
