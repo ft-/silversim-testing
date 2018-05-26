@@ -1181,7 +1181,7 @@ namespace SilverSim.Main.Cmd.Region
             }
             else if (args[0] == "help")
             {
-                io.Write("start region <regionname> [--force]");
+                io.Write("start region <regionname> [--force]\n  Use --force only when a regular start fails since it will delete offending parts when used.");
             }
             else if (args.Count < 3)
             {
