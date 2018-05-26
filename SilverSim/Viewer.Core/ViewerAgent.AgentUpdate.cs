@@ -343,8 +343,8 @@ namespace SilverSim.Viewer.Core
                 {
                     var ce = new ControlEvent
                     {
-                        Level = (int)(m_ActiveAgentControlFlags & kvp.Value.Taken),
-                        Flags = (int)(edge & kvp.Value.Taken)
+                        Level = m_ActiveAgentControlFlags & kvp.Value.Taken,
+                        Edge = edge & kvp.Value.Taken
                     };
                     kvp.Key.PostEvent(ce);
                 }
