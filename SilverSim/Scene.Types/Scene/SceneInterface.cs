@@ -255,7 +255,7 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        public abstract void LoadScene();
+        public abstract void LoadScene(bool skipErrors = false);
         public abstract void LoadSceneSync();
 
         [Flags]

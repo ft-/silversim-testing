@@ -1181,7 +1181,7 @@ namespace SilverSim.Main.Cmd.Region
             }
             else if (args[0] == "help")
             {
-                io.Write("start region <regionname>");
+                io.Write("start region <regionname> [--force]");
             }
             else if (args.Count < 3)
             {
@@ -1214,7 +1214,8 @@ namespace SilverSim.Main.Cmd.Region
                         return;
                     }
                     m_Scenes.Add(si);
-                    si.LoadScene();
+                    bool isForce = args.Count > 3 && args[3] == "--force";
+                    si.LoadScene(isForce);
                 }
             }
         }

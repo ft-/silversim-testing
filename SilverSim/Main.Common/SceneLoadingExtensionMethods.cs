@@ -48,9 +48,10 @@ namespace SilverSim.Main.Common
             public SceneList Scenes;
             public SceneInterface Scene;
             public SimulationDataStorageInterface SimulationDataStorage;
+            public bool SkipErrors;
         }
 
-        public static void LoadScene(this SceneInterface scene, SimulationDataStorageInterface simulationDataStorage, SceneList scenes)
+        public static void LoadScene(this SceneInterface scene, SimulationDataStorageInterface simulationDataStorage, SceneList scenes, bool skipErrors = false)
         {
             lock (scene.m_LoaderThreadLock)
             {
@@ -60,7 +61,8 @@ namespace SilverSim.Main.Common
                     {
                         Scenes = scenes,
                         Scene = scene,
-                        SimulationDataStorage = simulationDataStorage
+                        SimulationDataStorage = simulationDataStorage,
+                        SkipErrors = skipErrors
                     };
                     scene.m_LoaderThread = ThreadManager.CreateThread(LoadSceneThread);
                     scene.m_LoaderThread.Start(loadparams);
@@ -279,7 +281,7 @@ namespace SilverSim.Main.Common
                 }
                 if (objects.Count != 0)
                 {
-                    List<ObjectGroup> objGroups = loadparams.SimulationDataStorage.Objects.LoadObjects(loadparams.Scene.ID);
+                    List<ObjectGroup> objGroups = loadparams.SimulationDataStorage.Objects.LoadObjects(loadparams.Scene.ID, loadparams.SkipErrors);
                     m_Log.InfoFormat("Adding objects to {0} ({1})", loadparams.Scene.Name, loadparams.Scene.ID);
                     foreach (ObjectGroup grp in objGroups)
                     {

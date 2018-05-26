@@ -744,8 +744,8 @@ namespace SilverSim.Scene.Implementation.Common
             }
         }
 
-#region Scene Loading
-        public override void LoadScene()
+        #region Scene Loading
+        public override void LoadScene(bool skipErrors = false)
         {
             if (m_NeighborService != null)
             {
@@ -767,9 +767,9 @@ namespace SilverSim.Scene.Implementation.Common
             }
             this.LoadSceneSync(m_SimulationDataStorage, m_Scenes);
         }
-#endregion
+        #endregion
 
-#region Scene LL Message interface
+        #region Scene LL Message interface
         [PacketHandler(MessageType.RequestRegionInfo)]
         public void HandleRequestRegionInfo(Message m)
         {
