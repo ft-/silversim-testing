@@ -285,151 +285,162 @@ namespace SilverSim.Database.Memory.SimulationData
         #endregion
 
         #region Load all object groups of a single region
-        List<ObjectGroup> ISimulationDataObjectStorageInterface.this[UUID regionID]
+        List<ObjectGroup> ISimulationDataObjectStorageInterface.LoadObjects(UUID regionID, bool skipErrors = false)
         {
-            get
+            var objGroups = new Dictionary<UUID, ObjectGroup>();
+            var originalAssetIDs = new Dictionary<UUID, UUID>();
+            var nextOwnerAssetIDs = new Dictionary<UUID, UUID>();
+            var objGroupParts = new Dictionary<UUID, SortedDictionary<int, ObjectPart>>();
+            var objPartIDs = new List<UUID>();
+            var objParts = new Dictionary<UUID, ObjectPart>();
+            var orphanedPrims = new List<UUID>();
+            var orphanedPrimInventories = new List<KeyValuePair<UUID, UUID>>();
+
+            var objectList = new RwLockedDictionary<UUID, Map>();
+            var primitiveList = new RwLockedDictionary<UUID, Map>();
+            var primItemList = new RwLockedDictionary<string, Map>();
+
+            if (m_Objects.TryGetValue(regionID, out objectList))
             {
-                var objGroups = new Dictionary<UUID, ObjectGroup>();
-                var originalAssetIDs = new Dictionary<UUID, UUID>();
-                var nextOwnerAssetIDs = new Dictionary<UUID, UUID>();
-                var objGroupParts = new Dictionary<UUID, SortedDictionary<int, ObjectPart>>();
-                var objPartIDs = new List<UUID>();
-                var objParts = new Dictionary<UUID,ObjectPart>();
-                var orphanedPrims = new List<UUID>();
-                var orphanedPrimInventories = new List<KeyValuePair<UUID, UUID>>();
+                UUID objgroupID = UUID.Zero;
+                m_Log.InfoFormat("Loading object groups for region ID {0}", regionID);
 
-                var objectList = new RwLockedDictionary<UUID, Map>();
-                var primitiveList = new RwLockedDictionary<UUID, Map>();
-                var primItemList = new RwLockedDictionary<string, Map>();
-
-                if (m_Objects.TryGetValue(regionID, out objectList))
+                foreach (KeyValuePair<UUID, Map> kvp in objectList)
                 {
-                    UUID objgroupID = UUID.Zero;
-                    m_Log.InfoFormat("Loading object groups for region ID {0}", regionID);
-
-                    foreach(KeyValuePair<UUID, Map> kvp in objectList)
+                    try
                     {
-                        try
-                        {
-                            objgroupID = kvp.Key;
-                            originalAssetIDs[objgroupID] = kvp.Value["OriginalAssetID"].AsUUID;
-                            nextOwnerAssetIDs[objgroupID] = kvp.Value["NextOwnerAssetID"].AsUUID;
-                            objGroups[objgroupID] = ObjectGroupFromMap(kvp.Value);
-                        }
-                        catch (Exception e)
-                        {
-                            m_Log.WarnFormat("Failed to load object {0}: {1}\n{2}", objgroupID, e.Message, e.StackTrace);
-                            objGroups.Remove(objgroupID);
-                        }
+                        objgroupID = kvp.Key;
+                        originalAssetIDs[objgroupID] = kvp.Value["OriginalAssetID"].AsUUID;
+                        nextOwnerAssetIDs[objgroupID] = kvp.Value["NextOwnerAssetID"].AsUUID;
+                        objGroups[objgroupID] = ObjectGroupFromMap(kvp.Value);
                     }
-
-                    m_Log.InfoFormat("Loading prims for region ID {0}", regionID);
-                    int primcount = 0;
-                    if(m_Primitives.TryGetValue(regionID, out primitiveList))
+                    catch (Exception e)
                     {
-                        foreach(KeyValuePair<UUID, Map> kvp in primitiveList)
-                        {
-                            UUID rootPartID = kvp.Value["RootPartID"].AsUUID;
-                            if (objGroups.ContainsKey(rootPartID))
-                            {
-                                if(!objGroupParts.ContainsKey(rootPartID))
-                                {
-                                    objGroupParts.Add(rootPartID, new SortedDictionary<int, ObjectPart>());
-                                }
-
-                                var objpart = ObjectPartFromMap(kvp.Value);
-
-                                objGroupParts[rootPartID].Add(objpart.LoadedLinkNumber, objpart);
-                                objPartIDs.Add(objpart.ID);
-                                objParts[objpart.ID] = objpart;
-                                if ((++primcount) % 5000 == 0)
-                                {
-                                    m_Log.InfoFormat("Loading prims for region ID {0} - {1} loaded", regionID, primcount);
-                                }
-                            }
-                            else
-                            {
-                                m_Log.WarnFormat("deleting orphan prim in region ID {0}: {1}", regionID, kvp.Key);
-                                orphanedPrims.Add(kvp.Key);
-                            }
-                        }
+                        m_Log.WarnFormat("Failed to load object {0}: {1}\n{2}", objgroupID, e.Message, e.StackTrace);
+                        objGroups.Remove(objgroupID);
                     }
-                    m_Log.InfoFormat("Loaded prims for region ID {0} - {1} loaded", regionID, primcount);
-
-                    int primitemcount = 0;
-                    m_Log.InfoFormat("Loading prim inventories for region ID {0}", regionID);
-                    if(m_PrimItems.TryGetValue(regionID, out primItemList))
-                    {
-                        foreach(var map in primItemList.Values)
-                        {
-                            var partID = map["PrimID"].AsUUID;
-                            ObjectPart part;
-                            if (objParts.TryGetValue(partID, out part))
-                            {
-                                var item = ObjectPartInventoryItemFromMap(map);
-
-                                part.Inventory.Add(item.ID, item.Name, item);
-                                if ((++primitemcount) % 5000 == 0)
-                                {
-                                    m_Log.InfoFormat("Loading prim inventories for region ID {0} - {1} loaded", regionID, primitemcount);
-                                }
-                            }
-                            else
-                            {
-                                m_Log.WarnFormat("deleting orphan prim in region ID {0}: {1}", regionID, map["ID"].AsUUID);
-                                orphanedPrimInventories.Add(new KeyValuePair<UUID, UUID>(map["PrimID"].AsUUID, map["ID"].AsUUID));
-                            }
-                        }
-                    }
-                    m_Log.InfoFormat("Loaded prim inventories for region ID {0} - {1} loaded", regionID, primitemcount);
                 }
 
-                var removeObjGroups = new List<UUID>();
-                foreach(var kvp in objGroups)
+                m_Log.InfoFormat("Loading prims for region ID {0}", regionID);
+                int primcount = 0;
+                if (m_Primitives.TryGetValue(regionID, out primitiveList))
                 {
-                    if (!objGroupParts.ContainsKey(kvp.Key))
+                    foreach (KeyValuePair<UUID, Map> kvp in primitiveList)
                     {
+                        UUID rootPartID = kvp.Value["RootPartID"].AsUUID;
+                        if (objGroups.ContainsKey(rootPartID))
+                        {
+                            if (!objGroupParts.ContainsKey(rootPartID))
+                            {
+                                objGroupParts.Add(rootPartID, new SortedDictionary<int, ObjectPart>());
+                            }
+
+                            var objpart = ObjectPartFromMap(kvp.Value);
+
+                            objGroupParts[rootPartID].Add(objpart.LoadedLinkNumber, objpart);
+                            objPartIDs.Add(objpart.ID);
+                            objParts[objpart.ID] = objpart;
+                            if ((++primcount) % 5000 == 0)
+                            {
+                                m_Log.InfoFormat("Loading prims for region ID {0} - {1} loaded", regionID, primcount);
+                            }
+                        }
+                        else
+                        {
+                            m_Log.WarnFormat("deleting orphan prim in region ID {0}: {1}", regionID, kvp.Key);
+                            orphanedPrims.Add(kvp.Key);
+                        }
+                    }
+                }
+                m_Log.InfoFormat("Loaded prims for region ID {0} - {1} loaded", regionID, primcount);
+
+                int primitemcount = 0;
+                m_Log.InfoFormat("Loading prim inventories for region ID {0}", regionID);
+                if (m_PrimItems.TryGetValue(regionID, out primItemList))
+                {
+                    foreach (var map in primItemList.Values)
+                    {
+                        var partID = map["PrimID"].AsUUID;
+                        ObjectPart part;
+                        if (objParts.TryGetValue(partID, out part))
+                        {
+                            var item = ObjectPartInventoryItemFromMap(map);
+
+                            if (skipErrors)
+                            {
+                                try
+                                {
+                                    part.Inventory.Add(item.ID, item.Name, item);
+                                }
+                                catch
+                                {
+                                    orphanedPrimInventories.Add(new KeyValuePair<UUID, UUID>(map["PrimID"].AsUUID, map["ID"].AsUUID));
+                                }
+                            }
+                            else
+                            {
+                                part.Inventory.Add(item.ID, item.Name, item);
+                            }
+                            if ((++primitemcount) % 5000 == 0)
+                            {
+                                m_Log.InfoFormat("Loading prim inventories for region ID {0} - {1} loaded", regionID, primitemcount);
+                            }
+                        }
+                        else
+                        {
+                            m_Log.WarnFormat("deleting orphan prim in region ID {0}: {1}", regionID, map["ID"].AsUUID);
+                            orphanedPrimInventories.Add(new KeyValuePair<UUID, UUID>(map["PrimID"].AsUUID, map["ID"].AsUUID));
+                        }
+                    }
+                }
+                m_Log.InfoFormat("Loaded prim inventories for region ID {0} - {1} loaded", regionID, primitemcount);
+            }
+
+            var removeObjGroups = new List<UUID>();
+            foreach (var kvp in objGroups)
+            {
+                if (!objGroupParts.ContainsKey(kvp.Key))
+                {
+                    removeObjGroups.Add(kvp.Key);
+                }
+                else
+                {
+                    foreach (var objpart in objGroupParts[kvp.Key].Values)
+                    {
+                        kvp.Value.Add(objpart.LoadedLinkNumber, objpart.ID, objpart);
+                    }
+
+                    try
+                    {
+                        kvp.Value.OriginalAssetID = originalAssetIDs[kvp.Value.ID];
+                        kvp.Value.NextOwnerAssetID = nextOwnerAssetIDs[kvp.Value.ID];
+                        kvp.Value.FinalizeObject();
+                    }
+                    catch
+                    {
+                        m_Log.WarnFormat("deleting orphan object in region ID {0}: {1}", regionID, kvp.Key);
                         removeObjGroups.Add(kvp.Key);
                     }
-                    else
-                    {
-                        foreach (var objpart in objGroupParts[kvp.Key].Values)
-                        {
-                            kvp.Value.Add(objpart.LoadedLinkNumber, objpart.ID, objpart);
-                        }
-
-                        try
-                        {
-                            kvp.Value.OriginalAssetID = originalAssetIDs[kvp.Value.ID];
-                            kvp.Value.NextOwnerAssetID = nextOwnerAssetIDs[kvp.Value.ID];
-                            kvp.Value.FinalizeObject();
-                        }
-                        catch
-                        {
-                            m_Log.WarnFormat("deleting orphan object in region ID {0}: {1}", regionID, kvp.Key);
-                            removeObjGroups.Add(kvp.Key);
-                        }
-                    }
                 }
-
-                foreach(var objid in removeObjGroups)
-                {
-                    objGroups.Remove(objid);
-                    objectList.Remove(objid);
-                }
-
-                foreach(var primid in orphanedPrims)
-                {
-                    primitiveList.Remove(primid);
-                }
-
-                foreach(var kvp in orphanedPrimInventories)
-                {
-                    primItemList.Remove(GenItemKey(kvp.Key, kvp.Value));
-                }
-
-                return new List<ObjectGroup>(objGroups.Values);
             }
+
+            foreach (var objid in removeObjGroups)
+            {
+                objGroups.Remove(objid);
+                objectList.Remove(objid);
+            }
+
+            foreach (var primid in orphanedPrims)
+            {
+                primitiveList.Remove(primid);
+            }
+
+            foreach (var kvp in orphanedPrimInventories)
+            {
+                primItemList.Remove(GenItemKey(kvp.Key, kvp.Value));
+            }
+
+            return new List<ObjectGroup>(objGroups.Values);
         }
         #endregion
     }

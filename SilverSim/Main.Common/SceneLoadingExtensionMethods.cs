@@ -279,7 +279,7 @@ namespace SilverSim.Main.Common
                 }
                 if (objects.Count != 0)
                 {
-                    List<ObjectGroup> objGroups = loadparams.SimulationDataStorage.Objects[loadparams.Scene.ID];
+                    List<ObjectGroup> objGroups = loadparams.SimulationDataStorage.Objects.LoadObjects(loadparams.Scene.ID);
                     m_Log.InfoFormat("Adding objects to {0} ({1})", loadparams.Scene.Name, loadparams.Scene.ID);
                     foreach (ObjectGroup grp in objGroups)
                     {
