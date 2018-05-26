@@ -374,6 +374,7 @@ namespace SilverSim.Database.Memory.SimulationData
                                 }
                                 catch
                                 {
+                                    m_Log.WarnFormat("deleting duplicate prim in region ID {0}: {1}", regionID, map["ID"].AsUUID);
                                     orphanedPrimInventories.Add(new KeyValuePair<UUID, UUID>(map["PrimID"].AsUUID, map["ID"].AsUUID));
                                 }
                             }
