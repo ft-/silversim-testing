@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using log4net;
+using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Threading;
 using SilverSim.Types;
@@ -361,6 +362,7 @@ namespace SilverSim.Scripting.Common
                 long executionStart = TimeSource.TickCount;
                 tc.ExecutionStartTickCount = executionStart;
                 tc.IsExecuting = true;
+                ObjectPartInventoryItem item = ev.Item;
                 try
                 {
                     Interlocked.Increment(ref m_ExecutingScripts);
@@ -375,31 +377,13 @@ namespace SilverSim.Scripting.Common
                 {
                     /* no in script event should abort us */
                     Thread.ResetAbort();
-                    var item = ev.Item;
-                    var instance = item.ScriptInstance;
-                    item.ScriptInstance = null;
                     try
                     {
-                        instance.Remove();
+                        item.ScriptInstance = null;
                     }
-                    catch(Exception e)
+                    catch (ThreadAbortException)
                     {
-                        m_Log.WarnFormat("Exception at script removal {0} ({1}): {2}\n{3}",
-                            item.Name, item.AssetID.ToString(),
-                            e.Message,
-                            e.StackTrace);
-                    }
-                    ScriptLoader.Remove(item.AssetID, instance);
-                    continue;
-                }
-                catch(ScriptAbortException)
-                {
-                    var item = ev.Item;
-                    var instance = item.ScriptInstance;
-                    instance.AbortBegin();
-                    try
-                    {
-                        instance.Remove();
+                        Thread.ResetAbort();
                     }
                     catch (Exception e)
                     {
@@ -408,13 +392,32 @@ namespace SilverSim.Scripting.Common
                             e.Message,
                             e.StackTrace);
                     }
-                    item.ScriptInstance = null;
-                    ScriptLoader.Remove(item.AssetID, instance);
+                    ScriptLoader.Remove(item.AssetID, ev);
+                    continue;
+                }
+                catch(ScriptAbortException)
+                {
+                    ev.AbortBegin();
+                    try
+                    {
+                        item.ScriptInstance = null;
+                    }
+                    catch(ThreadAbortException)
+                    {
+                        Thread.ResetAbort();
+                    }
+                    catch (Exception e)
+                    {
+                        m_Log.WarnFormat("Exception at script removal {0} ({1}): {2}\n{3}",
+                            item.Name, item.AssetID.ToString(),
+                            e.Message,
+                            e.StackTrace);
+                    }
+                    ScriptLoader.Remove(item.AssetID, ev);
                     continue;
                 }
                 catch(InvalidProgramException e)
                 {
-                    var item = ev.Item;
                     var instance = item.ScriptInstance;
                     /* stop the broken script */
                     m_Log.WarnFormat("Automatically stopped script {0} ({1}) of {2} ({3}) in {4} ({5}) due to program error: {6}\n{7}",
@@ -428,7 +431,6 @@ namespace SilverSim.Scripting.Common
                 }
                 catch(Exception e)
                 {
-                    var item = ev.Item;
                     var instance = item.ScriptInstance;
                     m_Log.WarnFormat("Exception at script {0} ({1}) of {2} ({3}) in {4} ({5}) due to program error: {6}\n{7}",
                         item.Name, item.AssetID.ToString(),
