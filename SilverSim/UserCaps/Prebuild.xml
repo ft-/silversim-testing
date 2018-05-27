@@ -35,7 +35,6 @@
   <Reference name="log4net" localCopy="false"/>
   <Reference name="Nini" localCopy="false"/>
   <Reference name="C5" localCopy="false"/>
-  <Reference name="CSJ2K" localCopy="false"/>
   <Files>
     <Match pattern="*.cs" recurse="true">
       <Exclude pattern="TemporaryGeneratedFile"/>
