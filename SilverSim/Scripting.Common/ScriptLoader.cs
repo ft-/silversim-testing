@@ -73,11 +73,7 @@ namespace SilverSim.Scripting.Common
                 });
 
                 ScriptInstance instance = assembly.Instantiate(part, item, serializedState);
-                if (!m_LoadedInstances.ContainsKey(data.ID))
-                {
-                    m_LoadedInstances.Add(data.ID, new RwLockedList<ScriptInstance>());
-                }
-                m_LoadedInstances[data.ID].Add(instance);
+                m_LoadedInstances.GetOrAddIfNotExists(data.ID, () => new RwLockedList<ScriptInstance>()).Add(instance);
                 return instance;
             });
         }

@@ -117,17 +117,18 @@ namespace SilverSim.Threading
 
         public TValue GetOrAddIfNotExists(TKey key, CreateValueDelegate del) => m_RwLock.AcquireReaderLock(() =>
         {
-            try
+            TValue value;
+            if(m_Dictionary.TryGetValue(key, out value))
             {
-                return m_Dictionary[key];
+                return value;
             }
-            catch (KeyNotFoundException)
+            else
             {
                 return m_RwLock.UpgradeToWriterLock(() =>
                 {
-                    if (m_Dictionary.ContainsKey(key))
+                    if (m_Dictionary.TryGetValue(key, out value))
                     {
-                        return m_Dictionary[key];
+                        return value;
                     }
                     return m_Dictionary[key] = del();
                 });
