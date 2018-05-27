@@ -579,6 +579,7 @@ namespace SilverSim.Scene.Implementation.Common
                                     item.ScriptInstance.IsRunning = true;
                                     item.ScriptInstance.Reset();
                                 }
+                                item.ScriptInstance.StartParameter = startparameter;
                                 item.ScriptInstance.PostEvent(new OnRezEvent(startparameter));
                             }
                             catch (Exception e)

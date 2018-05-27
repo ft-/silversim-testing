@@ -80,6 +80,8 @@ namespace SilverSim.Scene.Types.Script
 
         public abstract double ExecutionTime { get; set; }
 
+        public abstract int StartParameter { get; set; }
+
         protected ScriptInstance()
         {
             IsAborting = false;
