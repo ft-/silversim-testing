@@ -191,7 +191,7 @@ namespace SilverSim.Scene.Types.Scene
             return RezObject(group, rezparams.RezzingAgent);
         }
 
-        public UInt32 RezObject(ObjectGroup group, UGUI rezzingAgent)
+        public UInt32 RezObject(ObjectGroup group, UGUI rezzingAgent, int startparameter = 0)
         {
             if (!group.Owner.EqualsGrid(rezzingAgent))
             {
@@ -213,11 +213,11 @@ namespace SilverSim.Scene.Types.Scene
             group.Owner = rezzingAgent;
             group.RezzingObjectID = UUID.Zero;
             Add(group);
-            RezScriptsForObject(group);
+            RezScriptsForObject(group, startparameter);
             return group.LocalID[ID];
         }
 
-        public abstract void RezScriptsForObject(ObjectGroup group);
+        public abstract void RezScriptsForObject(ObjectGroup group, int startparameter = 0);
 
         public List<UUID> ReturnObjects(UGUI returningAgent, List<UUID> objectids)
         {

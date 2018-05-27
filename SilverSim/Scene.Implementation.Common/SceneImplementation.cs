@@ -551,7 +551,7 @@ namespace SilverSim.Scene.Implementation.Common
         }
 #endregion
 
-        public override void RezScriptsForObject(ObjectGroup group)
+        public override void RezScriptsForObject(ObjectGroup group, int startparameter = 0)
         {
             foreach (ObjectPart part in group.Values)
             {
@@ -579,7 +579,7 @@ namespace SilverSim.Scene.Implementation.Common
                                     item.ScriptInstance.IsRunning = true;
                                     item.ScriptInstance.Reset();
                                 }
-                                item.ScriptInstance.PostEvent(new OnRezEvent(0));
+                                item.ScriptInstance.PostEvent(new OnRezEvent(startparameter));
                             }
                             catch (Exception e)
                             {
