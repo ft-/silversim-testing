@@ -111,5 +111,29 @@ namespace SilverSim.Threading
                 }
             }
         }
+
+        public new void Clear()
+        {
+            lock (m_Lock)
+            {
+                base.Clear();
+            }
+        }
+
+        public void RemoveIf(Func<T, bool> del)
+        {
+            lock (m_Lock)
+            {
+                T[] q = base.ToArray();
+                base.Clear();
+                foreach (T e in q)
+                {
+                    if (!del(e))
+                    {
+                        base.Enqueue(e);
+                    }
+                }
+            }
+        }
     }
 }
