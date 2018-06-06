@@ -82,6 +82,19 @@ namespace SilverSim.Scene.Chat
             res.Add(m_ID);
             res.Add(m_Message);
             res.Add(0);
+            int flags = 0;
+            if(LimitToSameOwner)
+            {
+                flags |= 2;
+            }
+            if(LimitToSameGroup)
+            {
+                flags |= 4;
+            }
+            if(flags != 0)
+            {
+                res.Add(flags);
+            }
         }
 
         public override void Remove()
