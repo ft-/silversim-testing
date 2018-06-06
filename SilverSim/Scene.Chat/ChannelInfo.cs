@@ -40,10 +40,15 @@ namespace SilverSim.Scene.Chat
         private void SendToListener(ChatServiceInterface.Listener listener, ListenEvent ev, double maxDistanceSquared)
         {
             Func<UUID> getowner = listener.GetOwner;
+            Func<UGI> getGroup = listener.GetGroup;
             if ((ev.GlobalPosition - listener.GetPosition()).LengthSquared > maxDistanceSquared &&
                 !listener.IsIgnorePosition)
             {
                 /* too far so no listening */
+            }
+            else if(listener.LimitToSameGroup && getGroup != null && ev.Group != null && ev.Group.Equals(getGroup()))
+            {
+                /* ignore group mismatch */
             }
             else if ((!listener.LimitToSameOwner && ev.TargetID == UUID.Zero) || 
                     ev.TargetID == listener.GetUUID() ||

@@ -35,6 +35,7 @@ namespace SilverSim.Scene.Chat
         private readonly Action<ListenEvent> m_Send;
         public override bool IsActive { get; set; }
         public override bool LimitToSameOwner { get; set; }
+        public override bool LimitToSameGroup { get; set; }
 
         public override bool IsAgent { get; }
 
@@ -93,6 +94,8 @@ namespace SilverSim.Scene.Chat
         public override Func<UUID> GetUUID { get; }
 
         public override Func<UUID> GetOwner { get; }
+
+        public override Func<UGI> GetGroup { get; }
 
         public override void Send(ListenEvent ev)
         {

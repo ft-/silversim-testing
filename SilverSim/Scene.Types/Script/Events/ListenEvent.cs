@@ -74,6 +74,7 @@ namespace SilverSim.Scene.Types.Script.Events
         public UUID OriginSceneID; /* used for Origin when doing sim neighbor passing */
         public double Distance;
         public IListenEventLocalization Localization;
+        public UGI Group;
 
         public ListenEvent(ListenEvent le)
         {
@@ -90,6 +91,7 @@ namespace SilverSim.Scene.Types.Script.Events
             OriginSceneID = le.OriginSceneID;
             Distance = le.Distance;
             Localization = le.Localization;
+            Group = le.Group;
         }
     }
 }

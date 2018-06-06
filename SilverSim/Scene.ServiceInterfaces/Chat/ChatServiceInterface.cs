@@ -40,6 +40,8 @@ namespace SilverSim.Scene.ServiceInterfaces.Chat
 
             public abstract Func<UUID> GetOwner { get; }
 
+            public abstract Func<UGI> GetGroup { get; }
+
             public virtual bool IsIgnorePosition => false;
 
             public abstract void Send(ListenEvent ev);
@@ -47,6 +49,8 @@ namespace SilverSim.Scene.ServiceInterfaces.Chat
             public abstract bool IsActive { get; set; }
 
             public abstract bool LimitToSameOwner { get; set; }
+
+            public abstract bool LimitToSameGroup { get; set; }
 
             public abstract bool IsAgent { get; }
 
