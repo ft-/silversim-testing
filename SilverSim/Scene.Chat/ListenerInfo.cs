@@ -34,6 +34,8 @@ namespace SilverSim.Scene.Chat
         private readonly string m_Message;
         private readonly Action<ListenEvent> m_Send;
         public override bool IsActive { get; set; }
+        public override bool LimitToSameOwner { get; set; }
+
         public override bool IsAgent { get; }
 
         private readonly ChatHandler m_Handler;

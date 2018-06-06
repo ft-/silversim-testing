@@ -38,6 +38,7 @@ namespace SilverSim.Scene.Chat
         private readonly Int32 m_RegexBitfield;
         private readonly Action<ListenEvent> m_Send;
         public override bool IsActive { get; set; }
+        public override bool LimitToSameOwner { get; set; }
         public override bool IsAgent => false;
 
         private readonly ChatHandler m_Handler;

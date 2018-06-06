@@ -46,6 +46,8 @@ namespace SilverSim.Scene.ServiceInterfaces.Chat
 
             public abstract bool IsActive { get; set; }
 
+            public abstract bool LimitToSameOwner { get; set; }
+
             public abstract bool IsAgent { get; }
 
             public abstract void Serialize(List<object> res, int handle);
