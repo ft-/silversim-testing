@@ -45,11 +45,8 @@ namespace SilverSim.Scene.Chat
             {
                 /* too far so no listening */
             }
-            else if(listener.LimitToSameOwner && (getowner == null || ev.OwnerID != getowner()))
-            {
-                /* owner does not match */
-            }
-            else if (ev.TargetID == UUID.Zero || ev.TargetID == listener.GetUUID() ||
+            else if ((!listener.LimitToSameOwner && ev.TargetID == UUID.Zero) || 
+                    ev.TargetID == listener.GetUUID() ||
                 (getowner != null && getowner() == ev.TargetID))
             {
                 listener.Send(ev);
