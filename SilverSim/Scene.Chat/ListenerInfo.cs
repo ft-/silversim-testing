@@ -48,6 +48,7 @@ namespace SilverSim.Scene.Chat
             UUID id,
             string message,
             Func<UUID> getuuid,
+            Func<UGI> getgroup,
             Func<Vector3> getpos,
             Func<UUID> getowner,
             Action<ListenEvent> send,
@@ -63,6 +64,7 @@ namespace SilverSim.Scene.Chat
             GetUUID = getuuid;
             GetPosition = getpos;
             GetOwner = getowner;
+            GetGroup = getgroup;
             m_Send = send;
         }
 
