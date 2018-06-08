@@ -112,6 +112,8 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
                 OnStart();
                 int nummessagespending = 0;
 
+                m_Log.InfoFormat("Object storage thread for region {0} started", m_RegionID);
+
                 while (!m_StopStorageThread || m_StorageMainRequestQueue.Count != 0 || HasPendingData)
                 {
                     IUpdateInfo req;
