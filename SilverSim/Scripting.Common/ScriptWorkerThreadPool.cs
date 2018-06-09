@@ -466,13 +466,10 @@ namespace SilverSim.Scripting.Common
                     }
                 }
 
-                lock (ev)
+                ev.ThreadPool = null;
+                if (ev.HasEventsPending)
                 {
-                    ev.ThreadPool = null;
-                    if (ev.HasEventsPending)
-                    {
-                        pool.m_ScriptTriggerQueue.Enqueue(ev);
-                    }
+                    pool.m_ScriptTriggerQueue.Enqueue(ev);
                 }
             }
 
