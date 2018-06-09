@@ -188,16 +188,10 @@ namespace SilverSim.Scripting.Common
         public void PostScript(ScriptInstance i)
         {
             /* Do not enqueue the already queued script */
-            if(m_ScriptTriggerQueue.Contains(i))
-            {
-                return;
-            }
-
             bool enqueued = false;
             if (i.ThreadPool == null)
             {
-                m_ScriptTriggerQueue.Enqueue(i);
-                enqueued = true;
+                enqueued = m_ScriptTriggerQueue.EnqueueNewOnly(i);
             }
 
             if(enqueued)
@@ -368,7 +362,10 @@ namespace SilverSim.Scripting.Common
                     Interlocked.Increment(ref m_ExecutingScripts);
                     lock (tc)
                     {
-                        ev.ThreadPool = this;
+                        if(Interlocked.CompareExchange(ref ev.ThreadPool, this, null) != null)
+                        {
+                            continue;
+                        }
                         tc.CurrentScriptInstance = ev;
                     }
                     ev.ProcessEvent();
@@ -471,13 +468,10 @@ namespace SilverSim.Scripting.Common
 
                 lock (ev)
                 {
+                    ev.ThreadPool = null;
                     if (ev.HasEventsPending)
                     {
                         pool.m_ScriptTriggerQueue.Enqueue(ev);
-                    }
-                    else
-                    {
-                        ev.ThreadPool = null;
                     }
                 }
             }

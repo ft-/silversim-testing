@@ -108,6 +108,21 @@ namespace SilverSim.Threading
             }
         }
 
+        public bool EnqueueNewOnly(T obj)
+        {
+            bool added = false;
+            lock(m_Lock)
+            {
+                if (!base.Contains(obj))
+                {
+                    base.Enqueue(obj);
+                    Monitor.Pulse(m_Lock);
+                    added = true;
+                }
+            }
+            return added;
+        }
+
         public new int Count
         {
             get

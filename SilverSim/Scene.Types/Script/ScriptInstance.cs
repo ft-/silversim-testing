@@ -67,7 +67,7 @@ namespace SilverSim.Scene.Types.Script
         public abstract void ShoutError(string msg);
         public abstract void ShoutError(IListenEventLocalization localizedMessage);
         public abstract bool HasEventsPending { get; }
-        public IScriptWorkerThreadPool ThreadPool { get; set; }
+        public IScriptWorkerThreadPool ThreadPool;
         public event Action<ScriptInstance> OnStateChange;
         public event Action<ScriptInstance> OnScriptReset;
         public abstract IScriptState ScriptState { get; }
