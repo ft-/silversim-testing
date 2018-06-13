@@ -129,5 +129,8 @@ namespace SilverSim.Main.Common.Caps
             m_Log.Info("Deinitializing Caps Http Redirector");
             Caps.Clear();
         }
+
+        public string NewCapsURL(UUID uuid) => ServerURI + "CAPS/" + uuid.ToString() + "0000/";
+        public static string NewCapsURL(string serverURI, UUID uuid) => serverURI + "CAPS/" + uuid.ToString() + "0000/";
     }
 }

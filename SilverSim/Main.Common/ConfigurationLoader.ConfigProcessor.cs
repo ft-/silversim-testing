@@ -748,21 +748,37 @@ namespace SilverSim.Main.Common
 
                 string sourceParam = sourceConfig.GetString(useparam[1]);
 
+                bool foundAny = false;
+                foreach (string name in config.GetKeys())
+                {
+                    if (name.StartsWith("SourceParameter-") && name.EndsWith("-" + sourceParam))
+                    {
+                        foundAny = true;
+                    }
+                }
+
                 if (string.IsNullOrEmpty(sourceParam) || sourceParam.StartsWith("SourceParameter") ||
-                    !config.Contains("SourceParameter-" + sourceParam))
+                    !foundAny)
                 {
                     continue;
                 }
                 config.Remove("UseSourceParameter");
 
-                string inputsource = config.GetString("SourceParameter-" + sourceParam);
-                if (inputsource.Contains(":"))
+                foreach (string name in config.GetKeys())
                 {
-                    config.Set("ImportResource-Generated", inputsource.StartsWith(":") ? inputsource.Substring(1) : inputsource);
-                }
-                else
-                {
-                    AddSource(inputsource);
+                    if (name.StartsWith("SourceParameter-") && name.EndsWith("-" + sourceParam))
+                    {
+                        string inputsource = config.GetString(name);
+                        foundAny = true;
+                        if (inputsource.Contains(":"))
+                        {
+                            config.Set("ImportResource-Generated", inputsource.StartsWith(":") ? inputsource.Substring(1) : inputsource);
+                        }
+                        else
+                        {
+                            AddSource(inputsource);
+                        }
+                    }
                 }
             }
         }
