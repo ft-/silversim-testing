@@ -305,8 +305,6 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                         m_LinearWindEfficiency = 0;
 
                         m_InvertedBankingModifier = 1.0;
-                        m_BankingMix = 1.0;
-                        m_BankingTimescale = 10.0;
                         m_MouselookAltitude = Math.PI / 4.0;
                         m_MouselookAzimuth = Math.PI / 4.0;
                         m_BankingAzimuth = Math.PI / 2.0;
@@ -349,8 +347,6 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                         m_LinearWindEfficiency = 0;
 
                         m_InvertedBankingModifier = 1.0;
-                        m_BankingMix = 1.0;
-                        m_BankingTimescale = 1.0;
                         m_MouselookAltitude = Math.PI / 4.0;
                         m_MouselookAzimuth = Math.PI / 4.0;
                         m_BankingAzimuth = Math.PI / 2.0;
@@ -393,8 +389,6 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                         m_LinearWindEfficiency = Vector3.Zero;
 
                         m_InvertedBankingModifier = 1.0;
-                        m_BankingMix = 0.5;
-                        m_BankingTimescale = 0.2;
                         m_MouselookAltitude = Math.PI / 4.0;
                         m_MouselookAzimuth = Math.PI / 4.0;
                         m_BankingAzimuth = Math.PI / 2.0;
@@ -442,8 +436,6 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                         m_LinearWindEfficiency = Vector3.Zero;
 
                         m_InvertedBankingModifier = 1.0;
-                        m_BankingMix = 0.7;
-                        m_BankingTimescale = 1.0;
                         m_MouselookAltitude = Math.PI / 4.0;
                         m_MouselookAzimuth = Math.PI / 4.0;
                         m_BankingAzimuth = Math.PI / 2.0;
@@ -493,8 +485,6 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                         m_LinearWindEfficiency = 0.1;
 
                         m_InvertedBankingModifier = 1.0;
-                        m_BankingMix = 0.5;
-                        m_BankingTimescale = 5.0;
                         m_MouselookAltitude = Math.PI / 4.0;
                         m_MouselookAzimuth = Math.PI / 4.0;
                         m_BankingAzimuth = Math.PI / 2.0;

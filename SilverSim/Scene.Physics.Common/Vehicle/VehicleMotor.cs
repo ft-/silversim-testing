@@ -143,7 +143,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             Vector3 linearMotorDirection = m_Params[VehicleVectorParamId.LinearMotorDirection] + linearTargetDirection;
             Vector3 angularMotorDirection = m_Params[VehicleVectorParamId.AngularMotorDirection] + mouselookAngularInput + angularTargetDirection;
             Vector3 linearMotorError = linearMotorDirection - velocity;
-            Vector3 angularMotorError = angularMotorDirection - m_Params[VehicleVectorParamId.AngularMotorDirection] - angularVelocity;
+            Vector3 angularMotorError = angularMotorDirection - angularVelocity;
 
             Vector3 oneByLinearMotorTimescale = Vector3.Zero;
             Vector3 oneByAngularMotorTimescale = Vector3.Zero;
@@ -368,11 +368,11 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
                 Vector3 angularError = angularOrientation.GetEulerAngles();
                 if(angularError.X > Math.PI)
                 {
-                    angularError.X -= Math.PI;
+                    angularError.X -= Math.PI * 2;
                 }
                 if (angularError.Y > Math.PI)
                 {
-                    angularError.Y -= Math.PI;
+                    angularError.Y -= Math.PI * 2;
                 }
                 roll = angularError.X;
                 angularError = -angularError-angularVelocity;
