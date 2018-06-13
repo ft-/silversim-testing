@@ -35,7 +35,6 @@ using SilverSim.Scene.Types.Script;
 using SilverSim.Scripting.Common;
 using SilverSim.ServiceInterfaces.Account;
 using SilverSim.ServiceInterfaces.Asset;
-using SilverSim.ServiceInterfaces.Avatar;
 using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Database;
 using SilverSim.ServiceInterfaces.Economy;
@@ -343,7 +342,6 @@ namespace SilverSim.Main.Common
             FeaturesTable[typeof(PresenceServiceInterface)] = "Presence Service";
             FeaturesTable[typeof(GridServiceInterface)] = "Grid Service";
             FeaturesTable[typeof(GridUserServiceInterface)] = "GridUser Service";
-            FeaturesTable[typeof(AvatarServiceInterface)] = "Avatar Service";
             FeaturesTable[typeof(UserAccountServiceInterface)] = "UserAccount Service";
             FeaturesTable[typeof(IInventoryServicePlugin)] = "Inventory Service HELO Instantiator";
             FeaturesTable[typeof(IFriendsServicePlugin)] = "FriendsService HELO Instantiator";

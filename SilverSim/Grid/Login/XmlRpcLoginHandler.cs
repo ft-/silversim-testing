@@ -27,7 +27,6 @@ using SilverSim.Scene.ServiceInterfaces.Teleport;
 using SilverSim.ServiceInterfaces;
 using SilverSim.ServiceInterfaces.Account;
 using SilverSim.ServiceInterfaces.AuthInfo;
-using SilverSim.ServiceInterfaces.Avatar;
 using SilverSim.ServiceInterfaces.Friends;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.GridUser;
@@ -87,7 +86,6 @@ namespace SilverSim.Grid.Login
         private PresenceServiceInterface m_PresenceService;
         private FriendsServiceInterface m_FriendsService;
         private AuthInfoServiceInterface m_AuthInfoService;
-        private AvatarServiceInterface m_AvatarService;
         private TravelingDataServiceInterface m_TravelingDataService;
         private ILoginConnectorServiceInterface m_LoginConnectorService;
         private List<ILoginUserCapsGetInterface> m_UserCapsGetters;
@@ -99,7 +97,6 @@ namespace SilverSim.Grid.Login
         private readonly string m_PresenceServiceName;
         private readonly string m_FriendsServiceName;
         private readonly string m_AuthInfoServiceName;
-        private readonly string m_AvatarServiceName;
         private readonly string m_TravelingDataServiceName;
         private readonly string m_LoginConnectorServiceName;
         private UUID m_GridLibraryOwner = new UUID("11111111-1111-0000-0000-000100bba000");
@@ -127,7 +124,6 @@ namespace SilverSim.Grid.Login
             m_InventoryServiceName = ownSection.GetString("InventoryService", "InventoryService");
             m_PresenceServiceName = ownSection.GetString("PresenceService", "PresenceService");
             m_FriendsServiceName = ownSection.GetString("FriendsService", "FriendsService");
-            m_AvatarServiceName = ownSection.GetString("AvatarService", "AvatarService");
             m_AuthInfoServiceName = ownSection.GetString("AuthInfoService", "AuthInfoService");
             m_TravelingDataServiceName = ownSection.GetString("TravelingDataService", "TravelingDataService");
             m_LoginConnectorServiceName = ownSection.GetString("LoginConnectorService", "LoginConnectorService");
@@ -149,7 +145,6 @@ namespace SilverSim.Grid.Login
             m_PresenceService = loader.GetService<PresenceServiceInterface>(m_PresenceServiceName);
             m_FriendsService = loader.GetService<FriendsServiceInterface>(m_FriendsServiceName);
             m_AuthInfoService = loader.GetService<AuthInfoServiceInterface>(m_AuthInfoServiceName);
-            m_AvatarService = loader.GetService<AvatarServiceInterface>(m_AvatarServiceName);
             m_AuthInfoService = loader.GetService<AuthInfoServiceInterface>(m_AuthInfoServiceName);
             m_TravelingDataService = loader.GetService<TravelingDataServiceInterface>(m_TravelingDataServiceName);
             m_LoginConnectorService = loader.GetService<ILoginConnectorServiceInterface>(m_LoginConnectorServiceName);
@@ -462,7 +457,18 @@ namespace SilverSim.Grid.Login
                 return LoginFailResponse("key", "Could not authenticate your avatar. Please check your username and password, and check the grid if problems persist.");
             }
 
-            loginData.HaveAppearance = m_AvatarService.TryGetAppearanceInfo(loginData.Account.Principal.ID, out loginData.AppearanceInfo);
+            try
+            {
+                InventoryFolder currentOutfitFolder;
+                if(m_InventoryService.Folder.TryGetValue(loginData.Account.Principal.ID, AssetType.CurrentOutfitFolder, out currentOutfitFolder))
+                {
+                    loginData.HaveAppearance = m_InventoryService.Folder.GetItems(loginData.Account.Principal.ID, currentOutfitFolder.ID).Count != 0;
+                }
+            }
+            catch
+            {
+                throw new LoginFailResponseException("key", "Error accessing avatar appearance");
+            }
 
             // After authentication, we have to remove the token if something fails
             try
@@ -570,16 +576,6 @@ namespace SilverSim.Grid.Login
                     m_Log.Error("Accessing friends failed", e);
                     throw new LoginFailResponseException("key", "Error accessing friends");
                 }
-            }
-
-            Dictionary<string, string> avatar;
-            try
-            {
-                avatar = m_AvatarService[loginData.Account.Principal.ID];
-            }
-            catch
-            {
-                throw new LoginFailResponseException("key", "Error accessing avatar appearance");
             }
 
             if (!m_AllowMultiplePresences)
