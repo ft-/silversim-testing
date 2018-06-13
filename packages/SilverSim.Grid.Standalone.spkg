@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<package>
+	<name>SilverSim.Grid.Standalone</name>
+	<default-configuration>
+		<source>SilverSim.Grid.Standalone:PackageConfig.Standalone.ini</source>
+		<use-if-started-as>standalone</use-if-started-as>
+	</default-configuration>
+	<files>
+		<file name="bin/plugins/SilverSim.Grid.Standalone.dll" is-version-src="true"/>
+	</files>
+</package>
