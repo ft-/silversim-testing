@@ -5,6 +5,10 @@
 		<source>SilverSim.Grid.Standalone:PackageConfig.Standalone.ini</source>
 		<use-if-started-as>standalone</use-if-started-as>
 	</default-configuration>
+	<default-configuration>
+		<source>SilverSim.Grid.Standalone:PackageConfig.Bare.ini</source>
+		<use-if-started-as>bare</use-if-started-as>
+	</default-configuration>
 	<files>
 		<file name="bin/plugins/SilverSim.Grid.Standalone.dll" is-version-src="true"/>
 	</files>
