@@ -783,7 +783,7 @@ namespace SilverSim.Main.Common
             {
                 foreach (IConfig config in Config.Configs)
                 {
-                    if (!config.Contains("UseSourceParameter"))
+                    if (!config.Contains("UseSourceParameter") || config.Contains("UseSourceParameter-IsValid"))
                     {
                         continue;
                     }

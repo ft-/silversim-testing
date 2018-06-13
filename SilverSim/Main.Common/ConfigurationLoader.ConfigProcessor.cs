@@ -749,11 +749,13 @@ namespace SilverSim.Main.Common
                 string sourceParam = sourceConfig.GetString(useparam[1]);
 
                 bool foundAny = false;
+                List<string> configKeys = new List<string>();
                 foreach (string name in config.GetKeys())
                 {
                     if (name.StartsWith("SourceParameter-") && name.EndsWith("-" + sourceParam))
                     {
                         foundAny = true;
+                        configKeys.Add(name);
                     }
                 }
 
@@ -762,22 +764,21 @@ namespace SilverSim.Main.Common
                 {
                     continue;
                 }
-                config.Remove("UseSourceParameter");
+                config.Set("UseSourceParameter-IsValid", true);
 
-                foreach (string name in config.GetKeys())
+                foreach (string name in configKeys)
                 {
-                    if (name.StartsWith("SourceParameter-") && name.EndsWith("-" + sourceParam))
+                    string inputsource = config.GetString(name);
+                    config.Set("-" + name, inputsource);
+                    config.Remove(name);
+                    foundAny = true;
+                    if (inputsource.Contains(":"))
                     {
-                        string inputsource = config.GetString(name);
-                        foundAny = true;
-                        if (inputsource.Contains(":"))
-                        {
-                            config.Set("ImportResource-Generated", inputsource.StartsWith(":") ? inputsource.Substring(1) : inputsource);
-                        }
-                        else
-                        {
-                            AddSource(inputsource);
-                        }
+                        config.Set("ImportResource-Generated-" + name, inputsource.StartsWith(":") ? inputsource.Substring(1) : inputsource);
+                    }
+                    else
+                    {
+                        AddSource(inputsource);
                     }
                 }
             }
