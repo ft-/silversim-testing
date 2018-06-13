@@ -241,6 +241,10 @@ namespace SilverSim.Scene.Agent
             set
             {
                 /* check for assets being valid */
+                if(value == null)
+                {
+                    throw new ArgumentNullException(nameof(value));
+                }
                 Dictionary<WearableType, List<AgentWearables.WearableInfo>> aw = value.Wearables;
                 foreach (KeyValuePair<WearableType, List<AgentWearables.WearableInfo>> kvp in aw)
                 {

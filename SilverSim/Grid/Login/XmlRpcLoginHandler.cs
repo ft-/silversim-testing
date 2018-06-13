@@ -265,7 +265,7 @@ namespace SilverSim.Grid.Login
             public InventoryFolder InventoryLibRoot;
             public List<FriendInfo> Friends;
             public bool HaveAppearance;
-            public AppearanceInfo AppearanceInfo;
+            public AppearanceInfo AppearanceInfo = new AppearanceInfo();
 
             public LoginData()
             {
@@ -457,6 +457,7 @@ namespace SilverSim.Grid.Login
                 return LoginFailResponse("key", "Could not authenticate your avatar. Please check your username and password, and check the grid if problems persist.");
             }
 
+#if TODO
             try
             {
                 InventoryFolder currentOutfitFolder;
@@ -469,6 +470,7 @@ namespace SilverSim.Grid.Login
             {
                 throw new LoginFailResponseException("key", "Error accessing avatar appearance");
             }
+#endif
 
             // After authentication, we have to remove the token if something fails
             try
@@ -1065,7 +1067,7 @@ namespace SilverSim.Grid.Login
             }
         }
 
-        #region Server Parameters
+#region Server Parameters
         private readonly object m_ConfigUpdateLock = new object();
 
         private const string ConfigIssueText = "Server parameter \"AllowLoginViaHttpWhenHttpsIsConfigured\" is set to true. Please disable it.";
@@ -1245,6 +1247,6 @@ namespace SilverSim.Grid.Login
             }
             m_GridNick = value;
         }
-        #endregion
+#endregion
     }
 }
