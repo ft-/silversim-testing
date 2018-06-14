@@ -264,8 +264,8 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             }
             #endregion
 
-            linearBodyForce += LinearMotorForce = (m_Params[VehicleVectorParamId.LinearMotorDirection] - velocity).ElementMultiply(oneByLinearMotorTimescale * dt);
-            angularBodyTorque += AngularMotorTorque = (m_Params[VehicleVectorParamId.AngularMotorDirection] - angularVelocity + mouselookAngularInput).ElementMultiply(oneByAngularMotorTimescale * dt);
+            linearBodyForce += LinearMotorForce = linearMotorError.ElementMultiply(oneByLinearMotorTimescale * dt);
+            angularBodyTorque += AngularMotorTorque = angularMotorError.ElementMultiply(oneByAngularMotorTimescale * dt);
 
             if((m_Params.Flags & VehicleFlags.TorqueWorldZ) != 0)
             {
