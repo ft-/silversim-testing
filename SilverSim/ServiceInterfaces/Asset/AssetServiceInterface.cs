@@ -37,6 +37,22 @@ namespace SilverSim.ServiceInterfaces.Asset
 
         public abstract bool TryGetValue(UUID key, out AssetData assetData);
 
+        public virtual bool TryGetValue(UUID key, out AssetMetadata metadata, out int datalength)
+        {
+            AssetData data;
+            bool res = TryGetValue(key, out data);
+            if(res)
+            {
+                metadata = new AssetMetadata(data);
+                datalength = data.Data.Length;
+            }
+            else
+            {
+                metadata = null;
+                datalength = 0;
+            }
+            return res;
+        }
         #endregion
 
         #region Metadata interface
