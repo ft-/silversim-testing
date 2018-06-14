@@ -47,6 +47,8 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
         public Vector3 AngularDeflectionTorque { get; private set; }
         public Vector3 LinearDeflectionForce { get; private set; }
 
+        public const double VerticalAttractorTimescaleDisable = 500;
+
         internal VehicleMotor(VehicleParams param)
         {
             m_Params = param;
@@ -363,7 +365,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             */
             Vector3 vaTimescale = m_Params[VehicleVectorParamId.VerticalAttractionTimescale];
             double roll = 0;
-            if (vaTimescale.X < 300 || vaTimescale.Y < 300)
+            if (vaTimescale.X < VerticalAttractorTimescaleDisable || vaTimescale.Y < VerticalAttractorTimescaleDisable)
             {
                 Vector3 angularError = angularOrientation.GetEulerAngles();
                 if(angularError.X > Math.PI)
@@ -378,23 +380,16 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
                 angularError = -angularError-angularVelocity;
                 Vector3 vertAttractorTorque = angularError.ElementMultiply((m_Params[VehicleVectorParamId.VerticalAttractionEfficiency].ElementMultiply(m_Params.OneByVerticalAttractionTimescale) * dt).ComponentMin(1));
 
-                if (vaTimescale.X < 300)
-                {
-                    angularBodyTorque.X = angularBodyTorque.X + vertAttractorTorque.X;
-                }
-                else
+                if (vaTimescale.X > VerticalAttractorTimescaleDisable)
                 {
                     vertAttractorTorque.X = 0;
                 }
 
-                if ((flags & VehicleFlags.LimitRollOnly) == 0 && vaTimescale.Y < 300)
-                {
-                    angularBodyTorque.Y = angularBodyTorque.Y + vertAttractorTorque.Y;
-                }
-                else
+                if ((flags & VehicleFlags.LimitRollOnly) != 0 || vaTimescale.Y > VerticalAttractorTimescaleDisable)
                 {
                     vertAttractorTorque.Y = 0;
                 }
+                angularBodyTorque += vertAttractorTorque;
                 VerticalAttractorTorque = vertAttractorTorque;
             }
             #endregion
