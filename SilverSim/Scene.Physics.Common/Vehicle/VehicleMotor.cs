@@ -368,6 +368,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             if (vaTimescale.X < VerticalAttractorTimescaleDisable || vaTimescale.Y < VerticalAttractorTimescaleDisable)
             {
                 Vector3 angularError = angularOrientation.GetEulerAngles();
+                angularError.Z = 0;
                 if(angularError.X > Math.PI)
                 {
                     angularError.X -= Math.PI * 2;
