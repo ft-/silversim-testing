@@ -20,6 +20,9 @@
 // exception statement from your version.
 
 using SilverSim.Http;
+using SilverSim.Types;
+using SilverSim.Types.StructuredData.Json;
+using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -298,5 +301,38 @@ namespace SilverSim.Main.Common.HttpServer
         }
 
         public abstract HttpWebSocket BeginWebSocket(string websocketprotocol = "");
+
+        public void JsonResponse(IValue iv)
+        {
+            using (HttpResponse res = BeginResponse("application/json"))
+            {
+                using (Stream s = res.GetOutputStream())
+                {
+                    Json.Serialize(iv, s);
+                }
+            }
+        }
+
+        public void LlsdXmlResponse(IValue iv)
+        {
+            using (HttpResponse res = BeginResponse("application/llsd+xml"))
+            {
+                using (Stream s = res.GetOutputStream())
+                {
+                    LlsdXml.Serialize(iv, s);
+                }
+            }
+        }
+
+        public void LlsdBinaryResponse(IValue iv, bool writeHeader = false)
+        {
+            using (HttpResponse res = BeginResponse("application/llsd+binary"))
+            {
+                using (Stream s = res.GetOutputStream())
+                {
+                    LlsdBinary.Serialize(iv, s, writeHeader);
+                }
+            }
+        }
     }
 }
