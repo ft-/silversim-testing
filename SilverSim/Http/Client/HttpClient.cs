@@ -506,7 +506,7 @@ namespace SilverSim.Http.Client
                                         }
                                         throw new BadHttpResponseException("Invalid WWW-Authenticate");
                                     }
-                                    else if(request.DisableHttpException && statusCode < 500)
+                                    else if(request.DisableHttpUnauthorizedException)
                                     {
                                         return GetResponseBodyStream(headers, uri, splits, method, s);
                                     }
@@ -644,7 +644,7 @@ namespace SilverSim.Http.Client
                             }
                             throw new BadHttpResponseException("Invalid WWW-Authenticate");
                         }
-                        else if(request.DisableHttpException && statusCode < 500)
+                        else if(request.DisableHttpUnauthorizedException)
                         {
                             return GetResponseBodyStream(headers, uri, splits, method, s);
                         }
@@ -1070,7 +1070,7 @@ redoafter401:
                             s.SendRstStream(Http2Connection.Http2ErrorCode.StreamClosed);
                             throw new BadHttpResponseException("Invalid WWW-Authenticate");
                         }
-                        else if(request.DisableHttpException && statusCode < 500)
+                        else if(request.DisableHttpUnauthorizedException)
                         {
                             return GetResponseBodyStream(request, rxheaders, s);
                         }

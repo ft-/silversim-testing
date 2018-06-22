@@ -56,6 +56,7 @@ namespace SilverSim.Http.Client
             public RemoteCertificateValidationCallback RemoteCertificateValidationCallback;
             public HttpStatusCode StatusCode;
             public bool DisableHttpException;
+            public bool DisableHttpUnauthorizedException;
 
             public Request(string url)
             {
