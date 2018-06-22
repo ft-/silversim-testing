@@ -175,6 +175,16 @@ namespace SilverSim.Http.Client
 
         #region Main HTTP Client Functionality
         public static string ExecuteRequest(
+            this Request request,
+            out HttpStatusCode statuscode)
+        {
+            request.DisableHttpException = true;
+            string res = request.ExecuteRequest();
+            statuscode = request.StatusCode;
+            return res;
+        }
+
+        public static string ExecuteRequest(
             this Request request)
         {
             using (Stream responseStream = ExecuteStreamRequest(request))
@@ -185,12 +195,30 @@ namespace SilverSim.Http.Client
         }
 
         public static byte[] ExecuteBinaryRequest(
+            this Request request,
+            out HttpStatusCode statuscode)
+        {
+            request.DisableHttpException = true;
+            byte[] res = request.ExecuteBinaryRequest();
+            statuscode = request.StatusCode;
+            return res;
+        }
+
+        public static byte[] ExecuteBinaryRequest(
             this Request request)
         {
             using (Stream responseStream = ExecuteStreamRequest(request))
             {
                 return responseStream.ReadToStreamEnd();
             }
+        }
+
+        public static Stream ExecuteStreamRequest(this Request request, out HttpStatusCode statuscode)
+        {
+            request.DisableHttpException = true;
+            Stream s = request.ExecuteStreamRequest();
+            statuscode = request.StatusCode;
+            return s;
         }
 
         public static Stream ExecuteStreamRequest(
