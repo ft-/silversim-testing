@@ -174,6 +174,14 @@ namespace SilverSim.Http.Client
         #endregion
 
         #region Main HTTP Client Functionality
+        public static HttpStatusCode ExecuteStatusRequest(
+            this Request request)
+        {
+            HttpStatusCode statuscode;
+            request.ExecuteRequest(out statuscode);
+            return statuscode;
+        }
+
         public static string ExecuteRequest(
             this Request request,
             out HttpStatusCode statuscode)
