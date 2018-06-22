@@ -453,9 +453,14 @@ namespace SilverSim.Http.Client
                             {
                                 statusCode = 500;
                             }
+                            request.StatusCode = (HttpStatusCode)statusCode;
 
                             if (statusCode == 401 && request.Authorization != null && request.Authorization.CanHandleUnauthorized(headers))
                             {
+                                using (GetResponseBodyStream(headers, uri, splits, method, s))
+                                {
+                                    /* just consume it */
+                                }
                                 goto redoafter401;
                             }
                             if (statusCode == 401)
@@ -467,6 +472,10 @@ namespace SilverSim.Http.Client
                                     Dictionary<string, string> authpara = ParseWWWAuthenticate(data, out authtype);
                                     if (authpara == null)
                                     {
+                                        using (GetResponseBodyStream(headers, uri, splits, method, s))
+                                        {
+                                            /* just consume it */
+                                        }
                                         throw new BadHttpResponseException("Invalid WWW-Authenticate");
                                     }
                                     else
@@ -476,18 +485,26 @@ namespace SilverSim.Http.Client
                                         {
                                             realm = string.Empty;
                                         }
-                                        throw new HttpUnauthorizedException(authtype, realm, authpara);
+                                        using (GetResponseBodyStream(headers, uri, splits, method, s))
+                                        {
+                                            /* just consume it */
+                                        }
+                                       throw new HttpUnauthorizedException(authtype, realm, authpara);
                                     }
                                 }
                             }
 
-                            if (statusCode == 404)
+                            if (request.DisableHttpException)
                             {
-                                throw new HttpException(statusCode, splits[2] + " (" + url + ")");
+                                return GetResponseBodyStream(headers, uri, splits, method, s);
                             }
                             else
                             {
-                                throw new HttpException(statusCode, splits[2]);
+                                using (GetResponseBodyStream(headers, uri, splits, method, s))
+                                {
+                                    /* just consume it */
+                                }
+                                throw new HttpException(statusCode, statusCode == 404 ? splits[2] + " (" + url + ")" : splits[2]);
                             }
                         }
 
@@ -570,9 +587,14 @@ namespace SilverSim.Http.Client
                 {
                     statusCode = 500;
                 }
+                request.StatusCode = (HttpStatusCode)statusCode;
 
                 if (statusCode == 401 && request.Authorization != null && request.Authorization.CanHandleUnauthorized(headers))
                 {
+                    using (GetResponseBodyStream(headers, uri, splits, method, s))
+                    {
+                        /* just consume it */
+                    }
                     goto redoafter401;
                 }
                 if (statusCode == 401)
@@ -586,9 +608,13 @@ namespace SilverSim.Http.Client
                         {
                             using (GetResponseBodyStream(headers, uri, splits, method, s))
                             {
-
+                                /* just consume it */
                             }
                             throw new BadHttpResponseException("Invalid WWW-Authenticate");
+                        }
+                        else if(request.DisableHttpException)
+                        {
+                            return GetResponseBodyStream(headers, uri, splits, method, s);
                         }
                         else
                         {
@@ -599,7 +625,7 @@ namespace SilverSim.Http.Client
                             }
                             using (GetResponseBodyStream(headers, uri, splits, method, s))
                             {
-
+                                /* just consume it */
                             }
                             throw new HttpUnauthorizedException(authtype, realm, authpara);
                         }
@@ -610,21 +636,17 @@ namespace SilverSim.Http.Client
                     request.Authorization?.ProcessResponseHeaders(headers);
                 }
 
-                if (statusCode == 404)
+                if (request.DisableHttpException)
                 {
-                    using (GetResponseBodyStream(headers, uri, splits, method, s))
-                    {
-                        /* nothing to do here */
-                    }
-                    throw new HttpException(statusCode, splits[2] + " (" + url + ")");
+                    return GetResponseBodyStream(headers, uri, splits, method, s);
                 }
                 else
                 {
                     using (GetResponseBodyStream(headers, uri, splits, method, s))
                     {
-                        /* nothing to do here */
+                        /* just consume it */
                     }
-                    throw new HttpException(statusCode, splits[2]);
+                    throw new HttpException(statusCode, statusCode == 404 ? splits[2] + " (" + url + ")" : splits[2]);
                 }
             }
 
@@ -907,6 +929,10 @@ redoafter401:
 
                         if (statusCode == 401 && request.Authorization != null && request.Authorization.CanHandleUnauthorized(rxheaders))
                         {
+                            using (GetResponseBodyStream(request, rxheaders, s))
+                            {
+                                /* just consume it */
+                            }
                             throw new RedoAfter401Exception();
                         }
 
@@ -919,7 +945,12 @@ redoafter401:
                                 Dictionary<string, string> authpara = ParseWWWAuthenticate(data, out authtype);
                                 if (authpara == null)
                                 {
+                                    s.SendRstStream(Http2Connection.Http2ErrorCode.StreamClosed);
                                     throw new BadHttpResponseException("Invalid WWW-Authenticate");
+                                }
+                                else if(request.DisableHttpException)
+                                {
+                                    return GetResponseBodyStream(request, rxheaders, s);
                                 }
                                 else
                                 {
@@ -928,20 +959,26 @@ redoafter401:
                                     {
                                         realm = string.Empty;
                                     }
+                                    using (GetResponseBodyStream(request, rxheaders, s))
+                                    {
+                                        /* just consume it */
+                                    }
                                     throw new HttpUnauthorizedException(authtype, realm, authpara);
                                 }
                             }
                         }
 
-                        if (statusCode == 404)
+                        if(request.DisableHttpException)
                         {
-                            s.SendRstStream(Http2Connection.Http2ErrorCode.StreamClosed);
-                            throw new HttpException(statusCode, statusCode.ToString() + " (" + uri + ")");
+                            return GetResponseBodyStream(request, rxheaders, s);
                         }
                         else
                         {
-                            s.SendRstStream(Http2Connection.Http2ErrorCode.StreamClosed);
-                            throw new HttpException(statusCode, statusCode.ToString());
+                            using (GetResponseBodyStream(request, rxheaders, s))
+                            {
+                                /* just consume it */
+                            }
+                            throw new HttpException(statusCode, statusCode == 404 ? statusCode.ToString() + " (" + uri + ")" : statusCode.ToString());
                         }
                     }
                 }
@@ -955,7 +992,7 @@ redoafter401:
             rxheaders = s.ReceiveHeaders();
 
             IDictionary<string, string> headers = request.Headers;
-            if(headers != null)
+            if (headers != null)
             {
                 headers.Clear();
                 foreach (KeyValuePair<string, string> kvp in rxheaders)
@@ -964,7 +1001,7 @@ redoafter401:
                 }
             }
             string statusVal;
-            if(!rxheaders.TryGetValue(":status", out statusVal))
+            if (!rxheaders.TryGetValue(":status", out statusVal))
             {
                 s.SendRstStream(Http2Connection.Http2ErrorCode.ProtocolError);
                 throw new BadHttpResponseException("Missing status");
@@ -978,8 +1015,14 @@ redoafter401:
                     statusCode = 500;
                 }
 
+                request.StatusCode = (HttpStatusCode)statusCode;
+
                 if (statusCode == 401 && request.Authorization != null && request.Authorization.CanHandleUnauthorized(rxheaders))
                 {
+                    using (GetResponseBodyStream(request, rxheaders, s))
+                    {
+                        /* just consume it */
+                    }
                     throw new RedoAfter401Exception();
                 }
 
@@ -992,7 +1035,12 @@ redoafter401:
                         Dictionary<string, string> authpara = ParseWWWAuthenticate(data, out authtype);
                         if (authpara == null)
                         {
+                            s.SendRstStream(Http2Connection.Http2ErrorCode.StreamClosed);
                             throw new BadHttpResponseException("Invalid WWW-Authenticate");
+                        }
+                        else if(request.DisableHttpException)
+                        {
+                            return GetResponseBodyStream(request, rxheaders, s);
                         }
                         else
                         {
@@ -1000,6 +1048,11 @@ redoafter401:
                             if (!authpara.TryGetValue("realm", out realm))
                             {
                                 realm = string.Empty;
+                            }
+
+                            using (GetResponseBodyStream(request, rxheaders, s))
+                            {
+                                /* just consume it */
                             }
                             throw new HttpUnauthorizedException(authtype, realm, authpara);
                         }
@@ -1010,20 +1063,31 @@ redoafter401:
                     request.Authorization?.ProcessResponseHeaders(rxheaders);
                 }
 
-                if (statusCode == 404)
+                if(request.DisableHttpException)
                 {
-                    s.SendRstStream(Http2Connection.Http2ErrorCode.StreamClosed);
-                    throw new HttpException(statusCode, statusVal + " (" + uri + ")");
+                    return GetResponseBodyStream(request, rxheaders, s);
                 }
                 else
                 {
-                    s.SendRstStream(Http2Connection.Http2ErrorCode.StreamClosed);
-                    throw new HttpException(statusCode, statusVal);
+                    using (GetResponseBodyStream(request, rxheaders, s))
+                    {
+                        /* just consume it */
+                    }
+                    throw new HttpException(statusCode, statusCode == 404 ? statusVal + " (" + uri + ")" : statusVal);
                 }
+            }
+            else
+            {
+                request.StatusCode = (HttpStatusCode)int.Parse(statusVal);
             }
 
             request.Authorization?.ProcessResponseHeaders(rxheaders);
 
+            return GetResponseBodyStream(request, rxheaders, s);
+        }
+
+        private static Stream GetResponseBodyStream(Request request, Dictionary<string, string> rxheaders, Http2Connection.Http2Stream s)
+        {
             string value;
             string compressedresult = string.Empty;
             if (rxheaders.TryGetValue("content-encoding", out value) || rxheaders.TryGetValue("x-content-encoding", out value))
@@ -1034,7 +1098,7 @@ redoafter401:
                 {
                     compressedresult = "gzip";
                 }
-                else if(value == "deflate")
+                else if (value == "deflate")
                 {
                     compressedresult = "deflate";
                 }
