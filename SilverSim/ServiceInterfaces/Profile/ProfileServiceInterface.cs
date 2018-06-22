@@ -28,7 +28,8 @@ using System.Collections.Generic;
 namespace SilverSim.ServiceInterfaces.Profile
 {
     public abstract class ProfileServiceInterface :
-        IPicksThisInterface
+        IPicksThisInterface,
+        IClassifiedsThisInterface
     {
         [Flags]
         public enum PropertiesUpdateFlags
@@ -43,6 +44,19 @@ namespace SilverSim.ServiceInterfaces.Profile
         public abstract INotesInterface Notes { get; }
         public abstract IUserPreferencesInterface Preferences { get; }
         public abstract IPropertiesInterface Properties { get; }
+
+        ProfileClassified IClassifiedsThisInterface.this[UGUI user, UUID id]
+        {
+            get
+            {
+                ProfileClassified classified;
+                if(Classifieds.TryGetValue(user, id, out classified))
+                {
+                    return classified;
+                }
+                throw new KeyNotFoundException();
+            }
+        }
 
         ProfilePick IPicksThisInterface.this[UGUI user, UUID id]
         {
