@@ -55,8 +55,49 @@ namespace SilverSim.Http.Client
             public IHttpAuthorization Authorization;
             public RemoteCertificateValidationCallback RemoteCertificateValidationCallback;
             public HttpStatusCode StatusCode;
-            public bool DisableHttpException;
-            public bool DisableHttpUnauthorizedException;
+            [Flags]
+            public enum DisableExceptionFlags
+            {
+                None = 0,
+                Disable3XX = 0x00000001,
+                DisableUnauthorized = 0x00000002,
+                DisableNotFound = 0x00000004,
+                DisableConflict = 0x00000008,
+                DisableGone = 0x00000010,
+                Disable5XX = 0x00000020,
+            }
+
+            public DisableExceptionFlags DisableExceptions;
+
+            public bool IsExceptionDisabled()
+            {
+                switch(StatusCode)
+                {
+                    case HttpStatusCode.Unauthorized:
+                        return (DisableExceptions & DisableExceptionFlags.DisableUnauthorized) != 0;
+                    case HttpStatusCode.NotFound:
+                        return (DisableExceptions & DisableExceptionFlags.DisableNotFound) != 0;
+                    case HttpStatusCode.Gone:
+                        return (DisableExceptions & DisableExceptionFlags.DisableGone) != 0;
+                    case HttpStatusCode.Conflict:
+                        return (DisableExceptions & DisableExceptionFlags.DisableConflict) != 0;
+                    default:
+                        int statusCodeRange = ((int)StatusCode) / 100;
+                        switch(statusCodeRange)
+                        {
+                            case 3:
+                                return (DisableExceptions & DisableExceptionFlags.Disable3XX) != 0;
+
+                            case 5:
+                                return (DisableExceptions & DisableExceptionFlags.Disable5XX) != 0;
+
+                            default:
+                                break;
+                        }
+                        break;
+                }
+                return false;
+            }
 
             public Request(string url)
             {
