@@ -102,19 +102,6 @@ namespace SilverSim.Database.Memory.Estate
             m_Data[estateInfo.ID] = new EstateInfo(estateInfo);
         }
 
-        public override EstateInfo this[uint estateID]
-        {
-            get
-            {
-                EstateInfo info;
-                if(TryGetValue(estateID, out info))
-                {
-                    return info;
-                }
-                throw new KeyNotFoundException();
-            }
-        }
-
         public override List<EstateInfo> All => new List<EstateInfo>(from estate in m_Data.Values where true select new EstateInfo(estate));
 
         public override List<uint> AllIDs => new List<uint>(m_Data.Keys);

@@ -91,19 +91,6 @@ namespace SilverSim.Database.Memory.Friends
             }
         }
 
-        public override FriendInfo this[UGUI user, UGUI friend]
-        {
-            get
-            {
-                FriendInfo fi;
-                if(!TryGetValue(user, friend, out fi))
-                {
-                    throw new KeyNotFoundException();
-                }
-                return fi;
-            }
-        }
-
         public override void Delete(FriendInfo fi)
         {
             RwLockedDictionary<UUID, FriendData> friendList;

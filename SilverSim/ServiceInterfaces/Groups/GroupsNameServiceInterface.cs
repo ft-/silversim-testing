@@ -27,7 +27,18 @@ namespace SilverSim.ServiceInterfaces.Groups
 {
     public abstract class GroupsNameServiceInterface
     {
-        public abstract UGI this[UUID groupID] { get; }
+        public virtual UGI this[UUID groupID]
+        {
+            get
+            {
+                UGI ugi;
+                if(!TryGetValue(groupID, out ugi))
+                {
+                    throw new KeyNotFoundException();
+                }
+                return ugi;
+            }
+        }
 
         public abstract bool TryGetValue(UUID groupID, out UGI ugi);
 

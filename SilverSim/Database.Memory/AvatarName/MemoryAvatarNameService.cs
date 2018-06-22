@@ -54,33 +54,7 @@ namespace SilverSim.Database.Memory.AvatarName
             return false;
         }
 
-        public override UGUIWithName this[string firstName, string lastName]
-        {
-            get
-            {
-                UGUIWithName uui;
-                if(!TryGetValue(firstName, lastName, out uui))
-                {
-                    throw new KeyNotFoundException();
-                }
-                return uui;
-            }
-        }
-
         public override bool TryGetValue(UUID key, out UGUIWithName uui) => m_Data.TryGetValue(key, out uui);
-
-        public override UGUIWithName this[UUID key]
-        {
-            get
-            {
-                UGUIWithName uui;
-                if(!TryGetValue(key, out uui))
-                {
-                    throw new KeyNotFoundException();
-                }
-                return uui;
-            }
-        }
         #endregion
 
         public override void Store(UGUIWithName value)

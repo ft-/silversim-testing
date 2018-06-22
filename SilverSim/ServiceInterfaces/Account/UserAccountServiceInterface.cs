@@ -52,11 +52,44 @@ namespace SilverSim.ServiceInterfaces.Account
 
     public abstract class UserAccountServiceInterface : IUserAccountDeleteServiceInterface
     {
-        public abstract UserAccount this[UUID scopeID, UUID accountID] { get; }
+        public virtual UserAccount this[UUID scopeID, UUID accountID]
+        {
+            get
+            {
+                UserAccount account;
+                if(!TryGetValue(scopeID, accountID, out account))
+                {
+                    throw new UserAccountNotFoundException();
+                }
+                return account;
+            }
+        }
 
-        public abstract UserAccount this[UUID scopeID, string email] { get; }
+        public virtual UserAccount this[UUID scopeID, string email]
+        {
+            get
+            {
+                UserAccount account;
+                if(!TryGetValue(scopeID, email, out account))
+                {
+                    throw new UserAccountNotFoundException();
+                }
+                return account;
+            }
+        }
 
-        public abstract UserAccount this[UUID scopeID, string firstName, string lastName] { get; }
+        public virtual UserAccount this[UUID scopeID, string firstName, string lastName]
+        {
+            get
+            {
+                UserAccount account;
+                if(!TryGetValue(scopeID, firstName, lastName, out account))
+                {
+                    throw new UserAccountNotFoundException();
+                }
+                return account;
+            }
+        }
 
         public abstract bool ContainsKey(UUID scopeID, UUID accountID);
         public abstract bool ContainsKey(UUID scopeID, string email);

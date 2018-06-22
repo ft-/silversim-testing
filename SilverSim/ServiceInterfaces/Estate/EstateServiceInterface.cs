@@ -26,7 +26,18 @@ namespace SilverSim.ServiceInterfaces.Estate
 {
     public abstract class EstateServiceInterface
     {
-        public abstract EstateInfo this[uint estateID] { get; }
+        public virtual EstateInfo this[uint estateID]
+        {
+            get
+            {
+                EstateInfo info;
+                if(!TryGetValue(estateID, out info))
+                {
+                    throw new KeyNotFoundException();
+                }
+                return info;
+            }
+        }
 
         public abstract void Add(EstateInfo estateInfo);
         public abstract void Update(EstateInfo estateInfo);

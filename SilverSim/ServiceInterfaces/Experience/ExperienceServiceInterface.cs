@@ -27,7 +27,19 @@ namespace SilverSim.ServiceInterfaces.Experience
 {
     public abstract class ExperienceServiceInterface
     {
-        public abstract ExperienceInfo this[UUID experienceID] { get; }
+        public virtual ExperienceInfo this[UUID experienceID]
+        {
+            get
+            {
+                ExperienceInfo info;
+                if(!TryGetValue(experienceID, out info))
+                {
+                    throw new KeyNotFoundException();
+                }
+                return info;
+            }
+        }
+
         public abstract bool TryGetValue(UUID experienceID, out ExperienceInfo experienceInfo);
         public abstract void Add(ExperienceInfo info);
         public abstract void Update(UGUI requestingAgent, ExperienceInfo info);

@@ -334,5 +334,11 @@ namespace SilverSim.Main.Common.HttpServer
                 }
             }
         }
+
+        public void NotFound() => ErrorResponse(HttpStatusCode.NotFound);
+
+        public void BadRequest() => ErrorResponse(HttpStatusCode.BadRequest);
+
+        public void MethodNotAllowed() => ErrorResponse(HttpStatusCode.MethodNotAllowed);
     }
 }

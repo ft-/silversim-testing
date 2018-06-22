@@ -55,14 +55,37 @@ namespace SilverSim.ServiceInterfaces.AvatarName
 
     public abstract class AvatarNameServiceInterface
     {
-        public abstract UGUIWithName this[UUID key] { get; }
+        public virtual UGUIWithName this[UUID key]
+        {
+            get
+            {
+                UGUIWithName res;
+                if(!TryGetValue(key, out res))
+                {
+                    throw new KeyNotFoundException();
+                }
+                return res;
+            }
+        }
+
         public abstract bool TryGetValue(UUID key, out UGUIWithName uui);
 
         /** <summary>if setting is not supported, ignore the details and return without exception. Only store authoritative information</summary> */
         public abstract void Store(UGUIWithName uui);
         public abstract bool Remove(UUID key);
 
-        public abstract UGUIWithName this[string firstName, string lastName] { get; }
+        public virtual UGUIWithName this[string firstName, string lastName]
+        {
+            get
+            {
+                UGUIWithName res;
+                if(!TryGetValue(firstName, lastName, out res))
+                {
+                    throw new KeyNotFoundException();
+                }
+                return res;
+            }
+        }
 
         public abstract bool TryGetValue(string firstName, string lastName, out UGUIWithName uui);
 

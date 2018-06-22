@@ -78,19 +78,6 @@ namespace SilverSim.Database.MySQL.Grid
         #endregion
 
         #region Accessors
-        public override RegionInfo this[UUID scopeID, UUID regionID]
-        {
-            get
-            {
-                RegionInfo rInfo;
-                if(!TryGetValue(scopeID, regionID, out rInfo))
-                {
-                    throw new KeyNotFoundException();
-                }
-                return rInfo;
-            }
-        }
-
         public override bool TryGetValue(UUID scopeID, UUID regionID, out RegionInfo rInfo)
         {
             if(m_Data.TryGetValue(regionID, out rInfo) && rInfo.ScopeID == scopeID)
@@ -105,19 +92,6 @@ namespace SilverSim.Database.MySQL.Grid
         {
             RegionInfo rInfo;
             return m_Data.TryGetValue(regionID, out rInfo) && (scopeID == UUID.Zero || scopeID == rInfo.ScopeID);
-        }
-
-        public override RegionInfo this[UUID scopeID, uint gridX, uint gridY]
-        {
-            get
-            {
-                RegionInfo rInfo;
-                if(!TryGetValue(scopeID, gridX, gridY, out rInfo))
-                {
-                    throw new KeyNotFoundException();
-                }
-                return rInfo;
-            }
         }
 
         public override bool TryGetValue(UUID scopeID, uint gridX, uint gridY, out RegionInfo rInfo)
@@ -152,19 +126,6 @@ namespace SilverSim.Database.MySQL.Grid
             return false;
         }
 
-        public override RegionInfo this[UUID scopeID, string regionName]
-        {
-            get
-            {
-                RegionInfo rInfo;
-                if(!TryGetValue(scopeID, regionName, out rInfo))
-                {
-                    throw new KeyNotFoundException();
-                }
-                return rInfo;
-            }
-        }
-
         public override bool TryGetValue(UUID scopeID, string regionName, out RegionInfo rInfo)
         {
             var res = from region in m_Data.Values
@@ -193,19 +154,6 @@ namespace SilverSim.Database.MySQL.Grid
             }
 
             return false;
-        }
-
-        public override RegionInfo this[UUID regionID]
-        {
-            get
-            {
-                RegionInfo rInfo;
-                if(!TryGetValue(regionID, out rInfo))
-                {
-                    throw new KeyNotFoundException();
-                }
-                return rInfo;
-            }
         }
 
         public override bool TryGetValue(UUID regionID, out RegionInfo rInfo) => m_Data.TryGetValue(regionID, out rInfo);

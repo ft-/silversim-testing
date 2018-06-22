@@ -92,23 +92,6 @@ namespace SilverSim.Database.Memory.UserAccounts
             return false;
         }
 
-        public override UserAccount this[UUID scopeID, UUID accountID]
-        {
-            get
-            {
-                UserAccount account;
-                if (!TryGetValue(scopeID, accountID, out account))
-                {
-                    throw new UserAccountNotFoundException();
-                }
-                account = new UserAccount(account)
-                {
-                    IsLocalToGrid = true
-                };
-                return account;
-            }
-        }
-
         public override bool ContainsKey(UUID scopeID, string email)
         {
             var result = from account in m_Data.Values
@@ -141,19 +124,6 @@ namespace SilverSim.Database.Memory.UserAccounts
             return false;
         }
 
-        public override UserAccount this[UUID scopeID, string email]
-        {
-            get
-            {
-                UserAccount account;
-                if(!TryGetValue(scopeID, email, out account))
-                {
-                    throw new UserAccountNotFoundException();
-                }
-                return account;
-            }
-        }
-
         public override bool ContainsKey(UUID scopeID, string firstName, string lastName)
         {
             var result = from account in m_Data.Values
@@ -178,26 +148,15 @@ namespace SilverSim.Database.Memory.UserAccounts
                                        select accountdata;
             foreach (UserAccount acc in result)
             {
-                account = new UserAccount(acc);
-                account.IsLocalToGrid = true;
+                account = new UserAccount(acc)
+                {
+                    IsLocalToGrid = true
+                };
                 return true;
             }
 
             account = default(UserAccount);
             return false;
-        }
-
-        public override UserAccount this[UUID scopeID, string firstName, string lastName]
-        {
-            get
-            {
-                UserAccount account;
-                if(!TryGetValue(scopeID, firstName, lastName, out account))
-                {
-                    throw new UserAccountNotFoundException();
-                }
-                return account;
-            }
         }
 
         public override List<UserAccount> GetAccounts(UUID scopeID, string query)

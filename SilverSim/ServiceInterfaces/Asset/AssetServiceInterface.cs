@@ -33,7 +33,18 @@ namespace SilverSim.ServiceInterfaces.Asset
         #endregion
 
         #region Accessors
-        public abstract AssetData this[UUID key] { get; }
+        public virtual AssetData this[UUID key]
+        {
+            get
+            {
+                AssetData data;
+                if(!TryGetValue(key, out data))
+                {
+                    throw new AssetNotFoundException(key);
+                }
+                return data;
+            }
+        }
 
         public abstract bool TryGetValue(UUID key, out AssetData assetData);
 

@@ -98,11 +98,33 @@ namespace SilverSim.ServiceInterfaces.GridUser
 
     public abstract class GridUserServiceInterface
     {
-        public abstract GridUserInfo this[UUID userID] { get; }
+        public virtual GridUserInfo this[UUID userID]
+        {
+            get
+            {
+                GridUserInfo info;
+                if(!TryGetValue(userID, out info))
+                {
+                    throw new GridUserNotFoundException();
+                }
+                return info;
+            }
+        }
 
         public abstract bool TryGetValue(UUID userID, out GridUserInfo userInfo);
 
-        public abstract GridUserInfo this[UGUI userID] { get; }
+        public virtual GridUserInfo this[UGUI userID]
+        {
+            get
+            {
+                GridUserInfo info;
+                if(!TryGetValue(userID, out info))
+                {
+                    throw new GridUserNotFoundException();
+                }
+                return info;
+            }
+        }
 
         public abstract bool TryGetValue(UGUI userID, out GridUserInfo userInfo);
 

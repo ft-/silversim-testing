@@ -45,19 +45,6 @@ namespace SilverSim.Database.Memory.Experience
             /* intentionally left empty */
         }
 
-        public override ExperienceInfo this[UUID experienceID]
-        {
-            get
-            {
-                ExperienceInfo res;
-                if (m_Experiences.TryGetValue(experienceID, out res))
-                {
-                    return new ExperienceInfo(res);
-                }
-                throw new KeyNotFoundException();
-            }
-        }
-
         public override void Add(ExperienceInfo info)
         {
             m_Experiences.Add(info.ID, info);

@@ -285,7 +285,7 @@ namespace SilverSim.Database.Memory.SimulationData
         #endregion
 
         #region Load all object groups of a single region
-        List<ObjectGroup> ISimulationDataObjectStorageInterface.LoadObjects(UUID regionID, bool skipErrors = false)
+        List<ObjectGroup> ISimulationDataObjectStorageInterface.LoadObjects(UUID regionID, bool skipErrors)
         {
             var objGroups = new Dictionary<UUID, ObjectGroup>();
             var originalAssetIDs = new Dictionary<UUID, UUID>();

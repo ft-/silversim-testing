@@ -21,6 +21,7 @@
 
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Asset;
+using SilverSim.ServiceInterfaces._Combined;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
@@ -32,7 +33,7 @@ namespace SilverSim.Database.Memory.Asset
 {
     [Description("Memory Asset Backend")]
     [PluginName("Assets")]
-    public class MemoryAssetService : AssetServiceInterface, IPlugin, IAssetMetadataServiceInterface, IAssetDataServiceInterface
+    public class MemoryAssetService : AssetServiceCombinedInterface, IPlugin
     {
         private readonly DefaultAssetReferencesService m_ReferencesService;
         private readonly RwLockedDictionary<UUID, AssetData> m_Assets = new RwLockedDictionary<UUID, AssetData>();
@@ -83,38 +84,10 @@ namespace SilverSim.Database.Memory.Asset
             return false;
         }
 
-        public override AssetData this[UUID key]
-        {
-            get
-            {
-                AssetData asset;
-                if(!TryGetValue(key, out asset))
-                {
-                    throw new AssetNotFoundException(key);
-                }
-                return asset;
-            }
-        }
-
         #endregion
 
         #region Metadata interface
-        public override IAssetMetadataServiceInterface Metadata => this;
-
-        AssetMetadata IAssetMetadataServiceInterface.this[UUID key]
-        {
-            get
-            {
-                AssetMetadata metadata;
-                if (!Metadata.TryGetValue(key, out metadata))
-                {
-                    throw new AssetNotFoundException(key);
-                }
-                return metadata;
-            }
-        }
-
-        bool IAssetMetadataServiceInterface.TryGetValue(UUID key, out AssetMetadata metadata)
+        public override bool TryGetValue(UUID key, out AssetMetadata metadata)
         {
             AssetData data;
             if (m_Assets.TryGetValue(key, out data))
@@ -137,22 +110,7 @@ namespace SilverSim.Database.Memory.Asset
         #endregion
 
         #region Data interface
-        public override IAssetDataServiceInterface Data => this;
-
-        Stream IAssetDataServiceInterface.this[UUID key]
-        {
-            get
-            {
-                Stream s;
-                if (!Data.TryGetValue(key, out s))
-                {
-                    throw new AssetNotFoundException(key);
-                }
-                return s;
-            }
-        }
-
-        bool IAssetDataServiceInterface.TryGetValue(UUID key, out Stream s)
+        public override bool TryGetValue(UUID key, out Stream s)
         {
             AssetData data;
             if (m_Assets.TryGetValue(key, out data))

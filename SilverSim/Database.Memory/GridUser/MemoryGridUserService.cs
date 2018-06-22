@@ -58,23 +58,8 @@ namespace SilverSim.Database.Memory.GridUser
             return false;
         }
 
-        public override GridUserInfo this[UUID userID]
-        {
-            get
-            {
-                GridUserInfo info;
-                if(TryGetValue(userID, out info))
-                {
-                    return info;
-                }
-                throw new GridUserNotFoundException();
-            }
-        }
-
         public override bool TryGetValue(UGUI userID, out GridUserInfo gridUserInfo) =>
             TryGetValue(userID.ID, out gridUserInfo);
-
-        public override GridUserInfo this[UGUI userID] => this[userID.ID];
 
         public override void LoggedInAdd(UGUI userID)
         {

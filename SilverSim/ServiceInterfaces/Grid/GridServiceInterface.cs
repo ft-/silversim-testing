@@ -100,7 +100,18 @@ namespace SilverSim.ServiceInterfaces.Grid
     public abstract class GridServiceInterface
     {
         #region Accessors
-        public abstract RegionInfo this[UUID scopeID, UUID regionID] { get; }
+        public virtual RegionInfo this[UUID scopeID, UUID regionID]
+        {
+            get
+            {
+                RegionInfo ri;
+                if(!TryGetValue(scopeID, regionID, out ri))
+                {
+                    throw new GridRegionNotFoundException();
+                }
+                return ri;
+            }
+        }
 
         public abstract bool TryGetValue(UUID scopeID, UUID regionID, out RegionInfo rInfo);
         public abstract bool ContainsKey(UUID scopeID, UUID regionID);
@@ -111,17 +122,50 @@ namespace SilverSim.ServiceInterfaces.Grid
 
         public bool ContainsKey(UUID scopeID, GridVector position) => ContainsKey(scopeID, position.X, position.Y);
 
-        public abstract RegionInfo this[UUID scopeID, uint gridX, uint gridY] { get; }
+        public virtual RegionInfo this[UUID scopeID, uint gridX, uint gridY]
+        {
+            get
+            {
+                RegionInfo ri;
+                if(!TryGetValue(scopeID, gridX, gridY, out ri))
+                {
+                    throw new GridRegionNotFoundException();
+                }
+                return ri;
+            }
+        }
 
         public abstract bool TryGetValue(UUID scopeID, uint gridX, uint gridY, out RegionInfo rInfo);
         public abstract bool ContainsKey(UUID scopeID, uint gridX, uint gridY);
 
-        public abstract RegionInfo this[UUID scopeID, string regionName] { get; }
+        public virtual RegionInfo this[UUID scopeID, string regionName]
+        {
+            get
+            {
+                RegionInfo ri;
+                if(!TryGetValue(scopeID, regionName, out ri))
+                {
+                    throw new GridRegionNotFoundException();
+                }
+                return ri;
+            }
+        }
 
         public abstract bool TryGetValue(UUID scopeID, string regionName, out RegionInfo rInfo);
         public abstract bool ContainsKey(UUID scopeID, string regionName);
 
-        public abstract RegionInfo this[UUID regionID] { get; }
+        public virtual RegionInfo this[UUID regionID]
+        {
+            get
+            {
+                RegionInfo ri;
+                if(!TryGetValue(regionID, out ri))
+                {
+                    throw new GridRegionNotFoundException();
+                }
+                return ri;
+            }
+        }
 
         public abstract bool TryGetValue(UUID regionID, out RegionInfo rInfo);
         public abstract bool ContainsKey(UUID regionID);

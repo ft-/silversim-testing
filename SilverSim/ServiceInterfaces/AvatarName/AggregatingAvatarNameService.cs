@@ -84,19 +84,6 @@ namespace SilverSim.ServiceInterfaces.AvatarName
             return true;
         }
 
-        public override UGUIWithName this[string firstName, string lastName]
-        {
-            get
-            {
-                UGUIWithName uui;
-                if (!TryGetValue(firstName, lastName, out uui))
-                {
-                    throw new KeyNotFoundException();
-                }
-                return uui;
-            }
-        }
-
         public override List<UGUIWithName> Search(string[] names)
         {
             Dictionary<UUID, UGUIWithName> results = new Dictionary<UUID, UGUIWithName>();
@@ -169,19 +156,6 @@ namespace SilverSim.ServiceInterfaces.AvatarName
                 }
             }
             return true;
-        }
-
-        public override UGUIWithName this[UUID key]
-        {
-            get
-            {
-                UGUIWithName uui = null;
-                if (!TryGetValue(key, out uui))
-                {
-                    throw new KeyNotFoundException();
-                }
-                return uui;
-            }
         }
 
         public override void Store(UGUIWithName uui)

@@ -52,7 +52,18 @@ namespace SilverSim.ServiceInterfaces.Friends
             }
         }
 
-        public abstract FriendInfo this[UGUI user, UGUI friend] { get; }
+        public virtual FriendInfo this[UGUI user, UGUI friend]
+        {
+            get
+            {
+                FriendInfo fi;
+                if(!TryGetValue(user, friend, out fi))
+                {
+                    throw new KeyNotFoundException();
+                }
+                return fi;
+            }
+        }
 
         public abstract List<FriendInfo> this[UGUI user] { get; }
 
