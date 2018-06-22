@@ -27,7 +27,7 @@ namespace SilverSim.ServiceInterfaces.Experience
 {
     public abstract class ExperienceServiceInterface
     {
-        public virtual ExperienceInfo this[UUID experienceID]
+        public ExperienceInfo this[UUID experienceID]
         {
             get
             {
@@ -51,35 +51,9 @@ namespace SilverSim.ServiceInterfaces.Experience
         public abstract List<UUID> FindExperienceByName(string query);
         public abstract List<ExperienceInfo> FindExperienceInfoByName(string query);
 
-        public interface IExperiencePermissionsInterface
-        {
-            bool this[UUID experienceID, UGUI agent] { get; set; }
-            bool TryGetValue(UUID experienceID, UGUI agent, out bool allowed);
-            bool Remove(UUID experienceID, UGUI agent);
-            Dictionary<UUID, bool> this[UGUI agent] { get; }
-        }
-
         public abstract IExperiencePermissionsInterface Permissions { get; }
 
-        public interface IExperienceAdminInterface
-        {
-            bool this[UUID experienceID, UGUI agent] { get; set; }
-            bool TryGetValue(UUID experienceID, UGUI agent, out bool allowed);
-            List<UUID> this[UGUI agent] { get; }
-        }
-
         public abstract IExperienceAdminInterface Admins { get; }
-
-        public interface IExperienceKeyValueInterface
-        {
-            bool TryGetValue(UUID experienceID, string key, out string val);
-            bool Remove(UUID experienceID, string key);
-            void Add(UUID experienceID, string key, string value);
-            void Store(UUID experienceID, string key, string value);
-            bool StoreOnlyIfEqualOrig(UUID experienceID, string key, string value, string orig_value);
-            List<string> GetKeys(UUID experienceID);
-            bool GetDatasize(UUID experienceID, out int used, out int quota);
-        }
 
         public abstract IExperienceKeyValueInterface KeyValueStore { get; }
     }

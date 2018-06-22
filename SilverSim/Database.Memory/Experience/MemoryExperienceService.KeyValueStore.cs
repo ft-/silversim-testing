@@ -26,7 +26,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.Database.Memory.Experience
 {
-    public sealed partial class MemoryExperienceService : ExperienceServiceInterface.IExperienceKeyValueInterface
+    public sealed partial class MemoryExperienceService : IExperienceKeyValueInterface
     {
         private readonly object m_UpdateLock = new object();
         private readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, string>> m_KeyValues = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, string>>(() => new RwLockedDictionary<string, string>());
