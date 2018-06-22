@@ -21,13 +21,11 @@
 
 using SilverSim.Types;
 using SilverSim.Types.Inventory;
-using System;
 
 namespace SilverSim.ServiceInterfaces.Inventory.This
 {
     public interface IInventoryFolderContentServiceThisInterface
     {
-        [Obsolete("Do not use this outside of Robust inventory handler", false)]
         InventoryFolderContent this[UUID principalID, UUID folderID] { get; }
     }
 }

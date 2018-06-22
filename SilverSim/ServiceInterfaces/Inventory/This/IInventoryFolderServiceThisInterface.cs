@@ -22,6 +22,7 @@
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
+using System;
 
 namespace SilverSim.ServiceInterfaces.Inventory.This
 {
@@ -31,6 +32,7 @@ namespace SilverSim.ServiceInterfaces.Inventory.This
         /* DO NOT USE this[UUID key] anywhere else than in a Robust Inventory handler 
          * Not all connectors / services support this access.
          */
+        [Obsolete("Do not use this outside of Robust inventory handler", false)]
         InventoryFolder this[UUID key] { get; }
         InventoryFolder this[UUID principalID, UUID key] { get; }
         InventoryFolder this[UUID principalID, AssetType type] { get; }
