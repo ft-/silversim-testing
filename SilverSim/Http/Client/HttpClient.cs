@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Net;
 using System.Net.Sockets;
 using System.Runtime.Serialization;
 using System.Text;
@@ -232,10 +233,10 @@ namespace SilverSim.Http.Client
                 return DoStreamRequestHttp2(request, uri);
             }
 
-            if(request.ConnectionMode == ConnectionModeEnum.UpgradeHttp2)
+            if (request.ConnectionMode == ConnectionModeEnum.UpgradeHttp2)
             {
                 Http2Connection.Http2Stream h2stream = TryReuseStream(uri.Scheme, uri.Host, uri.Port);
-                if(h2stream != null)
+                if (h2stream != null)
                 {
                     return DoStreamRequestHttp2(request, uri, h2stream);
                 }
@@ -245,9 +246,9 @@ namespace SilverSim.Http.Client
 
             string method = request.Method;
 
-redoafter401:        
+            redoafter401:
             var reqdata = new StringBuilder(uri.IsDefaultPort ?
-                    $"{method} {uri.PathAndQuery} HTTP/1.1\r\nHost: {uri.Host}\r\n":
+                    $"{method} {uri.PathAndQuery} HTTP/1.1\r\nHost: {uri.Host}\r\n" :
                     $"{method} {uri.PathAndQuery} HTTP/1.1\r\nHost: {uri.Host}:{uri.Port}\r\n");
 
             bool doPost = false;
@@ -284,9 +285,9 @@ redoafter401:
                 }
             }
 
-            if(request.Authorization != null)
+            if (request.Authorization != null)
             {
-                if(headers == null)
+                if (headers == null)
                 {
                     headers = new Dictionary<string, string>();
                 }
@@ -304,7 +305,7 @@ redoafter401:
                 }
             }
 
-            if(request.UseChunkedEncoding)
+            if (request.UseChunkedEncoding)
             {
                 reqdata.Append("Transfer-Encoding: chunked\r\n");
             }
@@ -314,7 +315,7 @@ redoafter401:
 
             if (request.RequestBodyDelegate != null)
             {
-                if(content_type != null)
+                if (content_type != null)
                 {
                     reqdata.Append($"Content-Type: {content_type}\r\n");
                 }
@@ -337,7 +338,7 @@ redoafter401:
                 else
                 {
                     doPost = true;
-                    if(content_length > request.Expect100ContinueMinSize)
+                    if (content_length > request.Expect100ContinueMinSize)
                     {
                         expect100Continue = true;
                         request.Expect100Continue = true;
@@ -355,12 +356,12 @@ redoafter401:
                 }
             }
 
-            if(method != "HEAD")
+            if (method != "HEAD")
             {
                 reqdata.Append("Accept-Encoding: gzip, deflate\r\n");
             }
 
-            if(!haveAccept)
+            if (!haveAccept)
             {
                 reqdata.Append("Accept: */*\r\n");
             }
@@ -374,7 +375,7 @@ redoafter401:
                 finalreqdata += "Connection: close\r\n";
             }
             bool h2cUpgrade = request.ConnectionMode == ConnectionModeEnum.UpgradeHttp2;
-            if(h2cUpgrade)
+            if (h2cUpgrade)
             {
                 finalreqdata += "Upgrade: h2c\r\nHTTP2-Settings:\r\n";
             }
@@ -386,7 +387,7 @@ redoafter401:
                 s.Write(outdata, 0, outdata.Length);
                 s.Flush();
             }
-            catch(ObjectDisposedException)
+            catch (ObjectDisposedException)
             {
                 if (retrycnt-- > 0)
                 {
@@ -394,7 +395,7 @@ redoafter401:
                 }
                 throw;
             }
-            catch(SocketException)
+            catch (SocketException)
             {
                 if (retrycnt-- > 0)
                 {
@@ -404,7 +405,7 @@ redoafter401:
             }
             catch (IOException)
             {
-                if(retrycnt-- > 0)
+                if (retrycnt-- > 0)
                 {
                     goto retry;
                 }
@@ -452,25 +453,26 @@ redoafter401:
                             {
                                 statusCode = 500;
                             }
+
                             if (statusCode == 401 && request.Authorization != null && request.Authorization.CanHandleUnauthorized(headers))
                             {
                                 goto redoafter401;
                             }
-                            if(statusCode == 401)
+                            if (statusCode == 401)
                             {
                                 string data;
-                                if(headers.TryGetValue("www-authenticate", out data))
+                                if (headers.TryGetValue("www-authenticate", out data))
                                 {
                                     string authtype;
                                     Dictionary<string, string> authpara = ParseWWWAuthenticate(data, out authtype);
-                                    if(authpara == null)
+                                    if (authpara == null)
                                     {
                                         throw new BadHttpResponseException("Invalid WWW-Authenticate");
                                     }
                                     else
                                     {
                                         string realm;
-                                        if(!authpara.TryGetValue("realm", out realm))
+                                        if (!authpara.TryGetValue("realm", out realm))
                                         {
                                             realm = string.Empty;
                                         }
@@ -549,7 +551,7 @@ redoafter401:
                 headers.Clear();
             }
 
-            if(splits[1] == "101")
+            if (splits[1] == "101")
             {
                 ReadHeaderLines(s, headers);
                 headers.Clear();
@@ -564,7 +566,7 @@ redoafter401:
             {
                 ReadHeaderLines(s, headers);
                 int statusCode;
-                if(!int.TryParse(splits[1], out statusCode))
+                if (!int.TryParse(splits[1], out statusCode))
                 {
                     statusCode = 500;
                 }
@@ -582,6 +584,10 @@ redoafter401:
                         Dictionary<string, string> authpara = ParseWWWAuthenticate(data, out authtype);
                         if (authpara == null)
                         {
+                            using (GetResponseBodyStream(headers, uri, splits, method, s))
+                            {
+
+                            }
                             throw new BadHttpResponseException("Invalid WWW-Authenticate");
                         }
                         else
@@ -590,6 +596,10 @@ redoafter401:
                             if (!authpara.TryGetValue("realm", out realm))
                             {
                                 realm = string.Empty;
+                            }
+                            using (GetResponseBodyStream(headers, uri, splits, method, s))
+                            {
+
                             }
                             throw new HttpUnauthorizedException(authtype, realm, authpara);
                         }
@@ -602,20 +612,34 @@ redoafter401:
 
                 if (statusCode == 404)
                 {
+                    using (GetResponseBodyStream(headers, uri, splits, method, s))
+                    {
+                        /* nothing to do here */
+                    }
                     throw new HttpException(statusCode, splits[2] + " (" + url + ")");
                 }
                 else
                 {
+                    using (GetResponseBodyStream(headers, uri, splits, method, s))
+                    {
+                        /* nothing to do here */
+                    }
                     throw new HttpException(statusCode, splits[2]);
                 }
             }
-            
+
+            var responsecode = (HttpStatusCode)int.Parse(splits[1]);
             /* needs a little passthrough for not changing the API, this actually comes from HTTP/2 */
             headers.Add(":status", splits[1]);
 
             ReadHeaderLines(s, headers);
             request.Authorization?.ProcessResponseHeaders(headers);
 
+            return GetResponseBodyStream(headers, uri, splits, method, s);
+        }
+
+        private static Stream GetResponseBodyStream(IDictionary<string, string> headers, Uri uri, string[] splits, string method, AbstractHttpStream s)
+        { 
             string value;
             string compressedresult = string.Empty;
             if (headers.TryGetValue("content-encoding", out value) || headers.TryGetValue("x-content-encoding", out value))
