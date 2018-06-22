@@ -25,10 +25,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.ServiceInterfaces.Inventory
 {
-    public interface IInventoryFolderContentServiceInterface
+    public interface IInventoryFolderContentServiceInterface : This.IInventoryFolderContentServiceThisInterface
     {
-        InventoryFolderContent this[UUID principalID, UUID folderID] { get; }
-
         bool TryGetValue(UUID principalID, UUID folderID, out InventoryFolderContent inventoryFolderContent);
         bool ContainsKey(UUID principalID, UUID folderID);
 

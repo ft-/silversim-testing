@@ -26,21 +26,17 @@ using System.Collections.Generic;
 
 namespace SilverSim.ServiceInterfaces.Inventory
 {
-    public interface IInventoryItemServiceInterface
+    public interface IInventoryItemServiceInterface : This.IInventoryItemServiceThisInterface
     {
         #region Accessors
         /* DO NOT USE this[UUID key] anywhere else than in a Robust Inventory handler 
          * Not all connectors / services support this access.
          */
         [Obsolete("Do not use this outside of Robust inventory handler", false)]
-        InventoryItem this[UUID key] { get; }
-
-        [Obsolete("Do not use this outside of Robust inventory handler", false)]
         bool TryGetValue(UUID key, out InventoryItem item);
         [Obsolete("Do not use this outside of Robust inventory handler", false)]
         bool ContainsKey(UUID key);
 
-        InventoryItem this[UUID principalID, UUID key] { get; }
         bool TryGetValue(UUID principalID, UUID key, out InventoryItem item);
         bool ContainsKey(UUID principalID, UUID key);
 

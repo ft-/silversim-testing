@@ -26,11 +26,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.Groups.Common.Permissions
 {
-    partial class DefaultPermissionsGroupsService : GroupsServiceInterface.IGroupRolesInterface
+    partial class DefaultPermissionsGroupsService : IGroupRolesInterface
     {
-        GroupRole IGroupRolesInterface.this[UGUI requestingAgent, UGI group, UUID roleID] =>
-            m_InnerService.Roles[requestingAgent, group, roleID];
-
         bool IGroupRolesInterface.TryGetValue(UGUI requestingAgent, UGI group, UUID roleID, out GroupRole groupRole) =>
             m_InnerService.Roles.TryGetValue(requestingAgent, group, roleID, out groupRole);
 

@@ -100,7 +100,7 @@ namespace SilverSim.ServiceInterfaces.Grid
     public abstract class GridServiceInterface
     {
         #region Accessors
-        public virtual RegionInfo this[UUID scopeID, UUID regionID]
+        public RegionInfo this[UUID scopeID, UUID regionID]
         {
             get
             {
@@ -122,7 +122,7 @@ namespace SilverSim.ServiceInterfaces.Grid
 
         public bool ContainsKey(UUID scopeID, GridVector position) => ContainsKey(scopeID, position.X, position.Y);
 
-        public virtual RegionInfo this[UUID scopeID, uint gridX, uint gridY]
+        public RegionInfo this[UUID scopeID, uint gridX, uint gridY]
         {
             get
             {
@@ -138,7 +138,7 @@ namespace SilverSim.ServiceInterfaces.Grid
         public abstract bool TryGetValue(UUID scopeID, uint gridX, uint gridY, out RegionInfo rInfo);
         public abstract bool ContainsKey(UUID scopeID, uint gridX, uint gridY);
 
-        public virtual RegionInfo this[UUID scopeID, string regionName]
+        public RegionInfo this[UUID scopeID, string regionName]
         {
             get
             {
@@ -154,7 +154,7 @@ namespace SilverSim.ServiceInterfaces.Grid
         public abstract bool TryGetValue(UUID scopeID, string regionName, out RegionInfo rInfo);
         public abstract bool ContainsKey(UUID scopeID, string regionName);
 
-        public virtual RegionInfo this[UUID regionID]
+        public RegionInfo this[UUID regionID]
         {
             get
             {

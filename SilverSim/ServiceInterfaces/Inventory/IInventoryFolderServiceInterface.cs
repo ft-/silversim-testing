@@ -22,25 +22,25 @@
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
+using System;
 using System.Collections.Generic;
 
 namespace SilverSim.ServiceInterfaces.Inventory
 {
-    public interface IInventoryFolderServiceInterface
+    public interface IInventoryFolderServiceInterface : This.IInventoryFolderServiceThisInterface
     {
         #region Accessors
-        /* DO NOT USE this[UUID key] anywhere else than in a Robust Inventory handler 
+        /* DO NOT USE this[UUID key] and relatives anywhere else than in a Robust Inventory handler 
          * Not all connectors / services support this access.
          */
-        InventoryFolder this[UUID key] { get; }
+        [Obsolete("Do not use this outside of Robust inventory handler", false)]
         bool TryGetValue(UUID key, out InventoryFolder folder);
+        [Obsolete("Do not use this outside of Robust inventory handler", false)]
         bool ContainsKey(UUID key);
 
-        InventoryFolder this[UUID principalID, UUID key] { get; }
         bool TryGetValue(UUID principalID, UUID key, out InventoryFolder folder);
         bool ContainsKey(UUID principalID, UUID key);
 
-        InventoryFolder this[UUID principalID, AssetType type] { get; }
         bool TryGetValue(UUID principalID, AssetType type, out InventoryFolder folder);
         bool ContainsKey(UUID principalID, AssetType type);
 

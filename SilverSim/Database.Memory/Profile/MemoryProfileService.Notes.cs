@@ -26,7 +26,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.Database.Memory.Profile
 {
-    partial class MemoryProfileService : ProfileServiceInterface.INotesInterface
+    partial class MemoryProfileService : INotesInterface
     {
         private readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, string>> m_Notes = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, string>>(() => new RwLockedDictionary<UUID, string>());
         public string this[UGUI user, UGUI target]

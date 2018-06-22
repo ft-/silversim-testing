@@ -19,13 +19,17 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.ServiceInterfaces.Asset.This;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using System.Collections.Generic;
+using System.IO;
 
 namespace SilverSim.ServiceInterfaces.Asset
 {
-    public abstract class AssetServiceInterface
+    public abstract class AssetServiceInterface :
+        IAssetDataServiceThisInterface,
+        IAssetMetadataServiceThisInterface
     {
         #region Exists methods
         public abstract bool Exists(UUID key);
@@ -33,7 +37,7 @@ namespace SilverSim.ServiceInterfaces.Asset
         #endregion
 
         #region Accessors
-        public virtual AssetData this[UUID key]
+        public AssetData this[UUID key]
         {
             get
             {
@@ -76,6 +80,32 @@ namespace SilverSim.ServiceInterfaces.Asset
 
         #region Data interface
         public abstract IAssetDataServiceInterface Data { get; }
+
+        AssetMetadata IAssetMetadataServiceThisInterface.this[UUID key]
+        {
+            get
+            {
+                AssetMetadata metadata;
+                if(!Metadata.TryGetValue(key, out metadata))
+                {
+                    throw new AssetNotFoundException(key);
+                }
+                return metadata;
+            }
+        }
+
+        Stream IAssetDataServiceThisInterface.this[UUID key]
+        {
+            get
+            {
+                Stream s;
+                if(!Data.TryGetValue(key, out s))
+                {
+                    throw new AssetNotFoundException(key);
+                }
+                return s;
+            }
+        }
         #endregion
 
         #region Store asset method

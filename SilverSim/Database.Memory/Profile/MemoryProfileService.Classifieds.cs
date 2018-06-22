@@ -27,7 +27,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.Database.Memory.Profile
 {
-    partial class MemoryProfileService : ProfileServiceInterface.IClassifiedsInterface
+    partial class MemoryProfileService : IClassifiedsInterface
     {
         private readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, ProfileClassified>> m_Classifieds = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, ProfileClassified>>(() => new RwLockedDictionary<UUID, ProfileClassified>());
 

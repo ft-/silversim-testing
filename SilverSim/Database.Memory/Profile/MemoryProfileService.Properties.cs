@@ -28,7 +28,7 @@ using System.Threading;
 
 namespace SilverSim.Database.Memory.Profile
 {
-    partial class MemoryProfileService : ProfileServiceInterface.IPropertiesInterface
+    partial class MemoryProfileService : IPropertiesInterface
     {
         private readonly Dictionary<UUID, ProfileProperties> m_Properties = new Dictionary<UUID, ProfileProperties>();
         private readonly ReaderWriterLock m_PropertiesLock = new ReaderWriterLock();

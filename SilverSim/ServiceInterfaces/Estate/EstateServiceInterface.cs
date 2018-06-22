@@ -19,14 +19,17 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.ServiceInterfaces.Estate.This;
+using SilverSim.Types;
 using SilverSim.Types.Estate;
+using SilverSim.Types.Experience;
 using System.Collections.Generic;
 
 namespace SilverSim.ServiceInterfaces.Estate
 {
-    public abstract class EstateServiceInterface
+    public abstract class EstateServiceInterface : IEstateExperienceServiceThisInterface
     {
-        public virtual EstateInfo this[uint estateID]
+        public EstateInfo this[uint estateID]
         {
             get
             {
@@ -60,5 +63,18 @@ namespace SilverSim.ServiceInterfaces.Estate
         public abstract IEstateRegionMapServiceInterface RegionMap { get; }
         public abstract IEstateExperienceServiceInterface Experiences { get; }
         public abstract IEstateTrustedExperienceServiceInterface TrustedExperiences { get; }
+
+        EstateExperienceInfo IEstateExperienceServiceThisInterface.this[uint estateID, UUID experienceID]
+        {
+            get
+            {
+                EstateExperienceInfo info;
+                if(!Experiences.TryGetValue(estateID, experienceID, out info))
+                {
+                    throw new KeyNotFoundException();
+                }
+                return info;
+            }
+        }
     }
 }

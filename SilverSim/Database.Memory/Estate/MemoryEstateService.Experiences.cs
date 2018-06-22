@@ -47,19 +47,6 @@ namespace SilverSim.Database.Memory.Estate
             }
         }
 
-        EstateExperienceInfo IEstateExperienceServiceInterface.this[uint estateID, UUID experienceID]
-        {
-            get
-            {
-                EstateExperienceInfo info;
-                if(!Experiences.TryGetValue(estateID, experienceID, out info))
-                {
-                    throw new KeyNotFoundException();
-                }
-                return info;
-            }
-        }
-
         bool IEstateExperienceServiceInterface.Remove(uint estateID, UUID experienceID)
         {
             RwLockedDictionary<UUID, EstateExperienceInfo> experiences;

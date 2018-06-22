@@ -24,11 +24,9 @@ using System.IO;
 
 namespace SilverSim.ServiceInterfaces.Asset
 {
-    public interface IAssetDataServiceInterface
+    public interface IAssetDataServiceInterface : This.IAssetDataServiceThisInterface
     {
         #region Data accessors
-        Stream this[UUID key] { get; }
-
         bool TryGetValue(UUID key, out Stream s);
         #endregion
     }

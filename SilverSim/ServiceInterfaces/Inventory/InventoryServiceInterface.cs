@@ -24,10 +24,14 @@ using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
+using SilverSim.ServiceInterfaces.Inventory.This;
 
 namespace SilverSim.ServiceInterfaces.Inventory
 {
-    public abstract class InventoryServiceInterface
+    public abstract class InventoryServiceInterface :
+        IInventoryFolderContentServiceThisInterface,
+        IInventoryFolderServiceThisInterface,
+        IInventoryItemServiceThisInterface
     {
         public abstract void Remove(UUID scopeID, UUID accountID);
 
@@ -35,6 +39,88 @@ namespace SilverSim.ServiceInterfaces.Inventory
         public abstract IInventoryFolderServiceInterface Folder { get; }
 
         public abstract IInventoryItemServiceInterface Item { get; }
+
+        InventoryItem IInventoryItemServiceThisInterface.this[UUID principalID, UUID key]
+        {
+            get
+            {
+                InventoryItem item;
+                if(Item.TryGetValue(principalID, key, out item))
+                {
+                    return item;
+                }
+                throw new KeyNotFoundException();
+            }
+        }
+
+        InventoryItem IInventoryItemServiceThisInterface.this[UUID key]
+        {
+            get
+            {
+                InventoryItem item;
+#pragma warning disable CS0618 // Typ oder Element ist veraltet
+                if (Item.TryGetValue(key, out item))
+#pragma warning restore CS0618 // Typ oder Element ist veraltet
+                {
+                    return item;
+                }
+                throw new KeyNotFoundException();
+            }
+        }
+
+        InventoryFolder IInventoryFolderServiceThisInterface.this[UUID principalID, AssetType type]
+        {
+            get
+            {
+                InventoryFolder folder;
+                if(Folder.TryGetValue(principalID, type, out folder))
+                {
+                    return folder;
+                }
+                throw new KeyNotFoundException();
+            }
+        }
+
+        InventoryFolder IInventoryFolderServiceThisInterface.this[UUID principalID, UUID key]
+        {
+            get
+            {
+                InventoryFolder folder;
+                if (Folder.TryGetValue(principalID, key, out folder))
+                {
+                    return folder;
+                }
+                throw new KeyNotFoundException();
+            }
+        }
+
+        InventoryFolder IInventoryFolderServiceThisInterface.this[UUID key]
+        {
+            get
+            {
+                InventoryFolder folder;
+#pragma warning disable CS0618 // Typ oder Element ist veraltet
+                if (Folder.TryGetValue(key, out folder))
+#pragma warning restore CS0618 // Typ oder Element ist veraltet
+                {
+                    return folder;
+                }
+                throw new KeyNotFoundException();
+            }
+        }
+
+        InventoryFolderContent IInventoryFolderContentServiceThisInterface.this[UUID principalID, UUID folderID]
+        {
+            get
+            {
+                InventoryFolderContent content;
+                if(Folder.Content.TryGetValue(principalID, folderID, out content))
+                {
+                    return content;
+                }
+                throw new KeyNotFoundException();
+            }
+        }
 
         public abstract List<InventoryItem> GetActiveGestures(UUID principalID);
 
@@ -75,7 +161,7 @@ namespace SilverSim.ServiceInterfaces.Inventory
                 InventoryFolder folder;
                 UUID checkFolderID = parentFolderID;
                 /* traverse to root folder and check that we never see the moved folder in that path */
-                while(Folder.TryGetValue(checkFolderID, out folder))
+                while(Folder.TryGetValue(principalID, checkFolderID, out folder))
                 {
                     if(folder.ID == expectedFolderID)
                     {

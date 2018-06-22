@@ -24,11 +24,9 @@ using SilverSim.Types.Asset;
 
 namespace SilverSim.ServiceInterfaces.Asset
 {
-    public interface IAssetMetadataServiceInterface
+    public interface IAssetMetadataServiceInterface : This.IAssetMetadataServiceThisInterface
     {
         #region Metadata accessors
-        AssetMetadata this[UUID key] { get; }
-
         bool TryGetValue(UUID key, out AssetMetadata metadata);
         #endregion
     }

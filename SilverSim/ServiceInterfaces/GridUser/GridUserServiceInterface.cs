@@ -98,7 +98,7 @@ namespace SilverSim.ServiceInterfaces.GridUser
 
     public abstract class GridUserServiceInterface
     {
-        public virtual GridUserInfo this[UUID userID]
+        public GridUserInfo this[UUID userID]
         {
             get
             {
@@ -113,7 +113,7 @@ namespace SilverSim.ServiceInterfaces.GridUser
 
         public abstract bool TryGetValue(UUID userID, out GridUserInfo userInfo);
 
-        public virtual GridUserInfo this[UGUI userID]
+        public GridUserInfo this[UGUI userID]
         {
             get
             {

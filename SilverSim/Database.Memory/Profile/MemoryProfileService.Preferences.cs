@@ -27,7 +27,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.Database.Memory.Profile
 {
-    partial class MemoryProfileService : ProfileServiceInterface.IUserPreferencesInterface
+    partial class MemoryProfileService : IUserPreferencesInterface
     {
         private readonly RwLockedDictionary<UUID, ProfilePreferences> m_Preferences = new RwLockedDictionary<UUID, ProfilePreferences>();
         public ProfilePreferences this[UGUI user]

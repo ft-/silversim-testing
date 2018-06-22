@@ -39,12 +39,6 @@ namespace SilverSim.ServiceInterfaces.Asset
         }
 
         #region AssetServiceInterface
-        public override AssetData this[UUID key] => m_Assets[key];
-
-        Stream IAssetDataServiceInterface.this[UUID key] => m_Assets[key].InputStream;
-
-        AssetMetadata IAssetMetadataServiceInterface.this[UUID key] => m_Assets[key];
-
         public override IAssetDataServiceInterface Data => this;
 
         public override IAssetMetadataServiceInterface Metadata => this;

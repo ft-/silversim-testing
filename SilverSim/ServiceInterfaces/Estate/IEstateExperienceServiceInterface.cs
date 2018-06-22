@@ -25,9 +25,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.ServiceInterfaces.Estate
 {
-    public interface IEstateExperienceServiceInterface
+    public interface IEstateExperienceServiceInterface : This.IEstateExperienceServiceThisInterface
     {
-        EstateExperienceInfo this[uint estateID, UUID experienceID] { get; }
         bool TryGetValue(uint estateID, UUID experienceID, out EstateExperienceInfo info);
         List<EstateExperienceInfo> this[uint estateID] { get; }
         void Store(EstateExperienceInfo info);

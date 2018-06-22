@@ -59,19 +59,6 @@ namespace SilverSim.Database.Memory.Inventory
             return false;
         }
 
-        InventoryFolder IInventoryFolderServiceInterface.this[UUID key]
-        {
-            get
-            {
-                InventoryFolder folder;
-                if(!Folder.TryGetValue(key, out folder))
-                {
-                    throw new InventoryFolderNotFoundException(key);
-                }
-                return folder;
-            }
-        }
-
         bool IInventoryFolderServiceInterface.TryGetValue(UUID principalID, UUID key, out InventoryFolder folder)
         {
             RwLockedDictionary<UUID, InventoryFolder> folderSet;
@@ -90,19 +77,6 @@ namespace SilverSim.Database.Memory.Inventory
         {
             RwLockedDictionary<UUID, InventoryFolder> folderSet;
             return m_Folders.TryGetValue(principalID, out folderSet) && folderSet.ContainsKey(key);
-        }
-
-        InventoryFolder IInventoryFolderServiceInterface.this[UUID principalID, UUID key]
-        {
-            get
-            {
-                InventoryFolder folder;
-                if(!Folder.TryGetValue(principalID, key, out folder))
-                {
-                    throw new InventoryFolderNotFoundException(key);
-                }
-                return folder;
-            }
         }
 
         bool IInventoryFolderServiceInterface.ContainsKey(UUID principalID, AssetType type)
@@ -165,20 +139,6 @@ namespace SilverSim.Database.Memory.Inventory
 
             folder = default(InventoryFolder);
             return false;
-        }
-
-        InventoryFolder IInventoryFolderServiceInterface.this[UUID principalID, AssetType type]
-        {
-            get
-            {
-                InventoryFolder folder;
-                if(Folder.TryGetValue(principalID, type, out folder))
-                {
-                    return folder;
-                }
-
-                throw new InventoryFolderTypeNotFoundException(type);
-            }
         }
 
         List<InventoryFolder> IInventoryFolderServiceInterface.GetFolders(UUID principalID, UUID key)

@@ -21,34 +21,15 @@
 
 using SilverSim.Types;
 using SilverSim.Types.Economy.Transactions;
+using SilverSim.ServiceInterfaces.Economy.This;
 using System;
 using System.Runtime.Serialization;
+using System.Collections.Generic;
 
 namespace SilverSim.ServiceInterfaces.Economy
 {
-    public abstract class EconomyServiceInterface
+    public abstract class EconomyServiceInterface : IGroupMoneyBalanceThisAccessor, IMoneyBalanceThisAccessor
     {
-        public interface IActiveTransaction
-        {
-            /** <summary>Function to finalize transaction</summary> */
-            void Commit();
-            /** <summary>Function to rollback a transaction</summary> */
-            void Rollback(Exception exception);
-        }
-
-        public interface IMoneyBalanceAccessor
-        {
-            int this[UGUI agentID] { get; }
-
-            bool TryGetValue(UGUI agentID, out int balance);
-        }
-
-        public interface IGroupMoneyBalanceAccessor
-        {
-            int this[UGI groupID] { get; }
-            bool TryGetValue(UGI groupID, out int balance);
-        }
-
         public abstract string CurrencySymbol { get; }
 
         public abstract void Login(UUID sceneID, UGUIWithName agentID, UUID sessionID, UUID secureSessionID);
@@ -65,6 +46,32 @@ namespace SilverSim.ServiceInterfaces.Economy
             get
             {
                 throw new NotSupportedException();
+            }
+        }
+
+        int IMoneyBalanceThisAccessor.this[UGUI agentID]
+        {
+            get
+            {
+                int balance;
+                if(MoneyBalance.TryGetValue(agentID, out balance))
+                {
+                    return balance;
+                }
+                throw new KeyNotFoundException();
+            }
+        }
+
+        int IGroupMoneyBalanceThisAccessor.this[UGI groupID]
+        {
+            get
+            {
+                int balance;
+                if(GroupMoneyBalance.TryGetValue(groupID, out balance))
+                {
+                    return balance;
+                }
+                throw new KeyNotFoundException();
             }
         }
 

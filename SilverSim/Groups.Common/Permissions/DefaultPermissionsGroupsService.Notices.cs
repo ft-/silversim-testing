@@ -26,25 +26,12 @@ using System.Collections.Generic;
 
 namespace SilverSim.Groups.Common.Permissions
 {
-    partial class DefaultPermissionsGroupsService : GroupsServiceInterface.IGroupNoticesInterface
+    partial class DefaultPermissionsGroupsService : IGroupNoticesInterface
     {
         List<GroupNotice> IGroupNoticesInterface.GetNotices(UGUI requestingAgent, UGI group)
         {
             VerifyAgentPowers(group, requestingAgent, GroupPowers.ReceiveNotices);
             return m_InnerService.Notices.GetNotices(requestingAgent, group);
-        }
-
-        GroupNotice IGroupNoticesInterface.this[UGUI requestingAgent, UUID groupNoticeID]
-        {
-            get
-            {
-                GroupNotice notice;
-                if(!Notices.TryGetValue(requestingAgent, groupNoticeID, out notice))
-                {
-                    throw new KeyNotFoundException();
-                }
-                return notice;
-            }
         }
 
         bool IGroupNoticesInterface.TryGetValue(UGUI requestingAgent, UUID groupNoticeID, out GroupNotice groupNotice)

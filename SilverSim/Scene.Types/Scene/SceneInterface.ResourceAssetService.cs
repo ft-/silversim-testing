@@ -99,25 +99,6 @@ namespace SilverSim.Scene.Types.Scene
 
             public override IAssetMetadataServiceInterface Metadata => this;
 
-            AssetMetadata IAssetMetadataServiceInterface.this[UUID key]
-            {
-                get
-                {
-                    AssetData ad = m_ResourceAssets.GetAsset(key);
-                    return new AssetMetadata
-                    {
-                        AccessTime = ad.AccessTime,
-                        CreateTime = ad.CreateTime,
-                        Flags = ad.Flags,
-                        ID = ad.ID,
-                        Local = ad.Local,
-                        Name = ad.Name,
-                        Temporary = ad.Temporary,
-                        Type = ad.Type
-                    };
-                }
-            }
-
             bool IAssetMetadataServiceInterface.TryGetValue(UUID key, out AssetMetadata metadata)
             {
                 if (!m_ResourceAssets.ContainsAsset(key))
@@ -125,15 +106,24 @@ namespace SilverSim.Scene.Types.Scene
                     metadata = null;
                     return false;
                 }
-                metadata = this[key];
+                AssetData ad = m_ResourceAssets.GetAsset(key);
+                metadata = new AssetMetadata
+                {
+                    AccessTime = ad.AccessTime,
+                    CreateTime = ad.CreateTime,
+                    Flags = ad.Flags,
+                    ID = ad.ID,
+                    Local = ad.Local,
+                    Name = ad.Name,
+                    Temporary = ad.Temporary,
+                    Type = ad.Type
+                };
                 return true;
             }
 
             public override AssetReferencesServiceInterface References => m_ReferencesService;
 
             public override IAssetDataServiceInterface Data => this;
-
-            Stream IAssetDataServiceInterface.this[UUID key] => new MemoryStream(m_ResourceAssets.GetAsset(key).Data);
 
             bool IAssetDataServiceInterface.TryGetValue(UUID key, out Stream s)
             {
@@ -145,8 +135,6 @@ namespace SilverSim.Scene.Types.Scene
                 s = Data[key];
                 return true;
             }
-
-            public override AssetData this[UUID key] => m_ResourceAssets.GetAsset(key);
 
             public override bool TryGetValue(UUID key, out AssetData assetData)
             {

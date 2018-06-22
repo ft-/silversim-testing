@@ -21,7 +21,6 @@
 
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Asset;
-using SilverSim.ServiceInterfaces._Combined;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
@@ -33,10 +32,13 @@ namespace SilverSim.Database.Memory.Asset
 {
     [Description("Memory Asset Backend")]
     [PluginName("Assets")]
-    public class MemoryAssetService : AssetServiceCombinedInterface, IPlugin
+    public class MemoryAssetService : AssetServiceInterface, IPlugin, IAssetMetadataServiceInterface, IAssetDataServiceInterface
     {
         private readonly DefaultAssetReferencesService m_ReferencesService;
         private readonly RwLockedDictionary<UUID, AssetData> m_Assets = new RwLockedDictionary<UUID, AssetData>();
+
+        public override IAssetMetadataServiceInterface Metadata => this;
+        public override IAssetDataServiceInterface Data => this;
 
         #region Constructor
         public MemoryAssetService()
@@ -87,7 +89,7 @@ namespace SilverSim.Database.Memory.Asset
         #endregion
 
         #region Metadata interface
-        public override bool TryGetValue(UUID key, out AssetMetadata metadata)
+        bool IAssetMetadataServiceInterface.TryGetValue(UUID key, out AssetMetadata metadata)
         {
             AssetData data;
             if (m_Assets.TryGetValue(key, out data))
@@ -110,7 +112,7 @@ namespace SilverSim.Database.Memory.Asset
         #endregion
 
         #region Data interface
-        public override bool TryGetValue(UUID key, out Stream s)
+        bool IAssetDataServiceInterface.TryGetValue(UUID key, out Stream s)
         {
             AssetData data;
             if (m_Assets.TryGetValue(key, out data))

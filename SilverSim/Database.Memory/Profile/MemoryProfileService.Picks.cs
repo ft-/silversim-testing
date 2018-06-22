@@ -27,22 +27,9 @@ using System.Collections.Generic;
 
 namespace SilverSim.Database.Memory.Profile
 {
-    partial class MemoryProfileService : ProfileServiceInterface.IPicksInterface
+    partial class MemoryProfileService : IPicksInterface
     {
         private readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, ProfilePick>> m_Picks = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, ProfilePick>>(() => new RwLockedDictionary<UUID, ProfilePick>());
-
-        ProfilePick IPicksInterface.this[UGUI user, UUID id]
-        {
-            get
-            {
-                ProfilePick pick;
-                if(!TryGetValue(user, id, out pick))
-                {
-                    throw new KeyNotFoundException();
-                }
-                return pick;
-            }
-        }
 
         public Dictionary<UUID, string> GetPicks(UGUI user)
         {

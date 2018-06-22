@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.ServiceInterfaces.Profile.This;
 using SilverSim.Types;
 using SilverSim.Types.Profile;
 using System;
@@ -26,42 +27,9 @@ using System.Collections.Generic;
 
 namespace SilverSim.ServiceInterfaces.Profile
 {
-    public abstract class ProfileServiceInterface
+    public abstract class ProfileServiceInterface :
+        IPicksThisInterface
     {
-        public interface IClassifiedsInterface
-        {
-            Dictionary<UUID, string> GetClassifieds(UGUI user);
-            ProfileClassified this[UGUI user, UUID id] { get; }
-            bool TryGetValue(UGUI user, UUID id, out ProfileClassified classified);
-            bool ContainsKey(UGUI user, UUID id);
-            void Update(ProfileClassified classified);
-            void Delete(UUID id);
-        }
-
-        public interface IPicksInterface
-        {
-            Dictionary<UUID, string> GetPicks(UGUI user);
-            ProfilePick this[UGUI user, UUID id] { get; }
-            bool TryGetValue(UGUI user, UUID id, out ProfilePick pick);
-            bool ContainsKey(UGUI user, UUID id);
-            void Update(ProfilePick pick);
-            void Delete(UUID id);
-        }
-
-        public interface INotesInterface
-        {
-            string this[UGUI user, UGUI target] { get; set; }
-            bool TryGetValue(UGUI user, UGUI target, out string notes);
-            bool ContainsKey(UGUI user, UGUI target);
-        }
-
-        public interface IUserPreferencesInterface
-        {
-            ProfilePreferences this[UGUI user] { get; set; }
-            bool TryGetValue(UGUI user, out ProfilePreferences profilePrefs);
-            bool ContainsKey(UGUI user);
-        }
-
         [Flags]
         public enum PropertiesUpdateFlags
         {
@@ -70,17 +38,24 @@ namespace SilverSim.ServiceInterfaces.Profile
             Interests = 2
         }
 
-        public interface IPropertiesInterface
-        {
-            ProfileProperties this[UGUI user] { get; }
-            ProfileProperties this[UGUI user, PropertiesUpdateFlags flags] { set; }
-        }
-
         public abstract IClassifiedsInterface Classifieds { get; }
         public abstract IPicksInterface Picks { get; }
         public abstract INotesInterface Notes { get; }
         public abstract IUserPreferencesInterface Preferences { get; }
         public abstract IPropertiesInterface Properties { get; }
+
+        ProfilePick IPicksThisInterface.this[UGUI user, UUID id]
+        {
+            get
+            {
+                ProfilePick pick;
+                if(Picks.TryGetValue(user, id, out pick))
+                {
+                    return pick;
+                }
+                throw new KeyNotFoundException();
+            }
+        }
 
         public abstract void Remove(UUID scopeID, UUID accountID);
 

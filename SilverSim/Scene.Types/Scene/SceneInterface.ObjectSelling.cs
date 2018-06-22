@@ -385,7 +385,7 @@ namespace SilverSim.Scene.Types.Scene
                         }
                         else if(agent.EconomyService != null)
                         {
-                            EconomyServiceInterface.IActiveTransaction transaction;
+                            IActiveTransaction transaction;
                             try
                             {
                                 transaction = agent.EconomyService.BeginTransferTransaction(agent.Owner, part.Owner,
@@ -441,7 +441,7 @@ namespace SilverSim.Scene.Types.Scene
         public class ObjectBuyTransferItem : ObjectTransferItem
         {
             private readonly UUID m_SellingPrimitiveID;
-            private readonly EconomyServiceInterface.IActiveTransaction m_Transaction;
+            private readonly IActiveTransaction m_Transaction;
 
             public ObjectBuyTransferItem(
                 IAgent agent,
@@ -450,7 +450,7 @@ namespace SilverSim.Scene.Types.Scene
                 List<InventoryItem> items,
                 string destinationFolder,
                 UUID sellingPrimitiveID,
-                EconomyServiceInterface.IActiveTransaction transaction = null)
+                IActiveTransaction transaction = null)
                 : base(agent, scene, assetids, items, destinationFolder)
             {
                 m_SellingPrimitiveID = sellingPrimitiveID;

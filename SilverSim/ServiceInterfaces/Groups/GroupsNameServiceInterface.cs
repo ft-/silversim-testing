@@ -27,7 +27,7 @@ namespace SilverSim.ServiceInterfaces.Groups
 {
     public abstract class GroupsNameServiceInterface
     {
-        public virtual UGI this[UUID groupID]
+        public UGI this[UUID groupID]
         {
             get
             {

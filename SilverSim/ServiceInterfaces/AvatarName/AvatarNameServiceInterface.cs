@@ -55,7 +55,7 @@ namespace SilverSim.ServiceInterfaces.AvatarName
 
     public abstract class AvatarNameServiceInterface
     {
-        public virtual UGUIWithName this[UUID key]
+        public UGUIWithName this[UUID key]
         {
             get
             {
@@ -74,7 +74,7 @@ namespace SilverSim.ServiceInterfaces.AvatarName
         public abstract void Store(UGUIWithName uui);
         public abstract bool Remove(UUID key);
 
-        public virtual UGUIWithName this[string firstName, string lastName]
+        public UGUIWithName this[string firstName, string lastName]
         {
             get
             {

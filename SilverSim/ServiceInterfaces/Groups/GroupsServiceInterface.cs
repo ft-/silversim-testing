@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.ServiceInterfaces.Groups.This;
 using SilverSim.Types;
 using SilverSim.Types.Groups;
 using System;
@@ -27,147 +28,16 @@ using System.Runtime.Serialization;
 
 namespace SilverSim.ServiceInterfaces.Groups
 {
-    public abstract class GroupsServiceInterface
+    public abstract class GroupsServiceInterface :
+        IActiveGroupMembershipThisInterface,
+        IGroupInvitesThisInterface,
+        IGroupMembershipsThisInterface,
+        IGroupMembersThisInterface,
+        IGroupNoticesThisInterface,
+        IGroupRolemembersThisInterface,
+        IGroupRolesThisInterface,
+        IGroupsThisInterface
     {
-        public interface IGroupsInterface
-        {
-            GroupInfo Create(UGUI requestingAgent, GroupInfo group);
-            GroupInfo Update(UGUI requestingAgent, GroupInfo group);
-            void Delete(UGUI requestingAgent, UGI group);
-
-            UGI this[UGUI requestingAgent, UUID groupID] { get; }
-
-            bool TryGetValue(UGUI requestingAgent, UUID groupID, out UGI ugi);
-            bool ContainsKey(UGUI requestingAgent, UUID groupID);
-
-            GroupInfo this[UGUI requestingAgent, UGI group] { get; }
-
-            bool TryGetValue(UGUI requestingAgent, UGI groupID, out GroupInfo groupInfo);
-            bool ContainsKey(UGUI requestingAgent, UGI groupID);
-
-            GroupInfo this[UGUI requestingAgent, string groupName] { get; }
-
-            bool TryGetValue(UGUI requestingAgent, string groupName, out GroupInfo groupInfo);
-            bool ContainsKey(UGUI requestingAgent, string groupName);
-
-            List<DirGroupInfo> GetGroupsByName(UGUI requestingAgent, string query);
-        }
-
-        public interface IGroupMembershipsInterface
-        {
-            GroupMembership this[UGUI requestingAgent, UGI group, UGUI principal] { get; }
-
-            bool TryGetValue(UGUI requestingAgent, UGI group, UGUI principal, out GroupMembership gmem);
-            bool ContainsKey(UGUI requestingAgent, UGI group, UGUI principal);
-
-            List<GroupMembership> this[UGUI requestingAgent, UGUI principal] { get; }
-        }
-
-        public interface IActiveGroupMembershipInterface
-        {
-            GroupActiveMembership this[UGUI requestingAgent, UGUI principal] { get; }
-
-            bool TryGetValue(UGUI requestingAgent, UGUI principal, out GroupActiveMembership gam);
-            bool ContainsKey(UGUI requestingAgent, UGUI principal);
-        }
-
-        public interface IGroupMembersInterface
-        {
-            GroupMember this[UGUI requestingAgent, UGI group, UGUI principal] { get; }
-
-            bool TryGetValue(UGUI requestingAgent, UGI group, UGUI principal, out GroupMember gmem);
-            bool ContainsKey(UGUI requestingAgent, UGI group, UGUI principal);
-
-            List<GroupMember> this[UGUI requestingAgent, UGI group] { get; }
-
-            List<GroupMember> this[UGUI requestingAgent, UGUI principal] { get; }
-
-            GroupMember Add(UGUI requestingAgent, UGI group, UGUI principal, UUID roleID, string accessToken);
-            void SetContribution(UGUI requestingagent, UGI group, UGUI principal, int contribution);
-            void Update(UGUI requestingagent, UGI group, UGUI principal, bool acceptNotices, bool listInProfile);
-            void Delete(UGUI requestingAgent, UGI group, UGUI principal);
-        }
-
-        public interface IGroupRolesInterface
-        {
-            GroupRole this[UGUI requestingAgent, UGI group, UUID roleID] { get; }
-
-            bool TryGetValue(UGUI requestingAgent, UGI group, UUID roleID, out GroupRole groupRole);
-            bool ContainsKey(UGUI requestingAgent, UGI group, UUID roleID);
-
-            List<GroupRole> this[UGUI requestingAgent, UGI group] { get; }
-            List<GroupRole> this[UGUI requestingAgent, UGI group, UGUI principal] { get; }
-
-            void Add(UGUI requestingAgent, GroupRole role);
-            void Update(UGUI requestingAgent, GroupRole role);
-            void Delete(UGUI requestingAgent, UGI group, UUID roleID);
-        }
-
-        public interface IGroupRolemembersInterface
-        {
-            GroupRolemember this[UGUI requestingAgent, UGI group, UUID roleID, UGUI principal] { get; }
-
-            bool TryGetValue(UGUI requestingAgent, UGI group, UUID roleID, UGUI principal, out GroupRolemember grolemem);
-            bool ContainsKey(UGUI requestingAgent, UGI group, UUID roleID, UGUI principal);
-
-            List<GroupRolemember> this[UGUI requestingAgent, UGI group, UUID roleID] { get; }
-
-            List<GroupRolemembership> this[UGUI requestingAgent, UGUI principal] { get; }
-
-            List<GroupRolemember> this[UGUI requestingAgent, UGI group] { get; }
-
-            void Add(UGUI requestingAgent, GroupRolemember rolemember);
-            void Delete(UGUI requestingAgent, UGI group, UUID roleID, UGUI principal);
-        }
-
-        public interface IGroupSelectInterface
-        {
-            UGI this[UGUI requestingAgent, UGUI princialID] { get; set; }
-
-            bool TryGetValue(UGUI requestingAgent, UGUI principalID, out UGI ugi);
-
-            /* get/set active role id */
-            UUID this[UGUI requestingAgent, UGI group, UGUI principal] { get; set; }
-
-            bool TryGetValue(UGUI requestingAgent, UGI group, UGUI principal, out UUID id);
-        }
-
-        public interface IGroupInvitesInterface
-        {
-            GroupInvite this[UGUI requestingAgent, UUID groupInviteID] { get; }
-
-            bool TryGetValue(UGUI requestingAgent, UUID groupInviteID, out GroupInvite ginvite);
-            bool ContainsKey(UGUI requestingAgent, UUID groupInviteID);
-
-            bool DoesSupportListGetters { get; }
-
-            /** <summary>Only for use of Permission modules</summary> */
-            List<GroupInvite> this[UGUI requestingAgent, UGI group, UUID roleID, UGUI principal] { get; }
-
-            /** <summary>Only for use of Permission modules</summary> */
-            List<GroupInvite> this[UGUI requestingAgent, UGUI principal] { get; }
-
-            /** <summary>Only for use of Permission modules</summary> */
-            List<GroupInvite> GetByGroup(UGUI requestingAgent, UGI group);
-
-            void Add(UGUI requestingAgent, GroupInvite invite);
-            void Delete(UGUI requestingAgent, UUID inviteID);
-        }
-
-        public interface IGroupNoticesInterface
-        {
-            List<GroupNotice> GetNotices(UGUI requestingAgent, UGI group);
-
-            GroupNotice this[UGUI requestingAgent, UUID groupNoticeID] { get; }
-
-            bool TryGetValue(UGUI requestingAgent, UUID groupNoticeID, out GroupNotice groupNotice);
-            bool ContainsKey(UGUI requestingAgent, UUID groupNoticeID);
-
-            void Add(UGUI requestingAgent, GroupNotice notice);
-
-            void Delete(UGUI requestingAgent, UUID groupNoticeID);
-        }
-
         public abstract IGroupsInterface Groups { get; }
 
         public abstract IGroupRolesInterface Roles { get; }
@@ -185,6 +55,136 @@ namespace SilverSim.ServiceInterfaces.Groups
         public abstract IGroupInvitesInterface Invites { get; }
 
         public abstract IGroupNoticesInterface Notices { get; }
+
+        GroupInfo IGroupsThisInterface.this[UGUI requestingAgent, string groupName]
+        {
+            get
+            {
+                GroupInfo info;
+                if(Groups.TryGetValue(requestingAgent, groupName, out info))
+                {
+                    return info;
+                }
+                throw new KeyNotFoundException();
+            }
+        }
+
+        GroupInfo IGroupsThisInterface.this[UGUI requestingAgent, UGI group]
+        {
+            get
+            {
+                GroupInfo info;
+                if(Groups.TryGetValue(requestingAgent, group, out info))
+                {
+                    return info;
+                }
+                throw new KeyNotFoundException();
+            }
+        }
+
+        UGI IGroupsThisInterface.this[UGUI requestingAgent, UUID groupID]
+        {
+            get
+            {
+                UGI ugi;
+                if(Groups.TryGetValue(requestingAgent, groupID, out ugi))
+                {
+                    return ugi;
+                }
+                throw new KeyNotFoundException();
+            }
+        }
+
+        GroupRole IGroupRolesThisInterface.this[UGUI requestingAgent, UGI group, UUID roleID]
+        {
+            get
+            {
+                GroupRole role;
+                if(Roles.TryGetValue(requestingAgent, group, roleID, out role))
+                {
+                    return role;
+                }
+                throw new KeyNotFoundException();
+            }
+        }
+
+        GroupRolemember IGroupRolemembersThisInterface.this[UGUI requestingAgent, UGI group, UUID roleID, UGUI principal]
+        {
+            get
+            {
+                GroupRolemember rolemember;
+                if (Rolemembers.TryGetValue(requestingAgent, group, roleID, principal, out rolemember))
+                {
+                    return rolemember;
+                }
+                throw new KeyNotFoundException();
+            }
+        }
+
+        GroupNotice IGroupNoticesThisInterface.this[UGUI requestingAgent, UUID groupNoticeID]
+        {
+            get
+            {
+                GroupNotice notice;
+                if(Notices.TryGetValue(requestingAgent, groupNoticeID, out notice))
+                {
+                    return notice;
+                }
+                throw new KeyNotFoundException();
+            }
+        }
+
+        GroupMember IGroupMembersThisInterface.this[UGUI requestingAgent, UGI group, UGUI principal]
+        {
+            get
+            {
+                GroupMember member;
+                if(Members.TryGetValue(requestingAgent, group, principal, out member))
+                {
+                    return member;
+                }
+                throw new KeyNotFoundException();
+            }
+        }
+
+        GroupMembership IGroupMembershipsThisInterface.this[UGUI requestingAgent, UGI group, UGUI principal]
+        {
+            get
+            {
+                GroupMembership membership;
+                if(Memberships.TryGetValue(requestingAgent, group, principal, out membership))
+                {
+                    return membership;
+                }
+                throw new KeyNotFoundException();
+            }
+        }
+
+        GroupInvite IGroupInvitesThisInterface.this[UGUI requestingAgent, UUID groupInviteID]
+        {
+            get
+            {
+                GroupInvite invite;
+                if(Invites.TryGetValue(requestingAgent, groupInviteID, out invite))
+                {
+                    return invite;
+                }
+                throw new KeyNotFoundException();
+            }
+        }
+
+        GroupActiveMembership IActiveGroupMembershipThisInterface.this[UGUI requestingAgent, UGUI principal]
+        {
+            get
+            {
+                GroupActiveMembership gam;
+                if(ActiveMembership.TryGetValue(requestingAgent, principal, out gam))
+                {
+                    return gam;
+                }
+                throw new KeyNotFoundException();
+            }
+        }
 
         [Serializable]
         public class AccessFailedException : Exception
