@@ -199,7 +199,14 @@ namespace SilverSim.Scripting.Common
 
             ~ParserInput()
             {
-                Reader?.Dispose();
+                try
+                {
+                    Reader?.Dispose();
+                }
+                catch
+                {
+                    /* keep this from blasting */
+                }
                 try
                 {
                     Writer?.Dispose();
