@@ -179,7 +179,14 @@ namespace SilverSim.Main.Common.HttpServer
 
         ~Http2Request()
         {
-            m_Body?.Dispose();
+            try
+            {
+                m_Body?.Dispose();
+            }
+            catch
+            {
+                /* do not put exceptions into GC */
+            }
         }
 
         public override HttpResponse BeginChunkedResponse() =>

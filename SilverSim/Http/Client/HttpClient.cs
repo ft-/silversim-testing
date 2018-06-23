@@ -973,6 +973,7 @@ redoafter401:
                         {
                             statusCode = 500;
                         }
+                        request.StatusCode = (HttpStatusCode)statusCode;
 
                         if (statusCode == 401 && request.Authorization != null && request.Authorization.CanHandleUnauthorized(rxheaders))
                         {

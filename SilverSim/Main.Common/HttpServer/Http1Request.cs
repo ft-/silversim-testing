@@ -392,7 +392,14 @@ namespace SilverSim.Main.Common.HttpServer
 
         ~Http1Request()
         {
-            m_Body?.Dispose();
+            try
+            {
+                m_Body?.Dispose();
+            }
+            catch
+            {
+                /* do not put exceptions into GC */
+            }
         }
 
         public override HttpResponse BeginResponse()
