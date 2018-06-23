@@ -46,6 +46,8 @@ namespace SilverSim.Database.Memory.Inventory
             m_ContentService = new DefaultInventoryFolderContentService(this);
         }
 
+        public override bool SupportsLegacyFunctions => true;
+
         IInventoryFolderContentServiceInterface IInventoryFolderServiceInterface.Content => m_ContentService;
 
         public override IInventoryFolderServiceInterface Folder => this;
