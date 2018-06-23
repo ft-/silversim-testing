@@ -174,6 +174,7 @@ namespace SilverSim.Http.Client
         #endregion
 
         #region Main HTTP Client Functionality
+        /** <summary>Execute status request with disabled NotFound exception</summary> */
         public static HttpStatusCode ExecuteStatusRequest(
             this Request request)
         {
@@ -182,6 +183,7 @@ namespace SilverSim.Http.Client
             return statuscode;
         }
 
+        /** <summary>Execute string request with disabled NotFound exception</summary> */
         public static string ExecuteRequest(
             this Request request,
             out HttpStatusCode statuscode)
@@ -202,6 +204,7 @@ namespace SilverSim.Http.Client
             }
         }
 
+        /** <summary>Execute binary request with disabled NotFound exception</summary> */
         public static byte[] ExecuteBinaryRequest(
             this Request request,
             out HttpStatusCode statuscode)
@@ -221,6 +224,7 @@ namespace SilverSim.Http.Client
             }
         }
 
+        /** <summary>Execute stream request with disabled NotFound exception</summary> */
         public static Stream ExecuteStreamRequest(this Request request, out HttpStatusCode statuscode)
         {
             request.DisableExceptions |= Request.DisableExceptionFlags.DisableNotFound;
