@@ -33,6 +33,9 @@ namespace SilverSim.ServiceInterfaces.Inventory
         IInventoryFolderServiceThisInterface,
         IInventoryItemServiceThisInterface
     {
+        /** <summary>shows whether service supports legacy functions without principal id</summary> */
+        public virtual bool SupportsLegacyFunctions => false;
+
         public abstract void Remove(UUID scopeID, UUID accountID);
 
         #region Accessors

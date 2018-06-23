@@ -60,6 +60,7 @@ namespace SilverSim.ServiceInterfaces.Inventory
          * Not all connectors / services support this access.
          * Only required path to support this is from Robust Inventory handler towards database connector.
          */
+        [Obsolete("Do not use this outside of Robust inventory handler", false)]
         void Purge(UUID folderID);
         void Purge(UUID principalID, UUID folderID);
         void IncrementVersion(UUID principalID, UUID folderID);
