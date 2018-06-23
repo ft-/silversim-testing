@@ -693,8 +693,11 @@ namespace SilverSim.Http.Client
                     throw new HttpException(statusCode, statusCode == 404 ? splits[2] + " (" + url + ")" : splits[2]);
                 }
             }
+            else
+            {
+                request.StatusCode = (HttpStatusCode)int.Parse(splits[1]);
+            }
 
-            var responsecode = (HttpStatusCode)int.Parse(splits[1]);
             /* needs a little passthrough for not changing the API, this actually comes from HTTP/2 */
             headers.Add(":status", splits[1]);
 
