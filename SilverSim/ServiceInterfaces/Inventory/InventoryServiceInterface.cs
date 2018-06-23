@@ -49,7 +49,7 @@ namespace SilverSim.ServiceInterfaces.Inventory
                 {
                     return item;
                 }
-                throw new KeyNotFoundException();
+                throw new InventoryItemNotFoundException();
             }
         }
 
@@ -64,7 +64,7 @@ namespace SilverSim.ServiceInterfaces.Inventory
                 {
                     return item;
                 }
-                throw new KeyNotFoundException();
+                throw new InventoryItemNotFoundException();
             }
         }
 
@@ -77,7 +77,7 @@ namespace SilverSim.ServiceInterfaces.Inventory
                 {
                     return folder;
                 }
-                throw new KeyNotFoundException();
+                throw new InventoryFolderNotFoundException();
             }
         }
 
@@ -90,7 +90,7 @@ namespace SilverSim.ServiceInterfaces.Inventory
                 {
                     return folder;
                 }
-                throw new KeyNotFoundException();
+                throw new InventoryFolderNotFoundException();
             }
         }
 
@@ -105,7 +105,7 @@ namespace SilverSim.ServiceInterfaces.Inventory
                 {
                     return folder;
                 }
-                throw new KeyNotFoundException();
+                throw new InventoryFolderNotFoundException();
             }
         }
 
@@ -118,7 +118,7 @@ namespace SilverSim.ServiceInterfaces.Inventory
                 {
                     return content;
                 }
-                throw new KeyNotFoundException();
+                throw new InventoryFolderNotFoundException();
             }
         }
 
