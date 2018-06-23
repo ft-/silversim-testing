@@ -36,16 +36,39 @@ namespace SilverSim.ServiceInterfaces.Inventory
 
         public bool TryGetValue(UUID principalID, UUID folderID, out InventoryFolderContent inventoryFolderContent)
         {
-            try
-            {
-                inventoryFolderContent = this[principalID, folderID];
-                return true;
-            }
-            catch
+            InventoryFolder folder;
+            if(!m_Service.TryGetValue(principalID, folderID, out folder))
             {
                 inventoryFolderContent = null;
                 return false;
             }
+
+            inventoryFolderContent = new InventoryFolderContent
+            {
+                Version = folder.Version,
+                Owner = folder.Owner,
+                FolderID = folder.ID
+            };
+
+            try
+            {
+                inventoryFolderContent.Folders = m_Service.GetFolders(principalID, folderID);
+            }
+            catch
+            {
+                inventoryFolderContent.Folders = new List<InventoryFolder>();
+            }
+
+            try
+            {
+                inventoryFolderContent.Items = m_Service.GetItems(principalID, folderID);
+            }
+            catch
+            {
+                inventoryFolderContent.Items = new List<InventoryItem>();
+            }
+
+            return true;
         }
 
         public bool ContainsKey(UUID principalID, UUID folderID) => m_Service.ContainsKey(principalID, folderID);
@@ -75,32 +98,12 @@ namespace SilverSim.ServiceInterfaces.Inventory
         {
             get
             {
-                var folderContent = new InventoryFolderContent();
-                InventoryFolder folder = m_Service[principalID, folderID];
-
-                folderContent.Version = folder.Version;
-                folderContent.Owner = folder.Owner;
-                folderContent.FolderID = folder.ID;
-
-                try
+                InventoryFolderContent content;
+                if(TryGetValue(principalID, folderID, out content))
                 {
-                    folderContent.Folders = m_Service.GetFolders(principalID, folderID);
+                    return content;
                 }
-                catch
-                {
-                    folderContent.Folders = new List<InventoryFolder>();
-                }
-
-                try
-                {
-                    folderContent.Items = m_Service.GetItems(principalID, folderID);
-                }
-                catch
-                {
-                    folderContent.Items = new List<InventoryItem>();
-                }
-
-                return folderContent;
+                throw new InventoryFolderNotFoundException();
             }
         }
     }
