@@ -84,7 +84,7 @@ namespace SilverSim.WebIF.Admin
                             {
                                 SelectedScene = webif.GetSelectedRegion(req, jsondata)
                             };
-                            m_Commands.ExecuteCommand(tty.GetCmdLine(cmd), tty);
+                            m_Commands.ExecuteCommandString(cmd, tty);
                             webif.SetSelectedRegion(req, jsondata, tty.SelectedScene);
                         }
                     }

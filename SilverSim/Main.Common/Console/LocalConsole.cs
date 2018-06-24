@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using log4net;
 using log4net.Core;
 using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.Types.Scene;
@@ -34,6 +35,7 @@ namespace SilverSim.Main.Common.Console
     [Description("Local Console")]
     public class LocalConsole : CmdIO.TTY, IPlugin, IPluginShutdown
     {
+        private static readonly ILog m_Log = LogManager.GetLogger("LOCAL CONSOLE");
         private int m_CursorXPosition;
         private int m_CursorYPosition = -1;
         private readonly StringBuilder m_CommandLineBuffer = new StringBuilder();
@@ -604,7 +606,14 @@ namespace SilverSim.Main.Common.Console
                 m_CmdHistory.Add(cmd);
                 lock (m_InputThreadLock)
                 {
-                    m_Commands.ExecuteCommand(GetCmdLine(cmd), this);
+                    try
+                    {
+                        m_Commands.ExecuteCommandString(cmd, this);
+                    }
+                    catch (Exception e)
+                    {
+                        m_Log.Error("Exception encountered during command execution", e);
+                    }
                 }
             }
         }

@@ -70,7 +70,7 @@ namespace SilverSim.Viewer.Core
             }
             else
             {
-                m_Commands.ExecuteCommand(tty.GetCmdLine(message), tty, Scene.ID);
+                m_Commands.ExecuteCommandString(message, tty, Scene.ID);
                 if(!tty.HaveOutputSent)
                 {
                     tty.Write("");

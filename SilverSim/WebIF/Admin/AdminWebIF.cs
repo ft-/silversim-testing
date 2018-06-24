@@ -687,7 +687,7 @@ namespace SilverSim.WebIF.Admin
                         continue;
                     }
                     tty.SelectedScene = GetSelectedRegion(req, jsondata);
-                    m_Loader.CommandRegistry.ExecuteCommand(tty.GetCmdLine(cmd), tty);
+                    m_Loader.CommandRegistry.ExecuteCommandString(cmd, tty);
                     SetSelectedRegion(req, jsondata, tty.SelectedScene);
                 }
                 if (m_ShutdownHandlerThreads)

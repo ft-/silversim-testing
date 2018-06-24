@@ -601,6 +601,7 @@ namespace SilverSim.Main.Common
             configSource.AddSwitch("Startup", "dumpconfig");
             configSource.AddSwitch("Startup", "skipregions");
             configSource.AddSwitch("Startup", "configdir", "d");
+            configSource.AddSwitch("Startup", "ExecuteCommand", "cmd");
             IConfig startup = configSource.Configs["Startup"];
             mode = startup.GetString("mode", "simulator");
             string dumpResultingIniName = startup.GetString("dumpconfig", string.Empty);
@@ -1229,6 +1230,17 @@ namespace SilverSim.Main.Common
                     Shutdown();
                 }
             }
+            try
+            {
+                if (startupConfig.Contains("StartupCommand"))
+                {
+                    CommandRegistry.ExecuteCommandString(startupConfig.GetString("StartupCommand"), new StartupCommandTTY());
+                }
+            }
+            catch(Exception e)
+            {
+                m_Log.Info("Exception during StartupCommand execution", e);
+            }
         }
         #endregion
 
@@ -1414,6 +1426,16 @@ namespace SilverSim.Main.Common
         #endregion
 
         #region Common Commands
+        private sealed class StartupCommandTTY : CmdIO.TTY
+        {
+            private readonly static ILog m_Log = LogManager.GetLogger("STARTUP COMMAND");
+            public StartupCommandTTY()
+            {
+            }
+
+            public override void Write(string text) => m_Log.Info(text);
+        }
+
         private void ExecuteCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             if(args[0] == "help" || args.Count < 2)
@@ -1427,7 +1449,7 @@ namespace SilverSim.Main.Common
                     string line;
                     while ((line = reader.ReadLine()) != null)
                     {
-                        CommandRegistry.ExecuteCommand(io.GetCmdLine(line), io, limitedToScene);
+                        CommandRegistry.ExecuteCommand(CmdIO.TTY.GetCmdLine(line), io, limitedToScene);
                     }
                 }
             }

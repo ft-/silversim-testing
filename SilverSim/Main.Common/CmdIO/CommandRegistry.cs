@@ -274,10 +274,14 @@ namespace SilverSim.Main.Common.CmdIO
             }
         }
 
+        public void ExecuteCommandString(string cmd, TTY io) => ExecuteCommand(TTY.GetCmdLine(cmd), io);
+
         public void ExecuteCommand(List<string> args, TTY io)
         {
             ExecuteCommand(args, io, UUID.Zero);
         }
+
+        public void ExecuteCommandString(string cmd, TTY io, UUID limitedToScene) => ExecuteCommand(TTY.GetCmdLine(cmd), io, limitedToScene);
 
         public void ExecuteCommand(List<string> args, TTY io, UUID limitedToScene)
         {

@@ -66,7 +66,7 @@ namespace SilverSim.Main.Common.CmdIO
 
         public string GetPass(string prompt) => ReadLine(String.Format("{0}: ", prompt), false);
 
-        public List<string> GetCmdLine(string cmdline)
+        public static List<string> GetCmdLine(string cmdline)
         {
             var cmdargs = new List<string>();
             cmdline = cmdline.Trim();
