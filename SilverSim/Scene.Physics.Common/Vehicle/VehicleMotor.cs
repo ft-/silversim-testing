@@ -367,7 +367,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             double roll = 0;
             if (vaTimescale.X < VerticalAttractorTimescaleDisable || vaTimescale.Y < VerticalAttractorTimescaleDisable)
             {
-                Vector3 angularError = angularOrientation.GetEulerAngles();
+                Vector3 angularError = angularOrientation.GetNauticalAngles();
                 angularError.Z = 0;
                 if(angularError.X > Math.PI)
                 {
