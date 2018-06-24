@@ -601,7 +601,7 @@ namespace SilverSim.Main.Common
             configSource.AddSwitch("Startup", "dumpconfig");
             configSource.AddSwitch("Startup", "skipregions");
             configSource.AddSwitch("Startup", "configdir", "d");
-            configSource.AddSwitch("Startup", "ExecuteCommand", "cmd");
+            configSource.AddSwitch("Startup", "ExecuteCommand", "ec");
             IConfig startup = configSource.Configs["Startup"];
             mode = startup.GetString("mode", "simulator");
             string dumpResultingIniName = startup.GetString("dumpconfig", string.Empty);
