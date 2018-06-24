@@ -66,6 +66,7 @@ namespace SilverSim.Http.Client
                 DisableGone = 0x00000010,
                 Disable5XX = 0x00000020,
                 DisableForbidden = 0x00000040,
+                DisableNotModified = 0x00000080
             }
 
             public DisableExceptionFlags DisableExceptions;
@@ -84,6 +85,8 @@ namespace SilverSim.Http.Client
                         return (DisableExceptions & DisableExceptionFlags.DisableConflict) != 0;
                     case HttpStatusCode.Forbidden:
                         return (DisableExceptions & DisableExceptionFlags.DisableForbidden) != 0;
+                    case HttpStatusCode.NotModified:
+                        return (DisableExceptions & (DisableExceptionFlags.Disable3XX | DisableExceptionFlags.DisableNotModified)) != 0;
                     default:
                         int statusCodeRange = ((int)StatusCode) / 100;
                         switch(statusCodeRange)
