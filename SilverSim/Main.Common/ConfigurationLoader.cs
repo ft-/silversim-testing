@@ -1232,14 +1232,25 @@ namespace SilverSim.Main.Common
             }
             try
             {
-                if (startupConfig.Contains("StartupCommand"))
+                if (startup.Contains("ExecuteCommand"))
                 {
-                    CommandRegistry.ExecuteCommandString(startupConfig.GetString("StartupCommand"), new StartupCommandTTY());
+                    CommandRegistry.ExecuteCommandString(startup.GetString("ExecuteCommand"), new StartupCommandTTY());
                 }
             }
             catch(Exception e)
             {
-                m_Log.Info("Exception during StartupCommand execution", e);
+                m_Log.Info("Exception during -ec command execution", e);
+            }
+            try
+            {
+                if (startupConfig.Contains("ExecuteCommand"))
+                {
+                    CommandRegistry.ExecuteCommandString(startupConfig.GetString("ExecuteCommand"), new StartupCommandTTY());
+                }
+            }
+            catch (Exception e)
+            {
+                m_Log.Info("Exception during Startup.ExecuteCommand execution", e);
             }
         }
         #endregion
