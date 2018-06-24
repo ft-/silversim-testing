@@ -614,6 +614,7 @@ namespace SilverSim.Main.Common
                 System.Console.WriteLine("-config=filename or -c filename\n  Use specific config file\n");
                 System.Console.WriteLine("-skipregions\n  Skip start of regions\n");
                 System.Console.WriteLine("-D:<section>:<variable>=<value>\n  Set a value from command line\n");
+                System.Console.WriteLine("-ExecuteCommand=cmd or -ec cmd\n  Execute a script after initial startup\n");
                 ShowModeHelp();
                 shutdownEvent.Set();
                 return;
