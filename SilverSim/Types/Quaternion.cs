@@ -869,6 +869,7 @@ namespace SilverSim.Types
         public int AsInt => (int)Length;
         public ulong AsULong => (ulong)Length;
         public long AsLong => (long)Length;
+        public bool IsNaN => double.IsNaN(X) || double.IsNaN(Y) || double.IsNaN(Z) || double.IsNaN(W);
         #endregion
 
         /// <summary>A quaternion with a value of 0,0,0,1</summary>

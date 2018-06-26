@@ -417,6 +417,8 @@ namespace SilverSim.Types
 
         #endregion Operators
 
+        public bool IsNaN => double.IsNaN(X) || double.IsNaN(Y) || double.IsNaN(Z) || double.IsNaN(W);
+
         public readonly static Vector4 Zero = new Vector4();
         public readonly static Vector4 One = new Vector4(1f, 1f, 1f, 1f);
         public readonly static Vector4 UnitX = new Vector4(1f, 0f, 0f, 0f);

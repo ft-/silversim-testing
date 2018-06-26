@@ -389,6 +389,7 @@ namespace SilverSim.Types
         public int AsInt => (int)Length;
         public ulong AsULong => (ulong)Length;
         public long AsLong => (long)Length;
+        public bool IsNaN => double.IsNaN(X) || double.IsNaN(Y) || double.IsNaN(Z);
         #endregion
 
         /// <summary>A vector with a value of 0,0,0</summary>
