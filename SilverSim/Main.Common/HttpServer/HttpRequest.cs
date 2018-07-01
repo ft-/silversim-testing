@@ -304,33 +304,81 @@ namespace SilverSim.Main.Common.HttpServer
 
         public void JsonResponse(IValue iv)
         {
-            using (HttpResponse res = BeginResponse("application/json"))
+            if (Method == "HEAD")
             {
-                using (Stream s = res.GetOutputStream())
+                int cLength;
+                using (var ms = new MemoryStream())
                 {
-                    Json.Serialize(iv, s);
+                    Json.Serialize(iv, ms);
+                    cLength = ms.ToArray().Length;
+                }
+                using (HttpResponse res = BeginResponse("application/json"))
+                {
+                    res.Headers["Content-Length"] = cLength.ToString();
+                }
+            }
+            else
+            {
+                using (HttpResponse res = BeginResponse("application/json"))
+                {
+                    using (Stream s = res.GetOutputStream())
+                    {
+                        Json.Serialize(iv, s);
+                    }
                 }
             }
         }
 
         public void LlsdXmlResponse(IValue iv)
         {
-            using (HttpResponse res = BeginResponse("application/llsd+xml"))
+            if (Method == "HEAD")
             {
-                using (Stream s = res.GetOutputStream())
+                int cLength;
+                using (var ms = new MemoryStream())
                 {
-                    LlsdXml.Serialize(iv, s);
+                    LlsdXml.Serialize(iv, ms);
+                    cLength = ms.ToArray().Length;
+                }
+                using (HttpResponse res = BeginResponse("application/json"))
+                {
+                    res.Headers["Content-Length"] = cLength.ToString();
+                }
+            }
+            else
+            {
+                using (HttpResponse res = BeginResponse("application/llsd+xml"))
+                {
+                    using (Stream s = res.GetOutputStream())
+                    {
+                        LlsdXml.Serialize(iv, s);
+                    }
                 }
             }
         }
 
         public void LlsdBinaryResponse(IValue iv, bool writeHeader = false)
         {
-            using (HttpResponse res = BeginResponse("application/llsd+binary"))
+            if (Method == "HEAD")
             {
-                using (Stream s = res.GetOutputStream())
+                int cLength;
+                using (var ms = new MemoryStream())
                 {
-                    LlsdBinary.Serialize(iv, s, writeHeader);
+                    LlsdBinary.Serialize(iv, ms);
+                    cLength = ms.ToArray().Length;
+                }
+                using (HttpResponse res = BeginResponse("application/json"))
+                {
+                    res.Headers["Content-Length"] = cLength.ToString();
+                }
+            }
+            else
+            {
+                using (HttpResponse res = BeginResponse("application/llsd+binary"))
+                {
+                    using (Stream s = res.GetOutputStream())
+                    {
+                        LlsdBinary.Serialize(iv, s, writeHeader);
+                    }
                 }
             }
         }
