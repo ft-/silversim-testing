@@ -145,7 +145,7 @@ namespace SilverSim.WebIF.Admin.MapServer
                         removeFlags |= RegionFlags.DefaultRegion;
                     }
                 }
-                if (jsondata.TryGetValue("defaulthg", out flag))
+                if (jsondata.TryGetValue("defaultintergrid", out flag))
                 {
                     if (flag)
                     {
