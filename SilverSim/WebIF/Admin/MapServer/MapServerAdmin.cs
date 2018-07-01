@@ -200,7 +200,7 @@ namespace SilverSim.WebIF.Admin.MapServer
             List<RegionInfo> regions;
             try
             {
-                regions = m_GridService.GetDefaultHypergridRegions(m_ScopeID);
+                regions = m_GridService.GetDefaultIntergridRegions(m_ScopeID);
             }
             catch
             {

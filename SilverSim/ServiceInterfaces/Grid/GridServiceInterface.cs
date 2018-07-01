@@ -199,7 +199,7 @@ namespace SilverSim.ServiceInterfaces.Grid
         public abstract List<RegionInfo> GetHyperlinks(UUID scopeID);
         public abstract List<RegionInfo> GetDefaultRegions(UUID scopeID);
         public abstract List<RegionInfo> GetFallbackRegions(UUID scopeID);
-        public abstract List<RegionInfo> GetDefaultHypergridRegions(UUID scopeID);
+        public abstract List<RegionInfo> GetDefaultIntergridRegions(UUID scopeID);
         public abstract List<RegionInfo> GetRegionsByRange(UUID scopeID, GridVector min, GridVector max);
         public abstract List<RegionInfo> GetNeighbours(UUID scopeID, UUID regionID);
         public abstract List<RegionInfo> GetAllRegions(UUID scopeID);
