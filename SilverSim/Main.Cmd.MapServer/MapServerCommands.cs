@@ -248,13 +248,13 @@ namespace SilverSim.Main.Cmd.MapServer
                             }
                             if (val)
                             {
-                                setFlags |= RegionFlags.DefaultHGRegion;
-                                removeFlags &= ~RegionFlags.DefaultHGRegion;
+                                setFlags |= RegionFlags.DefaultIntergridRegion;
+                                removeFlags &= ~RegionFlags.DefaultIntergridRegion;
                             }
                             else
                             {
-                                setFlags &= ~RegionFlags.DefaultHGRegion;
-                                removeFlags |= RegionFlags.DefaultHGRegion;
+                                setFlags &= ~RegionFlags.DefaultIntergridRegion;
+                                removeFlags |= RegionFlags.DefaultIntergridRegion;
                             }
                             break;
                         case "persistent":
@@ -336,7 +336,7 @@ namespace SilverSim.Main.Cmd.MapServer
 
                 try
                 {
-                    m_GridService.RemoveRegionFlags(id, RegionFlags.FallbackRegion | RegionFlags.DefaultRegion | RegionFlags.DefaultHGRegion | RegionFlags.Persistent);
+                    m_GridService.RemoveRegionFlags(id, RegionFlags.FallbackRegion | RegionFlags.DefaultRegion | RegionFlags.DefaultIntergridRegion | RegionFlags.Persistent);
                     m_RegionDefaultFlagsService.ChangeRegionDefaultFlags(id, RegionFlags.None, ~RegionFlags.None);
                 }
                 catch

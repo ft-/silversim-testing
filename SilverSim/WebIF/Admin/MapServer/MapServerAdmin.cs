@@ -149,11 +149,11 @@ namespace SilverSim.WebIF.Admin.MapServer
                 {
                     if (flag)
                     {
-                        setFlags |= RegionFlags.DefaultHGRegion;
+                        setFlags |= RegionFlags.DefaultIntergridRegion;
                     }
                     else
                     {
-                        removeFlags |= RegionFlags.DefaultHGRegion;
+                        removeFlags |= RegionFlags.DefaultIntergridRegion;
                     }
                 }
                 if (jsondata.TryGetValue("persistent", out flag))

@@ -37,6 +37,6 @@ namespace SilverSim.Types.Grid
         Reservation = 128,
         Authenticate = 256,
         Hyperlink = 512,
-        DefaultHGRegion = 1024
+        DefaultIntergridRegion = 1024
     }
 }
