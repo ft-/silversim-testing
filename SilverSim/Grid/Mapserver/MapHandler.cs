@@ -99,17 +99,17 @@ namespace SilverSim.Grid.Mapserver
                     }
                     else
                     {
-                        req.ErrorResponse(HttpStatusCode.NotFound, "Not found");
+                        req.NotFound();
                     }
                 }
                 else
                 {
-                    req.ErrorResponse(HttpStatusCode.NotFound, "Not found");
+                    req.NotFound();
                 }
             }
             else
             {
-                req.ErrorResponse(HttpStatusCode.NotFound, "Not found");
+                req.NotFound();
             }
         }
 
