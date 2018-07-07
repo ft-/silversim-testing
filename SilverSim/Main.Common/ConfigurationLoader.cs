@@ -33,6 +33,7 @@ using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Scripting.Common;
+using SilverSim.ServiceInterfaces;
 using SilverSim.ServiceInterfaces.Account;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.AvatarName;
@@ -54,6 +55,7 @@ using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.Threading;
 using SilverSim.Types;
+using SilverSim.Types.StructuredData.XmlRpc;
 using SilverSim.Updater;
 using System;
 using System.Collections.Generic;
@@ -306,6 +308,24 @@ namespace SilverSim.Main.Common
                     res.Headers["X-UDP-InterSim"] = "supported";
                 }
             }
+        }
+        #endregion
+
+        #region GetServerURLs
+        XmlRpc.XmlRpcResponse GetServerURLs(XmlRpc.XmlRpcRequest req)
+        {
+            Map respdata = new Map();
+            List<IServiceURLsGetInterface> getters = GetServicesByValue<IServiceURLsGetInterface>();
+            Dictionary<string, string> serviceurls = new Dictionary<string, string>();
+            foreach (IServiceURLsGetInterface getter in getters)
+            {
+                getter.GetServiceURLs(serviceurls);
+            }
+            foreach (KeyValuePair<string, string> kvp in serviceurls)
+            {
+                respdata.Add("SRV_" + kvp.Key, kvp.Value);
+            }
+            return new XmlRpc.XmlRpcResponse { ReturnValue = respdata };
         }
         #endregion
 
@@ -1048,7 +1068,11 @@ namespace SilverSim.Main.Common
                 GridNick = startupConfig.GetString("GridNick", string.Empty);
             }
 
-            PluginInstances.Add("XmlRpcServer", new HttpXmlRpcHandler());
+            {
+                HttpXmlRpcHandler handler = new HttpXmlRpcHandler();
+                PluginInstances.Add("XmlRpcServer", handler);
+                handler.XmlRpcMethods.Add("get_server_urls", GetServerURLs);
+            }
             PluginInstances.Add("JSON2.0RpcServer", new HttpJson20RpcHandler());
             PluginInstances.Add("CapsRedirector", new CapsHttpRedirector());
 
