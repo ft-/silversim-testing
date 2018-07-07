@@ -398,6 +398,14 @@ namespace SilverSim.Types
             }
         }
 
+        public Vector3 GetAngularDisplacement()
+        {
+            Vector3 v;
+            double angle;
+            GetAxisAngle(out v, out angle);
+            return v * angle;
+        }
+
         public static Quaternion RotBetween(Vector3 a, Vector3 b)
         {
             Quaternion rotBetween;
