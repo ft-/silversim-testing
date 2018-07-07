@@ -34,7 +34,7 @@ namespace SilverSim.Scene.Types.KeyframedMotion
         private readonly object m_KeyframeLock = new object();
         private KeyframedMotion m_Program = new KeyframedMotion();
 
-        public ObjectGroup ObjectGroup { get; }
+        public IKeyframedMotionObject ControlledObject { get; }
 
         public KeyframedMotion Program
         {
@@ -57,7 +57,7 @@ namespace SilverSim.Scene.Types.KeyframedMotion
                     m_Program = new KeyframedMotion(value);
                     if(!m_Program.IsRunning)
                     {
-                        ObjectGroup.IsMoving = false;
+                        ControlledObject.IsMoving = false;
                     }
                     m_KeyframeTimer.Enabled = m_Program.IsRunning;
                 }
@@ -66,14 +66,14 @@ namespace SilverSim.Scene.Types.KeyframedMotion
 
         public KeyframedMotionController(ObjectGroup group)
         {
-            ObjectGroup = group;
+            ControlledObject = group;
             m_KeyframeTimer.Elapsed += KeyframeTimer;
         }
 
         public void Dispose()
         {
             m_KeyframeTimer.Elapsed -= KeyframeTimer;
-            ObjectGroup.IsMoving = false;
+            ControlledObject.IsMoving = false;
             m_KeyframeTimer.Dispose();
         }
 
@@ -84,13 +84,13 @@ namespace SilverSim.Scene.Types.KeyframedMotion
             lock(m_KeyframeLock)
             {
                 wasRunning = m_Program.IsRunning;
-                ObjectGroup.IsMoving = true;
+                ControlledObject.IsMoving = true;
                 m_Program.IsRunning = true;
                 m_KeyframeTimer.Enabled = true;
             }
             if(!wasRunning)
             {
-                ObjectGroup.PostEvent(new MovingStartEvent());
+                ControlledObject.PostEvent(new MovingStartEvent());
             }
         }
 
@@ -99,16 +99,16 @@ namespace SilverSim.Scene.Types.KeyframedMotion
             bool wasRunning;
             lock (m_KeyframeLock)
             {
-                ObjectGroup.Velocity = Vector3.Zero;
-                ObjectGroup.AngularVelocity = Vector3.Zero;
+                ControlledObject.Velocity = Vector3.Zero;
+                ControlledObject.AngularVelocity = Vector3.Zero;
                 wasRunning = m_Program.IsRunning;
-                ObjectGroup.IsMoving = false;
+                ControlledObject.IsMoving = false;
                 m_Program.IsRunning = false;
                 m_KeyframeTimer.Enabled = false;
             }
             if (!wasRunning)
             {
-                ObjectGroup.PostEvent(new MovingStartEvent());
+                ControlledObject.PostEvent(new MovingStartEvent());
             }
         }
 
@@ -117,10 +117,10 @@ namespace SilverSim.Scene.Types.KeyframedMotion
             bool wasRunning;
             lock (m_KeyframeLock)
             {
-                ObjectGroup.Velocity = Vector3.Zero;
-                ObjectGroup.AngularVelocity = Vector3.Zero;
+                ControlledObject.Velocity = Vector3.Zero;
+                ControlledObject.AngularVelocity = Vector3.Zero;
                 wasRunning = m_Program.IsRunning;
-                ObjectGroup.IsMoving = false;
+                ControlledObject.IsMoving = false;
                 m_Program.IsRunning = false;
                 m_KeyframeTimer.Enabled = false;
                 /* reset program */
@@ -128,14 +128,14 @@ namespace SilverSim.Scene.Types.KeyframedMotion
             }
             if (wasRunning)
             {
-                ObjectGroup.PostEvent(new MovingEndEvent());
+                ControlledObject.PostEvent(new MovingEndEvent());
             }
         }
         #endregion
 
         private void KeyframeTimer(object o, ElapsedEventArgs args)
         {
-            var scene = ObjectGroup.Scene;
+            var scene = ControlledObject.KeyframeScene;
             if(scene == null || !scene.IsKeyframedMotionEnabled)
             {
                 return;
@@ -177,19 +177,19 @@ namespace SilverSim.Scene.Types.KeyframedMotion
                             {
                                 if ((flags & KeyframedMotion.DataFlags.Translation) != 0)
                                 {
-                                    ObjectGroup.Velocity = Vector3.Zero;
-                                    ObjectGroup.Position = curFrame.TargetPosition;
+                                    ControlledObject.Velocity = Vector3.Zero;
+                                    ControlledObject.Position = curFrame.TargetPosition;
                                 }
                                 if ((flags & KeyframedMotion.DataFlags.Rotation) != 0)
                                 {
-                                    ObjectGroup.AngularVelocity = Vector3.Zero;
-                                    ObjectGroup.Rotation = curFrame.TargetRotation;
+                                    ControlledObject.AngularVelocity = Vector3.Zero;
+                                    ControlledObject.Rotation = curFrame.TargetRotation;
                                 }
                                 m_Program.CurrentFrame = -1;
-                                ObjectGroup.IsMoving = false;
+                                ControlledObject.IsMoving = false;
                                 m_Program.IsRunning = false;
                                 m_KeyframeTimer.Enabled = false;
-                                ObjectGroup.PostEvent(new MovingEndEvent());
+                                ControlledObject.PostEvent(new MovingEndEvent());
                                 return;
                             }
                         }
@@ -203,19 +203,19 @@ namespace SilverSim.Scene.Types.KeyframedMotion
                                 case KeyframedMotion.Mode.Forward:
                                     if ((flags & KeyframedMotion.DataFlags.Translation) != 0)
                                     {
-                                        ObjectGroup.Velocity = Vector3.Zero;
-                                        ObjectGroup.Position = curFrame.TargetPosition;
+                                        ControlledObject.Velocity = Vector3.Zero;
+                                        ControlledObject.Position = curFrame.TargetPosition;
                                     }
                                     if ((flags & KeyframedMotion.DataFlags.Rotation) != 0)
                                     {
-                                        ObjectGroup.AngularVelocity = Vector3.Zero;
-                                        ObjectGroup.Rotation = curFrame.TargetRotation;
+                                        ControlledObject.AngularVelocity = Vector3.Zero;
+                                        ControlledObject.Rotation = curFrame.TargetRotation;
                                     }
                                     m_Program.CurrentFrame = -1;
-                                    ObjectGroup.IsMoving = false;
+                                    ControlledObject.IsMoving = false;
                                     m_Program.IsRunning = false;
                                     m_KeyframeTimer.Enabled = false;
-                                    ObjectGroup.PostEvent(new MovingEndEvent());
+                                    ControlledObject.PostEvent(new MovingEndEvent());
                                     return;
 
                                 case KeyframedMotion.Mode.Loop:
@@ -245,25 +245,25 @@ namespace SilverSim.Scene.Types.KeyframedMotion
                     if((flags & KeyframedMotion.DataFlags.Translation) != 0)
                     {
                         var distance = curFrame.TargetPosition;
-                        ObjectGroup.Velocity = distance / curFrame.Duration;
+                        ControlledObject.Velocity = distance / curFrame.Duration;
                     }
 
                     if((flags & KeyframedMotion.DataFlags.Rotation) != 0)
                     {
-                        var angularDistance = curFrame.TargetRotation.GetEulerAngles();
-                        ObjectGroup.AngularVelocity = angularDistance / curFrame.Duration;
+                        var angularDistance = (curFrame.TargetRotation / ControlledObject.Rotation).GetAngularDisplacement();
+                        ControlledObject.AngularVelocity = angularDistance / curFrame.Duration;
                     }
                 }
                 else
                 {
                     if ((flags & KeyframedMotion.DataFlags.Translation) != 0)
                     {
-                        ObjectGroup.Position += ObjectGroup.Velocity;
+                        ControlledObject.Position += ControlledObject.Velocity;
                     }
 
                     if ((flags & KeyframedMotion.DataFlags.Rotation) != 0)
                     {
-                        ObjectGroup.Rotation *= Quaternion.CreateFromEulers(ObjectGroup.AngularVelocity);
+                        ControlledObject.Rotation *= Quaternion.CreateFromEulers(ControlledObject.AngularVelocity);
                     }
                 }
             }

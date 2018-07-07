@@ -270,6 +270,13 @@ namespace SilverSim.Scene.Types.Object
         #endregion
     }
 
+    public interface IKeyframedMotionObject : IObject
+    {
+        bool IsMoving { get; set; }
+
+        SceneInterface KeyframeScene { get; }
+    }
+
     public interface IPhysicalObject : IObject
     {
         RwLockedDictionary<UUID, IPhysicsObject> PhysicsActors

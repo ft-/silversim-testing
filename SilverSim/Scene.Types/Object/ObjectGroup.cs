@@ -39,7 +39,7 @@ using System.Linq;
 
 namespace SilverSim.Scene.Types.Object
 {
-    public partial class ObjectGroup : RwLockedSortedDoubleDictionary<int, UUID, ObjectPart>, IObject
+    public partial class ObjectGroup : RwLockedSortedDoubleDictionary<int, UUID, ObjectPart>, IObject, IKeyframedMotionObject
     {
         private static IScriptCompilerRegistry m_CompilerRegistry;
         public static IScriptCompilerRegistry CompilerRegistry
@@ -58,6 +58,8 @@ namespace SilverSim.Scene.Types.Object
                 }
             }
         }
+
+        SceneInterface IKeyframedMotionObject.KeyframeScene => Scene;
 
         private static readonly ILog m_Log = LogManager.GetLogger("OBJECT GROUP");
 

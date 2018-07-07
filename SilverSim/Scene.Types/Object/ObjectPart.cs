@@ -41,9 +41,11 @@ using System.Threading;
 
 namespace SilverSim.Scene.Types.Object
 {
-    public partial class ObjectPart : IPhysicalObject, ILocalIDAccessor
+    public partial class ObjectPart : IPhysicalObject, ILocalIDAccessor, IKeyframedMotionObject
     {
         private static readonly ILog m_Log = LogManager.GetLogger("OBJECT PART");
+
+        SceneInterface IKeyframedMotionObject.KeyframeScene => ObjectGroup?.Scene;
 
         private readonly object m_DataLock = new object();
 
