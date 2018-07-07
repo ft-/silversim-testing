@@ -59,6 +59,11 @@ namespace SilverSim.ServiceInterfaces.UserAgents
 
         public abstract bool IsOnline(UGUI user);
 
+        public virtual void Reauth()
+        {
+            /* intentionally left empty */
+        }
+
         [Serializable]
         public class RequestFailedException : Exception
         {
