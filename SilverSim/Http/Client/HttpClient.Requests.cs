@@ -28,6 +28,7 @@ using System.Net;
 using System.Net.Security;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
+using System.Xml;
 
 namespace SilverSim.Http.Client
 {
@@ -190,6 +191,36 @@ namespace SilverSim.Http.Client
                 RequestContentType = contenttype;
                 Method = "POST";
             }
+
+            public Post(string url, string contenttype, Action<XmlTextWriter> body)
+                : base(url)
+            {
+                UseChunkedEncoding = true;
+                RequestBodyDelegate = (s) =>
+                {
+                    using (XmlTextWriter writer = s.UTF8XmlTextWriter())
+                    {
+                        body(writer);
+                    }
+                };
+                RequestContentType = contenttype;
+                Method = "POST";
+            }
+
+            public Post(string url, Action<XmlTextWriter> body)
+                : base(url)
+            {
+                UseChunkedEncoding = true;
+                RequestBodyDelegate = (s) =>
+                {
+                    using (XmlTextWriter writer = s.UTF8XmlTextWriter())
+                    {
+                        body(writer);
+                    }
+                };
+                RequestContentType = "application/xml";
+                Method = "POST";
+            }
         }
 
         public class Get : Request
@@ -254,6 +285,18 @@ namespace SilverSim.Http.Client
             {
                 Method = "PUT";
             }
+
+            public Put(string url, string contenttype, Action<XmlTextWriter> body)
+                : base(url, contenttype, body)
+            {
+                Method = "PUT";
+            }
+
+            public Put(string url, Action<XmlTextWriter> body)
+                : base(url, body)
+            {
+                Method = "PUT";
+            }
         }
 
         public class Copy : Request
@@ -306,6 +349,18 @@ namespace SilverSim.Http.Client
             }
 
             public Patch(string url, string contenttype, int contentlength, Action<Stream> body) : base(url, contenttype, contentlength, body)
+            {
+                Method = "PATCH";
+            }
+
+            public Patch(string url, string contenttype, Action<XmlTextWriter> body)
+                : base(url, contenttype, body)
+            {
+                Method = "PATCH";
+            }
+
+            public Patch(string url, Action<XmlTextWriter> body)
+                : base(url, body)
             {
                 Method = "PATCH";
             }
