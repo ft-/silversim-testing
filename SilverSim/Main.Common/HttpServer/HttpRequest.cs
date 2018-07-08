@@ -28,6 +28,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
+using System.Xml;
 
 namespace SilverSim.Main.Common.HttpServer
 {
@@ -339,7 +340,7 @@ namespace SilverSim.Main.Common.HttpServer
                     LlsdXml.Serialize(iv, ms);
                     cLength = ms.ToArray().Length;
                 }
-                using (HttpResponse res = BeginResponse("application/json"))
+                using (HttpResponse res = BeginResponse("application/llsd+xml"))
                 {
                     res.Headers["Content-Length"] = cLength.ToString();
                 }
@@ -366,7 +367,7 @@ namespace SilverSim.Main.Common.HttpServer
                     LlsdBinary.Serialize(iv, ms);
                     cLength = ms.ToArray().Length;
                 }
-                using (HttpResponse res = BeginResponse("application/json"))
+                using (HttpResponse res = BeginResponse("application/llsd+binary"))
                 {
                     res.Headers["Content-Length"] = cLength.ToString();
                 }
@@ -378,6 +379,27 @@ namespace SilverSim.Main.Common.HttpServer
                     using (Stream s = res.GetOutputStream())
                     {
                         LlsdBinary.Serialize(iv, s, writeHeader);
+                    }
+                }
+            }
+        }
+
+        public void XmlResponse(Action<XmlTextWriter> action)
+        {
+            if (Method == "HEAD")
+            {
+                EmptyResponse("application/xml");
+            }
+            else
+            {
+                using (HttpResponse res = BeginResponse("application/xml"))
+                {
+                    using (Stream s = res.GetOutputStream())
+                    {
+                        using (XmlTextWriter writer = s.UTF8XmlTextWriter())
+                        {
+                            action(writer);
+                        }
                     }
                 }
             }
