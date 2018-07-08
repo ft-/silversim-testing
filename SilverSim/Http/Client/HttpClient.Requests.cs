@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using SilverSim.Types;
+using SilverSim.Types.StructuredData.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -32,6 +33,27 @@ namespace SilverSim.Http.Client
 {
     public static partial class HttpClient
     {
+        public interface IRequestBodyType
+        {
+            string ContentType { get; }
+            byte[] RequestBody { get; }
+        }
+
+        public class JsonRequest : IRequestBodyType
+        {
+            public string ContentType => "application/json";
+            public byte[] RequestBody { get; }
+
+            public JsonRequest(IValue iv)
+            {
+                using (var s = new MemoryStream())
+                {
+                    Json.Serialize(iv, s);
+                    RequestBody = s.ToArray();
+                }
+            }
+        }
+
         public class Request
         {
             public string Method = "GET";
@@ -127,6 +149,14 @@ namespace SilverSim.Http.Client
                 Method = "POST";
             }
 
+            public Post(string url, IRequestBodyType typeddata)
+                : base(url)
+            {
+                RequestBody = typeddata.RequestBody;
+                RequestContentType = typeddata.ContentType;
+                Method = "POST";
+            }
+
             public Post(string url, string contenttype, string body)
                 : base(url)
             {
@@ -199,6 +229,11 @@ namespace SilverSim.Http.Client
                 Method = "PUT";
             }
 
+            public Put(string url, IRequestBodyType typeddata) : base(url, typeddata)
+            {
+                Method = "PUT";
+            }
+
             public Put(string url, string contenttype, string body) : base(url, contenttype, body)
             {
                 Method = "PUT";
@@ -227,6 +262,15 @@ namespace SilverSim.Http.Client
             {
                 Method = "COPY";
             }
+
+            public Copy(string url, string desturl) : base(url)
+            {
+                Method = "COPY";
+                Headers = new Dictionary<string, string>
+                {
+                    ["Destination"] = desturl
+                };
+            }
         }
 
         public class Patch : Post
@@ -241,12 +285,22 @@ namespace SilverSim.Http.Client
                 Method = "PATCH";
             }
 
+            public Patch(string url, IRequestBodyType typeddata) : base(url, typeddata)
+            {
+                Method = "PATCH";
+            }
+
             public Patch(string url, string contenttype, string body) : base(url, contenttype, body)
             {
                 Method = "PATCH";
             }
 
             public Patch(string url, string contenttype, byte[] body) : base(url, contenttype, body)
+            {
+                Method = "PATCH";
+            }
+
+            public Patch(string url, string contenttype, Action<Stream> body) : base(url, contenttype, body)
             {
                 Method = "PATCH";
             }
@@ -262,6 +316,15 @@ namespace SilverSim.Http.Client
             public Move(string url) : base(url)
             {
                 Method = "MOVE";
+            }
+
+            public Move(string url, string desturl) : base(url)
+            {
+                Method = "MOVE";
+                Headers = new Dictionary<string, string>
+                {
+                    ["Destination"] = desturl
+                };
             }
         }
     }
