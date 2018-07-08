@@ -40,7 +40,7 @@ namespace SilverSim.Http.Client
             byte[] RequestBody { get; }
         }
 
-        public class JsonRequest : IRequestBodyType
+        public sealed class JsonRequest : IRequestBodyType
         {
             public string ContentType => "application/json";
             public byte[] RequestBody { get; }
