@@ -57,7 +57,9 @@ namespace SilverSim.Http.Client
 
         public class Request
         {
-            public string Method = "GET";
+            protected virtual string DefaultMethod => "GET";
+
+            public string Method;
             public string Url;
             public IDictionary<string, string> GetValues;
             public string RequestContentType;
@@ -130,16 +132,19 @@ namespace SilverSim.Http.Client
 
             public Request(string url)
             {
+                Method = DefaultMethod;
                 Url = url;
             }
         }
 
         public class Post : Request
         {
+            protected override string DefaultMethod => "POST";
+
             public Post(string url)
                 : base(url)
             {
-                Method = "POST";
+                Method = DefaultMethod;
             }
 
             public Post(string url, IDictionary<string, string> postValues)
@@ -147,7 +152,7 @@ namespace SilverSim.Http.Client
             {
                 RequestBody = BuildQueryString(postValues).ToUTF8Bytes();
                 RequestContentType = "application/x-www-form-urlencoded";
-                Method = "POST";
+                Method = DefaultMethod;
             }
 
             public Post(string url, IRequestBodyType typeddata)
@@ -155,7 +160,7 @@ namespace SilverSim.Http.Client
             {
                 RequestBody = typeddata.RequestBody;
                 RequestContentType = typeddata.ContentType;
-                Method = "POST";
+                Method = DefaultMethod;
             }
 
             public Post(string url, string contenttype, string body)
@@ -163,7 +168,7 @@ namespace SilverSim.Http.Client
             {
                 RequestBody = body.ToUTF8Bytes();
                 RequestContentType = contenttype;
-                Method = "POST";
+                Method = DefaultMethod;
             }
 
             public Post(string url, string contenttype, byte[] body)
@@ -171,7 +176,7 @@ namespace SilverSim.Http.Client
             {
                 RequestBody = body;
                 RequestContentType = contenttype;
-                Method = "POST";
+                Method = DefaultMethod;
             }
 
             public Post(string url, string contenttype, int contentlength, Action<Stream> body)
@@ -180,7 +185,7 @@ namespace SilverSim.Http.Client
                 RequestBodyDelegate = body;
                 RequestContentLength = contentlength;
                 RequestContentType = contenttype;
-                Method = "POST";
+                Method = DefaultMethod;
             }
 
             public Post(string url, string contenttype, Action<Stream> body)
@@ -189,7 +194,7 @@ namespace SilverSim.Http.Client
                 UseChunkedEncoding = true;
                 RequestBodyDelegate = body;
                 RequestContentType = contenttype;
-                Method = "POST";
+                Method = DefaultMethod;
             }
 
             public Post(string url, string contenttype, Action<XmlTextWriter> body)
@@ -204,7 +209,7 @@ namespace SilverSim.Http.Client
                     }
                 };
                 RequestContentType = contenttype;
-                Method = "POST";
+                Method = DefaultMethod;
             }
 
             public Post(string url, Action<XmlTextWriter> body)
@@ -219,7 +224,7 @@ namespace SilverSim.Http.Client
                     }
                 };
                 RequestContentType = "application/xml";
-                Method = "POST";
+                Method = DefaultMethod;
             }
         }
 
@@ -232,83 +237,114 @@ namespace SilverSim.Http.Client
 
         public class Head : Request
         {
-            public Head(string url)
-                : base(url)
+            protected override string DefaultMethod => "HEAD";
+
+            public Head(string url) : base(url)
             {
-                Method = "HEAD";
             }
         }
 
         public class Delete : Request
         {
-            public Delete(string url)
-                : base(url)
+            protected override string DefaultMethod => "DELETE";
+
+            public Delete(string url) : base(url)
             {
-                Method = "DELETE";
             }
         }
 
-        public class Put : Post
+        public sealed class Put : Post
         {
+            protected override string DefaultMethod => "PUT";
+
             public Put(string url) : base(url)
             {
-                Method = "PUT";
             }
 
             public Put(string url, IDictionary<string, string> postValues) : base(url, postValues)
             {
-                Method = "PUT";
             }
 
             public Put(string url, IRequestBodyType typeddata) : base(url, typeddata)
             {
-                Method = "PUT";
+            }
+
+            public Put(string url, Action<XmlTextWriter> body) : base(url, body)
+            {
             }
 
             public Put(string url, string contenttype, string body) : base(url, contenttype, body)
             {
-                Method = "PUT";
             }
 
             public Put(string url, string contenttype, byte[] body) : base(url, contenttype, body)
             {
-                Method = "PUT";
+            }
+
+            public Put(string url, string contenttype, Action<Stream> body) : base(url, contenttype, body)
+            {
+            }
+
+            public Put(string url, string contenttype, Action<XmlTextWriter> body) : base(url, contenttype, body)
+            {
             }
 
             public Put(string url, string contenttype, int contentlength, Action<Stream> body) : base(url, contenttype, contentlength, body)
             {
-                Method = "PUT";
+            }
+        }
+
+        public class Patch : Post
+        {
+            protected override string DefaultMethod => "PATCH";
+
+            public Patch(string url) : base(url)
+            {
             }
 
-            public Put(string url, string contenttype, Action<Stream> body)
-                : base(url, contenttype, body)
+            public Patch(string url, IDictionary<string, string> postValues) : base(url, postValues)
             {
-                Method = "PUT";
             }
 
-            public Put(string url, string contenttype, Action<XmlTextWriter> body)
-                : base(url, contenttype, body)
+            public Patch(string url, IRequestBodyType typeddata) : base(url, typeddata)
             {
-                Method = "PUT";
             }
 
-            public Put(string url, Action<XmlTextWriter> body)
-                : base(url, body)
+            public Patch(string url, Action<XmlTextWriter> body) : base(url, body)
             {
-                Method = "PUT";
+            }
+
+            public Patch(string url, string contenttype, string body) : base(url, contenttype, body)
+            {
+            }
+
+            public Patch(string url, string contenttype, byte[] body) : base(url, contenttype, body)
+            {
+            }
+
+            public Patch(string url, string contenttype, Action<Stream> body) : base(url, contenttype, body)
+            {
+            }
+
+            public Patch(string url, string contenttype, Action<XmlTextWriter> body) : base(url, contenttype, body)
+            {
+            }
+
+            public Patch(string url, string contenttype, int contentlength, Action<Stream> body) : base(url, contenttype, contentlength, body)
+            {
             }
         }
 
         public class Copy : Request
         {
+            protected override string DefaultMethod => "COPY";
+
             public Copy(string url) : base(url)
             {
-                Method = "COPY";
             }
 
             public Copy(string url, string desturl) : base(url)
             {
-                Method = "COPY";
                 Headers = new Dictionary<string, string>
                 {
                     ["Destination"] = desturl
@@ -316,66 +352,16 @@ namespace SilverSim.Http.Client
             }
         }
 
-        public class Patch : Post
-        {
-            public Patch(string url) : base(url)
-            {
-                Method = "PATCH";
-            }
-
-            public Patch(string url, IDictionary<string, string> postValues) : base(url, postValues)
-            {
-                Method = "PATCH";
-            }
-
-            public Patch(string url, IRequestBodyType typeddata) : base(url, typeddata)
-            {
-                Method = "PATCH";
-            }
-
-            public Patch(string url, string contenttype, string body) : base(url, contenttype, body)
-            {
-                Method = "PATCH";
-            }
-
-            public Patch(string url, string contenttype, byte[] body) : base(url, contenttype, body)
-            {
-                Method = "PATCH";
-            }
-
-            public Patch(string url, string contenttype, Action<Stream> body) : base(url, contenttype, body)
-            {
-                Method = "PATCH";
-            }
-
-            public Patch(string url, string contenttype, int contentlength, Action<Stream> body) : base(url, contenttype, contentlength, body)
-            {
-                Method = "PATCH";
-            }
-
-            public Patch(string url, string contenttype, Action<XmlTextWriter> body)
-                : base(url, contenttype, body)
-            {
-                Method = "PATCH";
-            }
-
-            public Patch(string url, Action<XmlTextWriter> body)
-                : base(url, body)
-            {
-                Method = "PATCH";
-            }
-        }
-
         public class Move : Request
         {
+            protected override string DefaultMethod => "MOVE";
+
             public Move(string url) : base(url)
             {
-                Method = "MOVE";
             }
 
             public Move(string url, string desturl) : base(url)
             {
-                Method = "MOVE";
                 Headers = new Dictionary<string, string>
                 {
                     ["Destination"] = desturl
