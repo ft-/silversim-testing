@@ -213,6 +213,12 @@ namespace SilverSim.Http.Client
             {
                 Method = "PUT";
             }
+
+            public Put(string url, string contenttype, Action<Stream> body)
+                : base(url, contenttype, body)
+            {
+                Method = "PUT";
+            }
         }
 
         public class Copy : Request
