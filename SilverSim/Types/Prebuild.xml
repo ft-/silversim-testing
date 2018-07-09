@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<Project frameworkVersion="v4_5" name="SilverSim.Types" path="SilverSim/Types" type="Library">
+<Project frameworkVersion="v4_5_2" name="SilverSim.Types" path="SilverSim/Types" type="Library">
   <Configuration name="Release">
     <Options>
       <OutputPath>../../bin</OutputPath>
@@ -16,19 +16,19 @@
     </Options>
   </Configuration>
   <ReferencePath>../../bin</ReferencePath>
-  <Reference name="System"/>
-  <Reference name="System.Core"/>
-  <Reference name="System.Xml"/>
-  <Reference name="System.Web"/>
-  <Reference name="SilverSim.Threading" localCopy="false"/>
-  <Reference name="Nini" localCopy="false"/>
-  <Reference name="Ionic.Zip" localCopy="false"/>
-  <Reference name="C5" localCopy="false"/>
+  <Reference name="System" />
+  <Reference name="System.Core" />
+  <Reference name="System.Xml" />
+  <Reference name="System.Web" />
+  <Reference name="SilverSim.Threading" localCopy="false" />
+  <Reference name="Nini" localCopy="false" />
+  <Reference name="Ionic.Zip" localCopy="false" />
+  <Reference name="C5" localCopy="false" />
   <Files>
     <Match pattern="*.cs" recurse="true">
-      <Exclude pattern="TemporaryGeneratedFile"/>
+      <Exclude pattern="TemporaryGeneratedFile" />
     </Match>
-    <Match pattern="ProductAssemblyInfo.cs" path=".." recurse="false"/>
-    <Match pattern="Prebuild.xml" recurse="false" buildAction="None"/>
+    <Match pattern="ProductAssemblyInfo.cs" path=".." recurse="false" />
+    <Match pattern="Prebuild.xml" recurse="false" buildAction="None" />
   </Files>
 </Project>

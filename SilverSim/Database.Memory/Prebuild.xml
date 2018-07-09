@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<Project frameworkVersion="v4_5" name="SilverSim.Database.Memory" path="SilverSim/Database.Memory" type="Library">
+<Project frameworkVersion="v4_5_2" name="SilverSim.Database.Memory" path="SilverSim/Database.Memory" type="Library">
   <Configuration name="Release">
     <Options>
       <OutputPath>../../bin/plugins</OutputPath>
