@@ -262,11 +262,7 @@ namespace SilverSim.Scene.Types.Object
                     {
                         flagsStrs.Add("CameraSource");
                     }
-                    if ((flags & PrimitiveFlags.TemporaryOnRez) != 0)
-                    {
-                        flagsStrs.Add("TemporaryOnRez");
-                    }
-                    if ((flags & PrimitiveFlags.Temporary) != 0)
+                    if ((flags & PrimitiveFlags.TemporaryOnRez) != 0 || (flags & PrimitiveFlags.Temporary) != 0)
                     {
                         flagsStrs.Add("Temporary");
                     }
@@ -925,11 +921,8 @@ namespace SilverSim.Scene.Types.Object
                         break;
 
                     case "TemporaryOnRez":
-                        flags |= PrimitiveFlags.TemporaryOnRez;
-                        break;
-
                     case "Temporary":
-                        flags |= PrimitiveFlags.Temporary;
+                        flags |= PrimitiveFlags.TemporaryOnRez;
                         break;
                 }
             }
