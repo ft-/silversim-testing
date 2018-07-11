@@ -76,7 +76,7 @@ namespace SilverSim.Scene.Types.Object
         public const int LINK_THIS = -4;
         public const int LINK_ROOT = 1;
 
-        private bool m_IsTempOnRez;
+        private bool m_IsTemporary;
         private bool m_IsGroupOwned;
         private bool m_IsIncludedInSearch;
         private AttachmentPoint m_AttachPoint;
@@ -673,17 +673,17 @@ namespace SilverSim.Scene.Types.Object
 
         public bool IsTemporary
         {
-            get { return m_IsTempOnRez; }
+            get { return m_IsTemporary; }
 
             set
             {
                 lock (m_Lock)
                 {
-                    if(m_IsTempOnRez == value)
+                    if(m_IsTemporary == value)
                     {
                         return;
                     }
-                    m_IsTempOnRez = value;
+                    m_IsTemporary = value;
                 }
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
