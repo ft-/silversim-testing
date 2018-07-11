@@ -85,7 +85,7 @@ namespace SilverSim.Types.Asset.Format
             public readonly List<PositionEntry> Positions = new List<PositionEntry>();
         }
 
-        public readonly Dictionary<string, JointMotion> MotionList = new Dictionary<string, JointMotion>();
+        public readonly Dictionary<string, JointMotion> Motions = new Dictionary<string, JointMotion>();
 
         public class Constraint
         {
@@ -100,6 +100,8 @@ namespace SilverSim.Types.Asset.Format
             public double EaseOutStart;
             public double EaseOutStop;
         }
+
+        public readonly List<Constraint> Constraints = new List<Constraint>();
 
         public JointPriority BasePriority { get; private set; }
         public double Duration { get; private set; }
@@ -165,7 +167,7 @@ namespace SilverSim.Types.Asset.Format
                 for(uint motionidx = 0; motionidx < num_motions; ++motionidx)
                 {
                     JointMotion motion = new JointMotion();
-                    MotionList.Add(ReadString(s), motion);
+                    Motions.Add(ReadString(s), motion);
                     int jointPriority = ReadInt32(s);
                     if(jointPriority < (int)JointPriority.UseMotionPriority)
                     {
@@ -241,7 +243,7 @@ namespace SilverSim.Types.Asset.Format
 
                 while(numconstraints-- != 0)
                 {
-                    Constraint c = new Constraint
+                    Constraints.Add(new Constraint
                     {
                         ChainLength = ReadByte(s),
                         ConstraintType = ReadByte(s),
@@ -253,7 +255,7 @@ namespace SilverSim.Types.Asset.Format
                         EaseInStop = ReadFloat(s),
                         EaseOutStart = ReadFloat(s),
                         EaseOutStop = ReadFloat(s)
-                    };
+                    });
                 }
             }
         }
