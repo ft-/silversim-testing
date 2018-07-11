@@ -31,7 +31,6 @@ namespace SilverSim.Types.Asset.Format
         private const short KEYFRAME_MOTION_VERSION = 1;
         private const short KEYFRAME_MOTION_SUBVERSION = 0;
         private const double MAX_PELVIS_OFFSET = 5.0;
-        public const double MAX_ANIM_DURATION = 10;
         public const uint CHARACTER_MAX_ANIMATED_JOINTS = 216;
 
         public enum JointPriority
