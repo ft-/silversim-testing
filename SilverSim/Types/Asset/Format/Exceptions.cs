@@ -25,6 +25,29 @@ using System.Runtime.Serialization;
 namespace SilverSim.Types.Asset.Format
 {
     [Serializable]
+    public class NotAnAnimationFormatException : Exception
+    {
+        public NotAnAnimationFormatException()
+        {
+        }
+
+        public NotAnAnimationFormatException(string message)
+            : base(message)
+        {
+        }
+
+        protected NotAnAnimationFormatException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+        }
+
+        public NotAnAnimationFormatException(string message, Exception innerException)
+            : base(message, innerException)
+        {
+        }
+    }
+
+    [Serializable]
     public class NotAMeshFormatException : Exception
     {
         public NotAMeshFormatException()
