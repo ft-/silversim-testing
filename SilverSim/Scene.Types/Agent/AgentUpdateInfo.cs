@@ -43,6 +43,8 @@ namespace SilverSim.Scene.Types.Agent
 
         public bool IsAttached => false;
 
+        public bool IsTemporary => true;
+
         public bool IsMoving => false;
 
         public bool IsAttachedToPrivate => false;

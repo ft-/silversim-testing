@@ -843,12 +843,8 @@ namespace SilverSim.Scene.Types.Scene
 #endif
 
             grp.IsPhantom = req.IsPhantom;
-            grp.IsTempOnRez = req.IsTemporary;
+            grp.IsTemporary = req.IsTemporary;
             grp.IsPhysics = req.UsePhysics;
-            if(!req.IsTemporary && grp.IsTemporary)
-            {
-                grp.IsTemporary = false;
-            }
             if(req.ExtraPhysics.Count != 0)
             {
                 ObjectFlagUpdate.ExtraPhysicsData d = req.ExtraPhysics[0];

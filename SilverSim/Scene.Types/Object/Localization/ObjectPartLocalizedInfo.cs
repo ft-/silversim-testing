@@ -945,10 +945,6 @@ namespace SilverSim.Scene.Types.Object.Localization
                     }
                     if (objectGroup.IsTemporary)
                     {
-                        primUpdateFlags |= (uint)PrimitiveFlags.Temporary;
-                    }
-                    if (objectGroup.IsTempOnRez)
-                    {
                         primUpdateFlags |= (uint)PrimitiveFlags.TemporaryOnRez;
                     }
 

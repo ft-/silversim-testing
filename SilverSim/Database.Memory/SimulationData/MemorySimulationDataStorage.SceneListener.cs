@@ -124,7 +124,7 @@ namespace SilverSim.Database.Memory.SimulationData
             private Map GenerateUpdateObjectGroup(ObjectGroup objgroup) => new Map
             {
                 { "ID", objgroup.ID },
-                { "IsTempOnRez", objgroup.IsTempOnRez },
+                { "IsTemporary", objgroup.IsTemporary },
                 { "Owner", objgroup.Owner.ToString() },
                 { "LastOwner", objgroup.LastOwner.ToString() },
                 { "Group", objgroup.Group.ToString() },

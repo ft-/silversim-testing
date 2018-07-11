@@ -1910,13 +1910,9 @@ namespace SilverSim.Scene.Types.Object
                         /* get rid of every flag, we do create internally */
                         if (rootGroup != null)
                         {
-                            if ((part.Flags & PrimitiveFlags.Temporary) != 0)
-                            {
-                                rootGroup.IsTemporary = true;
-                            }
                             if ((part.Flags & PrimitiveFlags.TemporaryOnRez) != 0)
                             {
-                                rootGroup.IsTempOnRez = true;
+                                rootGroup.IsTemporary = true;
                             }
                         }
 

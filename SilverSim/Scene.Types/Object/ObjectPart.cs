@@ -1882,7 +1882,7 @@ namespace SilverSim.Scene.Types.Object
                         break;
 
                     case ObjectDetailsType.TempOnRez:
-                        paramList.Add(ObjectGroup.IsTempOnRez);
+                        paramList.Add(ObjectGroup.IsTemporary);
                         break;
 
                     case ObjectDetailsType.LastOwner:

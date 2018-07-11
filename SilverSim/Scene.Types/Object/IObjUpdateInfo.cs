@@ -38,6 +38,8 @@ namespace SilverSim.Scene.Types.Object
 
         bool IsKilled { get; }
 
+        bool IsTemporary { get; }
+
         bool IsAttached { get; }
 
         bool IsMoving { get; }

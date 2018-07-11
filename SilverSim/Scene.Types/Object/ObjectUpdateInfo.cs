@@ -50,6 +50,8 @@ namespace SilverSim.Scene.Types.Object
 
         public bool IsKilled => m_Killed;
 
+        public bool IsTemporary => Part.ObjectGroup.IsTemporary;
+
         public bool IsMoving => Part.IsMoving && Part.ObjectGroup.RootPart == Part;
 
         public bool IsAttached => Part.ObjectGroup.IsAttached;

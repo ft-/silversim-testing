@@ -77,7 +77,6 @@ namespace SilverSim.Scene.Types.Object
         public const int LINK_ROOT = 1;
 
         private bool m_IsTempOnRez;
-        private bool m_IsTemporary;
         private bool m_IsGroupOwned;
         private bool m_IsIncludedInSearch;
         private AttachmentPoint m_AttachPoint;
@@ -674,25 +673,6 @@ namespace SilverSim.Scene.Types.Object
 
         public bool IsTemporary
         {
-            get { return m_IsTemporary; }
-
-            set
-            {
-                lock (m_Lock)
-                {
-                    if(m_IsTemporary == value)
-                    {
-                        return;
-                    }
-                    m_IsTemporary = value;
-                }
-                IsChanged = m_IsChangedEnabled;
-                TriggerOnUpdate(0);
-            }
-        }
-
-        public bool IsTempOnRez
-        {
             get { return m_IsTempOnRez; }
 
             set
@@ -704,7 +684,6 @@ namespace SilverSim.Scene.Types.Object
                         return;
                     }
                     m_IsTempOnRez = value;
-                    m_IsTemporary = m_IsTemporary && m_IsTempOnRez;
                 }
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
@@ -952,7 +931,7 @@ namespace SilverSim.Scene.Types.Object
                         break;
 
                     case PrimitiveParamsType.TempOnRez:
-                        paramList.Add(IsTempOnRez);
+                        paramList.Add(IsTemporary);
                         break;
 
                     case PrimitiveParamsType.Phantom:
@@ -1058,7 +1037,7 @@ namespace SilverSim.Scene.Types.Object
                         break;
 
                     case PrimitiveParamsType.TempOnRez:
-                        IsTempOnRez = ParamsHelper.GetBoolean(enumerator, "PRIM_TEMP_ON_REZ");
+                        IsTemporary = ParamsHelper.GetBoolean(enumerator, "PRIM_TEMP_ON_REZ");
                         break;
 
                     case PrimitiveParamsType.Phantom:

@@ -79,7 +79,7 @@ namespace SilverSim.Database.Memory.SimulationData
         #region helpers
         private ObjectGroup ObjectGroupFromMap(Map map) => new ObjectGroup
         {
-            IsTempOnRez = map["IsTempOnRez"].AsBoolean,
+            IsTemporary = map["IsTemporary"].AsBoolean,
             Owner = new UGUI(map["Owner"].ToString()),
             LastOwner = new UGUI(map["LastOwner"].ToString()),
             Group = new UGI(map["Group"].ToString()),
