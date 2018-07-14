@@ -40,6 +40,7 @@ using SilverSim.ServiceInterfaces.IM;
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.Profile;
+using SilverSim.ServiceInterfaces.Teleport;
 using SilverSim.ServiceInterfaces.Traveling;
 using SilverSim.Types;
 using SilverSim.Types.Account;
@@ -86,6 +87,7 @@ namespace SilverSim.Grid.Standalone
         private GroupsServiceInterface m_LocalGroupsService;
         private readonly string m_LocalEconomyServiceName;
         private EconomyServiceInterface m_LocalEconomyService;
+        public List<TeleportHandlerServiceInterface> m_TeleportProtocols = new List<TeleportHandlerServiceInterface>();
 
         private List<AuthorizationServiceInterface> m_AuthorizationServices;
         private List<IProtocolExtender> m_PacketHandlerPlugins = new List<IProtocolExtender>();
@@ -138,6 +140,7 @@ namespace SilverSim.Grid.Standalone
 
         public void Startup(ConfigurationLoader loader)
         {
+            m_TeleportProtocols = loader.GetServicesByValue<TeleportHandlerServiceInterface>();
             m_Scenes = loader.Scenes;
             m_CapsRedirector = loader.CapsRedirector;
             m_AuthorizationServices = loader.GetServicesByValue<AuthorizationServiceInterface>();
@@ -397,6 +400,7 @@ namespace SilverSim.Grid.Standalone
             {
                 serviceList.Add(m_LocalEconomyService);
             }
+            serviceList.AddRange(m_TeleportProtocols);
 
             var agent = new ViewerAgent(
                 m_Scenes,
