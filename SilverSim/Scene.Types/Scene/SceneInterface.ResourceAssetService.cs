@@ -132,7 +132,7 @@ namespace SilverSim.Scene.Types.Scene
                     s = null;
                     return false;
                 }
-                s = Data[key];
+                s = m_ResourceAssets.GetAsset(key).InputStream;
                 return true;
             }
 
@@ -143,7 +143,7 @@ namespace SilverSim.Scene.Types.Scene
                     assetData = null;
                     return false;
                 }
-                assetData = this[key];
+                assetData = m_ResourceAssets.GetAsset(key);
                 return true;
             }
 
