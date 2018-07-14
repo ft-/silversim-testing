@@ -50,6 +50,7 @@ using SilverSim.Types.Grid;
 using SilverSim.Types.GridUser;
 using SilverSim.Types.Presence;
 using SilverSim.Viewer.Core;
+using SilverSim.Viewer.Core.Teleport;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -87,13 +88,14 @@ namespace SilverSim.Grid.Standalone
         private GroupsServiceInterface m_LocalGroupsService;
         private readonly string m_LocalEconomyServiceName;
         private EconomyServiceInterface m_LocalEconomyService;
-        public List<TeleportHandlerServiceInterface> m_TeleportProtocols = new List<TeleportHandlerServiceInterface>();
+        public List<ITeleportHandlerFactoryServiceInterface> m_TeleportProtocols = new List<ITeleportHandlerFactoryServiceInterface>();
 
         private List<AuthorizationServiceInterface> m_AuthorizationServices;
         private List<IProtocolExtender> m_PacketHandlerPlugins = new List<IProtocolExtender>();
         private string m_GatekeeperURI;
         private CapsHttpRedirector m_CapsRedirector;
         private SceneList m_Scenes;
+        private CommandRegistry m_CommandRegistry;
 
         private readonly string m_GridUserServiceName;
         private readonly string m_GridServiceName;
@@ -140,7 +142,8 @@ namespace SilverSim.Grid.Standalone
 
         public void Startup(ConfigurationLoader loader)
         {
-            m_TeleportProtocols = loader.GetServicesByValue<TeleportHandlerServiceInterface>();
+            m_CommandRegistry = loader.CommandRegistry;
+            m_TeleportProtocols = loader.GetServicesByValue<ITeleportHandlerFactoryServiceInterface>();
             m_Scenes = loader.Scenes;
             m_CapsRedirector = loader.CapsRedirector;
             m_AuthorizationServices = loader.GetServicesByValue<AuthorizationServiceInterface>();
@@ -400,7 +403,10 @@ namespace SilverSim.Grid.Standalone
             {
                 serviceList.Add(m_LocalEconomyService);
             }
-            serviceList.AddRange(m_TeleportProtocols);
+            foreach(ITeleportHandlerFactoryServiceInterface factory in m_TeleportProtocols)
+            {
+                serviceList.Add(factory.Instantiate(m_CommandRegistry, m_CapsRedirector, m_PacketHandlerPlugins, m_Scenes));
+            }
 
             var agent = new ViewerAgent(
                 m_Scenes,
