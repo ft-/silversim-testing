@@ -571,7 +571,7 @@ namespace SilverSim.Viewer.Core
                 m_Log.DebugFormat("Checking Teleport Service {0} for {1}", service.GetType().ToString(), NamedOwner.FullName);
 #endif
 
-                if (service.TeleportTo(sceneInterface, this, regionName, position, lookAt, flags))
+                if (service.TeleportTo(sceneInterface, regionName, position, lookAt, flags))
                 {
                     return true;
                 }
@@ -586,7 +586,7 @@ namespace SilverSim.Viewer.Core
 #if DEBUG
                 m_Log.DebugFormat("Checking Teleport Service {0} for {1}", service.GetType().ToString(), NamedOwner.FullName);
 #endif
-                if (service.TeleportTo(sceneInterface, this, location, position, lookAt, flags))
+                if (service.TeleportTo(sceneInterface, location, position, lookAt, flags))
                 {
                     return true;
                 }
@@ -601,7 +601,7 @@ namespace SilverSim.Viewer.Core
 #if DEBUG
                 m_Log.DebugFormat("Checking Teleport Service {0} for {1}", service.GetType().ToString(), NamedOwner.FullName);
 #endif
-                if (service.TeleportTo(sceneInterface, this, gatekeeperURI, location, position, lookAt, flags))
+                if (service.TeleportTo(sceneInterface, gatekeeperURI, location, position, lookAt, flags))
                 {
                     return true;
                 }
@@ -616,7 +616,7 @@ namespace SilverSim.Viewer.Core
 #if DEBUG
                 m_Log.DebugFormat("Checking Teleport Service {0} for {1}", service.GetType().ToString(), NamedOwner.FullName);
 #endif
-                if (service.TeleportTo(sceneInterface, this, regionID, position, lookAt, flags))
+                if (service.TeleportTo(sceneInterface, regionID, position, lookAt, flags))
                 {
                     return true;
                 }
@@ -631,7 +631,7 @@ namespace SilverSim.Viewer.Core
 #if DEBUG
                 m_Log.DebugFormat("Checking Teleport Service {0} for {1}", service.GetType().ToString(), NamedOwner.FullName);
 #endif
-                if (service.TeleportTo(sceneInterface, this, gatekeeperURI, regionID, position, lookAt, flags))
+                if (service.TeleportTo(sceneInterface, gatekeeperURI, regionID, position, lookAt, flags))
                 {
                     return true;
                 }
@@ -647,7 +647,7 @@ namespace SilverSim.Viewer.Core
 #if DEBUG
                 m_Log.DebugFormat("Checking Teleport Service {0} for {1}", service.GetType().ToString(), NamedOwner.FullName);
 #endif
-                if (service.TeleportHome(sceneInterface, this))
+                if (service.TeleportHome(sceneInterface))
                 {
                     return true;
                 }
@@ -671,6 +671,10 @@ namespace SilverSim.Viewer.Core
         {
             m_Scenes = scenes;
             m_TeleportServices = serviceList.GetAll<IAgentTeleportServiceInterface>();
+            foreach(IAgentTeleportServiceInterface service in m_TeleportServices)
+            {
+                service.Agent = this;
+            }
             CollisionPlane = Vector4.UnitW;
             SessionID = sessionID;
             m_UntrustedAccountInfo = untrustedAccountInfo;
@@ -699,6 +703,7 @@ namespace SilverSim.Viewer.Core
             OnPositionChange -= ChildUpdateOnPositionChange;
             lock (m_DataLock)
             {
+                m_TeleportServices.Clear();
                 m_AssetService = null;
                 m_InventoryService = null;
                 m_GroupsService = null;
