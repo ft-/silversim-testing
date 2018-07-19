@@ -1043,6 +1043,39 @@ namespace SilverSim.Viewer.Core
             ThreadPool.QueueUserWorkItem(ProcessLogoutWorkItem, lr);
         }
 
+        public void DisconnectCircuit(UUID sceneid, bool disconnectRoot = false)
+        {
+            AgentCircuit circuit;
+            if(Circuits.TryGetValue(sceneid, out circuit))
+            {
+                SceneInterface scene = circuit.Scene;
+                if (scene == null)
+                {
+                    return;
+                }
+                if(m_CurrentSceneID == sceneid && !disconnectRoot)
+                {
+                    return;
+                }
+#if DEBUG
+                m_Log.DebugFormat("Removing agent {0}: Removing from scene {1}", ID, scene.ID);
+#endif
+                scene.Remove(this);
+#if DEBUG
+                m_Log.DebugFormat("Removing agent {0}: Stop circuit {1}", ID, scene.ID);
+#endif
+                circuit.Stop();
+#if DEBUG
+                m_Log.DebugFormat("Removing agent {0} from circuit list ({1})", ID, scene.ID);
+#endif
+                Circuits.Remove(scene.ID);
+#if DEBUG
+                m_Log.DebugFormat("Removing agent {0} from scene {1}", ID, scene.ID);
+#endif
+                ((UDPCircuitsManager)scene.UDPServer).RemoveCircuit(circuit);
+            }
+        }
+
         private void ProcessLogoutWorkItem(object o)
         {
             var lr = (LogoutRequest)o;
