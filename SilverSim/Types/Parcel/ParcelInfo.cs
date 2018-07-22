@@ -119,6 +119,15 @@ namespace SilverSim.Types.Parcel
 
     public class ParcelMetaInfo
     {
+        private ParcelFlags m_Flags = ParcelFlags.AllowFly |
+                            ParcelFlags.AllowLandmark |
+                            ParcelFlags.AllowDeedToGroup |
+                            ParcelFlags.AllowTerraform |
+                            ParcelFlags.CreateGroupObjects |
+                            ParcelFlags.AllowGroupScripts |
+                            ParcelFlags.SoundLocal |
+                            ParcelFlags.AllowVoiceChat;
+
         public int Area;
         public uint AuctionID;
         public UGUI AuthBuyer = UGUI.Unknown;
@@ -129,14 +138,6 @@ namespace SilverSim.Types.Parcel
         public UGI Group = UGI.Unknown;
         public bool GroupOwned;
         public string Description = string.Empty;
-        public ParcelFlags Flags = ParcelFlags.AllowFly |
-                            ParcelFlags.AllowLandmark |
-                            ParcelFlags.AllowDeedToGroup |
-                            ParcelFlags.AllowTerraform |
-                            ParcelFlags.CreateGroupObjects |
-                            ParcelFlags.AllowGroupScripts |
-                            ParcelFlags.SoundLocal |
-                            ParcelFlags.AllowVoiceChat;
         public TeleportLandingType LandingType;
         public Vector3 LandingPosition = Vector3.Zero;
         public Vector3 LandingLookAt = Vector3.Zero;
@@ -171,6 +172,33 @@ namespace SilverSim.Types.Parcel
         public bool AnyAvatarSounds = true;
         public bool GroupAvatarSounds = true;
         public bool IsPrivate;
+
+        private readonly object m_Lock = new object();
+
+        public ParcelFlags Flags
+        {
+            get
+            {
+                return m_Flags;
+            }
+            set
+            {
+                lock (m_Lock)
+                {
+                    m_Flags = value;
+                }
+            }
+        }
+
+        public void ModifyFlags(ParcelFlags affected, ParcelFlags value)
+        {
+            lock(m_Lock)
+            {
+                ParcelFlags flags = Flags;
+                flags &= (~affected);
+                Flags = flags | (value & affected);
+            }
+        }
 
         public virtual Vector3 ParcelBasePosition { get; set; }
 
