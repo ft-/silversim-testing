@@ -103,6 +103,7 @@ namespace SilverSim.Types.Asset.Format
         public readonly List<Constraint> Constraints = new List<Constraint>();
 
         public JointPriority BasePriority { get; private set; }
+        /** <summary>duration in seconds</summary> */
         public double Duration { get; private set; }
         public string EmoteName { get; private set; }
         public double LoopInPoint { get; private set; }
