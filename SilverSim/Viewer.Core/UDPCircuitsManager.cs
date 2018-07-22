@@ -409,15 +409,19 @@ namespace SilverSim.Viewer.Core
                         OnNetTest?.Invoke(((IPEndPoint)pck.RemoteEndPoint).Address, LocalPort);
                         return;
                     }
+#if DEBUG
+                    if (mType != MessageType.StartPingCheck)
+                    {
+                        /* do not show that message for a StartPingCheck */
+                        m_Log.DebugFormat("Unmatched endpoint address {0} for UDP server at port {1}", pck.RemoteEndPoint.ToString(), LocalPort);
+                    }
+#endif
                 }
                 catch
                 {
                     /* no action required */
                 }
 
-#if DEBUG
-                m_Log.DebugFormat("Unmatched endpoint address {0} for UDP server at port {1}", pck.RemoteEndPoint.ToString(), LocalPort);
-#endif
                 return;
             }
 
