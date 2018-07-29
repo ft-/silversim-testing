@@ -56,7 +56,14 @@ namespace SilverSim.Scene.Types.Agent
             "taking off",
             "turning left",
             "turning right",
-            "walking"
+            "walking",
+
+            /* extension for underwater movement */
+            "floating",
+            "swimming",
+            "swimmingslow",
+            "swimmingup",
+            "swimmingdown"
         };
 
         private readonly object m_Lock = new object();
@@ -121,6 +128,13 @@ namespace SilverSim.Scene.Types.Agent
             m_DefaultAnimationOverride["turning left"] = "56e0ba0d-4a9f-7f27-6117-32f2ebbf6135";
             m_DefaultAnimationOverride["turning right"] = "2d6daa51-3192-6794-8e2e-a15f8338ec30";
             m_DefaultAnimationOverride["walking"] = "6ed24bd8-91aa-4b12-ccc7-c97c857ab4e0";
+
+            /* Extension for underwater movement */
+            m_DefaultAnimationOverride["floating"] = "4ae8016b-31b9-03bb-c401-b1ea941db41d";
+            m_DefaultAnimationOverride["swimming"] = "aec4610c-757f-bc4e-c092-c6e9caf18daf";
+            m_DefaultAnimationOverride["swimmingslow"] = "2b5a38b2-5e00-3a97-a495-4c826bc443e6";
+            m_DefaultAnimationOverride["swimmingup"] = "62c5de58-cb33-5743-3d07-9e4cd4352864";
+            m_DefaultAnimationOverride["swimmingdown"] = "20f063ea-8306-2562-0b07-5c853b37b31e";
         }
 
         public void SendAnimations()
