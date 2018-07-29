@@ -60,6 +60,40 @@ namespace SilverSim.Scene.Npc
             base.SendAnimations();
         }
 
+        public void StartTyping()
+        {
+            var chatService = CurrentScene.GetService<ChatServiceInterface>();
+            chatService.Send(new ListenEvent
+            {
+                ID = ID,
+                Type = ListenEvent.ChatType.StartTyping,
+                Channel = ListenEvent.PUBLIC_CHANNEL,
+                GlobalPosition = GlobalPosition,
+                Name = Name,
+                Message = string.Empty,
+                TargetID = UUID.Zero,
+                SourceType = ListenEvent.ChatSourceType.Agent,
+                OwnerID = ID
+            });
+        }
+
+        public void StopTyping()
+        {
+            var chatService = CurrentScene.GetService<ChatServiceInterface>();
+            chatService.Send(new ListenEvent
+            {
+                ID = ID,
+                Type = ListenEvent.ChatType.StopTyping,
+                Channel = ListenEvent.PUBLIC_CHANNEL,
+                GlobalPosition = GlobalPosition,
+                Name = Name,
+                Message = string.Empty,
+                TargetID = UUID.Zero,
+                SourceType = ListenEvent.ChatSourceType.Agent,
+                OwnerID = ID
+            });
+        }
+
         public void DoShout(int channel, string text)
         {
             var chatService = CurrentScene.GetService<ChatServiceInterface>();
