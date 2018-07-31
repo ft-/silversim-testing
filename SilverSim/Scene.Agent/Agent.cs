@@ -237,7 +237,6 @@ namespace SilverSim.Scene.Agent
 
         public abstract bool IsRunning { get; }
         public abstract bool IsFlying { get; }
-        public bool IsUnderwater => false;
 
         public UUID ID { get; }
 

@@ -218,6 +218,9 @@ namespace SilverSim.Scene.Physics.Common
             agentTorque = Vector3.Zero;
             Vector3 linearVelocity = Agent.Velocity;
             double horizontalVelocity = linearVelocity.HorizontalLength;
+            Vector3 currentPosition = Agent.GlobalPosition;
+            Vector3 size = Agent.Size;
+
             if (Agent.SittingOnObject != null || Agent.SceneID != m_StateData.SceneID)
             {
                 /* No animation update on disabled physics */
@@ -225,25 +228,26 @@ namespace SilverSim.Scene.Physics.Common
             }
             else if(Agent.IsFlying)
             {
+                bool isUnderwater = currentPosition.Z < LocationInfoProvider.At(currentPosition).WaterHeight;
                 if (horizontalVelocity >= FlySlowFastSpeedSwitchThreshold * SpeedFactor)
                 {
-                    Agent.SetDefaultAnimation(Agent.IsUnderwater ? AnimationState.Swimming : AnimationState.Flying);
+                    Agent.SetDefaultAnimation(isUnderwater ? AnimationState.Swimming : AnimationState.Flying);
                 }
                 else if (horizontalVelocity > 0.2)
                 {
-                    Agent.SetDefaultAnimation(Agent.IsUnderwater ? AnimationState.SwimmingSlow : AnimationState.FlyingSlow);
+                    Agent.SetDefaultAnimation(isUnderwater ? AnimationState.SwimmingSlow : AnimationState.FlyingSlow);
                 }
-                else if(Agent.Velocity.Z > 0.2)
+                else if (Agent.Velocity.Z > 0.2)
                 {
-                    Agent.SetDefaultAnimation(Agent.IsUnderwater ? AnimationState.SwimmingUp : AnimationState.HoveringUp);
+                    Agent.SetDefaultAnimation(isUnderwater ? AnimationState.SwimmingUp : AnimationState.HoveringUp);
                 }
-                else if(Agent.Velocity.Z < -0.2)
+                else if (Agent.Velocity.Z < -0.2)
                 {
-                    Agent.SetDefaultAnimation(Agent.IsUnderwater ? AnimationState.SwimmingDown : AnimationState.HoveringDown);
+                    Agent.SetDefaultAnimation(isUnderwater ? AnimationState.SwimmingDown : AnimationState.HoveringDown);
                 }
                 else
                 {
-                    Agent.SetDefaultAnimation(Agent.IsUnderwater ? AnimationState.Floating : AnimationState.Hovering);
+                    Agent.SetDefaultAnimation(isUnderwater ? AnimationState.Floating : AnimationState.Hovering);
                 }
                 /* TODO: implement taking off */
             }
@@ -270,6 +274,10 @@ namespace SilverSim.Scene.Physics.Common
                 {
                     Agent.SetDefaultAnimation(standing_still ? AnimationState.Crouching : AnimationState.CrouchWalking);
                 }
+                else if (m_ControlFlags.HasUp())
+                {
+                    Agent.SetDefaultAnimation(AnimationState.Prejumping);
+                }
                 else if (!standing_still)
                 {
                     Agent.SetDefaultAnimation(horizontalVelocity >= WalkRunSpeedSwitchThreshold * SpeedFactor ? AnimationState.Running : AnimationState.Walking);
@@ -292,8 +300,6 @@ namespace SilverSim.Scene.Physics.Common
             m_LastKnownBodyRotation = Agent.BodyRotation;
 
             forces.Add(BuoyancyMotor(this, Agent, Vector3.Zero));
-            Vector3 currentPosition = Agent.GlobalPosition;
-            Vector3 size = Agent.Size;
             if (!Agent.IsFlying && currentPosition.Z - size.Z / 2 > LocationInfoProvider.At(currentPosition).GroundHeight)
             {
                 forces.Add(GravityMotor(this, Agent, Vector3.Zero));

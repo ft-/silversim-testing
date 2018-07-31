@@ -106,8 +106,6 @@ namespace SilverSim.Scene.Types.Agent
 
         bool IsRunning { get; }
 
-        bool IsUnderwater { get; }
-
         IAgentTeleportServiceInterface ActiveTeleportService { get; set; }
         void RemoveActiveTeleportService(IAgentTeleportServiceInterface service);
 
