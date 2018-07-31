@@ -28,6 +28,7 @@ using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
 using System.Collections.Generic;
+using AnimationState = SilverSim.Scene.Types.Agent.AgentAnimationController.AnimationState;
 
 namespace SilverSim.Scene.Physics.Common
 {
@@ -226,23 +227,23 @@ namespace SilverSim.Scene.Physics.Common
             {
                 if (horizontalVelocity >= FlySlowFastSpeedSwitchThreshold * SpeedFactor)
                 {
-                    Agent.SetDefaultAnimation("flying");
+                    Agent.SetDefaultAnimation(Agent.IsUnderwater ? AnimationState.Swimming : AnimationState.Flying);
                 }
                 else if (horizontalVelocity > 0.2)
                 {
-                    Agent.SetDefaultAnimation("flyingslow");
+                    Agent.SetDefaultAnimation(Agent.IsUnderwater ? AnimationState.SwimmingSlow : AnimationState.FlyingSlow);
                 }
                 else if(Agent.Velocity.Z > 0.2)
                 {
-                    Agent.SetDefaultAnimation("hovering up");
+                    Agent.SetDefaultAnimation(Agent.IsUnderwater ? AnimationState.SwimmingUp : AnimationState.HoveringUp);
                 }
                 else if(Agent.Velocity.Z < -0.2)
                 {
-                    Agent.SetDefaultAnimation("hovering down");
+                    Agent.SetDefaultAnimation(Agent.IsUnderwater ? AnimationState.SwimmingDown : AnimationState.HoveringDown);
                 }
                 else
                 {
-                    Agent.SetDefaultAnimation("hovering");
+                    Agent.SetDefaultAnimation(Agent.IsUnderwater ? AnimationState.Floating : AnimationState.Hovering);
                 }
                 /* TODO: implement taking off */
             }
@@ -252,33 +253,38 @@ namespace SilverSim.Scene.Physics.Common
                 double groundHeightDiff = Agent.GlobalPositionOnGround.Z - LocationInfoProvider.At(Agent.GlobalPosition).GroundHeight;
                 bool isfalling = Agent.Velocity.Z > 0.1;
                 bool standing_still = horizontalVelocity < StandstillSpeedThreshold;
-                bool iscrouching = false; // groundHeightDiff < -0.1;
+                bool iscrouching = m_ControlFlags.HasDown();
+                AnimationState oldState = Agent.GetDefaultAnimation();
 
                 Vector3 bodyRotDiff = Agent.BodyRotation.GetEulerAngles() - m_LastKnownBodyRotation.GetEulerAngles();
 
-                if(iscrouching)
+                if (isfalling && 
+                    oldState != AnimationState.Running && 
+                    oldState != AnimationState.Walking && 
+                    oldState != AnimationState.Crouching && 
+                    oldState != AnimationState.CrouchWalking)
                 {
-                    Agent.SetDefaultAnimation(standing_still ? "crouching" : "crouchwalking");
+                    Agent.SetDefaultAnimation(AnimationState.FallingDown);
                 }
-                else if (isfalling)
+                else if (iscrouching)
                 {
-                    Agent.SetDefaultAnimation("falling down");
+                    Agent.SetDefaultAnimation(standing_still ? AnimationState.Crouching : AnimationState.CrouchWalking);
                 }
                 else if (!standing_still)
                 {
-                    Agent.SetDefaultAnimation(horizontalVelocity >= WalkRunSpeedSwitchThreshold * SpeedFactor ? "running" : "walking");
+                    Agent.SetDefaultAnimation(horizontalVelocity >= WalkRunSpeedSwitchThreshold * SpeedFactor ? AnimationState.Running : AnimationState.Walking);
                 }
                 else if (m_ControlFlags.HasLeft())
                 {
-                    Agent.SetDefaultAnimation("turning left");
+                    Agent.SetDefaultAnimation(AnimationState.TurningLeft);
                 }
                 else if (m_ControlFlags.HasRight())
                 {
-                    Agent.SetDefaultAnimation("turning right");
+                    Agent.SetDefaultAnimation(AnimationState.TurningRight);
                 }
                 else
                 {
-                    Agent.SetDefaultAnimation("standing");
+                    Agent.SetDefaultAnimation(AnimationState.Standing);
                 }
                 /* TODO: implement striding, prejumping, jumping, soft landing */
             }

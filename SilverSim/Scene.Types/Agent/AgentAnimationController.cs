@@ -27,6 +27,7 @@ using SilverSim.Viewer.Messages.Avatar;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace SilverSim.Scene.Types.Agent
 {
@@ -34,43 +35,101 @@ namespace SilverSim.Scene.Types.Agent
     {
         private static readonly ILog m_Log = LogManager.GetLogger("AGENT ANIMATION");
 
-        private static readonly string[] m_AnimStates = new string[] {
-            "crouching",
-            "crouchwalking",
-            "falling down",
-            "flying",
-            "flyingslow",
-            "hovering",
-            "hovering down",
-            "hovering up",
-            "jumping",
-            "landing",
-            "prejumping",
-            "running",
-            "sitting",
-            "sitting on ground",
-            "standing",
-            "standing up",
-            "striding",
-            "soft landing",
-            "taking off",
-            "turning left",
-            "turning right",
-            "walking",
+        [Serializable]
+        public class AnimationStateAttribute : Attribute
+        {
+            public string Name { get; }
+            public string DefaultID { get; }
 
-            /* extension for underwater movement */
-            "floating",
-            "swimming",
-            "swimmingslow",
-            "swimmingup",
-            "swimmingdown"
-        };
+            public AnimationStateAttribute(string name, string id)
+            {
+                Name = name;
+                DefaultID = id;
+            }
+        }
+
+        public enum AnimationState
+        {
+            [AnimationState("standing", "2408fe9e-df1d-1d7d-f4ff-1384fa7b350f")]
+            Standing,
+
+            [AnimationState("crouching", "201f3fdf-cb1f-dbec-201f-7333e328ae7c")]
+            Crouching,
+            [AnimationState("crouchwalking", "47f5f6fb-22e5-ae44-f871-73aaaf4a6022")]
+            CrouchWalking,
+            [AnimationState("falling down", "666307d9-a860-572d-6fd4-c3ab8865c094")]
+            FallingDown,
+            [AnimationState("flying", "aec4610c-757f-bc4e-c092-c6e9caf18daf")]
+            Flying,
+            [AnimationState("flyingslow", "2b5a38b2-5e00-3a97-a495-4c826bc443e6")]
+            FlyingSlow,
+            [AnimationState("hovering", "4ae8016b-31b9-03bb-c401-b1ea941db41d")]
+            Hovering,
+            [AnimationState("hovering down", "20f063ea-8306-2562-0b07-5c853b37b31e")]
+            HoveringDown,
+            [AnimationState("hovering up", "62c5de58-cb33-5743-3d07-9e4cd4352864")]
+            HoveringUp,
+            [AnimationState("jumping", "2305bd75-1ca9-b03b-1faa-b176b8a8c49e")]
+            Jumping,
+            [AnimationState("landing", "7a17b059-12b2-41b1-570a-186368b6aa6f")]
+            Landing,
+            [AnimationState("prejumping", "7a4e87fe-de39-6fcb-6223-024b00893244")]
+            Prejumping,
+            [AnimationState("running", "05ddbff8-aaa9-92a1-2b74-8fe77a29b445")]
+            Running,
+            [AnimationState("sitting", "1a5fe8ac-a804-8a5d-7cbd-56bd83184568")]
+            Sitting,
+            [AnimationState("sitting on ground", "1c7600d6-661f-b87b-efe2-d7421eb93c86")]
+            SittingOnGround,
+            [AnimationState("standing up", "3da1d753-028a-5446-24f3-9c9b856d9422")]
+            StandingUp,
+            [AnimationState("striding", "1cb562b0-ba21-2202-efb3-30f82cdf9595")]
+            Striding,
+            [AnimationState("soft landing", "7a17b059-12b2-41b1-570a-186368b6aa6f")]
+            SoftLanding,
+            [AnimationState("taking off", "2305bd75-1ca9-b03b-1faa-b176b8a8c49e")]
+            TakingOff,
+            [AnimationState("turning left", "56e0ba0d-4a9f-7f27-6117-32f2ebbf6135")]
+            TurningLeft,
+            [AnimationState("turning right", "2d6daa51-3192-6794-8e2e-a15f8338ec30")]
+            TurningRight,
+            [AnimationState("walking", "6ed24bd8-91aa-4b12-ccc7-c97c857ab4e0")]
+            Walking,
+
+            /* Extension for underwater movement */
+            [AnimationState("floating", "4ae8016b-31b9-03bb-c401-b1ea941db41d")]
+            Floating,
+            [AnimationState("swimming", "aec4610c-757f-bc4e-c092-c6e9caf18daf")]
+            Swimming,
+            [AnimationState("swimmingslow", "2b5a38b2-5e00-3a97-a495-4c826bc443e6")]
+            SwimmingSlow,
+            [AnimationState("swimming up", "62c5de58-cb33-5743-3d07-9e4cd4352864")]
+            SwimmingUp,
+            [AnimationState("swimming down", "20f063ea-8306-2562-0b07-5c853b37b31e")]
+            SwimmingDown
+        }
+
+        private static readonly Dictionary<string, AnimationState> m_StateStringToNumber = new Dictionary<string, AnimationState>();
+        private static readonly Dictionary<AnimationState, string> m_StateNumberToString = new Dictionary<AnimationState, string>();
+        public static readonly Dictionary<AnimationState, UUID> m_DefaultAnimationOverride = new Dictionary<AnimationState, UUID>();
+
+        static AgentAnimationController()
+        {
+            Type aType = typeof(AnimationState);
+            foreach(AnimationState state in aType.GetEnumValues().OfType<AnimationState>())
+            {
+                MemberInfo mi = aType.GetMember(state.ToString()).First();
+                AnimationStateAttribute nameAttr = mi.GetCustomAttribute(typeof(AnimationStateAttribute)) as AnimationStateAttribute;
+                m_DefaultAnimationOverride.Add(state, nameAttr.DefaultID);
+                m_StateNumberToString.Add(state, nameAttr.Name);
+                m_StateStringToNumber.Add(nameAttr.Name, state);
+            }
+        }
 
         private readonly object m_Lock = new object();
-        public readonly Dictionary<string, UUID> m_AnimationOverride = new Dictionary<string, UUID>();
-        public static readonly Dictionary<string, UUID> m_DefaultAnimationOverride = new Dictionary<string, UUID>();
+        public readonly Dictionary<AnimationState, UUID> m_AnimationOverride = new Dictionary<AnimationState, UUID>();
 
-        private string m_CurrentDefaultAnimation = "standing";
+        private AnimationState m_CurrentDefaultAnimation = AnimationState.Standing;
         private uint m_NextAnimSeqNumber;
         private struct AnimationInfo
         {
@@ -96,45 +155,12 @@ namespace SilverSim.Scene.Types.Agent
             m_Agent = agent;
             m_AgentID = agent.ID;
             m_SendAnimations = del;
-            foreach (string s in m_AnimStates)
+            foreach (KeyValuePair<AnimationState, UUID> kvp in m_DefaultAnimationOverride)
             {
-                m_AnimationOverride[s] = m_DefaultAnimationOverride[s];
+                m_AnimationOverride[kvp.Key] = kvp.Value;
             }
-            m_ActiveAnimations.Add(new AnimationInfo(m_AnimationOverride["standing"], 1, UUID.Zero));
+            m_ActiveAnimations.Add(new AnimationInfo(m_AnimationOverride[AnimationState.Standing], 1, UUID.Zero));
             m_NextAnimSeqNumber = 2;
-        }
-
-        static AgentAnimationController()
-        {
-            m_DefaultAnimationOverride["crouching"] = "201f3fdf-cb1f-dbec-201f-7333e328ae7c";
-            m_DefaultAnimationOverride["crouchwalking"] = "47f5f6fb-22e5-ae44-f871-73aaaf4a6022";
-            m_DefaultAnimationOverride["falling down"] = "666307d9-a860-572d-6fd4-c3ab8865c094";
-            m_DefaultAnimationOverride["flying"] = "aec4610c-757f-bc4e-c092-c6e9caf18daf";
-            m_DefaultAnimationOverride["flyingslow"] = "2b5a38b2-5e00-3a97-a495-4c826bc443e6";
-            m_DefaultAnimationOverride["hovering"] = "4ae8016b-31b9-03bb-c401-b1ea941db41d";
-            m_DefaultAnimationOverride["hovering down"] = "20f063ea-8306-2562-0b07-5c853b37b31e";
-            m_DefaultAnimationOverride["hovering up"] = "62c5de58-cb33-5743-3d07-9e4cd4352864";
-            m_DefaultAnimationOverride["jumping"] = "2305bd75-1ca9-b03b-1faa-b176b8a8c49e";
-            m_DefaultAnimationOverride["landing"] = "7a17b059-12b2-41b1-570a-186368b6aa6f";
-            m_DefaultAnimationOverride["prejumping"] = "7a4e87fe-de39-6fcb-6223-024b00893244";
-            m_DefaultAnimationOverride["running"] = "05ddbff8-aaa9-92a1-2b74-8fe77a29b445";
-            m_DefaultAnimationOverride["sitting"] = "1a5fe8ac-a804-8a5d-7cbd-56bd83184568";
-            m_DefaultAnimationOverride["sitting on ground"] = "1c7600d6-661f-b87b-efe2-d7421eb93c86";
-            m_DefaultAnimationOverride["standing"] = "2408fe9e-df1d-1d7d-f4ff-1384fa7b350f";
-            m_DefaultAnimationOverride["standing up"] = "3da1d753-028a-5446-24f3-9c9b856d9422";
-            m_DefaultAnimationOverride["striding"] = "1cb562b0-ba21-2202-efb3-30f82cdf9595";
-            m_DefaultAnimationOverride["soft landing"] = "7a17b059-12b2-41b1-570a-186368b6aa6f";
-            m_DefaultAnimationOverride["taking off"] = "2305bd75-1ca9-b03b-1faa-b176b8a8c49e";
-            m_DefaultAnimationOverride["turning left"] = "56e0ba0d-4a9f-7f27-6117-32f2ebbf6135";
-            m_DefaultAnimationOverride["turning right"] = "2d6daa51-3192-6794-8e2e-a15f8338ec30";
-            m_DefaultAnimationOverride["walking"] = "6ed24bd8-91aa-4b12-ccc7-c97c857ab4e0";
-
-            /* Extension for underwater movement */
-            m_DefaultAnimationOverride["floating"] = "4ae8016b-31b9-03bb-c401-b1ea941db41d";
-            m_DefaultAnimationOverride["swimming"] = "aec4610c-757f-bc4e-c092-c6e9caf18daf";
-            m_DefaultAnimationOverride["swimmingslow"] = "2b5a38b2-5e00-3a97-a495-4c826bc443e6";
-            m_DefaultAnimationOverride["swimmingup"] = "62c5de58-cb33-5743-3d07-9e4cd4352864";
-            m_DefaultAnimationOverride["swimmingdown"] = "20f063ea-8306-2562-0b07-5c853b37b31e";
         }
 
         public void SendAnimations()
@@ -182,64 +208,55 @@ namespace SilverSim.Scene.Types.Agent
             }
         }
 
-        public void ResetAnimationOverride(string anim_state)
+        public void ResetAnimationOverride()
         {
-            if ("ALL" == anim_state)
+            lock (m_Lock)
             {
-                lock (m_Lock)
+                if (m_AnimationOverride[m_CurrentDefaultAnimation] != m_DefaultAnimationOverride[m_CurrentDefaultAnimation])
                 {
-                    if (m_AnimationOverride[m_CurrentDefaultAnimation] != m_DefaultAnimationOverride[m_CurrentDefaultAnimation])
-                    {
-                        StopAnimation(m_AnimationOverride[m_CurrentDefaultAnimation], UUID.Zero);
-                    }
-                    foreach (string animstate in m_AnimStates)
-                    {
-                        m_AnimationOverride[animstate] = m_DefaultAnimationOverride[animstate];
-                    }
-                    if (m_AnimationOverride[m_CurrentDefaultAnimation] != m_DefaultAnimationOverride[m_CurrentDefaultAnimation])
-                    {
-                        PlayAnimation(m_AnimationOverride[m_CurrentDefaultAnimation], UUID.Zero);
-                    }
+                    StopAnimation(m_AnimationOverride[m_CurrentDefaultAnimation], UUID.Zero);
                 }
-            }
-            else if (m_AnimStates.Contains(anim_state))
-            {
-                lock (m_Lock)
+                foreach (KeyValuePair<AnimationState, UUID> kvp in m_DefaultAnimationOverride)
                 {
-                    if (m_CurrentDefaultAnimation == anim_state)
-                    {
-                        ReplaceAnimation(m_DefaultAnimationOverride[anim_state], m_AnimationOverride[anim_state], UUID.Zero);
-                    }
-                    m_AnimationOverride[anim_state] = m_DefaultAnimationOverride[anim_state];
+                    m_AnimationOverride[kvp.Key] = kvp.Value;
+                }
+                if (m_AnimationOverride[m_CurrentDefaultAnimation] != m_DefaultAnimationOverride[m_CurrentDefaultAnimation])
+                {
+                    PlayAnimation(m_AnimationOverride[m_CurrentDefaultAnimation], UUID.Zero);
                 }
             }
         }
 
-        public void SetAnimationOverride(string anim_state, UUID anim_id)
+        public void ResetAnimationOverride(AnimationState anim_state)
         {
-            if (m_AnimStates.Contains(anim_state))
+            lock (m_Lock)
             {
-                lock (m_Lock)
+                if (m_CurrentDefaultAnimation == anim_state)
                 {
-                    if(anim_state == m_CurrentDefaultAnimation)
-                    {
-                        ReplaceAnimation(anim_id, m_AnimationOverride[anim_state], UUID.Zero);
-                    }
-                    m_AnimationOverride[anim_state] = anim_id;
+                    ReplaceAnimation(m_DefaultAnimationOverride[anim_state], m_AnimationOverride[anim_state], UUID.Zero);
                 }
+                m_AnimationOverride[anim_state] = m_DefaultAnimationOverride[anim_state];
             }
         }
 
-        public string GetAnimationOverride(string anim_state)
+        public void SetAnimationOverride(AnimationState anim_state, UUID anim_id)
         {
-            if (m_AnimStates.Contains(anim_state))
+            lock (m_Lock)
             {
-                lock (m_Lock)
+                if(anim_state == m_CurrentDefaultAnimation)
                 {
-                    return (string)m_AnimationOverride[anim_state];
+                    ReplaceAnimation(anim_id, m_AnimationOverride[anim_state], UUID.Zero);
                 }
+                m_AnimationOverride[anim_state] = anim_id;
             }
-            return string.Empty;
+        }
+
+        public string GetAnimationOverride(AnimationState anim_state)
+        {
+            lock (m_Lock)
+            {
+                return (string)m_AnimationOverride[anim_state];
+            }
         }
 
         public void PlayAnimation(UUID animid, UUID objectid)
@@ -341,40 +358,46 @@ namespace SilverSim.Scene.Types.Agent
             return res;
         }
 
-        public void SetDefaultAnimation(string anim_state)
+        public void SetDefaultAnimationString(string anim_state)
         {
-            if (m_AnimStates.Contains(anim_state))
+            AnimationState selState;
+            if (m_StateStringToNumber.TryGetValue(anim_state, out selState))
             {
-                lock (m_Lock)
-                {
-                    if (m_CurrentDefaultAnimation != anim_state)
-                    {
-                        if (!m_IsSitting)
-                        {
-#if DEBUG
-                            m_Log.DebugFormat("Changed default animation to {0} for agent {1}", anim_state, m_AgentID);
-#endif
-                            for (int i = 0; i < m_ActiveAnimations.Count; ++i)
-                            {
-                                if (m_ActiveAnimations[i].AnimID == m_AnimationOverride[m_CurrentDefaultAnimation])
-                                {
-                                    m_ActiveAnimations.RemoveAt(i);
-                                    break;
-                                }
-                            }
-                            ++m_NextAnimSeqNumber;
-                            m_ActiveAnimations.Add(new AnimationInfo(m_AnimationOverride[anim_state], m_NextAnimSeqNumber, m_AgentID));
-                        }
-                        m_CurrentDefaultAnimation = anim_state;
-                    }
-                }
-                m_Agent.PostEvent(new ChangedEvent(ChangedEvent.ChangedFlags.Animation));
-                SendAnimations();
+                SetDefaultAnimation(selState);
             }
             else
             {
                 m_Log.ErrorFormat("Unexpected anim_state {0} set for agent {1}.", anim_state, m_AgentID);
             }
+        }
+
+        public void SetDefaultAnimation(AnimationState anim_state)
+        {
+            lock (m_Lock)
+            {
+                if (m_CurrentDefaultAnimation != anim_state)
+                {
+                    if (!m_IsSitting)
+                    {
+#if DEBUG
+                        m_Log.DebugFormat("Changed default animation to {0} for agent {1}", anim_state.ToString(), m_AgentID);
+#endif
+                        for (int i = 0; i < m_ActiveAnimations.Count; ++i)
+                        {
+                            if (m_ActiveAnimations[i].AnimID == m_AnimationOverride[m_CurrentDefaultAnimation])
+                            {
+                                m_ActiveAnimations.RemoveAt(i);
+                                break;
+                            }
+                        }
+                        ++m_NextAnimSeqNumber;
+                        m_ActiveAnimations.Add(new AnimationInfo(m_AnimationOverride[anim_state], m_NextAnimSeqNumber, m_AgentID));
+                    }
+                    m_CurrentDefaultAnimation = anim_state;
+                }
+            }
+            m_Agent.PostEvent(new ChangedEvent(ChangedEvent.ChangedFlags.Animation));
+            SendAnimations();
         }
 
         public UUID GetDefaultAnimationID()
@@ -385,7 +408,7 @@ namespace SilverSim.Scene.Types.Agent
             }
         }
 
-        public string GetDefaultAnimation()
+        public AnimationState GetDefaultAnimation()
         {
             lock (m_Lock)
             {
@@ -393,20 +416,22 @@ namespace SilverSim.Scene.Types.Agent
             }
         }
 
+        public string GetDefaultAnimationString() => m_StateNumberToString[GetDefaultAnimation()];
+
         bool m_IsSitting;
         public bool IsSitting => m_IsSitting;
-        private string m_CurrentSitDefaultAnimation = string.Empty;
+        private AnimationState m_CurrentSitDefaultAnimation;
 
-        private void Sit(string anim)
+        private void Sit(AnimationState anim)
         {
             lock (m_Lock)
             {
                 if (!m_IsSitting)
                 {
-                    if (m_CurrentDefaultAnimation != "sitting")
+                    if (m_CurrentDefaultAnimation != AnimationState.Sitting)
                     {
 #if DEBUG
-                        m_Log.DebugFormat("Changed default animation to {0} for agent {1}", anim, m_AgentID);
+                        m_Log.DebugFormat("Changed default animation to {0} for agent {1}", anim.ToString(), m_AgentID);
 #endif
                         ReplaceAnimation(m_AnimationOverride[anim], m_AnimationOverride[m_CurrentDefaultAnimation], UUID.Zero);
                     }
@@ -416,7 +441,7 @@ namespace SilverSim.Scene.Types.Agent
                 else if(m_CurrentSitDefaultAnimation != anim)
                 {
 #if DEBUG
-                    m_Log.DebugFormat("Changed default animation to {0} for agent {1}", anim, m_AgentID);
+                    m_Log.DebugFormat("Changed default animation to {0} for agent {1}", anim.ToString(), m_AgentID);
 #endif
                     ReplaceAnimation(m_AnimationOverride[anim], m_AnimationOverride[m_CurrentDefaultAnimation], UUID.Zero);
                     m_CurrentSitDefaultAnimation = anim;
@@ -424,8 +449,8 @@ namespace SilverSim.Scene.Types.Agent
             }
         }
 
-        public void Sit() => Sit("sitting");
-        public void SitOnGround() => Sit("sitting on ground");
+        public void Sit() => Sit(AnimationState.Sitting);
+        public void SitOnGround() => Sit(AnimationState.SittingOnGround);
 
         public void UnSit()
         {

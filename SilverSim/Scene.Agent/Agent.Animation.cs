@@ -31,7 +31,7 @@ namespace SilverSim.Scene.Agent
     {
         protected abstract void SendAnimations(AvatarAnimation m);
 
-        public void SetDefaultAnimation(string anim_state) => m_AnimationController.SetDefaultAnimation(anim_state);
+        public void SetDefaultAnimation(AgentAnimationController.AnimationState anim_state) => m_AnimationController.SetDefaultAnimation(anim_state);
 
         protected void SendAnimations() => m_AnimationController.SendAnimations();
 
@@ -42,11 +42,12 @@ namespace SilverSim.Scene.Agent
         protected void RevokeAnimPermissions(UUID sourceID, ScriptPermissions permissions) => m_AnimationController.RevokePermissions(sourceID, permissions);
 
         #region Server-Side Animation Override
-        public void ResetAnimationOverride(string anim_state) => m_AnimationController.ResetAnimationOverride(anim_state);
+        public void ResetAnimationOverride() => m_AnimationController.ResetAnimationOverride();
+        public void ResetAnimationOverride(AgentAnimationController.AnimationState anim_state) => m_AnimationController.ResetAnimationOverride(anim_state);
 
-        public void SetAnimationOverride(string anim_state, UUID anim_id) => m_AnimationController.SetAnimationOverride(anim_state, anim_id);
+        public void SetAnimationOverride(AgentAnimationController.AnimationState anim_state, UUID anim_id) => m_AnimationController.SetAnimationOverride(anim_state, anim_id);
 
-        public string GetAnimationOverride(string anim_state) => m_AnimationController.GetAnimationOverride(anim_state);
+        public string GetAnimationOverride(AgentAnimationController.AnimationState anim_state) => m_AnimationController.GetAnimationOverride(anim_state);
         #endregion
 
         public void PlayAnimation(UUID animid, UUID objectid) => m_AnimationController.PlayAnimation(animid, objectid);
@@ -63,7 +64,7 @@ namespace SilverSim.Scene.Agent
 
         public void EndSitAnimation() => m_AnimationController.UnSit();
 
-        public string GetDefaultAnimation() => m_AnimationController.GetDefaultAnimation();
+        public AgentAnimationController.AnimationState GetDefaultAnimation() => m_AnimationController.GetDefaultAnimation();
 
         public UUID GetDefaultAnimationID() => m_AnimationController.GetDefaultAnimationID();
 

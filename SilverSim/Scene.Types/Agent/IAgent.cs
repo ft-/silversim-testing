@@ -106,6 +106,8 @@ namespace SilverSim.Scene.Types.Agent
 
         bool IsRunning { get; }
 
+        bool IsUnderwater { get; }
+
         IAgentTeleportServiceInterface ActiveTeleportService { get; set; }
         void RemoveActiveTeleportService(IAgentTeleportServiceInterface service);
 
@@ -157,7 +159,7 @@ namespace SilverSim.Scene.Types.Agent
         void IncreaseHealth(double v);
         void DecreaseHealth(double v);
 
-        void SetDefaultAnimation(string anim_state);
+        void SetDefaultAnimation(AgentAnimationController.AnimationState anim_state);
 
         int AppearanceSerial
         {
@@ -233,13 +235,14 @@ namespace SilverSim.Scene.Types.Agent
 
         Quaternion BodyRotation { get; set; }
 
-        void ResetAnimationOverride(string anim_state);
-        void SetAnimationOverride(string anim_state, UUID anim);
-        string GetAnimationOverride(string anim_state);
+        void ResetAnimationOverride();
+        void ResetAnimationOverride(AgentAnimationController.AnimationState anim_state);
+        void SetAnimationOverride(AgentAnimationController.AnimationState anim_state, UUID anim);
+        string GetAnimationOverride(AgentAnimationController.AnimationState anim_state);
         void PlayAnimation(UUID anim, UUID objectid);
         void StopAnimation(UUID anim, UUID objectid);
         void StopAllAnimations(UUID sourceid);
-        string GetDefaultAnimation(); /* locomotion */
+        AgentAnimationController.AnimationState GetDefaultAnimation(); /* locomotion */
         UUID GetDefaultAnimationID();
         List<UUID> GetPlayingAnimations();
         void BeginSitAnimation();
