@@ -929,7 +929,7 @@ namespace SilverSim.Scene.Implementation.Common
 
         public override void StoreTerrainAsDefault(IAgent agent = null)
         {
-            m_SimulationDataStorage.Terrains.SaveAsDefault(ID);
+            m_TerrainListener.SaveAsDefault();
             if (agent != null)
             {
                 agent.SendAlertMessage(typeof(SceneImplementation).GetLanguageString(agent.CurrentCulture, "DefaultTerrainSaved", "Default terrain saved."), ID);
@@ -959,7 +959,7 @@ namespace SilverSim.Scene.Implementation.Common
             var terrainData = new List<LayerPatch>();
             if (m_SimulationDataStorage.Terrains.TryGetDefault(ID, terrainData))
             {
-                m_SimulationDataStorage.Terrains.SaveAsDefault(ID);
+                m_TerrainListener.SaveAsDefault();
                 Terrain.AllPatches = terrainData;
                 Terrain.Flush();
                 if (agent != null)

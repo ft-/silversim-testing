@@ -29,7 +29,6 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
     {
         List<LayerPatch> this[UUID regionID] { get; }
 
-        void SaveAsDefault(UUID regionID);
         bool TryGetDefault(UUID regionID, List<LayerPatch> list);
     }
 }

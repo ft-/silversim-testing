@@ -220,9 +220,18 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
 
             protected abstract void StorageTerrainThread();
 
-            public void TerrainUpdate(LayerPatch layerpath)
+            public void SaveAsDefault()
             {
-                m_StorageTerrainRequestQueue.Enqueue(layerpath);
+                m_StorageTerrainRequestQueue.Enqueue(null);
+            }
+
+            public void TerrainUpdate(LayerPatch layerpatch)
+            {
+                if(layerpatch == null)
+                {
+                    throw new ArgumentNullException(nameof(layerpatch));
+                }
+                m_StorageTerrainRequestQueue.Enqueue(layerpatch);
             }
         }
 
