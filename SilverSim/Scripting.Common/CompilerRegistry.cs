@@ -188,7 +188,14 @@ namespace SilverSim.Scripting.Common
                 {
                     if(disposing)
                     {
-                        m_InnerReader.Dispose();
+                        try
+                        {
+                            m_InnerReader.Dispose();
+                        }
+                        catch(ObjectDisposedException)
+                        {
+                            /* ignore this one */
+                        }
                     }
                 }
 
