@@ -597,10 +597,29 @@ namespace SilverSim.Scene.Types.Object
                     valid = valid && ((sbyte)PathShearY / 100.0).IsInRange(-0.5, 0.5);
                     valid = valid && (PathTwistBegin / 100.0).IsInRange(-1, 1);
                     valid = valid && (PathTwist / 100.0).IsInRange(-1, 1);
-                    //valid = valid && (PathRadiusOffset / 100.0); TODO: see LLVolumeParams.setRadiusOffset for this
+                    double radius_offset = PathRadiusOffset / 100.0;
+                    double radius_mag = Math.Abs(radius_offset);
+                    double hole_y_mag = Math.Abs(PathScaleY / 100.0 - 1);
+                    double taper_y = PathTaperY / 100.0;
+                    double taper_y_mag = Math.Abs(taper_y);
+                    if(radius_offset * taper_y < 0)
+                    {
+                        taper_y_mag = 0;
+                    }
+                    double max_radius_mag = 1.0 - hole_y_mag * (1.0 - taper_y_mag) / (1.0 - hole_y_mag);
+                    valid = valid && (radius_mag <= max_radius_mag);
                     valid = valid && (PathTaperX / 100.0).IsInRange(-1, 1);
                     valid = valid && (PathTaperY / 100.0).IsInRange(-1, 1);
                     valid = valid && (PathRevolutions / 100.0 + 1).IsInRange(1, 4);
+                    double revs = PathRevolutions / 100.0 + 1;
+                    double skew_mag = Math.Abs(PathSkew / 100.0);
+                    double scale_x = PathScaleX / 100.0 - 1.0;
+                    double min_skew_mag = 1.0 - 1.0 / (revs * scale_x + 1.0);
+                    if(Math.Abs(revs - 1.0) < 0.001)
+                    {
+                        min_skew_mag = 0;
+                    }
+                    valid = valid && (min_skew_mag <= skew_mag);
                     valid = valid && (PathSkew / 100.0).IsInRange(-1, 1);
                     valid = valid && (SculptType & PrimitiveSculptType.TypeMask) <= PrimitiveSculptType.Mesh;
                     return valid;
@@ -698,11 +717,39 @@ namespace SilverSim.Scene.Types.Object
                     PathScaleY = (byte)(value.PathScale.Y * 100 + 100).Clamp(0, 200);
                     PathTwistBegin = (sbyte)(value.TwistBegin * 100).Clamp(-100, 100);
                     PathTwist = (sbyte)(value.TwistEnd * 100).Clamp(-100, 100);
-                    PathRadiusOffset = (sbyte)(value.RadiusOffset * 100).Clamp(-100, 100);
+                    double hole_y_mag = Math.Abs(value.PathScale.Y);
+                    double taper_y_mag = Math.Abs(value.Taper.Y);
+                    if(value.RadiusOffset * value.Taper.Y < 0)
+                    {
+                        taper_y_mag = 0;
+                    }
+                    double max_radius_mag = 1.0 - hole_y_mag * (1.0 - taper_y_mag) / (1.0 - hole_y_mag);
+                    if (Math.Abs(value.RadiusOffset) > max_radius_mag)
+                    {
+                        double max_radius = max_radius_mag * Math.Sign(value.RadiusOffset);
+                        PathRadiusOffset = (sbyte)(max_radius * 100).Clamp(-100, 100);
+                    }
+                    else
+                    {
+                        PathRadiusOffset = (sbyte)(value.RadiusOffset * 100).Clamp(-100, 100);
+                    }
                     PathTaperX = (sbyte)(value.Taper.X * 100).Clamp(-100, 100);
                     PathTaperY = (sbyte)(value.Taper.Y * 100).Clamp(-100, 100);
                     PathRevolutions = (byte)((value.Revolutions.Clamp(1, 4) - 1) * 100);
-                    PathSkew = (sbyte)(value.Skew * 100).Clamp(-100, 100);
+                    double min_skew_mag = 1.0 - 1.0 / (PathRevolutions * PathScaleX + 1.0);
+                    if(Math.Abs(PathRevolutions - 1.0) < 0.001)
+                    {
+                        min_skew_mag = 0.0;
+                    }
+                    if (Math.Abs(value.Skew) < min_skew_mag)
+                    {
+                        double min_skew = min_skew_mag * Math.Sin(value.Skew);
+                        PathSkew = (sbyte)(min_skew * 100).Clamp(-100, 100);
+                    }
+                    else
+                    {
+                        PathSkew = (sbyte)(value.Skew * 100).Clamp(-100, 100);
+                    }
                 }
             }
 
@@ -976,11 +1023,29 @@ namespace SilverSim.Scene.Types.Object
                             revolutions = revolutions.Clamp(1f, 4f);
                             tempFloat = 66.66667f * (revolutions - 1.0f);
                             shape.PathRevolutions = (byte)tempFloat;
-                            // limits on radiusoffset depend on revolutions and hole size (how?) seems like the maximum range is 0 to 1
-                            radiusOffset = radiusOffset.Clamp(0f, 1f);
+                            double hole_y_mag = Math.Abs(holeSize.Y);
+                            double taper_y_mag = Math.Abs(taper.Y);
+                            if(radiusOffset * taper.Y < 0)
+                            {
+                                taper_y_mag = 0;
+                            }
+                            double max_radius_mag = 1.0 - hole_y_mag * (1.0 - taper_y_mag) / (1.0 - hole_y_mag);
+                            if(Math.Abs(radiusOffset) > max_radius_mag)
+                            {
+                                radiusOffset = Math.Sign(radiusOffset) * max_radius_mag;
+                            }
                             tempFloat = 100.0f * radiusOffset;
                             shape.PathRadiusOffset = (sbyte)tempFloat;
                             skew = skew.Clamp(-0.95f, 0.95f);
+                            double min_skew_mag = 1.0 - 1.0 / (revolutions * holeSize.X + 1.0);
+                            if(Math.Abs(revolutions - 1.0) < 0.001)
+                            {
+                                min_skew_mag = 0;
+                            }
+                            if(Math.Abs(skew) < min_skew_mag)
+                            {
+                                skew = Math.Sin(skew) * min_skew_mag;
+                            }
                             tempFloat = 100.0f * skew;
                             shape.PathSkew = (sbyte)tempFloat;
                             break;
