@@ -1036,7 +1036,6 @@ namespace SilverSim.Scene.Types.Object
                             }
                             tempFloat = 100.0f * radiusOffset;
                             shape.PathRadiusOffset = (sbyte)tempFloat;
-                            skew = skew.Clamp(-0.95f, 0.95f);
                             double min_skew_mag = 1.0 - 1.0 / (revolutions * holeSize.X + 1.0);
                             if(Math.Abs(revolutions - 1.0) < 0.001)
                             {
@@ -1046,6 +1045,7 @@ namespace SilverSim.Scene.Types.Object
                             {
                                 skew = Math.Sin(skew) * min_skew_mag;
                             }
+                            skew = skew.Clamp(-0.95f, 0.95f);
                             tempFloat = 100.0f * skew;
                             shape.PathSkew = (sbyte)tempFloat;
                             break;
