@@ -688,6 +688,29 @@ namespace SilverSim.Scene.Types.Object
                     d.Skew = (PathSkew / 100.0).Clamp(-1f, 1f);
                     #endregion
 
+                    /* prim param limiters */
+                    double hole_y_mag = Math.Abs(d.PathScale.Y);
+                    double taper_y_mag = Math.Abs(d.Taper.Y);
+                    if (d.RadiusOffset * d.Taper.Y < 0)
+                    {
+                        taper_y_mag = 0;
+                    }
+                    double max_radius_mag = 1.0 - hole_y_mag * (1.0 - taper_y_mag) / (1.0 - hole_y_mag);
+                    if(Math.Abs(d.RadiusOffset) > max_radius_mag)
+                    {
+                        d.RadiusOffset = Math.Sign(d.RadiusOffset) * max_radius_mag;
+                    }
+
+                    double min_skew_mag = 1.0 - 1.0 / (PathRevolutions * PathScaleX + 1.0);
+                    if (Math.Abs(PathRevolutions - 1.0) < 0.001)
+                    {
+                        min_skew_mag = 0.0;
+                    }
+                    if (Math.Abs(d.Skew) < min_skew_mag)
+                    {
+                        d.Skew = min_skew_mag * Math.Sin(d.Skew);
+                    }
+
                     return d;
                 }
 
