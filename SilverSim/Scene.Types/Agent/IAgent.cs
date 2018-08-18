@@ -149,7 +149,9 @@ namespace SilverSim.Scene.Types.Agent
 
         byte[] VisualParams { get; set; }
 
-        ObjectGroup SittingOnObject { get; set; }
+        ObjectGroup SittingOnObject { get; }
+        void SetSittingOn(ObjectGroup sitOn, Vector3 position, Quaternion rotation);
+        void ClearSittingOn(Vector3 targetPosition, Quaternion targetRotation);
 
         [Description("Health in %")]
         double Health { get; set; }

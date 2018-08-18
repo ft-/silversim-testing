@@ -149,6 +149,10 @@ namespace SilverSim.Scene.Agent
         }
 
         public abstract AgentUpdateInfo GetUpdateInfo(UUID sceneID);
+        public void IncUpdateInfoSerialNo()
+        {
+            GetUpdateInfo(SceneID)?.IncSerialNumber();
+        }
 
         public abstract void SendKillObject(UUID sceneID);
 
@@ -205,6 +209,36 @@ namespace SilverSim.Scene.Agent
 
         public bool AllowUnsit { get; set; }
 
+        public void SetSittingOn(ObjectGroup sitOn, Vector3 position, Quaternion rotation)
+        {
+            if(sitOn == null)
+            {
+                throw new ArgumentNullException(nameof(sitOn));
+            }
+            lock (m_DataLock)
+            {
+                m_SittingOnObject = sitOn;
+                m_GlobalRotation = rotation * sitOn.GlobalRotation;
+                m_GlobalPosition = position * sitOn.GlobalRotation + sitOn.GlobalPosition;
+            }
+            IncUpdateInfoSerialNo();
+        }
+
+        public void ClearSittingOn(Vector3 targetPosition, Quaternion targetRotation)
+        {
+            lock (m_DataLock)
+            {
+                if (m_SittingOnObject != null)
+                {
+                    m_SittingOnObject = null;
+                    m_GlobalPosition = targetPosition;
+                    m_GlobalRotation = targetRotation;
+                    AllowUnsit = false;
+                }
+            }
+            IncUpdateInfoSerialNo();
+        }
+
         public ObjectGroup SittingOnObject
         {
             /* we need to guard against our position routines and so on */
@@ -213,24 +247,6 @@ namespace SilverSim.Scene.Agent
                 lock (m_DataLock)
                 {
                     return m_SittingOnObject;
-                }
-            }
-            set
-            {
-                lock (m_DataLock)
-                {
-                    Vector3 eulers = GlobalRotation.GetEulerAngles();
-                    Vector3 l = GlobalPosition;
-                    l.Z += Size.Z / 2;
-                    Quaternion q = Quaternion.CreateFromEulers(0, 0, eulers.Z);
-                    bool isUnsit = m_SittingOnObject != null && value == null;
-                    m_SittingOnObject = value;
-                    if(isUnsit)
-                    {
-                        GlobalRotation = q;
-                        GlobalPosition = l;
-                        AllowUnsit = false;
-                    }
                 }
             }
         }
@@ -336,6 +352,7 @@ namespace SilverSim.Scene.Agent
                         value + m_SittingOnObject.Position :
                         value;
                 }
+                IncUpdateInfoSerialNo();
                 InvokeOnPositionUpdate();
             }
         }
@@ -356,6 +373,7 @@ namespace SilverSim.Scene.Agent
                 {
                     m_Velocity = value;
                 }
+                IncUpdateInfoSerialNo();
             }
         }
 
@@ -375,6 +393,7 @@ namespace SilverSim.Scene.Agent
                 {
                     m_AngularVelocity = value;
                 }
+                IncUpdateInfoSerialNo();
             }
         }
 
@@ -394,6 +413,7 @@ namespace SilverSim.Scene.Agent
                 {
                     m_AngularAcceleration = value;
                 }
+                IncUpdateInfoSerialNo();
             }
         }
 
@@ -412,6 +432,7 @@ namespace SilverSim.Scene.Agent
                 {
                     m_GlobalPosition = value;
                 }
+                IncUpdateInfoSerialNo();
                 InvokeOnPositionUpdate();
             }
         }
@@ -435,6 +456,7 @@ namespace SilverSim.Scene.Agent
                         value + m_SittingOnObject.Position :
                         value;
                 }
+                IncUpdateInfoSerialNo();
                 InvokeOnPositionUpdate();
             }
         }
@@ -456,6 +478,7 @@ namespace SilverSim.Scene.Agent
                 {
                     m_Acceleration = value;
                 }
+                IncUpdateInfoSerialNo();
             }
         }
 
@@ -480,6 +503,7 @@ namespace SilverSim.Scene.Agent
                         value / m_SittingOnObject.Rotation :
                         value;
                 }
+                IncUpdateInfoSerialNo();
                 InvokeOnPositionUpdate();
             }
         }
@@ -503,6 +527,7 @@ namespace SilverSim.Scene.Agent
                         value * m_SittingOnObject.Rotation :
                         value;
                 }
+                IncUpdateInfoSerialNo();
                 InvokeOnPositionUpdate();
             }
         }
@@ -522,6 +547,7 @@ namespace SilverSim.Scene.Agent
                 {
                     LocalRotation = value;
                 }
+                IncUpdateInfoSerialNo();
             }
         }
 

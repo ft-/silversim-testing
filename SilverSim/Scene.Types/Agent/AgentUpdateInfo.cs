@@ -24,6 +24,7 @@ using SilverSim.Types;
 using SilverSim.Types.Primitive;
 using System;
 using System.Globalization;
+using System.Threading;
 
 namespace SilverSim.Scene.Types.Agent
 {
@@ -49,7 +50,28 @@ namespace SilverSim.Scene.Types.Agent
 
         public bool IsAttachedToPrivate => false;
 
-        public int SerialNumber { get; }
+        private int m_UpdateSerialNumber = 1;
+
+        public void IncSerialNumber()
+        {
+            if(0 == Interlocked.Increment(ref m_UpdateSerialNumber))
+            {
+                Interlocked.CompareExchange(ref m_UpdateSerialNumber, 1, 0);
+            }
+        }
+
+        public int SerialNumber
+        {
+            get
+            {
+                int sno = Interlocked.CompareExchange(ref m_UpdateSerialNumber, 1, 0);
+                if(sno == 0)
+                {
+                    sno = 1;
+                }
+                return sno;
+            }
+        }
 
         public enum FullFixedBlock1Offset
         {

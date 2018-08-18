@@ -1282,21 +1282,24 @@ namespace SilverSim.Scene.Types.Object
                     }
 
                     m_Group.m_SittingAgents.Add(agent, sitOnTarget);
-                    agent.SittingOnObject = sitOnTarget.ObjectGroup;
                 }
+                Vector3 localPosition;
+                Quaternion localRotation;
+
                 agent.AllowUnsit = sitOnTarget.AllowUnsit;
 
                 if(sitOnTarget.IsSitTargetActive)
                 {
-                    agent.LocalPosition = sitOnTarget.SitTargetOffset - SIT_TARGET_OFFSET;
-                    agent.LocalRotation = sitOnTarget.SitTargetOrientation;
+                    localPosition = sitOnTarget.SitTargetOffset - SIT_TARGET_OFFSET;
+                    localRotation = sitOnTarget.SitTargetOrientation;
                 }
                 else
                 {
-                    agent.LocalPosition = preferedOffset;
-                    agent.GlobalRotation = Quaternion.Identity;
+                    localPosition = preferedOffset;
+                    localRotation = Quaternion.Identity;
 #warning Implement Unscripted sit here
                 }
+                agent.SetSittingOn(sitOnTarget.ObjectGroup, localPosition, localRotation);
 
                 /* we have to set those to zero */
                 agent.Velocity = Vector3.Zero;
@@ -1395,24 +1398,26 @@ namespace SilverSim.Scene.Types.Object
                         satOn = agent.SittingOnObject;
                         Vector3 formerPos = agent.GlobalPosition;
                         Quaternion formerRot = agent.GlobalRotation;
-                        agent.SittingOnObject = null;
+                        Vector3 realTargetPosition;
+                        Quaternion realTargetRotation;
                         if(paramTarget)
                         {
-                            agent.GlobalPosition = targetPos * satOnTarget.ObjectGroup.RootPart.GlobalRotation + satOnTarget.ObjectGroup.RootPart.GlobalPosition + agent.Size / 2;
+                            realTargetPosition = targetPos * satOnTarget.ObjectGroup.RootPart.GlobalRotation + satOnTarget.ObjectGroup.RootPart.GlobalPosition + agent.Size / 2;
                             Quaternion q = targetRot * satOnTarget.ObjectGroup.RootPart.GlobalRotation;
-                            agent.GlobalRotation = Quaternion.CreateFromEulers(0, 0, q.GetEulerAngles().Z);
+                            realTargetRotation = Quaternion.CreateFromEulers(0, 0, q.GetEulerAngles().Z);
                         }
                         else if (satOnTarget.IsUnSitTargetActive)
                         {
-                            agent.GlobalPosition = satOnTarget.UnSitTargetOffset * satOnTarget.GlobalRotation + satOnTarget.GlobalPosition + agent.Size / 2;
+                            realTargetPosition = satOnTarget.UnSitTargetOffset * satOnTarget.GlobalRotation + satOnTarget.GlobalPosition + agent.Size / 2;
                             Quaternion q = satOnTarget.UnSitTargetOrientation * satOnTarget.GlobalRotation;
-                            agent.GlobalRotation = Quaternion.CreateFromEulers(0, 0, q.GetEulerAngles().Z);
+                            realTargetRotation = Quaternion.CreateFromEulers(0, 0, q.GetEulerAngles().Z);
                         }
                         else
                         {
-                            agent.GlobalPosition = formerPos + agent.Size / 2;
-                            agent.GlobalRotation = Quaternion.CreateFromEulers(0, 0, formerRot.GetEulerAngles().Z);
+                            realTargetPosition = formerPos + agent.Size / 2;
+                            realTargetRotation = Quaternion.CreateFromEulers(0, 0, formerRot.GetEulerAngles().Z);
                         }
+                        agent.ClearSittingOn(realTargetPosition, realTargetRotation);
                     }
                 }
 
