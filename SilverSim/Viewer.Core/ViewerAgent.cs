@@ -745,10 +745,8 @@ namespace SilverSim.Viewer.Core
                 new RwLockedList<UUID>();
         }
 
-        public override ScriptPermissions RequestPermissions(ObjectPart part, UUID itemID, ScriptPermissions permissions)
-        {
-            return RequestPermissions(part, itemID, permissions, UUID.Zero);
-        }
+        public override ScriptPermissions RequestPermissions(ObjectPart part, UUID itemID, ScriptPermissions permissions) =>
+            RequestPermissions(part, itemID, permissions, UUID.Zero);
 
         public override ScriptPermissions RequestPermissions(ObjectPart part, UUID itemID, ScriptPermissions permissions, UUID experienceID)
         {
@@ -759,6 +757,7 @@ namespace SilverSim.Viewer.Core
                 autoGrant |= ScriptPermissions.ControlCamera;
                 autoGrant |= ScriptPermissions.TakeControls;
                 autoGrant |= ScriptPermissions.TrackCamera;
+                autoGrant |= ScriptPermissions.TriggerAnimation;
             }
             if(part.ObjectGroup.AttachPoint != Types.Agent.AttachmentPoint.NotAttached)
             {
@@ -790,10 +789,8 @@ namespace SilverSim.Viewer.Core
             return ScriptPermissions.None;
         }
 
-        public override void RevokePermissions(UUID sourceID, UUID itemID, ScriptPermissions permissions)
-        {
+        public override void RevokePermissions(UUID sourceID, UUID itemID, ScriptPermissions permissions) =>
             RevokeAnimPermissions(sourceID, permissions);
-        }
 
         public override bool WaitsForExperienceResponse(ObjectPart part, UUID itemID)
         {
