@@ -144,7 +144,7 @@ namespace SilverSim.Types.Asset
                 {
                     type = AssetType.Bodypart;
                 }
-                else if (value.EndsWith("_animation.bvh"))
+                else if (value.EndsWith("_animation.bvh") || value.EndsWith("_animation.anim"))
                 {
                     type = AssetType.Animation;
                 }
