@@ -24,6 +24,7 @@ using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
 using SilverSim.Types.Estate;
 using SilverSim.Types.Parcel;
+using SilverSim.Viewer.Messages.Script;
 using System;
 
 namespace SilverSim.Scene.Npc
@@ -58,12 +59,20 @@ namespace SilverSim.Scene.Npc
 
         public override void SendMessageAlways(SilverSim.Viewer.Messages.Message m, UUID fromSceneID)
         {
-            /* ignored */
+            Type t = m.GetType();
+            if(t == typeof(ScriptDialog))
+            {
+                HandleScriptDialog((ScriptDialog)m, fromSceneID);
+            }
         }
 
         public override void SendMessageIfRootAgent(SilverSim.Viewer.Messages.Message m, UUID fromSceneID)
         {
-            /* ignored */
+            Type t = m.GetType();
+            if (t == typeof(ScriptDialog))
+            {
+                HandleScriptDialog((ScriptDialog)m, fromSceneID);
+            }
         }
 
         public override void SendRegionNotice(UGUI fromAvatar, string message, UUID fromSceneID)

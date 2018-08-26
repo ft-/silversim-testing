@@ -27,6 +27,8 @@ using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.IM;
+using SilverSim.Viewer.Messages.Script;
+using System;
 using System.Collections.Generic;
 
 namespace SilverSim.Scene.Npc
@@ -339,5 +341,53 @@ namespace SilverSim.Scene.Npc
             }
             m_ScriptedChatListeners.RemoveIf(objectid, (RwLockedDictionary<UUID, int> list) => list.Count == 0);
         }
+
+        private readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, Func<ScriptDialog, IScriptEvent>>> m_ScriptedDialogListeners = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, Func<ScriptDialog, IScriptEvent>>>(() => new RwLockedDictionary<UUID, Func<ScriptDialog, IScriptEvent>>());
+
+        private void HandleScriptDialog(ScriptDialog dialog, UUID fromSceneID)
+        {
+            foreach (KeyValuePair<UUID, RwLockedDictionary<UUID, Func<ScriptDialog, IScriptEvent>>> kvp in m_ScriptedDialogListeners)
+            {
+                ObjectPart part;
+                ObjectPartInventoryItem item;
+                if (CurrentScene.Primitives.TryGetValue(kvp.Key, out part))
+                {
+                    foreach (KeyValuePair<UUID, Func<ScriptDialog, IScriptEvent>> kvpinner in kvp.Value)
+                    {
+                        if (part.Inventory.TryGetValue(kvpinner.Key, out item))
+                        {
+                            ScriptInstance instance = item.ScriptInstance;
+
+                            /* Translate listen event to mapped channel */
+                            IScriptEvent ev = kvpinner.Value(dialog);
+                            if (ev != null)
+                            {
+                                instance?.PostEvent(ev);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    m_ScriptedDialogListeners.Remove(kvp.Key);
+                }
+            }
+        }
+
+        public void ListenDialogNpc(UUID objectid, UUID itemid, Func<ScriptDialog, IScriptEvent> func)
+        {
+            m_ScriptedDialogListeners[objectid][itemid] = func;
+        }
+
+        public void UnlistenDialogNpc(UUID objectid, UUID itemid)
+        {
+            RwLockedDictionary<UUID, Func<ScriptDialog, IScriptEvent>> itemlist;
+            if (m_ScriptedDialogListeners.TryGetValue(objectid, out itemlist))
+            {
+                itemlist.Remove(itemid);
+            }
+            m_ScriptedDialogListeners.RemoveIf(objectid, (RwLockedDictionary<UUID, Func<ScriptDialog, IScriptEvent>> list) => list.Count == 0);
+        }
+
     }
 }
