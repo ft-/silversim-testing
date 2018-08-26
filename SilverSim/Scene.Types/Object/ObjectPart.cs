@@ -1946,7 +1946,7 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region Script Events
-        private void PostCollisionEvent(CollisionEvent ev)
+        private void PostCollisionEvent(CollisionEvent ev, bool filterExperience, UUID experienceID)
         {
             foreach(ObjectPartInventoryItem item in Inventory.Values)
             {
@@ -1954,7 +1954,10 @@ namespace SilverSim.Scene.Types.Object
                 if(string.IsNullOrEmpty(filter.Name) && filter.ID == UUID.Zero && filter.Type == ObjectPartInventoryItem.CollisionFilterEnum.Accept)
                 {
                     /* unfiltered so leave it unmodified */
-                    item.ScriptInstance?.PostEvent(ev);
+                    if (!filterExperience || experienceID == item.ExperienceID)
+                    {
+                        item.ScriptInstance?.PostEvent(ev);
+                    }
                 }
                 else
                 {
@@ -1976,7 +1979,7 @@ namespace SilverSim.Scene.Types.Object
                         evnew.Detected.Add(info);
                     }
 
-                    if(evnew.Detected.Count != 0)
+                    if(evnew.Detected.Count != 0 && (!filterExperience || experienceID == item.ExperienceID))
                     {
                         /* only post event if at least one passed the filter */
                         item.ScriptInstance?.PostEvent(evnew);
@@ -1989,13 +1992,31 @@ namespace SilverSim.Scene.Types.Object
         {
             if (ev.GetType() == typeof(CollisionEvent))
             {
-                PostCollisionEvent((CollisionEvent)ev);
+                PostCollisionEvent((CollisionEvent)ev, false, UUID.Zero);
             }
             else
             {
                 foreach (ObjectPartInventoryItem item in Inventory.Values)
                 {
                     item.ScriptInstance?.PostEvent(ev);
+                }
+            }
+        }
+
+        public void PostEvent(IScriptEvent ev, UUID experienceIDfilter)
+        {
+            if (ev.GetType() == typeof(CollisionEvent))
+            {
+                PostCollisionEvent((CollisionEvent)ev, true, experienceIDfilter);
+            }
+            else
+            {
+                foreach (ObjectPartInventoryItem item in Inventory.Values)
+                {
+                    if (item.ExperienceID == experienceIDfilter)
+                    {
+                        item.ScriptInstance?.PostEvent(ev);
+                    }
                 }
             }
         }
