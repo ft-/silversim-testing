@@ -181,7 +181,14 @@ namespace SilverSim.Scripting.Common
 
                 public override void Close()
                 {
-                    m_InnerReader.Close();
+                    try
+                    {
+                        m_InnerReader.Close();
+                    }
+                    catch
+                    {
+                        /* ignore this one */
+                    }
                 }
 
                 protected override void Dispose(bool disposing)
@@ -192,7 +199,7 @@ namespace SilverSim.Scripting.Common
                         {
                             m_InnerReader.Dispose();
                         }
-                        catch(ObjectDisposedException)
+                        catch
                         {
                             /* ignore this one */
                         }
