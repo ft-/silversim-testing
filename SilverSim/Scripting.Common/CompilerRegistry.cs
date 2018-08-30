@@ -187,7 +187,7 @@ namespace SilverSim.Scripting.Common
                     }
                     catch
                     {
-                        /* ignore this one */
+                        /* ignore this one. There are some code pathes triggering a double dispose */
                     }
                 }
 
@@ -201,7 +201,7 @@ namespace SilverSim.Scripting.Common
                         }
                         catch
                         {
-                            /* ignore this one */
+                            /* ignore this one. There are some code pathes triggering a double dispose */
                         }
                     }
                 }
