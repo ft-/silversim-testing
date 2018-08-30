@@ -171,7 +171,7 @@ namespace SilverSim.Scripting.Common
 
             public class StreamReaderAddHead : TextReader
             {
-                private TextReader m_InnerReader;
+                private readonly TextReader m_InnerReader;
                 private string m_Header;
                 public StreamReaderAddHead(string header, TextReader reader)
                 {
@@ -181,36 +181,37 @@ namespace SilverSim.Scripting.Common
 
                 public override void Close()
                 {
-                    m_InnerReader?.Close();
-                    m_InnerReader = null;
+                    try
+                    {
+                        m_InnerReader.Close();
+                    }
+                    catch
+                    {
+                        /* ignore this one */
+                    }
                 }
 
                 protected override void Dispose(bool disposing)
                 {
                     if(disposing)
                     {
-                        m_InnerReader?.Close();
-                        m_InnerReader = null;
+                        try
+                        {
+                            m_InnerReader.Dispose();
+                        }
+                        catch
+                        {
+                            /* ignore this one */
+                        }
                     }
                 }
 
-                public override int Peek()
-                {
-                    if(m_InnerReader == null)
-                    {
-                        throw new ObjectDisposedException(GetType().FullName);
-                    }
-                    return m_Header.Length != 0 ?
+                public override int Peek() => m_Header.Length != 0 ?
                         m_Header[0] :
                         m_InnerReader.Peek();
-                }
 
                 public override int Read()
                 {
-                    if (m_InnerReader == null)
-                    {
-                        throw new ObjectDisposedException(GetType().FullName);
-                    }
                     if (m_Header.Length != 0)
                     {
                         int c = m_Header[0];
@@ -225,10 +226,6 @@ namespace SilverSim.Scripting.Common
 
                 public override int Read(char[] buffer, int index, int count)
                 {
-                    if (m_InnerReader == null)
-                    {
-                        throw new ObjectDisposedException(GetType().FullName);
-                    }
                     int n = 0;
                     while(count-- > 0)
                     {
@@ -245,10 +242,6 @@ namespace SilverSim.Scripting.Common
 
                 public override int ReadBlock(char[] buffer, int index, int count)
                 {
-                    if (m_InnerReader == null)
-                    {
-                        throw new ObjectDisposedException(GetType().FullName);
-                    }
                     int n = 0;
                     while (count-- > 0)
                     {
@@ -265,11 +258,7 @@ namespace SilverSim.Scripting.Common
 
                 public override string ReadLine()
                 {
-                    if (m_InnerReader == null)
-                    {
-                        throw new ObjectDisposedException(GetType().FullName);
-                    }
-                    if (m_Header.Length > 0)
+                    if(m_Header.Length > 0)
                     {
                         string res = string.Empty;
                         int pos = m_Header.IndexOf('\n');
@@ -292,15 +281,7 @@ namespace SilverSim.Scripting.Common
                     }
                 }
 
-                public override string ReadToEnd()
-                {
-                    if (m_InnerReader == null)
-                    {
-                        throw new ObjectDisposedException(GetType().FullName);
-                    }
-
-                    return m_Header + m_InnerReader.ReadToEnd();
-                }
+                public override string ReadToEnd() => m_Header + m_InnerReader.ReadToEnd();
             }
 
             public IScriptAssembly Compile(AppDomain appDom, UGUI user, UUID assetID, TextReader reader, CultureInfo cultureInfo = null, Func<string, TextReader> includeOpen = null)
