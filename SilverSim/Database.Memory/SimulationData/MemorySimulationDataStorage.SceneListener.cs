@@ -198,41 +198,41 @@ namespace SilverSim.Database.Memory.SimulationData
                     { "NextOwnerPermissions", (int)objpart.NextOwnerMask },
                     { "ClickAction", (int)objpart.ClickAction },
                     { "LocalizationData", new BinaryData(objpart.LocalizationSerialization) },
-                    { "VehicleData", new BinaryData(objpart.VehicleParams.ToSerialization()) }
+                    { "VehicleData", new BinaryData(objpart.VehicleParams.ToSerialization()) },
+                    { "Damage", objpart.Damage },
+                    { "PassCollisionMode", (int)objpart.PassCollisionMode },
+                    { "PassTouchMode", (int)objpart.PassTouchMode },
+                    { "Velocity", objpart.Velocity },
+                    { "IsSoundQueueing", objpart.IsSoundQueueing },
+                    { "IsAllowedDrop", objpart.IsAllowedDrop },
+                    { "PhysicsDensity", objpart.PhysicsDensity },
+                    { "PhysicsFriction", objpart.PhysicsFriction },
+                    { "PhysicsRestitution", objpart.PhysicsRestitution },
+                    { "PhysicsGravityMultiplier", objpart.PhysicsGravityMultiplier },
+                    { "IsRotateXEnabled", objpart.IsRotateXEnabled },
+                    { "IsRotateYEnabled", objpart.IsRotateYEnabled },
+                    { "IsRotateZEnabled", objpart.IsRotateZEnabled },
+                    { "IsVolumeDetect", objpart.IsVolumeDetect },
+                    { "IsPhantom", objpart.IsPhantom },
+                    { "IsPhysics", objpart.IsPhysics },
+                    { "IsSandbox", objpart.IsSandbox },
+                    { "IsBlockGrab", objpart.IsBlockGrab },
+                    { "IsDieAtEdge", objpart.IsDieAtEdge },
+                    { "IsReturnAtEdge", objpart.IsReturnAtEdge },
+                    { "IsBlockGrabObject", objpart.IsBlockGrabObject },
+                    { "SandboxOrigin", objpart.SandboxOrigin },
+                    { "IsSitTargetActive", objpart.IsSitTargetActive },
+                    { "IsScriptedSitOnly", objpart.IsScriptedSitOnly },
+                    { "AllowUnsit", objpart.AllowUnsit },
+                    { "IsUnSitTargetActive", objpart.IsUnSitTargetActive },
+                    { "UnSitTargetOffset", objpart.UnSitTargetOffset },
+                    { "UnSitTargetOrientation", objpart.UnSitTargetOrientation }
                 };
                 using (var ms = new MemoryStream())
                 {
                     LlsdBinary.Serialize(objpart.DynAttrs, ms);
                     data.Add("DynAttrs", new BinaryData(ms.ToArray()));
                 }
-
-                data.Add("PassCollisionMode", (int)objpart.PassCollisionMode);
-                data.Add("PassTouchMode", (int)objpart.PassTouchMode);
-                data.Add("Velocity", objpart.Velocity);
-                data.Add("IsSoundQueueing", objpart.IsSoundQueueing);
-                data.Add("IsAllowedDrop", objpart.IsAllowedDrop);
-                data.Add("PhysicsDensity", objpart.PhysicsDensity);
-                data.Add("PhysicsFriction", objpart.PhysicsFriction);
-                data.Add("PhysicsRestitution", objpart.PhysicsRestitution);
-                data.Add("PhysicsGravityMultiplier", objpart.PhysicsGravityMultiplier);
-                data.Add("IsRotateXEnabled", objpart.IsRotateXEnabled);
-                data.Add("IsRotateYEnabled", objpart.IsRotateYEnabled);
-                data.Add("IsRotateZEnabled", objpart.IsRotateZEnabled);
-                data.Add("IsVolumeDetect", objpart.IsVolumeDetect);
-                data.Add("IsPhantom", objpart.IsPhantom);
-                data.Add("IsPhysics", objpart.IsPhysics);
-                data.Add("IsSandbox", objpart.IsSandbox);
-                data.Add("IsBlockGrab", objpart.IsBlockGrab);
-                data.Add("IsDieAtEdge", objpart.IsDieAtEdge);
-                data.Add("IsReturnAtEdge", objpart.IsReturnAtEdge);
-                data.Add("IsBlockGrabObject", objpart.IsBlockGrabObject);
-                data.Add("SandboxOrigin", objpart.SandboxOrigin);
-                data.Add("IsSitTargetActive", objpart.IsSitTargetActive);
-                data.Add("IsScriptedSitOnly", objpart.IsScriptedSitOnly);
-                data.Add("AllowUnsit", objpart.AllowUnsit);
-                data.Add("IsUnSitTargetActive", objpart.IsUnSitTargetActive);
-                data.Add("UnSitTargetOffset", objpart.UnSitTargetOffset);
-                data.Add("UnSitTargetOrientation", objpart.UnSitTargetOrientation);
 
                 return data;
             }

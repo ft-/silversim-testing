@@ -132,63 +132,94 @@ namespace SilverSim.Database.Memory.SimulationData
 
                 MediaURL = map["MediaURL"].ToString(),
 
-                AngularVelocity = map["AngularVelocity"].AsVector3
+                AngularVelocity = map["AngularVelocity"].AsVector3,
+                Damage = map["Damage"].AsReal,
+                ParticleSystemBytes = (BinaryData)map["ParticleSystem"],
+                TextureEntryBytes = (BinaryData)map["TextureEntryBytes"],
+                TextureAnimationBytes = (BinaryData)map["TextureAnimationBytes"],
+
+                ScriptAccessPin = map["ScriptAccessPin"].AsInt,
+
+                ForceMouselook = map["ForceMouselook"].AsBoolean,
+
+                BaseMask = (InventoryPermissionsMask)map["BasePermissions"].AsUInt,
+                OwnerMask = (InventoryPermissionsMask)map["CurrentPermissions"].AsUInt,
+                EveryoneMask = (InventoryPermissionsMask)map["EveryOnePermissions"].AsUInt,
+                GroupMask = (InventoryPermissionsMask)map["GroupPermissions"].AsUInt,
+                NextOwnerMask = (InventoryPermissionsMask)map["NextOwnerPermissions"].AsUInt,
+
+                ClickAction = (ClickActionType)map["ClickAction"].AsInt,
+                PointLight = new PointLightParam
+                {
+                    DbSerialization = (BinaryData)map["LightData"]
+                },
+                Projection = new ProjectionParam
+                {
+                    DbSerialization = (BinaryData)map["ProjectionData"]
+                },
+
+                ExtendedMesh = new ExtendedMeshParams
+                {
+                    DbSerialization = (BinaryData)map["ExtendedMeshData"]
+                },
+
+                Text = new TextParam
+                {
+                    Serialization = (BinaryData)map["HoverTextData"]
+                },
+
+                Flexible = new FlexibleParam
+                {
+                    DbSerialization = (BinaryData)map["FlexibleData"]
+                },
+
+                Sound = new SoundParam
+                {
+                    Serialization = (BinaryData)map["LoopedSoundData"]
+                },
+
+                CollisionSound = new CollisionSoundParam
+                {
+                    Serialization = (BinaryData)map["ImpactSoundData"]
+                },
+
+                Shape = new ObjectPart.PrimitiveShape
+                {
+                    Serialization = (BinaryData)map["PrimitiveShapeData"]
+                },
+                PassCollisionMode = (PassEventMode)map["PassCollisionMode"].AsInt,
+                PassTouchMode = (PassEventMode)map["PassTouchMode"].AsInt,
+                Velocity = map["Velocity"].AsVector3,
+                IsSoundQueueing = map["IsSoundQueueing"].AsBoolean,
+                IsAllowedDrop = map["IsAllowedDrop"].AsBoolean,
+
+                PhysicsDensity = map["PhysicsDensity"].AsReal,
+                PhysicsFriction = map["PhysicsFriction"].AsReal,
+                PhysicsRestitution = map["PhysicsRestitution"].AsReal,
+                PhysicsGravityMultiplier = map["PhysicsGravityMultiplier"].AsReal,
+
+                IsRotateXEnabled = map["IsRotateXEnabled"].AsBoolean,
+                IsRotateYEnabled = map["IsRotateYEnabled"].AsBoolean,
+                IsRotateZEnabled = map["IsRotateZEnabled"].AsBoolean,
+                IsVolumeDetect = map["IsVolumeDetect"].AsBoolean,
+                IsPhantom = map["IsPhantom"].AsBoolean,
+                IsPhysics = map["IsPhysics"].AsBoolean,
+                IsSandbox = map["IsSandbox"].AsBoolean,
+                IsBlockGrab = map["IsBlockGrab"].AsBoolean,
+                IsDieAtEdge = map["IsDieAtEdge"].AsBoolean,
+                IsReturnAtEdge = map["IsReturnAtEdge"].AsBoolean,
+                IsBlockGrabObject = map["IsBlockGrabObject"].AsBoolean,
+                SandboxOrigin = map["SandboxOrigin"].AsVector3,
+                IsSitTargetActive = map["IsSitTargetActive"].AsBoolean,
+                IsScriptedSitOnly = map["IsScriptedSitOnly"].AsBoolean,
+                AllowUnsit = map["AllowUnsit"].AsBoolean,
+                IsUnSitTargetActive = map["IsUnSitTargetActive"].AsBoolean,
+                UnSitTargetOffset = map["UnSitTargetOffset"].AsVector3,
+                UnSitTargetOrientation = map["UnSitTargetOrientation"].AsQuaternion,
+
+                LocalizationSerialization = (BinaryData)map["LocalizationData"]
             };
-            objpart.PointLight = new PointLightParam
-            {
-                DbSerialization = (BinaryData)map["LightData"]
-            };
-            objpart.Projection = new ProjectionParam
-            {
-                DbSerialization = (BinaryData)map["ProjectionData"]
-            };
-
-            objpart.ExtendedMesh = new ExtendedMeshParams
-            {
-                DbSerialization = (BinaryData)map["ExtendedMeshData"]
-            };
-
-            objpart.Text = new TextParam
-            {
-                Serialization = (BinaryData)map["HoverTextData"]
-            };
-
-            objpart.Flexible = new FlexibleParam
-            {
-                DbSerialization = (BinaryData)map["FlexibleData"]
-            };
-
-            objpart.Sound = new SoundParam
-            {
-                Serialization = (BinaryData)map["LoopedSoundData"]
-            };
-
-            objpart.CollisionSound = new CollisionSoundParam
-            {
-                Serialization = (BinaryData)map["ImpactSoundData"]
-            };
-
-            objpart.Shape = new ObjectPart.PrimitiveShape
-            {
-                Serialization = (BinaryData)map["PrimitiveShapeData"]
-            };
-
-            objpart.ParticleSystemBytes = (BinaryData)map["ParticleSystem"];
-            objpart.TextureEntryBytes = (BinaryData)map["TextureEntryBytes"];
-            objpart.TextureAnimationBytes = (BinaryData)map["TextureAnimationBytes"];
-
-            objpart.ScriptAccessPin = map["ScriptAccessPin"].AsInt;
-            objpart.LoadedLinkNumber = map["LinkNumber"].AsInt;
-
-            objpart.ForceMouselook = map["ForceMouselook"].AsBoolean;
-
-            objpart.BaseMask = (InventoryPermissionsMask)map["BasePermissions"].AsUInt;
-            objpart.OwnerMask = (InventoryPermissionsMask)map["CurrentPermissions"].AsUInt;
-            objpart.EveryoneMask = (InventoryPermissionsMask)map["EveryOnePermissions"].AsUInt;
-            objpart.GroupMask = (InventoryPermissionsMask)map["GroupPermissions"].AsUInt;
-            objpart.NextOwnerMask = (InventoryPermissionsMask)map["NextOwnerPermissions"].AsUInt;
-
-            objpart.ClickAction = (ClickActionType)map["ClickAction"].AsInt;
+            objpart.LoadFromVehicleSerialization((BinaryData)map["VehicleData"]);
 
             using (var ms = new MemoryStream((BinaryData)map["DynAttrs"]))
             {
@@ -197,40 +228,6 @@ namespace SilverSim.Database.Memory.SimulationData
                     objpart.DynAttrs.Add(kvp.Key, kvp.Value);
                 }
             }
-
-            objpart.PassCollisionMode = (PassEventMode)map["PassCollisionMode"].AsInt;
-            objpart.PassTouchMode = (PassEventMode)map["PassTouchMode"].AsInt;
-            objpart.Velocity = map["Velocity"].AsVector3;
-            objpart.AngularVelocity = map["AngularVelocity"].AsVector3;
-            objpart.IsSoundQueueing = map["IsSoundQueueing"].AsBoolean;
-            objpart.IsAllowedDrop = map["IsAllowedDrop"].AsBoolean;
-
-            objpart.PhysicsDensity = map["PhysicsDensity"].AsReal;
-            objpart.PhysicsFriction = map["PhysicsFriction"].AsReal;
-            objpart.PhysicsRestitution = map["PhysicsRestitution"].AsReal;
-            objpart.PhysicsGravityMultiplier = map["PhysicsGravityMultiplier"].AsReal;
-
-            objpart.IsRotateXEnabled = map["IsRotateXEnabled"].AsBoolean;
-            objpart.IsRotateYEnabled = map["IsRotateYEnabled"].AsBoolean;
-            objpart.IsRotateZEnabled = map["IsRotateZEnabled"].AsBoolean;
-            objpart.IsVolumeDetect = map["IsVolumeDetect"].AsBoolean;
-            objpart.IsPhantom = map["IsPhantom"].AsBoolean;
-            objpart.IsPhysics = map["IsPhysics"].AsBoolean;
-            objpart.IsSandbox = map["IsSandbox"].AsBoolean;
-            objpart.IsBlockGrab = map["IsBlockGrab"].AsBoolean;
-            objpart.IsDieAtEdge = map["IsDieAtEdge"].AsBoolean;
-            objpart.IsReturnAtEdge = map["IsReturnAtEdge"].AsBoolean;
-            objpart.IsBlockGrabObject = map["IsBlockGrabObject"].AsBoolean;
-            objpart.SandboxOrigin = map["SandboxOrigin"].AsVector3;
-            objpart.IsSitTargetActive = map["IsSitTargetActive"].AsBoolean;
-            objpart.IsScriptedSitOnly = map["IsScriptedSitOnly"].AsBoolean;
-            objpart.AllowUnsit = map["AllowUnsit"].AsBoolean;
-            objpart.IsUnSitTargetActive = map["IsUnSitTargetActive"].AsBoolean;
-            objpart.UnSitTargetOffset = map["UnSitTargetOffset"].AsVector3;
-            objpart.UnSitTargetOrientation = map["UnSitTargetOrientation"].AsQuaternion;
-
-            objpart.LocalizationSerialization = (BinaryData)map["LocalizationData"];
-            objpart.LoadFromVehicleSerialization((BinaryData)map["VehicleData"]);
             return objpart;
         }
 

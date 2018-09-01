@@ -186,6 +186,24 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        public double Damage
+        {
+            get
+            {
+                return RootPart.Damage;
+            }
+            set
+            {
+                foreach (ObjectPart part in Values)
+                {
+                    if (part.Damage != value)
+                    {
+                        part.Damage = value;
+                    }
+                }
+            }
+        }
+
         public bool IsSandbox
         {
             get

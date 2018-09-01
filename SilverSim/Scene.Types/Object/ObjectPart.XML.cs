@@ -220,6 +220,7 @@ namespace SilverSim.Scene.Types.Object
                     writer.WriteNamedValue("GroupMask", (uint)GroupMask);
                     writer.WriteNamedValue("EveryoneMask", (uint)EveryoneMask);
                     writer.WriteNamedValue("NextOwnerMask", (uint)NextOwnerMask);
+                    writer.WriteNamedValue("Damage", Damage);
                     PrimitiveFlags flags = Flags;
                     var flagsStrs = new List<string>();
                     if ((flags & PrimitiveFlags.Physics) != 0)
@@ -1618,6 +1619,10 @@ namespace SilverSim.Scene.Types.Object
 
                             case "NextOwnerMask":
                                 part.NextOwnerMask = (InventoryPermissionsMask)reader.ReadElementValueAsUInt();
+                                break;
+
+                            case "Damage":
+                                part.Damage = reader.ReadElementValueAsDouble();
                                 break;
 
                             case "Flags":

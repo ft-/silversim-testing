@@ -858,6 +858,20 @@ namespace SilverSim.Scene.Types.Object
             TriggerOnUpdate(0);
         }
 
+        private double m_Damage;
+        public double Damage
+        {
+            get { return m_Damage; }
+            set
+            {
+                lock (m_DataLock)
+                {
+                    m_Damage = value.Clamp(0, 100);
+                }
+                TriggerOnUpdate(0);
+            }
+        }
+
         public InventoryPermissionsMask GroupMask
         {
             get
