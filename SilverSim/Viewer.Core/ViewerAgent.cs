@@ -211,6 +211,20 @@ namespace SilverSim.Viewer.Core
             }
         }
 
+        protected override SceneInterface RootAgentScene
+        {
+            get
+            {
+                UUID id = SceneID;
+                AgentCircuit circuit;
+                if(Circuits.TryGetValue(id, out circuit))
+                {
+                    return circuit.Scene;
+                }
+                return null;
+            }
+        }
+
         public override UUID SceneID
         {
             get
@@ -637,6 +651,14 @@ namespace SilverSim.Viewer.Core
                 }
             }
             return false;
+        }
+
+        protected override void DieAgent()
+        {
+            if(!TeleportHome(RootAgentScene))
+            {
+                KickUser(this.GetLanguageString(CurrentCulture, "YouHaveDied", "You have died"));
+            }
         }
 
         /* following function returns true if it accepts a teleport request or if it wants to distribute more specific error message except home location not available */

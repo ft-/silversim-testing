@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using log4net;
+using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object.Localization;
 using SilverSim.Scene.Types.Pathfinding;
 using SilverSim.Scene.Types.Physics.Vehicle;
@@ -32,6 +33,7 @@ using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Asset.Format;
 using SilverSim.Types.Inventory;
+using SilverSim.Types.Parcel;
 using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
@@ -1962,6 +1964,54 @@ namespace SilverSim.Scene.Types.Object
         #region Script Events
         private void PostCollisionEvent(CollisionEvent ev, bool filterExperience, UUID experienceID)
         {
+            ObjectGroup grp = ObjectGroup;
+            SceneInterface scene = grp?.Scene;
+
+            /* check if prim collides with vehicle having seated avatars on damage enabled areas */
+            if(grp?.AgentSitting.Count != 0 && scene != null)
+            {
+                CollisionEvent nev = new CollisionEvent { Type = ev.Type };
+                foreach(DetectInfo di in ev.Detected)
+                {
+                    bool causedDamage = false;
+                    ObjectPart colpart;
+                    if (!scene.Primitives.TryGetValue(di.Key, out colpart) || colpart.UpdateInfo.IsKilled)
+                    {
+                        continue;
+                    }
+                    double damage = colpart.Damage;
+                    if (damage > 0)
+                    {
+                        foreach (IAgent agent in grp.m_SittingAgents.Keys1)
+                        {
+                            ParcelInfo pInfo;
+                            if(scene.Parcels.TryGetValue(agent.GlobalPosition, out pInfo) && (pInfo.Flags & ParcelFlags.AllowDamage) != 0)
+                            {
+                                agent.DecreaseHealth(damage);
+                                causedDamage = true;
+                            }
+                        }
+                    }
+                    if (causedDamage)
+                    {
+                        ObjectGroup colgrp = colpart.ObjectGroup;
+                        if (colgrp != null)
+                        {
+                            scene.Remove(colgrp);
+                        }
+                    }
+                    else
+                    {
+                        nev.Detected.Add(di);
+                    }
+                }
+                ev = nev;
+                if(ev.Detected.Count == 0)
+                {
+                    return;
+                }
+            }
+
             foreach(ObjectPartInventoryItem item in Inventory.Values)
             {
                 ObjectPartInventoryItem.CollisionFilterParam filter = item.CollisionFilter;

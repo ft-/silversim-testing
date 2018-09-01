@@ -380,6 +380,11 @@ namespace SilverSim.Scene.Npc
             /* ignored */
         }
 
+        protected override void DieAgent()
+        {
+#warning Implement NPC agent death
+        }
+
         public override void ClearKnownFriends()
         {
             /* ignored */

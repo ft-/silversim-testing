@@ -25,3 +25,4 @@ TeleportNotPossibleToRegion=Teleport not possible to region.
 UnableToRezANonScriptAsScript=Unable to rez a non-script asset as script.
 ChangingEstateExperienceNotPossibleSinceExperienceNotKnown=Changing estate experience not possible since experience not known
 ChangingEstateExperienceNotPossibleSinceNoEstateFound=Changing estate experience not possible since no estate found
+YouHaveDied=You have died.

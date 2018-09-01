@@ -825,6 +825,42 @@ namespace SilverSim.Scene.Agent
         public void PostEvent(IScriptEvent ev)
         {
             /* intentionally left empty */
+            if(ev.GetType() == typeof(CollisionEvent))
+            {
+                PostCollisionEvent((CollisionEvent)ev);
+            }
+        }
+
+        protected abstract SceneInterface RootAgentScene { get; }
+
+        private void PostCollisionEvent(CollisionEvent ev)
+        {
+            SceneInterface scene = RootAgentScene;
+            if (scene != null)
+            {
+                foreach (DetectInfo di in ev.Detected)
+                {
+                    ObjectPart colpart;
+                    if (!scene.Primitives.TryGetValue(di.Key, out colpart) || colpart.UpdateInfo.IsKilled)
+                    {
+                        continue;
+                    }
+                    double damage = colpart.Damage;
+                    if (damage > 0)
+                    {
+                        ParcelInfo pInfo;
+                        if (scene.Parcels.TryGetValue(GlobalPosition, out pInfo) && (pInfo.Flags & ParcelFlags.AllowDamage) != 0)
+                        {
+                            DecreaseHealth(damage);
+                            ObjectGroup colgrp = colpart.ObjectGroup;
+                            if (colgrp != null)
+                            {
+                                scene.Remove(colgrp);
+                            }
+                        }
+                    }
+                }
+            }
         }
         #endregion
 
@@ -882,10 +918,16 @@ namespace SilverSim.Scene.Agent
             }
             set
             {
+                bool agentDies;
                 lock (m_DataLock)
                 {
                     m_Health = value.Clamp(0, 100);
-#warning Implement death
+                    agentDies = m_Health < 0.0001;
+                }
+
+                if(agentDies)
+                {
+                    DieAgent();
                 }
             }
         }
@@ -928,15 +970,22 @@ namespace SilverSim.Scene.Agent
             }
         }
 
+        protected abstract void DieAgent();
+
         public void DecreaseHealth(double v)
         {
+            bool agentDies = false;
             lock (m_DataLock)
             {
-                if (v <= 0)
+                if (v >= 0)
                 {
                     m_Health = (m_Health - v).Clamp(0, 100);
-#warning Implement death
+                    agentDies = m_Health < 0.0001;
                 }
+            }
+            if(agentDies)
+            {
+                DieAgent();
             }
         }
 

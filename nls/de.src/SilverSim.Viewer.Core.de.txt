@@ -25,3 +25,4 @@ TeleportNotPossibleToRegion=Teleport zur Region nicht möglich.
 UnableToRezANonScriptAsScript=Ein anderes Asset als ein Skript rezzen nicht möglich.
 ChangingEstateExperienceNotPossibleSinceExperienceNotKnown=Grundbesitz-Erlebnisberechtigungen können nicht geändert werden, da das Erlebnis nicht bekannt ist.
 ChangingEstateExperienceNotPossibleSinceNoEstateFound=Grundbesitz-Erlebnisberechtigungen können nicht geändert werden, da der Grundbesitz nicht bekannt ist.
+YouHaveDied=Du bist gestorben.

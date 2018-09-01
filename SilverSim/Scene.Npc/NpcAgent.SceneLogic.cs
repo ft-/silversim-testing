@@ -38,6 +38,8 @@ namespace SilverSim.Scene.Npc
             return scene.ID == currentScene.ID;
         }
 
+        protected override SceneInterface RootAgentScene => CurrentScene;
+
         protected override void SendAnimations(AvatarAnimation m)
         {
             CurrentScene?.SendAgentAnimToAllAgents(m);
