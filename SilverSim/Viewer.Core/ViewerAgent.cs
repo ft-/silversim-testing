@@ -655,7 +655,8 @@ namespace SilverSim.Viewer.Core
 
         protected override void DieAgent()
         {
-            if(!TeleportHome(RootAgentScene))
+            SceneInterface scene = RootAgentScene;
+            if(scene == null || !TeleportHome(scene))
             {
                 KickUser(this.GetLanguageString(CurrentCulture, "YouHaveDied", "You have died"));
             }
