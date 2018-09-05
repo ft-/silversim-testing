@@ -22,6 +22,7 @@
 using log4net;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object.Localization;
+using SilverSim.Scene.Types.Object.Parameters;
 using SilverSim.Scene.Types.Pathfinding;
 using SilverSim.Scene.Types.Physics.Vehicle;
 using SilverSim.Scene.Types.Scene;
@@ -1979,6 +1980,15 @@ namespace SilverSim.Scene.Types.Object
             ObjectGroup grp = ObjectGroup;
             SceneInterface scene = grp?.Scene;
             
+            if(ev.Type == CollisionEvent.CollisionType.Start)
+            {
+                CollisionSoundParam soundParam = CollisionSound;
+                if(soundParam.ImpactSound != UUID.Zero)
+                {
+                    scene?.SendTriggerSound(this, soundParam.ImpactSound, soundParam.ImpactVolume, soundParam.ImpactSoundRadius);
+                }
+            }
+
             if(grp.Damage > 0)
             {
                 scene?.Remove(grp);

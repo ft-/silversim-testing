@@ -29,6 +29,7 @@ namespace SilverSim.Scene.Types.Object.Parameters
         #region Fields
         public UUID ImpactSound = UUID.Zero;
         public double ImpactVolume;
+        public double ImpactSoundRadius;
         #endregion
 
         public CollisionSoundParam()
@@ -39,6 +40,7 @@ namespace SilverSim.Scene.Types.Object.Parameters
         {
             ImpactSound = src.ImpactSound;
             ImpactVolume = src.ImpactVolume;
+            ImpactSoundRadius = src.ImpactSoundRadius;
         }
 
         public byte[] Serialization
@@ -48,28 +50,45 @@ namespace SilverSim.Scene.Types.Object.Parameters
                 var serialized = new byte[24];
                 ImpactSound.ToBytes(serialized, 0);
                 Buffer.BlockCopy(BitConverter.GetBytes(ImpactVolume), 0, serialized, 16, 8);
+                Buffer.BlockCopy(BitConverter.GetBytes(ImpactSoundRadius), 0, serialized, 24, 8);
                 if (!BitConverter.IsLittleEndian)
                 {
                     Array.Reverse(serialized, 16, 8);
+                }
+                if (!BitConverter.IsLittleEndian)
+                {
+                    Array.Reverse(serialized, 24, 8);
                 }
                 return serialized;
             }
 
             set
             {
-                if (value.Length != 24)
+                if (value.Length != 24 && value.Length != 32)
                 {
-                    throw new ArgumentException("Array length must be 24.");
+                    throw new ArgumentException("Array length must be 24 or 32.");
                 }
                 if (!BitConverter.IsLittleEndian)
                 {
                     Array.Reverse(value, 16, 8);
                 }
                 ImpactSound.FromBytes(value, 0);
-                ImpactVolume = BitConverter.ToDouble(value, 16);
                 if (!BitConverter.IsLittleEndian)
                 {
                     Array.Reverse(value, 16, 8);
+                }
+                ImpactVolume = BitConverter.ToDouble(value, 16);
+                if(value.Length > 24)
+                {
+                    if (!BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(value, 24, 8);
+                    }
+                    ImpactSoundRadius = BitConverter.ToDouble(value, 24);
+                }
+                else
+                {
+                    ImpactSoundRadius = 20;
                 }
             }
         }
