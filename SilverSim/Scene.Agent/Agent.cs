@@ -148,6 +148,18 @@ namespace SilverSim.Scene.Agent
             set { /* setting intentionally ignored */ }
         }
 
+        public double Damage
+        {
+            get { return 0; }
+            set {  /* setting intentionally ignored */ }
+        }
+
+        public bool HasCausedDamage
+        {
+            get { return false; }
+            set {  /* setting intentionally ignored */ }
+        }
+
         public abstract AgentUpdateInfo GetUpdateInfo(UUID sceneID);
         public void IncUpdateInfoSerialNo()
         {
@@ -840,23 +852,12 @@ namespace SilverSim.Scene.Agent
             {
                 foreach (DetectInfo di in ev.Detected)
                 {
-                    ObjectPart colpart;
-                    if (!scene.Primitives.TryGetValue(di.Key, out colpart) || colpart.UpdateInfo.IsKilled)
-                    {
-                        continue;
-                    }
-                    double damage = colpart.Damage;
-                    if (damage > 0)
+                    if (di.CausingDamage > 0)
                     {
                         ParcelInfo pInfo;
                         if (scene.Parcels.TryGetValue(GlobalPosition, out pInfo) && (pInfo.Flags & ParcelFlags.AllowDamage) != 0)
                         {
-                            DecreaseHealth(damage);
-                            ObjectGroup colgrp = colpart.ObjectGroup;
-                            if (colgrp != null)
-                            {
-                                scene.Remove(colgrp);
-                            }
+                            DecreaseHealth(di.CausingDamage);
                         }
                     }
                 }

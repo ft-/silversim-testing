@@ -254,6 +254,9 @@ namespace SilverSim.Scene.Types.Object
             get;
         }
 
+        double Damage { get; set; }
+
+        bool HasCausedDamage { get; set; }
         #endregion
 
         #region Methods

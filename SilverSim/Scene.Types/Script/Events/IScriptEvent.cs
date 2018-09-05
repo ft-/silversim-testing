@@ -46,5 +46,6 @@ namespace SilverSim.Scene.Types.Script.Events
         public Vector3 TouchPosition;
         public Vector3 TouchST;
         public Vector3 TouchUV;
+        public double CausingDamage;
     }
 }

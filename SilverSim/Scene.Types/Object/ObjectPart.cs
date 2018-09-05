@@ -874,6 +874,18 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        public bool HasCausedDamage
+        {
+            get
+            {
+                return ObjectGroup.HasCausedDamage;
+            }
+            set
+            {
+                ObjectGroup.HasCausedDamage = value;
+            }
+        }
+
         public InventoryPermissionsMask GroupMask
         {
             get
@@ -1966,6 +1978,12 @@ namespace SilverSim.Scene.Types.Object
         {
             ObjectGroup grp = ObjectGroup;
             SceneInterface scene = grp?.Scene;
+            
+            if(grp.Damage > 0)
+            {
+                scene?.Remove(grp);
+                return;
+            }
 
             /* check if prim collides with vehicle having seated avatars on damage enabled areas */
             if(grp?.AgentSitting.Count != 0 && scene != null)
@@ -1974,33 +1992,19 @@ namespace SilverSim.Scene.Types.Object
                 foreach(DetectInfo di in ev.Detected)
                 {
                     bool causedDamage = false;
-                    ObjectPart colpart;
-                    if (!scene.Primitives.TryGetValue(di.Key, out colpart) || colpart.UpdateInfo.IsKilled)
-                    {
-                        continue;
-                    }
-                    double damage = colpart.Damage;
-                    if (damage > 0)
+                    if (di.CausingDamage > 0)
                     {
                         foreach (IAgent agent in grp.m_SittingAgents.Keys1)
                         {
                             ParcelInfo pInfo;
                             if(scene.Parcels.TryGetValue(agent.GlobalPosition, out pInfo) && (pInfo.Flags & ParcelFlags.AllowDamage) != 0)
                             {
-                                agent.DecreaseHealth(damage);
+                                agent.DecreaseHealth(di.CausingDamage);
                                 causedDamage = true;
                             }
                         }
                     }
-                    if (causedDamage)
-                    {
-                        ObjectGroup colgrp = colpart.ObjectGroup;
-                        if (colgrp != null)
-                        {
-                            scene.Remove(colgrp);
-                        }
-                    }
-                    else
+                    if (!causedDamage)
                     {
                         nev.Detected.Add(di);
                     }

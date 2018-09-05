@@ -91,6 +91,8 @@ namespace SilverSim.Scene.Types.Object
         public AgentSittingInterface AgentSitting { get; }
         public SceneInterface Scene { get; set; }
 
+        public bool HasCausedDamage { get; set; } /* used in collision handling */
+
         private ReferenceBoxed<UUID> m_FromItemID = UUID.Zero;
         public UUID FromItemID /* used for attachments */
         {
