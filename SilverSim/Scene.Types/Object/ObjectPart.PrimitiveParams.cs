@@ -273,32 +273,31 @@ namespace SilverSim.Scene.Types.Object
                 switch (numfaces)
                 {
                     case 1:
-                        ProfileCurve = (byte)PrimitiveProfileShape.HalfCircle;
+                        ProfileCurve = (byte)PrimitiveProfileShape.Circle | (byte)PrimitiveProfileHollowShape.Triangle;
                         PathCurve = (byte)PrimitiveExtrusion.Curve1;
+                        PathScaleY = 150;
                         break;
 
                     case 2:
-                        PathCurve = (byte)PrimitiveExtrusion.Curve1;
-                        ProfileCurve = (byte)PrimitiveProfileShape.Circle;
-                        PathScaleY = 150;
                         ProfileHollow = 27500;
-                        break;
+                        goto case 1;
 
                     case 3:
+                        ProfileCurve = (byte)PrimitiveProfileShape.Circle | (byte)PrimitiveProfileHollowShape.Triangle;
                         PathCurve = (byte)PrimitiveExtrusion.Straight;
                         break;
 
                     case 4:
-                        ProfileHollow = 25000;
+                        ProfileHollow = 27500;
                         goto case 3;
 
                     case 5:
-                        ProfileCurve = (byte)PrimitiveProfileShape.EquilateralTriangle;
+                        ProfileCurve = (byte)PrimitiveProfileShape.EquilateralTriangle | (byte)PrimitiveProfileHollowShape.Triangle;
                         PathCurve = (byte)PrimitiveExtrusion.Straight;
                         break;
 
                     case 6:
-                        ProfileCurve = (byte)PrimitiveProfileShape.Square;
+                        ProfileCurve = (byte)PrimitiveProfileShape.Square | (byte)PrimitiveProfileHollowShape.Triangle;
                         PathCurve = (byte)PrimitiveExtrusion.Straight;
                         break;
 
@@ -307,7 +306,7 @@ namespace SilverSim.Scene.Types.Object
                         goto case 6;
 
                     case 8:
-                        ProfileEnd = 6250;
+                        ProfileBegin = 9375;
                         goto case 6;
 
                     case 9:
@@ -449,8 +448,23 @@ namespace SilverSim.Scene.Types.Object
                 get
                 {
                     int ret = 0;
+                    bool hasCut;
+                    bool hasHollow;
+                    bool hasDimple;
+                    bool hasProfileCut;
 
-                    switch (Type)
+                    var primType = Type;
+                    hasCut = (primType == PrimitiveShapeType.Box ||
+                        primType == PrimitiveShapeType.Cylinder ||
+                        primType == PrimitiveShapeType.Prism) ?
+                        (ProfileBegin > 0 || ProfileEnd > 0) :
+                        (PathBegin > 0 || PathEnd > 0);
+
+                    hasHollow = ProfileHollow > 0;
+                    hasDimple = (ProfileBegin > 0) || (ProfileEnd > 0); // taken from llSetPrimitiveParms
+                    hasProfileCut = hasDimple; // is it the same thing?
+
+                    switch (primType)
                     {
                         case PrimitiveShapeType.Box:
                         case PrimitiveShapeType.Cylinder:
@@ -466,13 +480,13 @@ namespace SilverSim.Scene.Types.Object
                             // Special mesh handling
                             if(SculptType == PrimitiveSculptType.Mesh)
                             {
-                                //if(((PrimitiveProfileHollowShape)ProfileCurve & PrimitiveProfileHollowShape.Mask) == PrimitiveProfileHollowShape.Triangle)
+                                if(((PrimitiveProfileHollowShape)ProfileCurve & PrimitiveProfileHollowShape.Mask) == PrimitiveProfileHollowShape.Triangle)
                                 {
                                     ret = NumberOfSidesNoSculptCheck;
                                 }
-                                //else
+                                else
                                 {
-                                  //  ret = 8;
+                                    ret = 8;
                                 }
                             }
                             else
