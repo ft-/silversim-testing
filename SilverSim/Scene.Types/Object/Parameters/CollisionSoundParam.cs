@@ -47,7 +47,7 @@ namespace SilverSim.Scene.Types.Object.Parameters
         {
             get
             {
-                var serialized = new byte[24];
+                var serialized = new byte[32];
                 ImpactSound.ToBytes(serialized, 0);
                 Buffer.BlockCopy(BitConverter.GetBytes(ImpactVolume), 0, serialized, 16, 8);
                 Buffer.BlockCopy(BitConverter.GetBytes(ImpactSoundRadius), 0, serialized, 24, 8);
