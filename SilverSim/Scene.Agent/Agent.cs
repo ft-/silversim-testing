@@ -837,9 +837,18 @@ namespace SilverSim.Scene.Agent
         public void PostEvent(IScriptEvent ev)
         {
             /* intentionally left empty */
-            if(ev.GetType() == typeof(CollisionEvent))
+            Type evType = ev.GetType();
+            if(evType == typeof(CollisionEvent))
             {
                 PostCollisionEvent((CollisionEvent)ev);
+            }
+            else if(evType == typeof(LandCollisionEvent))
+            {
+                /* relay collision events to attachments */
+                foreach (ObjectGroup attached in Attachments.All)
+                {
+                    attached.PostEvent(ev);
+                }
             }
         }
 
@@ -861,6 +870,12 @@ namespace SilverSim.Scene.Agent
                         }
                     }
                 }
+            }
+
+            /* relay collision events to attachments */
+            foreach(ObjectGroup attached in Attachments.All)
+            {
+                attached.PostEvent(ev);
             }
         }
         #endregion
