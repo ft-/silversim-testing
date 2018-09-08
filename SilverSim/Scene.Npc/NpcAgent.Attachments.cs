@@ -286,11 +286,13 @@ namespace SilverSim.Scene.Npc
             {
                 grp.AttachPoint = AttachmentPoint.LeftHand;
                 grp.AttachedPos = Vector3.Zero;
+                grp.AttachedRot = Quaternion.Identity;
             }
 
             grp.FromItemID = itemID;
             grp.IsAttached = true;
             grp.Position = grp.AttachedPos;
+            grp.Rotation = grp.AttachedRot;
             grp.IsChangedEnabled = true;
 
 #if DEBUG

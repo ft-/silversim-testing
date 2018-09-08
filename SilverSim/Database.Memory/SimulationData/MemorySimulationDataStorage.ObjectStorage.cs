@@ -91,6 +91,7 @@ namespace SilverSim.Database.Memory.SimulationData
             PayPrice3 = map["PayPrice3"].AsInt,
             PayPrice4 = map["PayPrice4"].AsInt,
             AttachedPos = map["AttachedPos"].AsVector3,
+            AttachedRot = map["AttachedRot"].AsQuaternion,
             AttachPoint = (AttachmentPoint)map["AttachPoint"].AsUInt,
             IsIncludedInSearch = map["IsIncludedInSearch"].AsBoolean,
             RezzingObjectID = map["RezzingObjectID"].AsUUID

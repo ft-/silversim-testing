@@ -82,6 +82,7 @@ namespace SilverSim.Scene.Agent
                 if (attachAt != AttachmentPoint.Default && attachAt != grp.AttachPoint)
                 {
                     grp.AttachedPos = Vector3.Zero;
+                    grp.AttachedRot = Quaternion.Identity;
                 }
 
                 if (attachAt == AttachmentPoint.Default)
@@ -92,6 +93,7 @@ namespace SilverSim.Scene.Agent
                     {
                         grp.AttachPoint = AttachmentPoint.LeftHand;
                         grp.AttachedPos = Vector3.Zero;
+                        grp.AttachedRot = Quaternion.Identity;
                     }
                 }
 
@@ -102,6 +104,7 @@ namespace SilverSim.Scene.Agent
 
                 grp.IsAttached = true;
                 grp.Position = grp.AttachedPos;
+                grp.Rotation = grp.AttachedRot;
 
                 grp.PostEvent(new AttachEvent { ObjectID = Owner.ID });
             }
@@ -167,6 +170,7 @@ namespace SilverSim.Scene.Agent
                 if (attachAt != AttachmentPoint.Default && attachAt != grp.AttachPoint)
                 {
                     grp.AttachedPos = Vector3.Zero;
+                    grp.AttachedRot = Quaternion.Identity;
                 }
 
                 if (attachAt == AttachmentPoint.Default)
@@ -177,6 +181,7 @@ namespace SilverSim.Scene.Agent
                     {
                         grp.AttachPoint = AttachmentPoint.LeftHand;
                         grp.AttachedPos = Vector3.Zero;
+                        grp.AttachedRot = Quaternion.Identity;
                     }
                 }
 
@@ -184,6 +189,7 @@ namespace SilverSim.Scene.Agent
 
                 grp.IsAttached = true;
                 grp.Position = grp.AttachedPos;
+                grp.Rotation = grp.AttachedRot;
 
                 Attachments.Add(grp.AttachPoint, grp);
                 grp.PostEvent(new AttachEvent { ObjectID = Owner.ID });
@@ -342,6 +348,7 @@ namespace SilverSim.Scene.Agent
                 if (attachAt != AttachmentPoint.Default && attachAt != grp.AttachPoint)
                 {
                     grp.AttachedPos = Vector3.Zero;
+                    grp.AttachedRot = Quaternion.Identity;
                     attachPointChanged = true;
                 }
 
@@ -353,6 +360,7 @@ namespace SilverSim.Scene.Agent
                     {
                         grp.AttachPoint = AttachmentPoint.LeftHand;
                         grp.AttachedPos = Vector3.Zero;
+                        grp.AttachedRot = Quaternion.Identity;
                     }
                 }
 
@@ -360,6 +368,7 @@ namespace SilverSim.Scene.Agent
                 grp.FromItemID = m_ItemID;
                 grp.IsAttached = true;
                 grp.Position = grp.AttachedPos;
+                grp.Rotation = grp.AttachedRot;
                 grp.IsChangedEnabled = true;
 
                 if(attachPointChanged)

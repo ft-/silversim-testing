@@ -81,6 +81,7 @@ namespace SilverSim.Scene.Types.Object
         private bool m_IsIncludedInSearch;
         private AttachmentPoint m_AttachPoint;
         private ReferenceBoxed<Vector3> m_AttachedPos = Vector3.Zero;
+        private ReferenceBoxed<Quaternion> m_AttachedRot = Quaternion.Identity;
         private ReferenceBoxed<Vector3> m_Velocity = Vector3.Zero;
         private UGI m_Group = UGI.Unknown;
         private UGUI m_Owner = UGUI.Unknown;
@@ -674,6 +675,18 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_AttachedPos = value;
+                IsChanged = m_IsChangedEnabled;
+                TriggerOnUpdate(0);
+            }
+        }
+
+        public Quaternion AttachedRot
+        {
+            get { return m_AttachedRot; }
+
+            set
+            {
+                m_AttachedRot = value;
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }

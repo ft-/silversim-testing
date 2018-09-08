@@ -278,6 +278,7 @@ namespace SilverSim.Scene.Types.Object
                         writer.WriteNamedValue("MediaUrl", MediaURL);
                     }
                     writer.WriteNamedValue("AttachedPos", ObjectGroup.AttachedPos);
+                    writer.WriteNamedValue("AttachedRot", ObjectGroup.AttachedRot);
 
                     writer.WriteStartElement("DynAttrs");
                     LlsdXml.Serialize(DynAttrs, writer);
@@ -1676,6 +1677,17 @@ namespace SilverSim.Scene.Types.Object
                                 if (rootGroup != null)
                                 {
                                     rootGroup.AttachedPos = reader.ReadElementChildsAsVector3();
+                                }
+                                else
+                                {
+                                    reader.ReadToEndElement();
+                                }
+                                break;
+
+                            case "AttachedRot":
+                                if(rootGroup != null)
+                                {
+                                    rootGroup.AttachedRot = reader.ReadElementChildsAsQuaternion();
                                 }
                                 else
                                 {

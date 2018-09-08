@@ -684,8 +684,9 @@ namespace SilverSim.Scene.Types.Object
 
         private void TriggerOnPositionChange()
         {
+            ObjectGroup grp = ObjectGroup;
             /* we have to check the ObjectGroup during setup process before using it here */
-            if (ObjectGroup == null)
+            if (grp == null)
             {
                 return;
             }
@@ -702,7 +703,12 @@ namespace SilverSim.Scene.Types.Object
                 }
             }
             UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.Full | ObjectPartLocalizedInfo.UpdateDataFlags.Terse);
-            ObjectGroup.Scene?.ScheduleUpdate(UpdateInfo);
+            grp.Scene?.ScheduleUpdate(UpdateInfo);
+            if(grp.IsAttached && grp.RootPart == this)
+            {
+                grp.AttachedPos = grp.Position;
+                grp.AttachedRot = grp.Rotation;
+            }
         }
 
         private void TriggerOnPhysicsPositionChange()
