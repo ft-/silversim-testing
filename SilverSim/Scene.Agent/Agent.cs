@@ -836,7 +836,6 @@ namespace SilverSim.Scene.Agent
 
         public void PostEvent(IScriptEvent ev)
         {
-            /* intentionally left empty */
             Type evType = ev.GetType();
             if(evType == typeof(CollisionEvent))
             {
