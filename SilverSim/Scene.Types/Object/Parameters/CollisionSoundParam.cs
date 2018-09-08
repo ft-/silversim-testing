@@ -30,6 +30,7 @@ namespace SilverSim.Scene.Types.Object.Parameters
         public UUID ImpactSound = UUID.Zero;
         public double ImpactVolume;
         public double ImpactSoundRadius;
+        public bool ImpactUseHitpoint;
         #endregion
 
         public CollisionSoundParam()
@@ -47,7 +48,7 @@ namespace SilverSim.Scene.Types.Object.Parameters
         {
             get
             {
-                var serialized = new byte[32];
+                var serialized = new byte[33];
                 ImpactSound.ToBytes(serialized, 0);
                 Buffer.BlockCopy(BitConverter.GetBytes(ImpactVolume), 0, serialized, 16, 8);
                 Buffer.BlockCopy(BitConverter.GetBytes(ImpactSoundRadius), 0, serialized, 24, 8);
@@ -59,14 +60,15 @@ namespace SilverSim.Scene.Types.Object.Parameters
                 {
                     Array.Reverse(serialized, 24, 8);
                 }
+                serialized[32] = ImpactUseHitpoint ? (byte)1 : (byte)0;
                 return serialized;
             }
 
             set
             {
-                if (value.Length != 24 && value.Length != 32)
+                if (value.Length != 24 && value.Length != 32 && value.Length != 33)
                 {
-                    throw new ArgumentException("Array length must be 24 or 32.");
+                    throw new ArgumentException("Array length must be 24 or 32 or 33.");
                 }
                 if (!BitConverter.IsLittleEndian)
                 {
@@ -89,6 +91,14 @@ namespace SilverSim.Scene.Types.Object.Parameters
                 else
                 {
                     ImpactSoundRadius = 20;
+                }
+                if(value.Length > 32)
+                {
+                    ImpactUseHitpoint = value[32] != 0;
+                }
+                else
+                {
+                    ImpactUseHitpoint = false;
                 }
             }
         }

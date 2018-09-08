@@ -38,7 +38,7 @@ namespace SilverSim.Scene.Types.Script.Events
         public Vector3 Position;
         public Vector3 Velocity;
         public Quaternion Rotation;
-        public Vector3 GrabOffset;
+        public Vector3 GrabOffset; /* in collision event this holds the region position where the object was exactly hit */
         public int LinkNumber;
         public Vector3 TouchBinormal;
         public int TouchFace;

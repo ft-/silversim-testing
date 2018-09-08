@@ -272,6 +272,7 @@ namespace SilverSim.Scene.Types.Object
                     writer.WriteUUID("CollisionSound", sp.ImpactSound);
                     writer.WriteNamedValue("CollisionSoundVolume", sp.ImpactVolume);
                     writer.WriteNamedValue("CollisionSoundRadius", sp.ImpactSoundRadius);
+                    writer.WriteNamedValue("CollisionSoundUseHitpoint", sp.ImpactUseHitpoint);
                     if (!string.IsNullOrEmpty(MediaURL))
                     {
                         writer.WriteNamedValue("MediaUrl", MediaURL);
@@ -1653,7 +1654,15 @@ namespace SilverSim.Scene.Types.Object
                             case "CollisionSoundRadius":
                                 {
                                     CollisionSoundParam sp = part.CollisionSound;
-                                    sp.ImpactSoundRadius = Math.Max(reader.ReadElementContentAsDouble(), 0);
+                                    sp.ImpactSoundRadius = Math.Max(reader.ReadElementValueAsDouble(), 0);
+                                    part.CollisionSound = sp;
+                                }
+                                break;
+
+                            case "CollisionSoundUseHitpoint":
+                                {
+                                    CollisionSoundParam sp = part.CollisionSound;
+                                    sp.ImpactUseHitpoint = reader.ReadElementValueAsBoolean();
                                     part.CollisionSound = sp;
                                 }
                                 break;
