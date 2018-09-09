@@ -304,19 +304,37 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         #region Object Permissions
-        public bool CanRez(UGUI agent, Vector3 location)
+        public readonly RwLockedList<UUID> WhiteListedRezzableAssetIds = new RwLockedList<UUID>();
+        public readonly RwLockedList<UUID> BlackListedRezzableAssetIds = new RwLockedList<UUID>();
+        public readonly RwLockedList<UUID> WhiteListedRezzingScriptAssetIds = new RwLockedList<UUID>();
+
+        public bool CanRez(UGUI agent, Vector3 location) => CanRez(agent, location, UUID.Zero);
+
+        /** <summary>special call variant for supporting assetid based overrides</summary> */
+        public bool CanRez(UGUI agent, Vector3 location, UUID assetID)
         {
             ParcelInfo pinfo;
+
+            if (BlackListedRezzableAssetIds.Contains(assetID))
+            {
+                return false;
+            }
+
             if (!Parcels.TryGetValue(location, out pinfo))
             {
                 return false;
             }
 
-            if ((pinfo.Flags & ParcelFlags.CreateObjects) != 0)
+            if (assetID != UUID.Zero && WhiteListedRezzableAssetIds.Contains(assetID))
+            {
+                /* white listed asset */
+                return true;
+            }
+            else if ((pinfo.Flags & ParcelFlags.CreateObjects) != 0)
             {
                 return true;
             }
-            else if ((agent.EqualsGrid(pinfo.Owner)) || IsPossibleGod(agent))
+            else if (agent.EqualsGrid(pinfo.Owner) || IsPossibleGod(agent))
             {
                 return true;
             }
