@@ -273,6 +273,7 @@ namespace SilverSim.Scene.Types.Object
                     writer.WriteNamedValue("CollisionSoundVolume", sp.ImpactVolume);
                     writer.WriteNamedValue("CollisionSoundRadius", sp.ImpactSoundRadius);
                     writer.WriteNamedValue("CollisionSoundUseHitpoint", sp.ImpactUseHitpoint);
+                    writer.WriteNamedValue("CollisionSoundUseChilds", sp.ImpactUseChilds);
                     if (!string.IsNullOrEmpty(MediaURL))
                     {
                         writer.WriteNamedValue("MediaUrl", MediaURL);
@@ -1664,6 +1665,14 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     CollisionSoundParam sp = part.CollisionSound;
                                     sp.ImpactUseHitpoint = reader.ReadElementValueAsBoolean();
+                                    part.CollisionSound = sp;
+                                }
+                                break;
+
+                            case "CollisionSoundUseChilds":
+                                {
+                                    CollisionSoundParam sp = part.CollisionSound;
+                                    sp.ImpactUseChilds = reader.ReadElementValueAsBoolean();
                                     part.CollisionSound = sp;
                                 }
                                 break;

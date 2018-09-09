@@ -26,12 +26,58 @@ namespace SilverSim.Scene.Types.Object.Parameters
 {
     public class CollisionSoundParam
     {
+        [Flags]
+        private enum CollisionSoundFlags : uint
+        {
+            None = 0,
+            UseHitpoint = 1,
+            UseChilds = 2,
+        }
+
         #region Fields
         public UUID ImpactSound = UUID.Zero;
         public double ImpactVolume;
         public double ImpactSoundRadius;
-        public bool ImpactUseHitpoint;
+        private CollisionSoundFlags m_ImpactSoundFlags;
         #endregion
+
+        public bool ImpactUseHitpoint
+        {
+            get
+            {
+                return (m_ImpactSoundFlags & CollisionSoundFlags.UseHitpoint) != 0;
+            }
+            set
+            {
+                if(value)
+                {
+                    m_ImpactSoundFlags |= CollisionSoundFlags.UseHitpoint;
+                }
+                else
+                {
+                    m_ImpactSoundFlags &= ~CollisionSoundFlags.UseHitpoint;
+                }
+            }
+        }
+
+        public bool ImpactUseChilds
+        {
+            get
+            {
+                return (m_ImpactSoundFlags & CollisionSoundFlags.UseChilds) != 0;
+            }
+            set
+            {
+                if(value)
+                {
+                    m_ImpactSoundFlags |= CollisionSoundFlags.UseChilds;
+                }
+                else
+                {
+                    m_ImpactSoundFlags &= ~CollisionSoundFlags.UseChilds;
+                }
+            }
+        }
 
         public CollisionSoundParam()
         {
@@ -42,13 +88,14 @@ namespace SilverSim.Scene.Types.Object.Parameters
             ImpactSound = src.ImpactSound;
             ImpactVolume = src.ImpactVolume;
             ImpactSoundRadius = src.ImpactSoundRadius;
+            m_ImpactSoundFlags = src.m_ImpactSoundFlags;
         }
 
         public byte[] Serialization
         {
             get
             {
-                var serialized = new byte[33];
+                var serialized = new byte[36];
                 ImpactSound.ToBytes(serialized, 0);
                 Buffer.BlockCopy(BitConverter.GetBytes(ImpactVolume), 0, serialized, 16, 8);
                 Buffer.BlockCopy(BitConverter.GetBytes(ImpactSoundRadius), 0, serialized, 24, 8);
@@ -60,15 +107,20 @@ namespace SilverSim.Scene.Types.Object.Parameters
                 {
                     Array.Reverse(serialized, 24, 8);
                 }
+                Buffer.BlockCopy(BitConverter.GetBytes((uint)m_ImpactSoundFlags), 0, serialized, 32, 4);
                 serialized[32] = ImpactUseHitpoint ? (byte)1 : (byte)0;
+                if(!BitConverter.IsLittleEndian)
+                {
+                    Array.Reverse(serialized, 32, 4);
+                }
                 return serialized;
             }
 
             set
             {
-                if (value.Length != 24 && value.Length != 32 && value.Length != 33)
+                if (value.Length != 24 && value.Length != 32 && value.Length != 36)
                 {
-                    throw new ArgumentException("Array length must be 24 or 32 or 33.");
+                    throw new ArgumentException("Array length must be 24 or 32 or 36.");
                 }
                 if (!BitConverter.IsLittleEndian)
                 {
@@ -94,11 +146,15 @@ namespace SilverSim.Scene.Types.Object.Parameters
                 }
                 if(value.Length > 32)
                 {
-                    ImpactUseHitpoint = value[32] != 0;
+                    if(!BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(value, 32, 4);
+                    }
+                    m_ImpactSoundFlags = (CollisionSoundFlags)BitConverter.ToUInt32(value, 32);
                 }
                 else
                 {
-                    ImpactUseHitpoint = false;
+                    m_ImpactSoundFlags = CollisionSoundFlags.None;
                 }
             }
         }

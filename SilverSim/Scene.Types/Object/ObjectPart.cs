@@ -1985,25 +1985,6 @@ namespace SilverSim.Scene.Types.Object
         {
             ObjectGroup grp = ObjectGroup;
             SceneInterface scene = grp?.Scene;
-            
-            if(ev.Type == CollisionEvent.CollisionType.Start)
-            {
-                CollisionSoundParam soundParam = CollisionSound;
-                if (soundParam.ImpactSound != UUID.Zero)
-                {
-                    foreach (DetectInfo di in ev.Detected)
-                    {
-                        if (soundParam.ImpactUseHitpoint)
-                        {
-                            scene?.SendTriggerSound(this, di.GrabOffset, soundParam.ImpactSound, soundParam.ImpactVolume, soundParam.ImpactSoundRadius);
-                        }
-                        else
-                        {
-                            scene?.SendTriggerSound(this, soundParam.ImpactSound, soundParam.ImpactVolume, soundParam.ImpactSoundRadius);
-                        }
-                    }
-                }
-            }
 
             if(grp.Damage > 0)
             {

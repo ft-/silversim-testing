@@ -22,6 +22,7 @@
 using log4net;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.KeyframedMotion;
+using SilverSim.Scene.Types.Object.Parameters;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Scene.Types.Script.Events;
@@ -1486,6 +1487,40 @@ namespace SilverSim.Scene.Types.Object
         #region Script Events
         public void PostEvent(IScriptEvent ev)
         {
+            Type evType = ev.GetType();
+            if(evType == typeof(CollisionEvent))
+            {
+                CollisionEvent cev = (CollisionEvent)ev;
+
+                if (cev.Type == CollisionEvent.CollisionType.Start)
+                {
+                    foreach (DetectInfo di in cev.Detected)
+                    {
+                        ObjectPart colSoundPrim = RootPart;
+                        CollisionSoundParam soundParam = colSoundPrim.CollisionSound;
+                        if(soundParam.ImpactUseChilds)
+                        {
+                            if (!TryGetValue(di.LinkNumber, out colSoundPrim))
+                            {
+                                continue;
+                            }
+                            soundParam = colSoundPrim.CollisionSound;
+                        }
+
+                        if (soundParam.ImpactSound != UUID.Zero)
+                        {
+                            if (soundParam.ImpactUseHitpoint)
+                            {
+                                Scene?.SendTriggerSound(colSoundPrim, di.GrabOffset, soundParam.ImpactSound, soundParam.ImpactVolume, soundParam.ImpactSoundRadius);
+                            }
+                            else
+                            {
+                                Scene?.SendTriggerSound(colSoundPrim, soundParam.ImpactSound, soundParam.ImpactVolume, soundParam.ImpactSoundRadius);
+                            }
+                        }
+                    }
+                }
+            }
             foreach (ObjectPart item in Values)
             {
                 item.PostEvent(ev);
