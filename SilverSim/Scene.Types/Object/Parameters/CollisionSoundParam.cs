@@ -108,7 +108,6 @@ namespace SilverSim.Scene.Types.Object.Parameters
                     Array.Reverse(serialized, 24, 8);
                 }
                 Buffer.BlockCopy(BitConverter.GetBytes((uint)m_ImpactSoundFlags), 0, serialized, 32, 4);
-                serialized[32] = ImpactUseHitpoint ? (byte)1 : (byte)0;
                 if(!BitConverter.IsLittleEndian)
                 {
                     Array.Reverse(serialized, 32, 4);
