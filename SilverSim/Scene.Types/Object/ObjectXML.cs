@@ -97,7 +97,12 @@ namespace SilverSim.Scene.Types.Object
 
             using (var xmlstream = data.InputStream)
             {
-                return FromXml(xmlstream, currentOwner, options);
+                List<ObjectGroup> grps = FromXml(xmlstream, currentOwner, options);
+                foreach(ObjectGroup grp in grps)
+                {
+                    grp.OriginalAssetID = data.ID;
+                }
+                return grps;
             }
         }
 
