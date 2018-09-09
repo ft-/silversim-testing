@@ -308,10 +308,10 @@ namespace SilverSim.Scene.Types.Scene
         public readonly RwLockedList<UUID> BlackListedRezzableAssetIds = new RwLockedList<UUID>();
         public readonly RwLockedList<UUID> WhiteListedRezzingScriptAssetIds = new RwLockedList<UUID>();
 
-        public bool CanRez(UGUI agent, Vector3 location) => CanRez(agent, location, UUID.Zero);
+        public bool CanRez(UGUI agent, Vector3 location) => CanRez(agent, location, UUID.Zero, UUID.Zero);
 
         /** <summary>special call variant for supporting assetid based overrides</summary> */
-        public bool CanRez(UGUI agent, Vector3 location, UUID assetID)
+        public bool CanRez(UGUI agent, Vector3 location, UUID assetID, UUID rezzingassetid)
         {
             ParcelInfo pinfo;
 
@@ -325,13 +325,13 @@ namespace SilverSim.Scene.Types.Scene
                 return false;
             }
 
-            if (assetID != UUID.Zero && WhiteListedRezzableAssetIds.Contains(assetID))
+            if ((pinfo.Flags & ParcelFlags.CreateObjects) != 0 && !WhiteListedRezzingScriptAssetIds.Contains(rezzingassetid))
             {
-                /* white listed asset */
                 return true;
             }
-            else if ((pinfo.Flags & ParcelFlags.CreateObjects) != 0)
+            else if (assetID != UUID.Zero && WhiteListedRezzableAssetIds.Contains(assetID))
             {
+                /* white listed asset */
                 return true;
             }
             else if (agent.EqualsGrid(pinfo.Owner) || IsPossibleGod(agent))
