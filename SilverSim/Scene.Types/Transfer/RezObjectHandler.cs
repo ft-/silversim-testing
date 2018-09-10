@@ -184,7 +184,7 @@ namespace SilverSim.Scene.Types.Transfer
             {
                 foreach (ObjectGroup grp in objgroups)
                 {
-                    if (m_Scene.CanRez(m_RezzingAgent, grp.GlobalPosition))
+                    if (m_Scene.CanRez(m_RezzingAgent.ID, m_RezzingAgent, grp.GlobalPosition))
                     {
                         if (m_Scene.GroupsService?.Members.ContainsKey(m_RezzingAgent, m_RezzingGroup, m_RezzingAgent) ?? false)
                         {

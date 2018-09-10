@@ -27,6 +27,7 @@ using SilverSim.Types;
 using SilverSim.Types.Groups;
 using SilverSim.Types.Inventory;
 using SilverSim.Types.Parcel;
+using System;
 using System.Collections.Generic;
 
 namespace SilverSim.Scene.Types.Scene
@@ -308,20 +309,24 @@ namespace SilverSim.Scene.Types.Scene
         public readonly RwLockedList<UUID> BlackListedRezzableAssetIds = new RwLockedList<UUID>();
         public readonly RwLockedList<UUID> WhiteListedRezzingScriptAssetIds = new RwLockedList<UUID>();
 
-        public bool CanRez(UGUI agent, Vector3 location) => CanRez(agent, location, UUID.Zero, UUID.Zero);
+        public bool CanRez(UUID rezzerid, UGUI agent, Vector3 location) => CanRez(rezzerid, agent, location, UUID.Zero, UUID.Zero);
+
+        public event Action<UUID /* scene */, UGUI, UUID /* rezzerid */, RezDenialReason, UUID /* rezzing script asset id */, UUID /* rezzed object asset id */> RezzingDenied;
 
         /** <summary>special call variant for supporting assetid based overrides</summary> */
-        public bool CanRez(UGUI agent, Vector3 location, UUID assetID, UUID rezzingassetid)
+        public bool CanRez(UUID rezzerid, UGUI agent, Vector3 location, UUID assetID, UUID rezzingassetid)
         {
             ParcelInfo pinfo;
 
             if (BlackListedRezzableAssetIds.Contains(assetID))
             {
+                RezzingDenied?.Invoke(ID, agent, rezzerid, RezDenialReason.Blacklisted, rezzingassetid, assetID);
                 return false;
             }
 
             if (!Parcels.TryGetValue(location, out pinfo))
             {
+                RezzingDenied?.Invoke(ID, agent, rezzerid, RezDenialReason.ParcelNotFound, rezzingassetid, assetID);
                 return false;
             }
 
@@ -346,6 +351,7 @@ namespace SilverSim.Scene.Types.Scene
             }
             else
             {
+                RezzingDenied?.Invoke(ID, agent, rezzerid, RezDenialReason.ParcelNotAllowed, rezzingassetid, assetID);
                 return false;
             }
         }

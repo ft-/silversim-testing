@@ -245,7 +245,7 @@ namespace SilverSim.Scene.Agent
 
         public void DropAttachment(ObjectGroup grp, Vector3 position, Quaternion rotation, bool override_canrez = false)
         {
-            if (override_canrez || grp.Scene.CanRez(Owner, position))
+            if (override_canrez || grp.Scene.CanRez(Owner.ID, Owner, position))
             {
                 if (Attachments.Remove(grp.ID))
                 {
