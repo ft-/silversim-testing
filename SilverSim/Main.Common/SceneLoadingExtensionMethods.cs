@@ -392,6 +392,7 @@ namespace SilverSim.Main.Common
                                     if (item.ScriptInstance.IsResetRequired)
                                     {
                                         item.ScriptInstance.IsResetRequired = false;
+                                        item.ScriptInstance.IsRunningAllowed = loadparams.Scene.CanRunScript(item.Owner, part.ObjectGroup.GlobalPosition, item.AssetID);
                                         item.ScriptInstance.IsRunning = true;
                                         item.ScriptInstance.Reset();
                                     }

@@ -573,6 +573,7 @@ namespace SilverSim.Scene.Implementation.Common
                                 m_Log.DebugFormat("Instantiated script: IsResetRequired={0} Running={1}", item.ScriptInstance.IsResetRequired, item.ScriptInstance.IsRunning);
 #endif
 
+                                item.ScriptInstance.IsRunningAllowed = group.Scene.CanRunScript(item.Owner, part.ObjectGroup.GlobalPosition, item.AssetID);
                                 if (item.ScriptInstance.IsResetRequired || !hasState)
                                 {
                                     item.ScriptInstance.IsResetRequired = false;

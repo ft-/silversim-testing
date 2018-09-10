@@ -56,6 +56,7 @@ namespace SilverSim.Scene.Types.Script
     {
         public abstract void PostEvent(IScriptEvent e);
         public abstract bool IsRunning { get; set; }
+        public bool IsRunningAllowed { get; set; }
         public bool IsAborting { get; private set; }
         /* Remove and Dispose must deregister all possible handles */
         public abstract void Remove();

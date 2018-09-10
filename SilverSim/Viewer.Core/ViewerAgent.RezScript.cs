@@ -235,8 +235,10 @@ namespace SilverSim.Viewer.Core
             ScriptInstance instance;
             try
             {
+                SceneInterface scene = part.ObjectGroup.Scene;
                 instance = ScriptLoader.Load(part, item, item.Owner, data, CurrentCulture, openInclude: part.OpenScriptInclude);
                 item.ScriptInstance = instance;
+                item.ScriptInstance.IsRunningAllowed = scene.CanRunScript(item.Owner, part.ObjectGroup.GlobalPosition, item.AssetID);
                 item.ScriptInstance.IsRunning = true;
                 item.ScriptInstance.Reset();
                 part.ObjectGroup.Scene.SendObjectPropertiesToAgent(this, part);

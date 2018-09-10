@@ -73,7 +73,7 @@ namespace SilverSim.Scripting.Common
 
         public override void PostEvent(IScriptEvent e)
         {
-            if (IsRunning && !IsAborting)
+            if (IsRunning && IsRunningAllowed && !IsAborting)
             {
                 m_Events.Enqueue(e);
                 Part.ObjectGroup.Scene.ScriptThreadPool.PostScript(this);
