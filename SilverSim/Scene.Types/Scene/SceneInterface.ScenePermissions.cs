@@ -308,6 +308,7 @@ namespace SilverSim.Scene.Types.Scene
         public readonly RwLockedList<UUID> WhiteListedRezzableAssetIds = new RwLockedList<UUID>();
         public readonly RwLockedList<UUID> BlackListedRezzableAssetIds = new RwLockedList<UUID>();
         public readonly RwLockedList<UUID> WhiteListedRezzingScriptAssetIds = new RwLockedList<UUID>();
+        public readonly RwLockedList<UUID> WhiteListedRunScriptAssetIds = new RwLockedList<UUID>();
 
         public bool CanRez(UUID rezzerid, UGUI agent, Vector3 location) => CanRez(rezzerid, agent, location, UUID.Zero, UUID.Zero);
 
@@ -356,7 +357,7 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        public bool CanRunScript(UGUI agent, Vector3 location)
+        public bool CanRunScript(UGUI agent, Vector3 location, UUID scriptassetid)
         {
             ParcelInfo pinfo;
             if (!Parcels.TryGetValue(location, out pinfo))
@@ -375,6 +376,10 @@ namespace SilverSim.Scene.Types.Scene
             else if ((pinfo.Flags & ParcelFlags.AllowGroupScripts) != 0 &&
                 pinfo.Group.ID != UUID.Zero &&
                 IsGroupMember(agent, pinfo.Group))
+            {
+                return true;
+            }
+            else if (WhiteListedRunScriptAssetIds.Contains(scriptassetid))
             {
                 return true;
             }
