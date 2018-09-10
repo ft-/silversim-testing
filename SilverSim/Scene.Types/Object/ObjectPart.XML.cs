@@ -1427,6 +1427,10 @@ namespace SilverSim.Scene.Types.Object
 
                             case "RotationOffset":
                                 part.LocalRotation = reader.ReadElementChildsAsQuaternion();
+                                if(rootGroup != null)
+                                {
+                                    rootGroup.AttachedRot = part.LocalRotation;
+                                }
                                 break;
 
                             case "Velocity":
