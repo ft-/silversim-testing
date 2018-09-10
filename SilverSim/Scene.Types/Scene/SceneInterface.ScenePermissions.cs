@@ -369,7 +369,7 @@ namespace SilverSim.Scene.Types.Scene
             {
                 return true;
             }
-            else if ((agent.EqualsGrid(pinfo.Owner)) || IsPossibleGod(agent))
+            else if (agent.EqualsGrid(pinfo.Owner) || IsPossibleGod(agent))
             {
                 return true;
             }
