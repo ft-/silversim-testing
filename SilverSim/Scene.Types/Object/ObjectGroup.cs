@@ -1532,6 +1532,14 @@ namespace SilverSim.Scene.Types.Object
                     }
                 }
             }
+            else if(evType == typeof(LandCollisionEvent))
+            {
+                ObjectPart part;
+                if(TryGetRootPart(out part))
+                {
+                    part.PostEvent(ev);
+                }
+            }
             else
             {
                 foreach (ObjectPart item in Values)

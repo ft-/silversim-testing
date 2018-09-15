@@ -843,10 +843,14 @@ namespace SilverSim.Scene.Agent
             }
             else if(evType == typeof(LandCollisionEvent))
             {
-                /* relay collision events to attachments */
+                /* relay collision events to attachment root prims */
                 foreach (ObjectGroup attached in Attachments.All)
                 {
-                    attached.PostEvent(ev);
+                    ObjectPart part;
+                    if (attached.TryGetRootPart(out part))
+                    {
+                        part.PostEvent(ev);
+                    }
                 }
             }
         }
