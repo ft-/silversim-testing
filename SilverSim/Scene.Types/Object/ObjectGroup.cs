@@ -1488,7 +1488,7 @@ namespace SilverSim.Scene.Types.Object
         public void PostEvent(IScriptEvent ev)
         {
             Type evType = ev.GetType();
-            if(evType == typeof(CollisionEvent))
+            if (evType == typeof(CollisionEvent))
             {
                 CollisionEvent cev = (CollisionEvent)ev;
 
@@ -1498,7 +1498,7 @@ namespace SilverSim.Scene.Types.Object
                     {
                         ObjectPart colSoundPrim = RootPart;
                         CollisionSoundParam soundParam = colSoundPrim.CollisionSound;
-                        if(soundParam.ImpactUseChilds)
+                        if (soundParam.ImpactUseChilds)
                         {
                             if (!TryGetValue(di.LinkNumber, out colSoundPrim))
                             {
@@ -1520,10 +1520,22 @@ namespace SilverSim.Scene.Types.Object
                         }
                     }
                 }
+
+                foreach(DetectInfo di in cev.Detected)
+                {
+                    ObjectPart part;
+                    if(TryGetValue(di.LinkNumber, out part))
+                    {
+                        part.PostEvent(ev);
+                    }
+                }
             }
-            foreach (ObjectPart item in Values)
+            else
             {
-                item.PostEvent(ev);
+                foreach (ObjectPart item in Values)
+                {
+                    item.PostEvent(ev);
+                }
             }
         }
         #endregion

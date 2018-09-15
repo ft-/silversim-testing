@@ -74,6 +74,8 @@ namespace SilverSim.Scene.Types.Script
         public abstract IScriptState ScriptState { get; }
         public virtual bool HasTouchEvent => false;
         public virtual bool HasMoneyEvent => false;
+        public virtual bool HasCollisionEvent => false;
+        public virtual bool HasLandCollisionEvent => false;
 
         public abstract ObjectPartInventoryItem Item { get; }
 

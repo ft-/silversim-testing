@@ -2023,8 +2023,14 @@ namespace SilverSim.Scene.Types.Object
                 }
             }
 
+            bool isHandledEvent = false;
             foreach(ObjectPartInventoryItem item in Inventory.Values)
             {
+                if (!(item.ScriptInstance?.HasCollisionEvent ?? false))
+                {
+                    continue;
+                }
+                isHandledEvent = true;
                 ObjectPartInventoryItem.CollisionFilterParam filter = item.CollisionFilter;
                 if(string.IsNullOrEmpty(filter.Name) && filter.ID == UUID.Zero && filter.Type == ObjectPartInventoryItem.CollisionFilterEnum.Accept)
                 {
@@ -2059,6 +2065,27 @@ namespace SilverSim.Scene.Types.Object
                         /* only post event if at least one passed the filter */
                         item.ScriptInstance?.PostEvent(evnew);
                     }
+                }
+            }
+
+            ObjectPart rootPart = ObjectGroup?.RootPart;
+            if(rootPart != this)
+            {
+                switch(PassCollisionMode)
+                {
+                    case PassEventMode.Never:
+                        break;
+
+                    case PassEventMode.IfNotHandled:
+                        if(!isHandledEvent)
+                        {
+                            goto case PassEventMode.Always;
+                        }
+                        break;
+
+                    case PassEventMode.Always:
+                        rootPart?.PostCollisionEvent(ev, filterExperience, experienceID);
+                        break;
                 }
             }
         }
