@@ -874,7 +874,11 @@ namespace SilverSim.Scene.Agent
             /* relay collision events to attachments */
             foreach(ObjectGroup attached in Attachments.All)
             {
-                attached.PostEvent(ev);
+                ObjectPart part;
+                if(attached.TryGetRootPart(out part))
+                {
+                    part.PostEvent(ev);
+                }
             }
         }
         #endregion

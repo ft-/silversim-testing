@@ -467,6 +467,8 @@ namespace SilverSim.Scene.Types.Object
             controller?.Stop();
         }
 
+        public bool TryGetRootPart(out ObjectPart part) => TryGetValue(LINK_ROOT, out part);
+
         #endregion
 
         #region Properties
