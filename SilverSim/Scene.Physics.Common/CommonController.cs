@@ -122,6 +122,55 @@ namespace SilverSim.Scene.Physics.Common
 
         #endregion
 
+        #region MoveToTarget Motor
+        private readonly object m_MoveToTargetParamsLock = new object();
+        public bool m_EnableMoveToTarget;
+        private Vector3 m_MoveToTargetPos;
+        private double m_MoveToTargetTau;
+
+        protected PositionalForce MoveToTargetMotor(IPhysicalObject obj)
+        {
+            Vector3 force = Vector3.Zero;
+            Vector3 dist = obj.GlobalPosition;
+            lock (m_MoveToTargetParamsLock)
+            {
+                if(m_MoveToTargetTau > 0.01 && m_EnableMoveToTarget)
+                {
+                    dist -= m_MoveToTargetPos;
+                    force = dist / m_MoveToTargetTau;
+                    Vector3 abs = new Vector3
+                    {
+                        X = Math.Abs(dist.X),
+                        Y = Math.Abs(dist.Y),
+                        Z = Math.Abs(dist.Z)
+                    };
+                    force.X = force.X.Clamp(-abs.X, abs.X);
+                    force.Y = force.Y.Clamp(-abs.Y, abs.Y);
+                    force.Z = force.Z.Clamp(-abs.Z, abs.Z);
+                }
+            }
+            return new PositionalForce("MoveToTargetMotor", force, Vector3.Zero);
+        }
+
+        public void SetMoveToTarget(Vector3 target, double tau)
+        {
+            lock(m_MoveToTargetParamsLock)
+            {
+                m_EnableMoveToTarget = true;
+                m_MoveToTargetPos = target;
+                m_MoveToTargetTau = tau;
+            }
+        }
+
+        public void StopMoveToTarget()
+        {
+            lock(m_MoveToTargetParamsLock)
+            {
+                m_EnableMoveToTarget = false;
+            }
+        }
+        #endregion
+
         #region LookAt Motor
         private readonly object m_LookAtParamsLock = new object();
         private bool m_EnableLookAt;

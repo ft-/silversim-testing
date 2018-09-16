@@ -221,6 +221,7 @@ namespace SilverSim.Scene.Physics.Common
                 forces.Add(new PositionalForce("AppliedForce", m_AppliedForce, Vector3.Zero));
                 vehicleTorque += m_AppliedTorque;
             }
+            forces.Add(MoveToTargetMotor(m_Part));
 
             vehicleTorque += LookAtMotor(m_Part);
 
