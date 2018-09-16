@@ -152,8 +152,8 @@ namespace SilverSim.Scene.Physics.Common
             {
                 m_EnableLookAt = true;
                 m_LookAtTarget = q;
-                m_LookAtStrength = strength;
-                m_LookAtDamping = Math.Max(1.0, damping);
+                m_LookAtStrength = Math.Max(0, strength);
+                m_LookAtDamping = damping.Clamp(0, 1.0);
             }
         }
 
