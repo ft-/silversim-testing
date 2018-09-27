@@ -109,7 +109,8 @@ namespace SilverSim.Scene.Types.Transfer
 
                         foreach (UUID assetid_new in ref_assetids)
                         {
-                            if (!new_assetids.Contains(assetid_new))
+                            if (!new_assetids.Contains(assetid_new) &&
+                                !processed_assetids.Contains(assetid_new))
                             {
                                 new_assetids.Add(assetid_new);
                             }
