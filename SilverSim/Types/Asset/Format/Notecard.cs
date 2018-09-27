@@ -26,6 +26,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace SilverSim.Types.Asset.Format
 {
@@ -33,6 +34,7 @@ namespace SilverSim.Types.Asset.Format
     {
         public NotecardInventory Inventory = new NotecardInventory();
         public string Text = string.Empty;
+        private static readonly Regex m_HeuristicUUIDPattern = new Regex("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}");
 
         #region Constructors
         public Notecard()
@@ -144,6 +146,17 @@ namespace SilverSim.Types.Asset.Format
                         catch
                         {
                             /* no action required */
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (Match match in m_HeuristicUUIDPattern.Matches(Text))
+                    {
+                        UUID id = new UUID(match.Value);
+                        if (id != UUID.Zero && !reflist.Contains(id))
+                        {
+                            reflist.Add(id);
                         }
                     }
                 }

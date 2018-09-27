@@ -113,6 +113,18 @@ namespace SilverSim.Types.Asset
                             return new List<UUID>();
                         }
 
+                    case AssetType.LSLText:
+                        try
+                        {
+                            refs = new ScriptSource(this).References;
+                            refs.Remove(ID);
+                        }
+                        catch
+                        {
+                            refs = new List<UUID>();
+                        }
+                        return refs;
+
                     default:
                         break;
                 }
