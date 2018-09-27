@@ -100,6 +100,7 @@ namespace SilverSim.Scene.Types.Transfer
                             catch(AssetNotFoundException)
                             {
                                 /* ignore this one since there is simply too many of incomplete items */
+                                continue;
                             }
                         }
 
