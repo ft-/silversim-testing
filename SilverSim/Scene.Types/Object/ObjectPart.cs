@@ -1233,6 +1233,10 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        public bool IsRootPart => ObjectGroup?.RootPart == this;
+
+        public ObjectPart RootPart => ObjectGroup?.RootPart;
+
         public int LinkNumber
         {
             get
