@@ -41,6 +41,8 @@ namespace SilverSim.Scene.Types.Object.Parameters
             TextColor = src.TextColor;
         }
 
+        public bool IsDifferent(TextParam p) => Text != p.Text || TextColor != p.TextColor;
+
         public byte[] Serialization
         {
             get

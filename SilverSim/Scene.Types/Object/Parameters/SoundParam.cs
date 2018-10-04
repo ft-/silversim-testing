@@ -46,6 +46,8 @@ namespace SilverSim.Scene.Types.Object.Parameters
             Flags = src.Flags;
         }
 
+        public bool IsDifferent(SoundParam src) => SoundID != src.SoundID || Gain != src.Gain || Radius != src.Radius || Flags != src.Flags;
+
         public byte[] Serialization
         {
             get

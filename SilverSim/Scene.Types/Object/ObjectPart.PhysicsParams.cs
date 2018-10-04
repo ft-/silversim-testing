@@ -25,6 +25,7 @@ using SilverSim.Scene.Types.Physics.Vehicle;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Threading;
 using SilverSim.Types;
+using System.Threading;
 
 namespace SilverSim.Scene.Types.Object
 {
@@ -46,9 +47,11 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
-                m_PhysicsDensity = value;
-                IncrementPhysicsParameterUpdateSerial();
-                TriggerOnUpdate(0);
+                if (Atomic.TryChange(ref m_PhysicsDensity, value))
+                {
+                    IncrementPhysicsParameterUpdateSerial();
+                    TriggerOnUpdate(0);
+                }
             }
         }
 
@@ -60,9 +63,11 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
-                m_Mass = (value < double.Epsilon) ? double.Epsilon : value;
-                IncrementPhysicsParameterUpdateSerial();
-                TriggerOnUpdate(0);
+                if (Atomic.TryChange(ref m_Mass, (value < double.Epsilon) ? double.Epsilon : value))
+                {
+                    IncrementPhysicsParameterUpdateSerial();
+                    TriggerOnUpdate(0);
+                }
             }
         }
 
@@ -74,9 +79,11 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
-                m_PhysicsFriction = value;
-                IncrementPhysicsParameterUpdateSerial();
-                TriggerOnUpdate(0);
+                if (Atomic.TryChange(ref m_PhysicsFriction, value))
+                {
+                    IncrementPhysicsParameterUpdateSerial();
+                    TriggerOnUpdate(0);
+                }
             }
         }
 
@@ -88,9 +95,11 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
-                m_PhysicsRestitution = value;
-                IncrementPhysicsParameterUpdateSerial();
-                TriggerOnUpdate(0);
+                if (Atomic.TryChange(ref m_PhysicsRestitution, value))
+                {
+                    IncrementPhysicsParameterUpdateSerial();
+                    TriggerOnUpdate(0);
+                }
             }
         }
 
@@ -102,9 +111,11 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
-                m_PhysicsGravityMultiplier = value;
-                IncrementPhysicsParameterUpdateSerial();
-                TriggerOnUpdate(0);
+                if (Atomic.TryChange(ref m_PhysicsGravityMultiplier, value))
+                {
+                    IncrementPhysicsParameterUpdateSerial();
+                    TriggerOnUpdate(0);
+                }
             }
         }
         #endregion
@@ -192,9 +203,17 @@ namespace SilverSim.Scene.Types.Object
 
             set
             {
-                m_IsRotateXEnabled = value;
-                IncrementPhysicsParameterUpdateSerial();
-                TriggerOnUpdate(UpdateChangedFlags.Physics);
+                bool changed;
+                lock (m_DataLock)
+                {
+                    changed = m_IsRotateXEnabled != value;
+                    m_IsRotateXEnabled = value;
+                }
+                if (changed)
+                {
+                    IncrementPhysicsParameterUpdateSerial();
+                    TriggerOnUpdate(UpdateChangedFlags.Physics);
+                }
             }
         }
 
@@ -204,9 +223,17 @@ namespace SilverSim.Scene.Types.Object
 
             set
             {
-                m_IsRotateYEnabled = value;
-                IncrementPhysicsParameterUpdateSerial();
-                TriggerOnUpdate(UpdateChangedFlags.Physics);
+                bool changed;
+                lock (m_DataLock)
+                {
+                    changed = m_IsRotateYEnabled != value;
+                    m_IsRotateYEnabled = value;
+                }
+                if (changed)
+                {
+                    IncrementPhysicsParameterUpdateSerial();
+                    TriggerOnUpdate(UpdateChangedFlags.Physics);
+                }
             }
         }
 
@@ -216,9 +243,17 @@ namespace SilverSim.Scene.Types.Object
 
             set
             {
-                m_IsRotateZEnabled = value;
-                IncrementPhysicsParameterUpdateSerial();
-                TriggerOnUpdate(UpdateChangedFlags.Physics);
+                bool changed;
+                lock (m_DataLock)
+                {
+                    changed = m_IsRotateZEnabled != value;
+                    m_IsRotateZEnabled = value;
+                }
+                if (changed)
+                {
+                    IncrementPhysicsParameterUpdateSerial();
+                    TriggerOnUpdate(UpdateChangedFlags.Physics);
+                }
             }
         }
 
@@ -228,9 +263,17 @@ namespace SilverSim.Scene.Types.Object
 
             set
             {
-                m_IsPhantom = value;
-                IncrementPhysicsParameterUpdateSerial();
-                TriggerOnUpdate(UpdateChangedFlags.Physics);
+                bool changed;
+                lock (m_DataLock)
+                {
+                    changed = m_IsPhantom != value;
+                    m_IsPhantom = value;
+                }
+                if (changed)
+                {
+                    IncrementPhysicsParameterUpdateSerial();
+                    TriggerOnUpdate(UpdateChangedFlags.Physics);
+                }
             }
         }
 
@@ -240,9 +283,17 @@ namespace SilverSim.Scene.Types.Object
 
             set
             {
-                m_IsPhysics = value;
-                IncrementPhysicsParameterUpdateSerial();
-                TriggerOnUpdate(UpdateChangedFlags.Physics);
+                bool changed;
+                lock (m_DataLock)
+                {
+                    changed = m_IsPhysics != value;
+                    m_IsPhysics = value;
+                }
+                if (changed)
+                {
+                    IncrementPhysicsParameterUpdateSerial();
+                    TriggerOnUpdate(UpdateChangedFlags.Physics);
+                }
             }
         }
 
@@ -251,9 +302,17 @@ namespace SilverSim.Scene.Types.Object
             get { return m_IsVolumeDetect; }
             set
             {
-                m_IsVolumeDetect = value;
-                IncrementPhysicsParameterUpdateSerial();
-                TriggerOnUpdate(UpdateChangedFlags.Physics);
+                bool changed;
+                lock (m_DataLock)
+                {
+                    changed = m_IsVolumeDetect != value;
+                    m_IsVolumeDetect = value;
+                }
+                if (changed)
+                {
+                    IncrementPhysicsParameterUpdateSerial();
+                    TriggerOnUpdate(UpdateChangedFlags.Physics);
+                }
             }
         }
 
@@ -263,10 +322,12 @@ namespace SilverSim.Scene.Types.Object
 
             set
             {
-                m_Buoyancy = value;
-                PhysicsActor.Buoyancy = value;
-                IncrementPhysicsParameterUpdateSerial();
-                TriggerOnUpdate(UpdateChangedFlags.Physics);
+                if (Interlocked.Exchange(ref m_Buoyancy, value) != value)
+                {
+                    PhysicsActor.Buoyancy = value;
+                    IncrementPhysicsParameterUpdateSerial();
+                    TriggerOnUpdate(UpdateChangedFlags.Physics);
+                }
             }
         }
 

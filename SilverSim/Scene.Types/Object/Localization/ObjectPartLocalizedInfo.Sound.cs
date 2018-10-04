@@ -22,6 +22,7 @@
 using SilverSim.Scene.Types.Object.Parameters;
 using SilverSim.Types;
 using System;
+using System.Threading;
 
 namespace SilverSim.Scene.Types.Object.Localization
 {
@@ -45,17 +46,20 @@ namespace SilverSim.Scene.Types.Object.Localization
             }
             set
             {
+                bool changed;
                 if(value == null)
                 {
                     if (m_ParentInfo == null)
                     {
                         throw new InvalidOperationException();
                     }
-                    m_Sound = null;
+                    changed = Interlocked.Exchange(ref m_Sound, null) != null;
                 }
                 else
                 {
-                    m_Sound = new SoundParam(value);
+                    SoundParam oldParam;
+                    oldParam = Interlocked.Exchange(ref m_Sound, new SoundParam(value));
+                    changed = oldParam?.IsDifferent(value) ?? true;
                 }
                 lock (m_UpdateDataLock)
                 {
@@ -85,7 +89,10 @@ namespace SilverSim.Scene.Types.Object.Localization
                         UUID.Zero.ToBytes(m_FullUpdateFixedBlock2, (int)FullFixedBlock2Offset.SoundOwner);
                     }
                 }
-                m_Part.TriggerOnUpdate(0);
+                if (changed)
+                {
+                    m_Part.TriggerOnUpdate(0);
+                }
             }
         }
 
@@ -107,19 +114,25 @@ namespace SilverSim.Scene.Types.Object.Localization
             }
             set
             {
+                bool changed;
                 if(value == null)
                 {
                     if(m_ParentInfo == null)
                     {
                         throw new InvalidOperationException();
                     }
-                    m_CollisionSound = null;
+                    changed = Interlocked.Exchange(ref m_CollisionSound, null) != null;
                 }
                 else
                 {
-                    m_CollisionSound = new CollisionSoundParam(value);
+                    CollisionSoundParam oldParam;
+                    oldParam = Interlocked.Exchange(ref m_CollisionSound, new CollisionSoundParam(value));
+                    changed = oldParam?.IsDifferent(value) ?? true;
                 }
-                m_Part.TriggerOnUpdate(0);
+                if (changed)
+                {
+                    m_Part.TriggerOnUpdate(0);
+                }
             }
         }
     }

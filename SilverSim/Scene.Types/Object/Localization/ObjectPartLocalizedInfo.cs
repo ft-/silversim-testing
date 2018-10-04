@@ -28,6 +28,7 @@ using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Viewer.Messages.Object;
 using System;
 using System.IO;
+using System.Threading;
 using System.Xml;
 
 namespace SilverSim.Scene.Types.Object.Localization
@@ -602,19 +603,24 @@ namespace SilverSim.Scene.Types.Object.Localization
 
             set
             {
+                bool changed;
                 if (value == null)
                 {
                     if(m_ParentInfo == null)
                     {
                         throw new InvalidOperationException();
                     }
-                    m_Name = null;
+                    changed = Interlocked.Exchange(ref m_Name, null) != null;
                 }
                 else
                 {
-                    m_Name = value.FilterToAscii7Printable().TrimToMaxLength(63);
+                    string newname = value.FilterToAscii7Printable().TrimToMaxLength(63);
+                    changed = Interlocked.Exchange(ref m_Name, newname) != newname;
                 }
-                m_Part.TriggerOnUpdate(0);
+                if (changed)
+                {
+                    m_Part.TriggerOnUpdate(0);
+                }
             }
         }
 
@@ -627,19 +633,24 @@ namespace SilverSim.Scene.Types.Object.Localization
 
             set
             {
+                bool changed;
                 if (value == null)
                 {
                     if (m_ParentInfo == null)
                     {
                         throw new InvalidOperationException();
                     }
-                    m_Description = null;
+                    changed = Interlocked.Exchange(ref m_Description, null) != null;
                 }
                 else
                 {
-                    m_Description = value.FilterToNonControlChars().TrimToMaxLength(127);
+                    string newdesc = value.FilterToNonControlChars().TrimToMaxLength(127);
+                    changed = Interlocked.Exchange(ref m_Description, newdesc) != newdesc;
                 }
-                m_Part.TriggerOnUpdate(0);
+                if (changed)
+                {
+                    m_Part.TriggerOnUpdate(0);
+                }
             }
         }
 
@@ -655,8 +666,10 @@ namespace SilverSim.Scene.Types.Object.Localization
                 {
                     throw new InvalidOperationException();
                 }
-                m_SitText = value;
-                m_Part.TriggerOnUpdate(0);
+                if (Interlocked.Exchange(ref m_SitText, value) != value)
+                {
+                    m_Part.TriggerOnUpdate(0);
+                }
             }
         }
 
@@ -672,8 +685,10 @@ namespace SilverSim.Scene.Types.Object.Localization
                 {
                     throw new InvalidOperationException();
                 }
-                m_TouchText = value;
-                m_Part.TriggerOnUpdate(0);
+                if (Interlocked.Exchange(ref m_TouchText, value) != value)
+                {
+                    m_Part.TriggerOnUpdate(0);
+                }
             }
         }
 

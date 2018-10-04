@@ -59,6 +59,18 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
 
         public static implicit operator TimescaleVectorData(Vector3 timescale) => new TimescaleVectorData(timescale);
         public static implicit operator TimescaleVectorData(double timescale) => new TimescaleVectorData(new Vector3(timescale));
+
+        public static bool TryChange(ref TimescaleVectorData location, double timescale)
+        {
+            TimescaleVectorData newtimescale = timescale;
+            return Interlocked.Exchange(ref location, newtimescale).Timescale != newtimescale.Timescale;
+        }
+
+        public static bool TryChange(ref TimescaleVectorData location, Vector3 timescale)
+        {
+            TimescaleVectorData newtimescale = timescale;
+            return Interlocked.Exchange(ref location, newtimescale).Timescale != newtimescale.Timescale;
+        }
     }
 
     internal sealed class TimescaleDoubleData : TimescaleData<double>
@@ -69,6 +81,12 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
         }
 
         public static implicit operator TimescaleDoubleData(double timescale) => new TimescaleDoubleData(timescale);
+
+        public static bool TryChange(ref TimescaleDoubleData location, double timescale)
+        {
+            TimescaleDoubleData newtimescale = timescale;
+            return Interlocked.Exchange(ref location, newtimescale).Timescale != newtimescale.Timescale;
+        }
     }
 
     public sealed class VehicleParams
@@ -96,6 +114,12 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
             public static implicit operator Vector3(ReferenceVectorBoxed reference) => reference?.Value ?? default(Vector3);
             public static implicit operator ReferenceVectorBoxed(Vector3 value) => new ReferenceVectorBoxed(value);
             public static implicit operator ReferenceVectorBoxed(double value) => new ReferenceVectorBoxed(value);
+
+            public static bool TryChange(ref ReferenceVectorBoxed location, Vector3 value)
+            {
+                ReferenceVectorBoxed newtimescale = value;
+                return Interlocked.Exchange(ref location, newtimescale).Value != newtimescale.Value;
+            }
         }
 
         public VehicleParams(ObjectPart part)
@@ -601,8 +625,10 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
 
             set
             {
-                m_FlagsStore = (int)value;
-                m_Part.IncSerialNumber();
+                if (Interlocked.Exchange(ref m_FlagsStore, (int)value) != (int)value)
+                {
+                    m_Part.IncSerialNumber();
+                }
             }
         }
 
@@ -611,12 +637,18 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
             int setflags = (int)value;
             int oldFlagsStore = m_FlagsStore;
             int newFlagsStore;
+            bool changed = false;
             do
             {
                 newFlagsStore = oldFlagsStore | setflags;
-                oldFlagsStore = Interlocked.CompareExchange(ref m_FlagsStore, newFlagsStore, oldFlagsStore) | setflags;
+                oldFlagsStore = Interlocked.CompareExchange(ref m_FlagsStore, newFlagsStore, oldFlagsStore);
+                changed = changed || oldFlagsStore != newFlagsStore;
+                oldFlagsStore |= setflags;
             } while (newFlagsStore != oldFlagsStore);
-            m_Part.IncSerialNumber();
+            if (changed)
+            {
+                m_Part.IncSerialNumber();
+            }
         }
 
         public void ClearFlags(VehicleFlags value)
@@ -624,12 +656,18 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
             int clrflags = ~(int)value;
             int oldFlagsStore = m_FlagsStore;
             int newFlagsStore;
+            bool changed = false;
             do
             {
                 newFlagsStore = oldFlagsStore & ~clrflags;
-                oldFlagsStore = Interlocked.CompareExchange(ref m_FlagsStore, newFlagsStore, oldFlagsStore) & ~clrflags;
+                oldFlagsStore = Interlocked.CompareExchange(ref m_FlagsStore, newFlagsStore, oldFlagsStore);
+                changed = changed || oldFlagsStore != newFlagsStore;
+                oldFlagsStore &= ~clrflags;
             } while (newFlagsStore != oldFlagsStore);
-            m_Part.IncSerialNumber();
+            if (changed)
+            {
+                m_Part.IncSerialNumber();
+            }
         }
 
         public Quaternion this[VehicleRotationParamId id]
@@ -767,177 +805,247 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
             }
             set
             {
+                bool changed;
                 switch (id)
                 {
                     case VehicleVectorParamId.AngularDeflectionEfficiency:
-                        m_AngularDeflectionEfficiency = value.ComponentClamp(0, 1);
-                        m_Part.IncSerialNumber();
+                        if(ReferenceVectorBoxed.TryChange(ref m_AngularDeflectionEfficiency, value.ComponentClamp(0, 1)))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleVectorParamId.AngularDeflectionTimescale:
-                        m_AngularDeflectionTimescale = value;
-                        m_Part.IncSerialNumber();
+                        if (TimescaleVectorData.TryChange(ref m_AngularDeflectionTimescale, value))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleVectorParamId.LinearDeflectionEfficiency:
-                        m_LinearDeflectionEfficiency = value.ComponentClamp(0, 1);
-                        m_Part.IncSerialNumber();
+                        if (ReferenceVectorBoxed.TryChange(ref m_LinearDeflectionEfficiency, value.ComponentClamp(0, 1)))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleVectorParamId.LinearDeflectionTimescale:
-                        m_LinearDeflectionTimescale = value;
-                        m_Part.IncSerialNumber();
+                        if (TimescaleVectorData.TryChange(ref m_LinearDeflectionTimescale, value))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleVectorParamId.VerticalAttractionEfficiency:
-                        m_VerticalAttractionEfficiency = value.ComponentClamp(0f, 1f);
-                        m_Part.IncSerialNumber();
+                        if (ReferenceVectorBoxed.TryChange(ref m_VerticalAttractionEfficiency, value.ComponentClamp(0f, 1f)))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleVectorParamId.VerticalAttractionTimescale:
-                        m_VerticalAttractionTimescale = value;
-                        m_Part.IncSerialNumber();
+                        if (TimescaleVectorData.TryChange(ref m_VerticalAttractionTimescale, value))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleVectorParamId.AngularFrictionTimescale:
-                        m_AngularFrictionTimescale = value;
-                        m_Part.IncSerialNumber();
+                        if (TimescaleVectorData.TryChange(ref m_AngularFrictionTimescale, value))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleVectorParamId.AngularMotorDirection:
-                        m_AngularMotorDirection = value;
-                        m_Part.IncSerialNumber();
+                        if (ReferenceVectorBoxed.TryChange(ref m_AngularMotorDirection, value))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleVectorParamId.LinearFrictionTimescale:
-                        m_LinearFrictionTimescale = value;
-                        m_Part.IncSerialNumber();
+                        if (TimescaleVectorData.TryChange(ref m_LinearFrictionTimescale, value))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleVectorParamId.LinearMotorDirection:
-                        m_LinearMotorDirection = value;
-                        m_Part.IncSerialNumber();
+                        if (ReferenceVectorBoxed.TryChange(ref m_LinearMotorDirection, value))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleVectorParamId.LinearMotorOffset:
-                        m_LinearMotorOffset = value;
-                        m_Part.IncSerialNumber();
+                        if (ReferenceVectorBoxed.TryChange(ref m_LinearMotorOffset, value))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleVectorParamId.AngularMotorDecayTimescale:
-                        m_AngularMotorDecayTimescale = value.ComponentMin(120);
-                        m_Part.IncSerialNumber();
+                        if (TimescaleVectorData.TryChange(ref m_AngularMotorDecayTimescale, value.ComponentMin(120)))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleVectorParamId.AngularMotorTimescale:
-                        m_AngularMotorAccelPosTimescale = value;
-                        m_AngularMotorDecelPosTimescale = m_AngularMotorAccelPosTimescale;
-                        m_AngularMotorAccelNegTimescale = m_AngularMotorAccelPosTimescale;
-                        m_AngularMotorDecelNegTimescale = m_AngularMotorAccelPosTimescale;
-                        m_Part.IncSerialNumber();
+                        /* do not move || changed to front due to disjunction */
+                        changed = TimescaleVectorData.TryChange(ref m_AngularMotorAccelPosTimescale, value);
+                        changed = Interlocked.Exchange(ref m_AngularMotorDecelPosTimescale, m_AngularMotorAccelPosTimescale) != m_AngularMotorAccelPosTimescale || changed;
+                        changed = Interlocked.Exchange(ref m_AngularMotorAccelNegTimescale, m_AngularMotorAccelPosTimescale) != m_AngularMotorAccelPosTimescale || changed;
+                        changed = Interlocked.Exchange(ref m_AngularMotorDecelNegTimescale, m_AngularMotorAccelPosTimescale) != m_AngularMotorAccelPosTimescale || changed;
+                        if (changed)
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleVectorParamId.AngularMotorAccelPosTimescale:
-                        m_AngularMotorAccelPosTimescale = value;
-                        m_Part.IncSerialNumber();
+                        if (TimescaleVectorData.TryChange(ref m_AngularMotorAccelPosTimescale, value))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleVectorParamId.AngularMotorDecelPosTimescale:
-                        m_AngularMotorDecelPosTimescale = value;
-                        m_Part.IncSerialNumber();
+                        if (TimescaleVectorData.TryChange(ref m_AngularMotorDecelPosTimescale, value))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleVectorParamId.AngularMotorAccelNegTimescale:
-                        m_AngularMotorAccelNegTimescale = value;
-                        m_Part.IncSerialNumber();
+                        if (TimescaleVectorData.TryChange(ref m_AngularMotorAccelNegTimescale, value))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleVectorParamId.AngularMotorDecelNegTimescale:
-                        m_AngularMotorDecelNegTimescale = value;
-                        m_Part.IncSerialNumber();
+                        if (TimescaleVectorData.TryChange(ref m_AngularMotorDecelNegTimescale, value))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleVectorParamId.LinearMotorDecayTimescale:
-                        m_LinearMotorDecayTimescale = value.ComponentMin(120);
-                        m_Part.IncSerialNumber();
+                        if (TimescaleVectorData.TryChange(ref m_LinearMotorDecayTimescale, value.ComponentMin(120)))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleVectorParamId.LinearMotorTimescale:
-                        m_LinearMotorAccelPosTimescale = value;
-                        m_LinearMotorDecelPosTimescale = m_LinearMotorAccelPosTimescale;
-                        m_LinearMotorAccelNegTimescale = m_LinearMotorAccelPosTimescale;
+                        /* do not move || changed to front due to disjunction */
+                        changed = TimescaleVectorData.TryChange(ref m_LinearMotorAccelPosTimescale, value);
+                        changed = Interlocked.Exchange(ref m_LinearMotorDecelPosTimescale, m_LinearMotorAccelPosTimescale) != m_LinearMotorAccelPosTimescale || changed;
+                        changed = Interlocked.Exchange(ref m_LinearMotorAccelNegTimescale, m_LinearMotorAccelPosTimescale) != m_LinearMotorAccelPosTimescale || changed;
+                        changed = Interlocked.Exchange(ref m_LinearMotorDecelNegTimescale, m_LinearMotorAccelPosTimescale) != m_LinearMotorAccelPosTimescale || changed;
                         m_LinearMotorDecelNegTimescale = m_LinearMotorAccelPosTimescale;
+
                         m_Part.IncSerialNumber();
                         break;
 
                     case VehicleVectorParamId.LinearMotorAccelPosTimescale:
-                        m_LinearMotorAccelPosTimescale = value;
-                        m_Part.IncSerialNumber();
+                        if (TimescaleVectorData.TryChange(ref m_LinearMotorAccelPosTimescale, value))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleVectorParamId.LinearMotorDecelPosTimescale:
-                        m_LinearMotorDecelPosTimescale = value;
-                        m_Part.IncSerialNumber();
+                        if (TimescaleVectorData.TryChange(ref m_LinearMotorDecelPosTimescale, value))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleVectorParamId.LinearMotorAccelNegTimescale:
-                        m_LinearMotorAccelNegTimescale = value;
-                        m_Part.IncSerialNumber();
+                        if (TimescaleVectorData.TryChange(ref m_LinearMotorAccelNegTimescale, value))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleVectorParamId.LinearMotorDecelNegTimescale:
-                        m_LinearMotorDecelNegTimescale = value;
-                        m_Part.IncSerialNumber();
+                        if (TimescaleVectorData.TryChange(ref m_LinearMotorDecelNegTimescale, value))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleVectorParamId.AngularWindEfficiency:
-                        m_AngularWindEfficiency = value;
-                        m_Part.IncSerialNumber();
+                        if (ReferenceVectorBoxed.TryChange(ref m_AngularWindEfficiency, value))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleVectorParamId.LinearWindEfficiency:
-                        m_LinearWindEfficiency = value;
-                        m_Part.IncSerialNumber();
+                        if (ReferenceVectorBoxed.TryChange(ref m_LinearWindEfficiency, value))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleVectorParamId.LinearMoveToTargetEfficiency:
-                        m_LinearMoveToTargetEfficiency = value;
-                        m_Part.IncSerialNumber();
+                        if (ReferenceVectorBoxed.TryChange(ref m_LinearMoveToTargetEfficiency, value))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleVectorParamId.LinearMoveToTargetTimescale:
-                        m_LinearMoveToTargetTimescale = value;
-                        m_Part.IncSerialNumber();
+                        if (TimescaleVectorData.TryChange(ref m_LinearMoveToTargetTimescale, value))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleVectorParamId.LinearMoveToTargetEpsilon:
-                        m_LinearMoveToTargetEpsilon = value; /* negative for disable */
-                        m_Part.IncSerialNumber();
+                        if (ReferenceVectorBoxed.TryChange(ref m_LinearMoveToTargetEpsilon, value)) /* negative for disable */
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleVectorParamId.LinearMoveToTargetMaxOutput:
-                        m_LinearMoveToTargetMaxOutput = value.ComponentMax(0);
-                        m_Part.IncSerialNumber();
+                        if (ReferenceVectorBoxed.TryChange(ref m_LinearMoveToTargetMaxOutput, value.ComponentMax(0)))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleVectorParamId.AngularMoveToTargetEfficiency:
-                        m_AngularMoveToTargetEfficiency = value;
-                        m_Part.IncSerialNumber();
+                        if (ReferenceVectorBoxed.TryChange(ref m_AngularMoveToTargetEfficiency, value))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleVectorParamId.AngularMoveToTargetTimescale:
-                        m_AngularMoveToTargetTimescale = value;
-                        m_Part.IncSerialNumber();
+                        if (TimescaleVectorData.TryChange(ref m_AngularMoveToTargetTimescale, value))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleVectorParamId.AngularMoveToTargetEpsilon:
-                        m_AngularMoveToTargetEpsilon = value; /* negative for disable */
-                        m_Part.IncSerialNumber();
+                        if (ReferenceVectorBoxed.TryChange(ref m_AngularMoveToTargetEpsilon, value)) /* negative for disable */
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleVectorParamId.AngularMoveToTargetMaxOutput:
-                        m_AngularMoveToTargetMaxOutput = value.ComponentMax(0);
-                        m_Part.IncSerialNumber();
+                        if (ReferenceVectorBoxed.TryChange(ref m_AngularMoveToTargetMaxOutput, value.ComponentMax(0)))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     default:
@@ -1003,68 +1111,94 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                 switch (id)
                 {
                     case VehicleFloatParamId.BankingEfficiency:
-                        m_BankingEfficiency = value.Clamp(-1f, 1f);
-                        m_Part.IncSerialNumber();
+                        if (Atomic.TryChange(ref m_BankingEfficiency, value.Clamp(-1f, 1f)))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleFloatParamId.BankingMix:
-                        m_BankingMix = value.Clamp(0f, 1f);
-                        m_Part.IncSerialNumber();
+                        if (Atomic.TryChange(ref m_BankingMix, value.Clamp(0f, 1f)))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleFloatParamId.BankingTimescale:
-                        m_BankingTimescale = value;
-                        m_Part.IncSerialNumber();
+                        if (TimescaleDoubleData.TryChange(ref m_BankingTimescale, value))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleFloatParamId.Buoyancy:
-                        m_Buoyancy = value.Clamp(-1f, 1f);
-                        m_Part.IncSerialNumber();
+                        if (Atomic.TryChange(ref m_Buoyancy, value.Clamp(-1f, 1f)))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleFloatParamId.HoverHeight:
-                        m_HoverHeight = value;
-                        m_Part.IncSerialNumber();
+                        if (Atomic.TryChange(ref m_HoverHeight, value))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleFloatParamId.HoverEfficiency:
-                        m_HoverEfficiency = value.Clamp(0f, 1f);
-                        m_Part.IncSerialNumber();
+                        if (Atomic.TryChange(ref m_HoverEfficiency, value.Clamp(0f, 1f)))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleFloatParamId.HoverTimescale:
-                        m_HoverTimescale = value;
-                        m_Part.IncSerialNumber();
+                        if (TimescaleDoubleData.TryChange(ref m_HoverTimescale, value))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleFloatParamId.MouselookAzimuth:
-                        m_MouselookAzimuth = value;
-                        m_Part.IncSerialNumber();
+                        if (Atomic.TryChange(ref m_MouselookAzimuth, value))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleFloatParamId.MouselookAltitude:
-                        m_MouselookAltitude = value;
-                        m_Part.IncSerialNumber();
+                        if (Atomic.TryChange(ref m_MouselookAltitude, value))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleFloatParamId.BankingAzimuth:
-                        m_BankingAzimuth = value;
-                        m_Part.IncSerialNumber();
+                        if (Atomic.TryChange(ref m_BankingAzimuth, value))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleFloatParamId.DisableMotorsAbove:
-                        m_DisableMotorsAbove = value;
-                        m_Part.IncSerialNumber();
+                        if (Atomic.TryChange(ref m_DisableMotorsAbove, value))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleFloatParamId.DisableMotorsAfter:
-                        m_DisableMotorsAfter = value;
-                        m_Part.IncSerialNumber();
+                        if (Atomic.TryChange(ref m_DisableMotorsAfter, value))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleFloatParamId.InvertedBankingModifier:
-                        m_InvertedBankingModifier = value;
-                        m_Part.IncSerialNumber();
+                        if (Atomic.TryChange(ref m_InvertedBankingModifier, value))
+                        {
+                            m_Part.IncSerialNumber();
+                        }
                         break;
 
                     case VehicleFloatParamId.HeightExceededTime:

@@ -1149,12 +1149,14 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 bool sculptChanged = false;
+                bool changed;
                 lock (m_Shape)
                 {
                     if (m_Shape.SculptMap != value.SculptMap || m_Shape.SculptType != value.SculptType)
                     {
                         sculptChanged = true;
                     }
+                    changed = !m_Shape.Equals(value);
                     m_Shape.CopyFrom(value);
                     foreach(ObjectPartLocalizedInfo l in Localizations)
                     {
@@ -1166,9 +1168,12 @@ namespace SilverSim.Scene.Types.Object
                 {
                     UpdateExtraParams();
                 }
-                IncrementPhysicsShapeUpdateSerial();
-                IncrementPhysicsParameterUpdateSerial();
-                TriggerOnUpdate(UpdateChangedFlags.Shape);
+                if (changed)
+                {
+                    IncrementPhysicsShapeUpdateSerial();
+                    IncrementPhysicsParameterUpdateSerial();
+                    TriggerOnUpdate(UpdateChangedFlags.Shape);
+                }
             }
         }
 

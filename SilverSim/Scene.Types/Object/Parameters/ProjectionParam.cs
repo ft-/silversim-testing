@@ -34,6 +34,12 @@ namespace SilverSim.Scene.Types.Object.Parameters
         public double ProjectionAmbience;
         #endregion
 
+        public bool IsDifferent(ProjectionParam p) => IsProjecting != p.IsProjecting ||
+            ProjectionTextureID != p.ProjectionTextureID ||
+            ProjectionFOV != p.ProjectionFOV ||
+            ProjectionFocus != p.ProjectionFocus ||
+            ProjectionAmbience != p.ProjectionAmbience;
+
         public ProjectionParam()
         {
         }

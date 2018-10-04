@@ -246,20 +246,26 @@ namespace SilverSim.Scene.Types.Object.Localization
             }
             set
             {
+                bool changed;
                 if (value == null)
                 {
                     if (m_ParentInfo == null)
                     {
                         throw new InvalidOperationException();
                     }
-                    m_Projection = null;
+                    changed = Interlocked.Exchange(ref m_Projection, null) != null;
                 }
                 else
-                { 
-                    m_Projection = new ProjectionParam(value);
+                {
+                    ProjectionParam oldParam;
+                    oldParam = Interlocked.Exchange(ref m_Projection, new ProjectionParam(value));
+                    changed = oldParam?.IsDifferent(value) ?? true;
                 }
-                UpdateExtraParams();
-                m_Part.TriggerOnUpdate(0);
+                if (changed)
+                {
+                    UpdateExtraParams();
+                    m_Part.TriggerOnUpdate(0);
+                }
             }
         }
     }

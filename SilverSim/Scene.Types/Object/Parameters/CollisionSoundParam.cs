@@ -41,6 +41,11 @@ namespace SilverSim.Scene.Types.Object.Parameters
         private CollisionSoundFlags m_ImpactSoundFlags;
         #endregion
 
+        public bool IsDifferent(CollisionSoundParam p) => ImpactSound != p.ImpactSound ||
+            ImpactVolume != p.ImpactVolume ||
+            ImpactSoundRadius != p.ImpactSoundRadius ||
+            m_ImpactSoundFlags != p.m_ImpactSoundFlags;
+
         public bool ImpactUseHitpoint
         {
             get

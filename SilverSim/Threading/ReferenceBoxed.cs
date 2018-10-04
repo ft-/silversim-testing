@@ -19,6 +19,8 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using System.Collections.Generic;
+
 namespace SilverSim.Threading
 {
     public sealed class ReferenceBoxed<T> where T : struct
@@ -37,5 +39,29 @@ namespace SilverSim.Threading
         public static implicit operator T(ReferenceBoxed<T> reference) => reference?.Value ?? default(T);
 
         public static implicit operator ReferenceBoxed<T>(T value) => new ReferenceBoxed<T>(value);
+
+        public static bool operator ==(ReferenceBoxed<T> refBox, T value) => refBox.Value.Equals(value);
+
+        public static bool operator !=(ReferenceBoxed<T> refBox, T value) => !refBox.Value.Equals(value);
+
+        public static bool operator ==(T value, ReferenceBoxed<T> refBox) => refBox.Value.Equals(value);
+
+        public static bool operator !=(T value, ReferenceBoxed<T> refBox) => !refBox.Value.Equals(value);
+
+        public override bool Equals(object obj)
+        {
+            if(obj.GetType() == typeof(T))
+            {
+                return Value.Equals(obj);
+            }
+            var boxed = obj as ReferenceBoxed<T>;
+            return boxed != null &&
+                   EqualityComparer<T>.Default.Equals(Value, boxed.Value);
+        }
+
+        public override int GetHashCode()
+        {
+            return -1937169414 + EqualityComparer<T>.Default.GetHashCode(Value);
+        }
     }
 }

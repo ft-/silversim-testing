@@ -21,6 +21,7 @@
 
 using SilverSim.Scene.Types.Object.Parameters;
 using System;
+using System.Threading;
 
 namespace SilverSim.Scene.Types.Object.Localization
 {
@@ -44,20 +45,25 @@ namespace SilverSim.Scene.Types.Object.Localization
             }
             set
             {
+                bool changed;
                 if(value == null)
                 {
                     if(m_ParentInfo == null)
                     {
                         throw new InvalidOperationException();
                     }
-                    m_Text = null;
+                    changed = Interlocked.Exchange(ref m_Text, null) != null;
                 }
                 else
                 {
-                    m_Text = new TextParam(value);
+                    TextParam oldParam = Interlocked.Exchange(ref m_Text, new TextParam(value));
+                    changed = oldParam?.IsDifferent(value) ?? true;
                 }
-                UpdateExtraParams();
-                m_Part.TriggerOnUpdate(0);
+                if (changed)
+                {
+                    UpdateExtraParams();
+                    m_Part.TriggerOnUpdate(0);
+                }
             }
         }
     }

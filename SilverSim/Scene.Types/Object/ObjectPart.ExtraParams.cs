@@ -41,23 +41,17 @@ namespace SilverSim.Scene.Types.Object
 
         public double FacelightLimitIntensity
         {
-            get { return m_FacelightLimitIntensity; }
+            get { return Interlocked.CompareExchange(ref m_FacelightLimitIntensity, 0, 0); }
 
             set
             {
+                bool changed;
                 lock (m_DataLock)
                 {
-                    if (value > 1)
-                    {
-                        value = 1;
-                    }
-                    else if (value < 0)
-                    {
-                        value = 0;
-                    }
-                    m_FacelightLimitIntensity = value;
+                    value = value.Clamp(0, 1);
+                    changed = Interlocked.Exchange(ref m_FacelightLimitIntensity, value) != value;
                 }
-                if (PointLight.IsLight)
+                if (PointLight.IsLight && changed)
                 {
                     UpdateExtraParams();
                     TriggerOnUpdate(0);
@@ -71,19 +65,13 @@ namespace SilverSim.Scene.Types.Object
 
             set
             {
+                bool changed;
                 lock (m_DataLock)
                 {
-                    if (value > 1)
-                    {
-                        value = 1;
-                    }
-                    else if (value < 0)
-                    {
-                        value = 0;
-                    }
-                    m_AttachmentLightLimitIntensity = value;
+                    value = value.Clamp(0, 1);
+                    changed = Interlocked.Exchange(ref m_AttachmentLightLimitIntensity, value) != value;
                 }
-                if (PointLight.IsLight)
+                if (PointLight.IsLight && changed)
                 {
                     UpdateExtraParams();
                     TriggerOnUpdate(0);
@@ -97,11 +85,13 @@ namespace SilverSim.Scene.Types.Object
 
             set
             {
+                bool changed;
                 lock (m_DataLock)
                 {
+                    changed = m_IsFacelightDisabled != value;
                     m_IsFacelightDisabled = value;
                 }
-                if (PointLight.IsLight)
+                if (PointLight.IsLight && changed)
                 {
                     UpdateExtraParams();
                     TriggerOnUpdate(0);
@@ -115,11 +105,13 @@ namespace SilverSim.Scene.Types.Object
 
             set
             {
+                bool changed;
                 lock (m_DataLock)
                 {
+                    changed = m_IsAttachmentLightsDisabled != value;
                     m_IsAttachmentLightsDisabled = value;
                 }
-                if (PointLight.IsLight)
+                if (PointLight.IsLight && changed)
                 {
                     UpdateExtraParams();
                     TriggerOnUpdate(0);
@@ -293,9 +285,15 @@ namespace SilverSim.Scene.Types.Object
 
                     if (!isSculpt)
                     {
+                        bool changed;
                         lock (m_Shape)
                         {
+                            changed = m_Shape.SculptType != PrimitiveSculptType.None;
                             m_Shape.SculptType = PrimitiveSculptType.None;
+                        }
+                        if(changed)
+                        {
+                            TriggerOnUpdate(0);
                         }
                     }
                 });
@@ -336,12 +334,17 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
+                bool changed;
                 lock(m_ExtendedMesh)
                 {
+                    changed = m_ExtendedMesh.Flags != value.Flags;
                     m_ExtendedMesh.Flags = value.Flags;
                 }
-                UpdateExtraParams();
-                TriggerOnUpdate(UpdateChangedFlags.Shape);
+                if (changed)
+                {
+                    UpdateExtraParams();
+                    TriggerOnUpdate(UpdateChangedFlags.Shape);
+                }
             }
         }
 
@@ -364,8 +367,16 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
+                bool changed;
                 lock (m_Flexible)
                 {
+                    changed = m_Flexible.Force != value.Force ||
+                        m_Flexible.Friction != value.Friction ||
+                        m_Flexible.Gravity != value.Gravity ||
+                        m_Flexible.IsFlexible != value.IsFlexible ||
+                        m_Flexible.Softness != value.Softness ||
+                        m_Flexible.Tension != value.Tension ||
+                        m_Flexible.Wind != value.Wind;
                     m_Flexible.Force = value.Force;
                     m_Flexible.Friction = value.Friction;
                     m_Flexible.Gravity = value.Gravity;
@@ -374,10 +385,13 @@ namespace SilverSim.Scene.Types.Object
                     m_Flexible.Tension = value.Tension;
                     m_Flexible.Wind = value.Wind;
                 }
-                UpdateExtraParams();
-                IncrementPhysicsShapeUpdateSerial();
-                IncrementPhysicsParameterUpdateSerial();
-                TriggerOnUpdate(UpdateChangedFlags.Shape);
+                if (changed)
+                {
+                    UpdateExtraParams();
+                    IncrementPhysicsShapeUpdateSerial();
+                    IncrementPhysicsParameterUpdateSerial();
+                    TriggerOnUpdate(UpdateChangedFlags.Shape);
+                }
             }
         }
 
@@ -398,16 +412,25 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
+                bool changed;
                 lock (m_PointLight)
                 {
+                    changed = m_PointLight.Falloff != value.Falloff ||
+                        m_PointLight.Intensity != value.Intensity ||
+                        m_PointLight.IsLight != value.IsLight ||
+                        m_PointLight.LightColor != value.LightColor ||
+                        m_PointLight.Radius != value.Radius;
                     m_PointLight.Falloff = value.Falloff;
                     m_PointLight.Intensity = value.Intensity;
                     m_PointLight.IsLight = value.IsLight;
                     m_PointLight.LightColor = new Color(value.LightColor);
                     m_PointLight.Radius = value.Radius;
                 }
-                UpdateExtraParams();
-                TriggerOnUpdate(0);
+                if (changed)
+                {
+                    UpdateExtraParams();
+                    TriggerOnUpdate(0);
+                }
             }
         }
     }

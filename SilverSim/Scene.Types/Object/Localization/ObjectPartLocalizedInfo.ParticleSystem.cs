@@ -21,6 +21,8 @@
 
 using SilverSim.Types.Primitive;
 using System;
+using System.Linq;
+using System.Threading;
 
 namespace SilverSim.Scene.Types.Object.Localization
 {
@@ -46,15 +48,29 @@ namespace SilverSim.Scene.Types.Object.Localization
 
             set
             {
+                bool changed;
                 if(value == null)
                 {
-                    m_ParticleSystem = m_ParentInfo == null ? new byte[0] : null;
+                    if(m_ParentInfo == null)
+                    {
+                        byte[] oldBytes = Interlocked.Exchange(ref m_ParticleSystem, new byte[0]);
+                        changed = oldBytes == null || oldBytes.Length != 0;
+                    }
+                    else
+                    {
+                        changed = Interlocked.Exchange(ref m_ParticleSystem, null) != null;
+                    }
                 }
                 else
                 {
-                    m_ParticleSystem = value.GetBytes();
+                    byte[] newBytes = value.GetBytes();
+                    byte[] oldBytes = Interlocked.Exchange(ref m_ParticleSystem, newBytes);
+                    changed = oldBytes == null || oldBytes.SequenceEqual(newBytes);
                 }
-                m_Part.TriggerOnUpdate(UpdateChangedFlags.None);
+                if (changed)
+                {
+                    m_Part.TriggerOnUpdate(UpdateChangedFlags.None);
+                }
             }
         }
 
@@ -78,7 +94,12 @@ namespace SilverSim.Scene.Types.Object.Localization
                 {
                     var ps = new byte[value.Length];
                     Buffer.BlockCopy(value, 0, ps, 0, value.Length);
-                    m_ParticleSystem = ps;
+                    byte[] oldBytes = Interlocked.Exchange(ref m_ParticleSystem, ps);
+
+                    if(oldBytes == null || oldBytes.SequenceEqual(ps))
+                    {
+                        m_Part.TriggerOnUpdate(UpdateChangedFlags.None);
+                    }
                 }
             }
         }

@@ -192,12 +192,14 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                return m_WalkableCoefficientAvatar;
+                return Interlocked.CompareExchange(ref m_WalkableCoefficientAvatar, 0, 0);
             }
             set
             {
-                m_WalkableCoefficientAvatar = Math.Min(value, 0);
-                TriggerOnUpdate(UpdateChangedFlags.Physics);
+                if (Atomic.TryChange(ref m_WalkableCoefficientAvatar, Math.Min(value, 0)))
+                {
+                    TriggerOnUpdate(UpdateChangedFlags.Physics);
+                }
             }
         }
 
@@ -205,12 +207,14 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                return m_WalkableCoefficientA;
+                return Interlocked.CompareExchange(ref m_WalkableCoefficientA, 0, 0);
             }
             set
             {
-                m_WalkableCoefficientA = Math.Min(value, 0);
-                TriggerOnUpdate(UpdateChangedFlags.Physics);
+                if (Atomic.TryChange(ref m_WalkableCoefficientA, Math.Min(value, 0)))
+                {
+                    TriggerOnUpdate(UpdateChangedFlags.Physics);
+                }
             }
         }
 
@@ -218,12 +222,14 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                return m_WalkableCoefficientB;
+                return Interlocked.CompareExchange(ref m_WalkableCoefficientB, 0, 0);
             }
             set
             {
-                m_WalkableCoefficientB = Math.Min(value, 0);
-                TriggerOnUpdate(UpdateChangedFlags.Physics);
+                if (Atomic.TryChange(ref m_WalkableCoefficientB, Math.Min(value, 0)))
+                {
+                    TriggerOnUpdate(UpdateChangedFlags.Physics);
+                }
             }
         }
 
@@ -231,12 +237,14 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                return m_WalkableCoefficientC;
+                return Interlocked.CompareExchange(ref m_WalkableCoefficientC, 0, 0);
             }
             set
             {
-                m_WalkableCoefficientC = Math.Min(value, 0);
-                TriggerOnUpdate(UpdateChangedFlags.Physics);
+                if (Atomic.TryChange(ref m_WalkableCoefficientC, Math.Min(value, 0)))
+                {
+                    TriggerOnUpdate(UpdateChangedFlags.Physics);
+                }
             }
         }
 
@@ -244,12 +252,14 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                return m_WalkableCoefficientD;
+                return Interlocked.CompareExchange(ref m_WalkableCoefficientD, 0, 0);
             }
             set
             {
-                m_WalkableCoefficientD = Math.Min(value, 0);
-                TriggerOnUpdate(UpdateChangedFlags.Physics);
+                if (Atomic.TryChange(ref m_WalkableCoefficientD, Math.Min(value, 0)))
+                {
+                    TriggerOnUpdate(UpdateChangedFlags.Physics);
+                }
             }
         }
 
@@ -870,14 +880,13 @@ namespace SilverSim.Scene.Types.Object
         private double m_Damage;
         public double Damage
         {
-            get { return m_Damage; }
+            get { return Interlocked.CompareExchange(ref m_Damage, 0, 0); }
             set
             {
-                lock (m_DataLock)
+                if(Atomic.TryChange(ref m_Damage, value.Clamp(0, 100)))
                 {
-                    m_Damage = value.Clamp(0, 100);
+                    TriggerOnUpdate(0);
                 }
-                TriggerOnUpdate(0);
             }
         }
 
@@ -1046,21 +1055,32 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
+                bool changed;
                 lock(m_DataLock)
                 {
+                    changed = m_PrimitiveFlags != value;
                     m_PrimitiveFlags = value;
                 }
-                TriggerOnUpdate(0);
+                if (changed)
+                {
+                    TriggerOnUpdate(0);
+                }
             }
         }
 
         public void SetClrFlagsMask(PrimitiveFlags setMask, PrimitiveFlags clrMask)
         {
+            bool changed;
             lock (m_DataLock)
             {
+                PrimitiveFlags old = m_PrimitiveFlags;
                 m_PrimitiveFlags = (m_PrimitiveFlags  & ~clrMask) | setMask;
+                changed = old != m_PrimitiveFlags;
             }
-            TriggerOnUpdate(0);
+            if (changed)
+            {
+                TriggerOnUpdate(0);
+            }
         }
 
         public UGUI Creator
@@ -1133,9 +1153,17 @@ namespace SilverSim.Scene.Types.Object
 
             set
             {
-                m_PassCollisionMode = value;
-                IncrementPhysicsParameterUpdateSerial();
-                TriggerOnUpdate(0);
+                bool changed;
+                lock (m_DataLock)
+                {
+                    changed = m_PassCollisionMode != value;
+                    m_PassCollisionMode = value;
+                }
+                if (changed)
+                {
+                    IncrementPhysicsParameterUpdateSerial();
+                    TriggerOnUpdate(0);
+                }
             }
         }
 
@@ -1144,8 +1172,16 @@ namespace SilverSim.Scene.Types.Object
             get { return m_PassTouchMode; }
             set
             {
-                m_PassTouchMode = value;
-                TriggerOnUpdate(0);
+                bool changed;
+                lock (m_DataLock)
+                {
+                    changed = m_PassTouchMode != value;
+                    m_PassTouchMode = value;
+                }
+                if (changed)
+                {
+                    TriggerOnUpdate(0);
+                }
             }
         }
 
@@ -1175,15 +1211,18 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
+                bool changed = Atomic.TryChange(ref m_AngularVelocity, value);
                 lock (m_DataLock)
                 {
-                    m_AngularVelocity = value;
                     foreach(ObjectPartLocalizedInfo l in Localizations)
                     {
                         l.SetAngularVelocity(value);
                     }
                 }
-                TriggerOnUpdate(0);
+                if (changed)
+                {
+                    TriggerOnUpdate(0);
+                }
             }
         }
 
@@ -1228,8 +1267,16 @@ namespace SilverSim.Scene.Types.Object
 
             set
             {
-                m_IsSoundQueueing = value;
-                TriggerOnUpdate(0);
+                bool changed;
+                lock (m_DataLock)
+                {
+                    changed = m_IsSoundQueueing != value;
+                    m_IsSoundQueueing = value;
+                }
+                if (changed)
+                {
+                    TriggerOnUpdate(0);
+                }
             }
         }
 
@@ -1268,8 +1315,16 @@ namespace SilverSim.Scene.Types.Object
             get { return m_IsAllowedDrop; }
             set
             {
-                m_IsAllowedDrop = value;
-                TriggerOnUpdate(UpdateChangedFlags.AllowedDrop);
+                bool changed;
+                lock (m_DataLock)
+                {
+                    changed = m_IsAllowedDrop != value;
+                    m_IsAllowedDrop = value;
+                }
+                if (changed)
+                {
+                    TriggerOnUpdate(UpdateChangedFlags.AllowedDrop);
+                }
             }
         }
 
@@ -1281,8 +1336,16 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
-                m_IsSitTargetActive = value;
-                TriggerOnUpdate(0);
+                bool changed;
+                lock (m_DataLock)
+                {
+                    changed = m_IsSitTargetActive != value;
+                    m_IsSitTargetActive = value;
+                }
+                if (changed)
+                {
+                    TriggerOnUpdate(0);
+                }
             }
         }
 
@@ -1294,8 +1357,17 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
-                m_SitAnimation = value ?? string.Empty;
-                TriggerOnUpdate(0);
+                string v = value ?? value;
+                bool changed;
+                lock (m_DataLock)
+                {
+                    changed = v != m_SitAnimation;
+                    m_SitAnimation = v;
+                }
+                if (changed)
+                {
+                    TriggerOnUpdate(0);
+                }
             }
         }
 
@@ -1311,8 +1383,10 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
-                m_UnSitTargetOffset = value;
-                TriggerOnUpdate(0);
+                if (Atomic.TryChange(ref m_UnSitTargetOffset, value))
+                {
+                    TriggerOnUpdate(0);
+                }
             }
         }
 
@@ -1324,8 +1398,10 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
-                m_UnSitTargetOrientation = value;
-                TriggerOnUpdate(0);
+                if (Atomic.TryChange(ref m_UnSitTargetOrientation, value))
+                {
+                    TriggerOnUpdate(0);
+                }
             }
         }
 
@@ -1337,8 +1413,16 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
-                m_IsUnSitTargetActive = value;
-                TriggerOnUpdate(0);
+                bool changed;
+                lock (m_DataLock)
+                {
+                    changed = m_IsUnSitTargetActive != value;
+                    m_IsUnSitTargetActive = value;
+                }
+                if (changed)
+                {
+                    TriggerOnUpdate(0);
+                }
             }
         }
 
@@ -1350,8 +1434,10 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
-                m_SitTargetOffset = value;
-                TriggerOnUpdate(0);
+                if (Atomic.TryChange(ref m_SitTargetOffset, value))
+                {
+                    TriggerOnUpdate(0);
+                }
             }
         }
 
@@ -1363,8 +1449,10 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
-                m_SitTargetOrientation = value;
-                TriggerOnUpdate(0);
+                if (Atomic.TryChange(ref m_SitTargetOrientation, value))
+                {
+                    TriggerOnUpdate(0);
+                }
             }
         }
 
@@ -1377,7 +1465,6 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_DefaultLocalization.SitText = value;
-                TriggerOnUpdate(0);
             }
         }
 
@@ -1409,7 +1496,6 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_DefaultLocalization.TouchText = value;
-                TriggerOnUpdate(0);
             }
         }
 
@@ -1504,16 +1590,21 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
+                bool valueChanged;
                 lock(m_DataLock)
                 {
+                    valueChanged = m_Size != value;
                     m_Size = value;
                     foreach(ObjectPartLocalizedInfo l in Localizations)
                     {
                         l.SetScale(value);
                     }
                 }
-                IncrementPhysicsParameterUpdateSerial();
-                TriggerOnUpdate(UpdateChangedFlags.Scale);
+                if (valueChanged)
+                {
+                    IncrementPhysicsParameterUpdateSerial();
+                    TriggerOnUpdate(UpdateChangedFlags.Scale);
+                }
             }
         }
 
@@ -1525,10 +1616,12 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
-                m_Slice = value;
-                IncrementPhysicsShapeUpdateSerial();
-                IncrementPhysicsParameterUpdateSerial();
-                TriggerOnUpdate(UpdateChangedFlags.Shape);
+                if (Atomic.TryChange(ref m_Slice, value))
+                {
+                    IncrementPhysicsShapeUpdateSerial();
+                    IncrementPhysicsParameterUpdateSerial();
+                    TriggerOnUpdate(UpdateChangedFlags.Shape);
+                }
             }
         }
 
@@ -1630,16 +1723,20 @@ namespace SilverSim.Scene.Types.Object
                 {
                     goto hitsandboxlimit;
                 }
+                bool changed = IsPhysics;
                 lock (m_DataLock)
                 {
-                    m_LocalPosition = value;
+                    changed = changed || Atomic.TryChange(ref m_LocalPosition, value);
                     foreach(ObjectPartLocalizedInfo l in Localizations)
                     {
                         l.SetPosition(value);
                     }
                 }
-                TriggerOnUpdate(0);
-                TriggerOnPositionChange();
+                if (changed)
+                {
+                    TriggerOnUpdate(0);
+                    TriggerOnPositionChange();
+                }
                 return;
 
                 hitsandboxlimit:
@@ -1676,17 +1773,21 @@ namespace SilverSim.Scene.Types.Object
                         goto hitsandboxlimit;
                     }
                 }
+                bool changed = IsPhysics;
                 lock (m_DataLock)
                 {
-                    m_LocalPosition = value;
+                    changed = changed || Atomic.TryChange(ref m_LocalPosition, value);
                     foreach (ObjectPartLocalizedInfo l in Localizations)
                     {
                         l.SetPosition(value);
                     }
                 }
 
-                TriggerOnUpdate(0);
-                TriggerOnPositionChange();
+                if (changed)
+                {
+                    TriggerOnUpdate(0);
+                    TriggerOnPositionChange();
+                }
                 return;
 
                 hitsandboxlimit:
@@ -1713,17 +1814,21 @@ namespace SilverSim.Scene.Types.Object
                 {
                     goto hitsandboxlimit;
                 }
+                bool changed = IsPhysics;
                 lock (m_DataLock)
                 {
-                    m_LocalPosition = value;
+                    changed = changed || Atomic.TryChange(ref m_LocalPosition, value);
                     foreach (ObjectPartLocalizedInfo l in Localizations)
                     {
                         l.SetPosition(value);
                     }
                 }
 
-                TriggerOnUpdate(0);
-                TriggerOnPositionChange();
+                if (changed)
+                {
+                    TriggerOnUpdate(0);
+                    TriggerOnPositionChange();
+                }
                 return;
 
                 hitsandboxlimit:
@@ -1745,17 +1850,21 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
+                bool changed = IsPhysics;
                 lock (m_DataLock)
                 {
-                    m_LocalRotation = value;
+                    changed = changed || Atomic.TryChange(ref m_LocalRotation, value);
                     foreach(ObjectPartLocalizedInfo l in Localizations)
                     {
                         l.SetRotation(value);
                     }
                 }
 
-                TriggerOnUpdate(0);
-                TriggerOnPositionChange();
+                if (changed)
+                {
+                    TriggerOnUpdate(0);
+                    TriggerOnPositionChange();
+                }
             }
         }
 
@@ -1770,6 +1879,7 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
+                bool changed = IsPhysics;
                 lock (m_DataLock)
                 {
                     ObjectGroup grp = ObjectGroup;
@@ -1777,15 +1887,18 @@ namespace SilverSim.Scene.Types.Object
                     {
                         value /= grp.RootPart.GlobalRotation;
                     }
-                    m_LocalRotation = value;
+                    changed = changed || Atomic.TryChange(ref m_LocalRotation, value);
                     foreach (ObjectPartLocalizedInfo l in Localizations)
                     {
                         l.SetRotation(value);
                     }
                 }
 
-                TriggerOnUpdate(0);
-                TriggerOnPositionChange();
+                if (changed)
+                {
+                    TriggerOnUpdate(0);
+                    TriggerOnPositionChange();
+                }
             }
         }
 
@@ -1797,17 +1910,21 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
+                bool changed = IsPhysics;
                 lock (m_DataLock)
                 {
-                    m_LocalRotation = value;
+                    changed = changed || Atomic.TryChange(ref m_LocalRotation, value);
                     foreach (ObjectPartLocalizedInfo l in Localizations)
                     {
                         l.SetRotation(value);
                     }
                 }
 
-                TriggerOnUpdate(0);
-                TriggerOnPositionChange();
+                if (changed)
+                {
+                    TriggerOnUpdate(0);
+                    TriggerOnPositionChange();
+                }
             }
         }
         #endregion
