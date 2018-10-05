@@ -1580,7 +1580,7 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.Slice:
-                    Slice = ParamsHelper.GetVector(enumerator, "PRIM_SIZE");
+                    Slice = ParamsHelper.GetVector(enumerator, "PRIM_SLICE");
                     break;
 
                 case PrimitiveParamsType.PhysicsShapeType:
