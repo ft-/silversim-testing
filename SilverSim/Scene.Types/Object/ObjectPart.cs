@@ -432,7 +432,6 @@ namespace SilverSim.Scene.Types.Object
             SitTargetOrientation = fromPart.SitTargetOrientation;
             SitText = fromPart.SitText;
             Size = fromPart.Size;
-            Slice = fromPart.Slice;
             Sound = fromPart.Sound;
             TextureAnimationBytes = fromPart.TextureAnimationBytes;
             TextureEntryBytes = fromPart.TextureEntryBytes;
