@@ -107,7 +107,7 @@ namespace SilverSim.ServiceInterfaces.Economy
          * this function has to throw exception for signaling error
          * <returns>returns a debit permission key on success</returns>
          */
-        public virtual UUID RequestScriptDebitPermission(UGUI sourceID, UUID regionID, UUID objectID, UUID itemID) => UUID.Zero;
+        public virtual UUID RequestScriptDebitPermission(DebitPermissionRequestData requestData) => UUID.Zero;
 
         /** <summary>Request script debit permission</summary>
          */
