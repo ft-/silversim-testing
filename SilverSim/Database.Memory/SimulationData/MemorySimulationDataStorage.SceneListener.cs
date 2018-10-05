@@ -115,6 +115,7 @@ namespace SilverSim.Database.Memory.SimulationData
                     { "SalePermMask", (int)item.SaleInfo.PermMask },
                     { "PermsGranter", grantinfo.PermsGranter.ToString() },
                     { "PermsMask", (int)grantinfo.PermsMask },
+                    { "DebitPermissionKey", item.PermsGranter.DebitPermissionKey },
                     { "NextOwnerAssetID", item.NextOwnerAssetID },
                     { "ExperienceID", item.ExperienceID },
                     { "CollisionFilterData", new BinaryData(item.CollisionFilter.DbSerialization) }

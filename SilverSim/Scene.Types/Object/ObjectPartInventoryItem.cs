@@ -177,6 +177,7 @@ namespace SilverSim.Scene.Types.Object
         {
             public UGUI PermsGranter = UGUI.Unknown;
             public ScriptPermissions PermsMask;
+            public UUID DebitPermissionKey;
 
             public PermsGranterInfo()
             {
@@ -186,6 +187,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 PermsGranter = i.PermsGranter;
                 PermsMask = i.PermsMask;
+                DebitPermissionKey = i.DebitPermissionKey;
             }
         }
 

@@ -276,6 +276,7 @@ namespace SilverSim.Database.Memory.SimulationData
                 }
             }
             grantinfo.PermsMask = (ScriptPermissions)map["PermsMask"].AsUInt;
+            grantinfo.DebitPermissionKey = map["DebitPermissionKey"].AsUUID;
 
             return item;
         }
