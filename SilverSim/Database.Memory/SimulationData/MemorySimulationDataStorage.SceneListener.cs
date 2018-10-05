@@ -170,7 +170,6 @@ namespace SilverSim.Database.Memory.SimulationData
                     { "WalkableCoefficientD", objpart.WalkableCoefficientD },
                     { "Material", (int)objpart.Material },
                     { "Size", objpart.Size },
-                    { "Slice", objpart.Slice },
                     { "MediaURL", objpart.MediaURL },
                     { "Creator", objpart.Creator.ToString() },
                     { "CreationDate", objpart.CreationDate },

@@ -129,7 +129,6 @@ namespace SilverSim.Database.Memory.SimulationData
                 WalkableCoefficientD = map["WalkableCoefficientD"].AsReal,
                 Material = (PrimitiveMaterial)map["Material"].AsInt,
                 Size = map["Size"].AsVector3,
-                Slice = map["Slice"].AsVector3,
 
                 MediaURL = map["MediaURL"].ToString(),
 
