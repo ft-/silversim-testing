@@ -110,7 +110,6 @@ namespace SilverSim.Scene.Types.Object
         private ReferenceBoxed<Vector3> m_LocalPosition = Vector3.Zero;
         private ReferenceBoxed<Vector3> m_SandboxOrigin = Vector3.Zero;
         private ReferenceBoxed<Quaternion> m_LocalRotation = Quaternion.Identity;
-        private ReferenceBoxed<Vector3> m_Slice = new Vector3(0, 1, 0);
         private PrimitivePhysicsShapeType m_PhysicsShapeType;
         private PrimitiveMaterial m_Material = PrimitiveMaterial.Wood;
         private ReferenceBoxed<Vector3> m_Size = new Vector3(0.5, 0.5, 0.5);
@@ -1604,23 +1603,6 @@ namespace SilverSim.Scene.Types.Object
                 {
                     IncrementPhysicsParameterUpdateSerial();
                     TriggerOnUpdate(UpdateChangedFlags.Scale);
-                }
-            }
-        }
-
-        public Vector3 Slice
-        {
-            get
-            {
-                return m_Slice;
-            }
-            set
-            {
-                if (Atomic.TryChange(ref m_Slice, value))
-                {
-                    IncrementPhysicsShapeUpdateSerial();
-                    IncrementPhysicsParameterUpdateSerial();
-                    TriggerOnUpdate(UpdateChangedFlags.Shape);
                 }
             }
         }

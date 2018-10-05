@@ -1135,6 +1135,96 @@ namespace SilverSim.Scene.Types.Object
 
         private readonly PrimitiveShape m_Shape = new PrimitiveShape();
 
+        public Vector3 Slice
+        {
+            get
+            {
+                Vector3 slice = Vector3.Zero;
+                lock(m_Shape)
+                {
+                    if(m_Shape.Type == PrimitiveShapeType.Sphere ||
+                        m_Shape.Type == PrimitiveShapeType.Torus ||
+                        m_Shape.Type == PrimitiveShapeType.Tube ||
+                        m_Shape.Type == PrimitiveShapeType.Ring)
+                    {
+                        slice.X = (m_Shape.ProfileBegin / 50000.0).Clamp(0f, 1f);
+                        slice.Y = 1 - (m_Shape.ProfileEnd / 50000.0).Clamp(0f, 1f);
+                    }
+                    else
+                    {
+                        slice.X = (m_Shape.PathBegin / 50000.0).Clamp(0f, 1f);
+                        slice.Y = 1 - (m_Shape.PathEnd / 50000.0).Clamp(0f, 1f);
+                    }
+                }
+                return slice;
+            }
+            set
+            {
+                bool changed = false;
+
+                double begin = value.X.Clamp(0, 1);
+                double end = value.Y.Clamp(0, 1);
+
+                if(end < begin)
+                {
+                    double temp = begin;
+                    begin = end;
+                    end = temp;
+                }
+
+                begin = Math.Min(begin, end - 0.02);
+
+                if (begin < 0.02 && end < 0.02)
+                {
+                    begin = 0;
+                    end = 0.02;
+                }
+
+                lock (m_Shape)
+                {
+                    ushort pBegin = Math.Min((ushort)(50000.0 * begin), (ushort)50000);
+                    ushort pEnd = Math.Min((ushort)(50000.0 * (1 - end)), (ushort)50000);
+                    switch(m_Shape.Type)
+                    {
+                        case PrimitiveShapeType.Sphere:
+                        case PrimitiveShapeType.Torus:
+                        case PrimitiveShapeType.Tube:
+                        case PrimitiveShapeType.Ring:
+                            changed = m_Shape.ProfileBegin != pBegin || m_Shape.ProfileEnd != pEnd;
+                            m_Shape.ProfileBegin = pBegin;
+                            m_Shape.ProfileEnd = pEnd;
+                            break;
+
+                        case PrimitiveShapeType.Sculpt:
+                            /* no modification of sculpt slice param */
+                            break;
+
+                        default:
+                            changed = m_Shape.PathBegin != pBegin || m_Shape.PathEnd != pEnd;
+                            m_Shape.PathBegin = pBegin;
+                            m_Shape.PathEnd = pEnd;
+                            break;
+                    }
+
+                    if (changed)
+                    {
+                        foreach (ObjectPartLocalizedInfo l in Localizations)
+                        {
+                            l.SetPrimitiveShape(m_Shape);
+                        }
+                    }
+                }
+
+                if (changed)
+                {
+                    IncrementPhysicsShapeUpdateSerial();
+                    IncrementPhysicsParameterUpdateSerial();
+                    TriggerOnUpdate(UpdateChangedFlags.Shape);
+                }
+
+            }
+        }
+
         public PrimitiveShape Shape
         {
             get
