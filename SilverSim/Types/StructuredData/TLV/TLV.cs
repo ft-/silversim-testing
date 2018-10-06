@@ -67,12 +67,12 @@ namespace SilverSim.Types.StructuredData.TLV
         private ushort m_OuterId;
         private int m_MaxLength = 0;
 
-        TLV(Stream s)
+        public TLV(Stream s)
         {
             m_Stream = s;
         }
 
-        TLV(ushort tlvId, TLV tlv)
+        private TLV(ushort tlvId, TLV tlv)
         {
             if (tlv == null)
             {
@@ -83,7 +83,7 @@ namespace SilverSim.Types.StructuredData.TLV
             m_OuterId = tlvId;
         }
 
-        TLV(Header header, TLV tlv)
+        private TLV(Header header, TLV tlv)
         {
             if(header.Type != EntryType.TLV)
             {
@@ -98,6 +98,10 @@ namespace SilverSim.Types.StructuredData.TLV
             m_Stream = tlv.m_Stream;
             m_MaxLength = header.Length;
         }
+
+        public TLV WriteInner(ushort tlvId) => new TLV(tlvId, this);
+
+        public TLV ReadInner(Header header) => new TLV(header, this);
 
         public void Dispose()
         {
