@@ -159,6 +159,13 @@ namespace SilverSim.Types.StructuredData.TLV
             Write_Blob(tlvId, type, data);
         }
 
+        public void Write<T>(ushort tlvId, Enum value)
+        {
+            Type t = value.GetType().GetEnumUnderlyingType();
+            GetType().GetMethod("Write", new Type[] { typeof(ushort), t }).Invoke(this, 
+                new object[] { tlvId, Convert.ChangeType(value, t) });
+        }
+
         public void Write(ushort tlvId, string value) =>
             Write_Blob(tlvId, EntryType.String, value.ToUTF8Bytes());
 
@@ -286,8 +293,14 @@ namespace SilverSim.Types.StructuredData.TLV
             {
                 return false;
             }
-            if(d.GetType() != typeof(T))
+            Type targetType = typeof(T);
+            Type sourceType = d.GetType();
+            if(sourceType != targetType)
             {
+                if(targetType.IsEnum && targetType.GetEnumUnderlyingType() == sourceType)
+                {
+                    data = (T)Convert.ChangeType(d, targetType);
+                }
                 return false;
             }
             data = (T)d;
