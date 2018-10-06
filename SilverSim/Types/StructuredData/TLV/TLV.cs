@@ -278,6 +278,22 @@ namespace SilverSim.Types.StructuredData.TLV
         public void Write(ushort tlvId, sbyte value) =>
             Write_Blob(tlvId, EntryType.Int8, new byte[] { (byte)value });
 
+        public bool TryReadTypedValue<T>(Header header, out T data)
+        {
+            data = default(T);
+            object d;
+            if(!TryReadValue(header, out d))
+            {
+                return false;
+            }
+            if(d.GetType() != typeof(T))
+            {
+                return false;
+            }
+            data = (T)d;
+            return true;
+        }
+
         public bool TryRead(out Header header, out object data)
         {
             while(TryReadHeader( out header))
