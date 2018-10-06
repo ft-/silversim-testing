@@ -51,7 +51,8 @@ namespace SilverSim.Types.StructuredData.TLV
             UGUI = 20,
             UGUIWithName = 21,
             URI = 22,
-            TLV = 23
+            TLV = 23,
+            GridVector = 24
         }
 
         public struct Header
@@ -261,6 +262,9 @@ namespace SilverSim.Types.StructuredData.TLV
             m_Stream.Write(dataZ, 0, 8);
             m_Stream.Write(dataW, 0, 8);
         }
+
+        public void Write(ushort tlvId, GridVector value) =>
+            Write_HtoL(tlvId, EntryType.GridVector, BitConverter.GetBytes(value.RegionHandle));
 
         public void Write(ushort tlvId, float value) =>
             Write_HtoL(tlvId, EntryType.Float, BitConverter.GetBytes(value));
@@ -710,6 +714,22 @@ namespace SilverSim.Types.StructuredData.TLV
                         return false;
                     }
                     data = readdata[0] != 0;
+                    return true;
+
+                case EntryType.GridVector:
+                    if (!TryReadData(header.Length, out readdata))
+                    {
+                        return false;
+                    }
+                    if (header.Length != 8)
+                    {
+                        return false;
+                    }
+                    if(!BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(readdata);
+                    }
+                    data = new GridVector { RegionHandle = BitConverter.ToUInt64(readdata, 0) };
                     return true;
 
                 default:
