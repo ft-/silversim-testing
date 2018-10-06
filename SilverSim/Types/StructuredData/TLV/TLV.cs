@@ -262,6 +262,12 @@ namespace SilverSim.Types.StructuredData.TLV
             m_Stream.Write(dataW, 0, 8);
         }
 
+        public void Write(ushort tlvId, float value) =>
+            Write_HtoL(tlvId, EntryType.Float, BitConverter.GetBytes(value));
+
+        public void Write(ushort tlvId, double value) =>
+            Write_HtoL(tlvId, EntryType.Double, BitConverter.GetBytes(value));
+
         public void Write(ushort tlvId, ushort value) => 
             Write_HtoL(tlvId, EntryType.UInt16, BitConverter.GetBytes(value));
 
