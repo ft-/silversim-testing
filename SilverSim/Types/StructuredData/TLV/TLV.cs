@@ -159,7 +159,7 @@ namespace SilverSim.Types.StructuredData.TLV
             Write_Blob(tlvId, type, data);
         }
 
-        public void Write<T>(ushort tlvId, Enum value)
+        public void Write(ushort tlvId, Enum value)
         {
             Type t = value.GetType().GetEnumUnderlyingType();
             GetType().GetMethod("Write", new Type[] { typeof(ushort), t }).Invoke(this, 
