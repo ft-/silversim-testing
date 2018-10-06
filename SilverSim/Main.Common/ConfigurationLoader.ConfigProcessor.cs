@@ -470,6 +470,16 @@ namespace SilverSim.Main.Common
                     }
                     catch(TargetInvocationException e)
                     {
+#if DEBUG
+                        if (e.InnerException != null)
+                        {
+                            m_Log.FatalFormat("Failed to load factory for {1} in module {0}: {2}: {3}\n{4}", assemblyname, modulenameparts[1], e.InnerException.GetType().FullName, e.InnerException.Message, e.InnerException.StackTrace);
+                        }
+                        else
+                        {
+                            m_Log.FatalFormat("Failed to load factory for {1} in module {0}: {2}: {3}\n{4}", assemblyname, modulenameparts[1], e.GetType().FullName, e.Message, e.StackTrace);
+                        }
+#else
                         if (e.InnerException != null)
                         {
                             m_Log.FatalFormat("Failed to load factory for {1} in module {0}: {2}: {3}", assemblyname, modulenameparts[1], e.InnerException.GetType().FullName, e.InnerException.Message);
@@ -478,6 +488,7 @@ namespace SilverSim.Main.Common
                         {
                             m_Log.FatalFormat("Failed to load factory for {1} in module {0}: {2}: {3}", assemblyname, modulenameparts[1], e.GetType().FullName, e.Message);
                         }
+#endif
                         throw new ConfigurationErrorException();
                     }
                 }
@@ -570,9 +581,9 @@ namespace SilverSim.Main.Common
                 }
             }
         }
-        #endregion
+#endregion
 
-        #region Process [ParameterMap] section
+#region Process [ParameterMap] section
         private void ProcessParameterMap()
         {
             IConfig parameterMap = Config.Configs["ParameterMap"];
@@ -617,9 +628,9 @@ namespace SilverSim.Main.Common
                 parameterMap.Remove(key);
             }
         }
-        #endregion
+#endregion
 
-        #region Process ImportResource* entries
+#region Process ImportResource* entries
         private void ProcessImportResources()
         {
             foreach (IConfig config in Config.Configs)
@@ -635,9 +646,9 @@ namespace SilverSim.Main.Common
                 }
             }
         }
-        #endregion
+#endregion
 
-        #region Process [ResourceMap] section
+#region Process [ResourceMap] section
         private void ProcessResourceMap()
         {
             IConfig resourceMap = Config.Configs["ResourceMap"];
@@ -668,9 +679,9 @@ namespace SilverSim.Main.Common
                 }
             }
         }
-        #endregion
+#endregion
 
-        #region Process "ParameterMapTemplates" section
+#region Process "ParameterMapTemplates" section
         private bool ProcessParameterMapTemplates()
         {
             bool processParaMap = false;
@@ -722,9 +733,9 @@ namespace SilverSim.Main.Common
             }
             return processParaMap;
         }
-        #endregion
+#endregion
 
-        #region Process UseSourceParameter lines
+#region Process UseSourceParameter lines
         private void ProcessUseSourceParameter()
         {
             foreach (IConfig config in Config.Configs)
@@ -783,9 +794,9 @@ namespace SilverSim.Main.Common
                 }
             }
         }
-        #endregion
+#endregion
 
-        #region Process UseTemplates lines
+#region Process UseTemplates lines
         private void ProcessUseTemplates()
         {
             foreach (IConfig config in Config.Configs)
@@ -815,9 +826,9 @@ namespace SilverSim.Main.Common
                 }
             }
         }
-        #endregion
+#endregion
 
-        #region Load from grids xml
+#region Load from grids xml
         private IConfigSource m_GridsXmlConfig;
         public void LoadGridsXml()
         {
@@ -841,7 +852,7 @@ namespace SilverSim.Main.Common
                 }
             }
         }
-        #endregion
+#endregion
 
         private void ProcessConfigurations(bool processParameterMap = true)
         {
