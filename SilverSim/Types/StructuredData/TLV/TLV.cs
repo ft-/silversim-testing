@@ -307,6 +307,12 @@ namespace SilverSim.Types.StructuredData.TLV
             return true;
         }
 
+        public void SkipValue(Header header)
+        {
+            byte[] readdata;
+            TryReadData(header.Length, out readdata);
+        }
+
         public bool TryRead(out Header header, out object data)
         {
             while(TryReadHeader( out header))
@@ -697,7 +703,7 @@ namespace SilverSim.Types.StructuredData.TLV
                     return true;
 
                 default:
-                    TryReadData(header.Length, out readdata);
+                    SkipValue(header);
                     break;
             }
 
