@@ -112,7 +112,7 @@ namespace SilverSim.WebIF.Admin.UserServer
             }
             if (jsondata.TryGetValue("userflags", out uval))
             {
-                account.UserFlags = uval;
+                account.UserFlags = (UserFlags)uval;
             }
             if (jsondata.TryGetValue("email", out sval))
             {
@@ -183,21 +183,20 @@ namespace SilverSim.WebIF.Admin.UserServer
                     return;
                 }
             }
-            if (jsondata.TryGetValue("usertitle", out sval))
-            {
-                account.UserTitle = sval;
-            }
-            if (jsondata.TryGetValue("userflags", out uval))
-            {
-                account.UserFlags = uval;
-            }
-            if (jsondata.TryGetValue("email", out sval))
-            {
-                account.Email = sval;
-            }
             try
             {
-                m_UserAccountService.Update(account);
+                if (jsondata.TryGetValue("usertitle", out sval))
+                {
+                    m_UserAccountService.SetUserTitle(account.ScopeID, account.Principal.ID, sval);
+                }
+                if (jsondata.TryGetValue("userflags", out uval))
+                {
+                    m_UserAccountService.SetUserFlags(account.ScopeID, account.Principal.ID, (UserFlags)uval);
+                }
+                if (jsondata.TryGetValue("email", out sval))
+                {
+                    m_UserAccountService.SetEmail(account.ScopeID, account.Principal.ID, sval);
+                }
             }
             catch
             {

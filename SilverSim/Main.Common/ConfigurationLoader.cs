@@ -43,7 +43,6 @@ using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.ServiceInterfaces.Experience;
 using SilverSim.ServiceInterfaces.Friends;
 using SilverSim.ServiceInterfaces.Grid;
-using SilverSim.ServiceInterfaces.GridUser;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.ServiceInterfaces.Neighbor;
@@ -361,7 +360,6 @@ namespace SilverSim.Main.Common
             FeaturesTable[typeof(AvatarNameServiceInterface)] = "Avatar Name Lookup Service";
             FeaturesTable[typeof(PresenceServiceInterface)] = "Presence Service";
             FeaturesTable[typeof(GridServiceInterface)] = "Grid Service";
-            FeaturesTable[typeof(GridUserServiceInterface)] = "GridUser Service";
             FeaturesTable[typeof(UserAccountServiceInterface)] = "UserAccount Service";
             FeaturesTable[typeof(IInventoryServicePlugin)] = "Inventory Service HELO Instantiator";
             FeaturesTable[typeof(IFriendsServicePlugin)] = "FriendsService HELO Instantiator";
@@ -433,6 +431,19 @@ namespace SilverSim.Main.Common
                 throw new InvalidOperationException($"Unexpected module configured for service \"{serviceName}\": Expected={typeof(T).FullName} Got={module.GetType().FullName}");
             }
             return (T)module;
+        }
+
+        public void GetService<T>(string serviceName, out T service) => service = GetService<T>(serviceName);
+
+        public void GetServices<T>(string csv, IList<T> services)
+        {
+            string[] serviceNames = csv.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            foreach(string serviceName in serviceNames)
+            {
+                T service;
+                GetService(serviceName, out service);
+                services.Add(service);
+            }
         }
 
         public bool TryGetService<T>(string serviceName, out T service)

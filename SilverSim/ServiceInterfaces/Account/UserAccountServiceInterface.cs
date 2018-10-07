@@ -21,6 +21,7 @@
 
 using SilverSim.Types;
 using SilverSim.Types.Account;
+using SilverSim.Types.Agent;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -101,12 +102,44 @@ namespace SilverSim.ServiceInterfaces.Account
 
         public abstract List<UserAccount> GetAccounts(UUID scopeID, string query);
 
-        #region Optionally supported services
-        public abstract void Add(UserAccount userAccount);
-        public abstract void Update(UserAccount userAccount);
+        public bool TryGetHomeRegion(UUID scopeID, UUID accountID, out UserRegionData homeRegion)
+        {
+            UserAccount ua;
+            homeRegion = default(UserRegionData);
+            if(TryGetValue(scopeID, accountID, out ua))
+            {
+                homeRegion = ua.HomeRegion;
+                return homeRegion != null;
+            }
+            return false;
+        }
 
-        public abstract void Remove(UUID scopeID, UUID accountID);
+        public bool TryGetLastRegion(UUID scopeID, UUID accountID, out UserRegionData lastRegion)
+        {
+            UserAccount ua;
+            lastRegion = default(UserRegionData);
+            if (TryGetValue(scopeID, accountID, out ua))
+            {
+                lastRegion = ua.LastRegion;
+                return lastRegion != null;
+            }
+            return false;
+        }
+
+        #region Online Status
+        public abstract void LoggedOut(UUID scopeID, UUID accountID, UserRegionData regionData = null);
+        public abstract void SetHome(UUID scopeID, UUID accountID, UserRegionData regionData);
+        public abstract void SetPosition(UUID scopeID, UUID accountID, UserRegionData regionData);
+        #endregion
+
+        #region Optionally supported services
         public abstract void SetEverLoggedIn(UUID scopeID, UUID accountID);
+        public abstract void Add(UserAccount userAccount);
+        public abstract void SetEmail(UUID scopeID, UUID accountID, string email);
+        public abstract void SetUserLevel(UUID scopeID, UUID accountID, int userLevel);
+        public abstract void SetUserFlags(UUID scopeID, UUID accountID, UserFlags userFlags);
+        public abstract void SetUserTitle(UUID scopeID, UUID accountID, string title);
+        public abstract void Remove(UUID scopeID, UUID accountID);
         #endregion
     }
 }

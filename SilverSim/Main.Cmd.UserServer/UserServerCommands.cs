@@ -192,14 +192,17 @@ namespace SilverSim.Main.Cmd.UserServer
                                 io.WriteFormatted("User level parameter {0} is not valid", account.UserLevel);
                                 return;
                             }
+                            m_UserAccountService.SetUserLevel(account.ScopeID, account.Principal.ID, account.UserLevel);
                             break;
 
                         case "email":
                             account.Email = args[argi + 1];
+                            m_UserAccountService.SetEmail(account.ScopeID, account.Principal.ID, account.Email);
                             break;
 
                         case "usertitle":
                             account.UserTitle = args[argi + 1];
+                            m_UserAccountService.SetUserTitle(account.ScopeID, account.Principal.ID, account.UserTitle);
                             break;
 
                         default:
@@ -207,8 +210,6 @@ namespace SilverSim.Main.Cmd.UserServer
                             return;
                     }
                 }
-
-                m_UserAccountService.Update(account);
             }
             else
             {

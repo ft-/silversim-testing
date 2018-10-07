@@ -21,6 +21,7 @@
 
 using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.Types;
+using SilverSim.Types.Agent;
 using SilverSim.Types.Grid;
 using SilverSim.Types.ServerURIs;
 using System;
@@ -60,6 +61,11 @@ namespace SilverSim.Viewer.Profile
         }
 
         public override DestinationInfo GetHomeRegion(UGUI user)
+        {
+            throw new NotSupportedException();
+        }
+
+        public override void SetHomeRegion(UGUI user, UserRegionData info)
         {
             throw new NotSupportedException();
         }

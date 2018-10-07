@@ -24,6 +24,7 @@ using SilverSim.ServiceInterfaces.Account;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Account;
+using SilverSim.Types.Agent;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -189,19 +190,44 @@ namespace SilverSim.Database.Memory.UserAccounts
             Interlocked.Increment(ref m_SerialNumber);
         }
 
-        public override void Update(UserAccount userAccount)
-        {
-            var uac = new UserAccount(userAccount);
-            uac.Principal.HomeURI = m_HomeURI;
-            uac.IsLocalToGrid = true;
-            m_Data[userAccount.Principal.ID] = uac;
-        }
-
         public override void Remove(UUID scopeID, UUID accountID)
         {
             m_Data.RemoveIf(accountID, (UserAccount acc) => acc.ScopeID == scopeID || scopeID == UUID.Zero);
         }
 
+        #region Online Status
+        public override void LoggedOut(UUID scopeID, UUID accountID, UserRegionData regionData)
+        {
+            UserAccount ua = m_Data[accountID];
+            ua.LastLogout = Date.Now;
+            if (regionData != null)
+            {
+                ua.LastRegion = regionData.Clone();
+            }
+        }
+
+        public override void SetHome(UUID scopeID, UUID accountID, UserRegionData regionData)
+        {
+            if (regionData == null)
+            {
+                throw new ArgumentNullException(nameof(regionData));
+            }
+            UserAccount ua = m_Data[accountID];
+            ua.HomeRegion = regionData.Clone();
+        }
+
+        public override void SetPosition(UUID scopeID, UUID accountID, UserRegionData regionData)
+        {
+            if (regionData == null)
+            {
+                throw new ArgumentNullException(nameof(regionData));
+            }
+            UserAccount ua = m_Data[accountID];
+            ua.LastRegion = regionData.Clone();
+        }
+        #endregion
+
+        #region Optionally supported services
         public override void SetEverLoggedIn(UUID scopeID, UUID accountID)
         {
             UserAccount ua;
@@ -210,5 +236,43 @@ namespace SilverSim.Database.Memory.UserAccounts
                 ua.IsEverLoggedIn = true;
             }
         }
+
+        public override void SetEmail(UUID scopeID, UUID accountID, string email)
+        {
+            if (email == null)
+            {
+                throw new ArgumentNullException(nameof(email));
+            }
+            UserAccount ua = m_Data[accountID];
+            ua.Email = email;
+        }
+
+        public override void SetUserLevel(UUID scopeID, UUID accountID, int userLevel)
+        {
+            if (userLevel < -1 || userLevel > 255)
+            {
+                throw new ArgumentOutOfRangeException(nameof(userLevel));
+            }
+            UserAccount ua = m_Data[accountID];
+            ua.UserLevel = userLevel;
+        }
+
+        public override void SetUserFlags(UUID scopeID, UUID accountID, UserFlags userFlags)
+        {
+            UserAccount ua = m_Data[accountID];
+            ua.UserFlags = userFlags;
+        }
+
+        public override void SetUserTitle(UUID scopeID, UUID accountID, string title)
+        {
+            if (title == null)
+            {
+                throw new ArgumentNullException(nameof(title));
+            }
+            UserAccount ua = m_Data[accountID];
+            ua.UserTitle = title;
+        }
+        #endregion
+
     }
 }

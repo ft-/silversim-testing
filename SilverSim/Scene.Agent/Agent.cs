@@ -31,7 +31,6 @@ using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Economy;
 using SilverSim.ServiceInterfaces.Friends;
 using SilverSim.ServiceInterfaces.Grid;
-using SilverSim.ServiceInterfaces.GridUser;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.IM;
 using SilverSim.ServiceInterfaces.Inventory;
@@ -971,7 +970,6 @@ namespace SilverSim.Scene.Agent
         public abstract FriendsServiceInterface FriendsService { get; }
         public abstract UserAgentServiceInterface UserAgentService { get; }
         public abstract PresenceServiceInterface PresenceService { get; }
-        public abstract GridUserServiceInterface GridUserService { get; }
         public abstract EconomyServiceInterface EconomyService { get; }
         public abstract MuteListServiceInterface MuteListService { get; }
         public abstract OfflineIMServiceInterface OfflineIMService { get; }

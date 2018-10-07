@@ -34,7 +34,6 @@ using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Economy;
 using SilverSim.ServiceInterfaces.Friends;
 using SilverSim.ServiceInterfaces.Grid;
-using SilverSim.ServiceInterfaces.GridUser;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.IM;
 using SilverSim.ServiceInterfaces.Inventory;
@@ -414,8 +413,6 @@ namespace SilverSim.Viewer.Core
 
         public override PresenceServiceInterface PresenceService => m_PresenceService;
 
-        public override GridUserServiceInterface GridUserService => m_GridUserService;
-
         public override EconomyServiceInterface EconomyService { get; }
         #endregion
 
@@ -510,7 +507,6 @@ namespace SilverSim.Viewer.Core
         private FriendsServiceInterface m_FriendsService;
         private UserAgentServiceInterface m_UserAgentService;
         private PresenceServiceInterface m_PresenceService;
-        private GridUserServiceInterface m_GridUserService;
 
         #endregion
 
@@ -711,7 +707,6 @@ namespace SilverSim.Viewer.Core
             m_FriendsService = serviceList.Get<FriendsServiceInterface>();
             m_UserAgentService = serviceList.Get<UserAgentServiceInterface>();
             m_PresenceService = serviceList.Get<PresenceServiceInterface>();
-            m_GridUserService = serviceList.Get<GridUserServiceInterface>();
             EconomyService = serviceList.Get<EconomyServiceInterface>();
             OfflineIMService = serviceList.Get<OfflineIMServiceInterface>();
             MuteListService = serviceList.Get<MuteListServiceInterface>();
@@ -734,7 +729,6 @@ namespace SilverSim.Viewer.Core
                 m_FriendsService = null;
                 m_UserAgentService = null;
                 m_PresenceService = null;
-                m_GridUserService = null;
             }
         }
 

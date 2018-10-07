@@ -19,37 +19,27 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-namespace SilverSim.Types.GridUser
+using System;
+using System.Runtime.Serialization;
+
+namespace SilverSim.ServiceInterfaces.UserAgents
 {
-    public class GridUserInfo
+    public sealed class SetHomeNotPossibleForForeignersException : Exception
     {
-        public GridUserInfo()
+        public SetHomeNotPossibleForForeignersException()
         {
         }
 
-        public UGUI User = UGUI.Unknown;
-        public UUID HomeRegionID = UUID.Zero;
-        public Vector3 HomePosition = Vector3.Zero;
-        public Vector3 HomeLookAt = Vector3.Zero;
-        public UUID LastRegionID = UUID.Zero;
-        public Vector3 LastPosition = Vector3.Zero;
-        public Vector3 LastLookAt = Vector3.Zero;
-        public bool IsOnline;
-        public Date LastLogin = new Date();
-        public Date LastLogout = new Date();
-
-        public GridUserInfo(GridUserInfo src)
+        public SetHomeNotPossibleForForeignersException(string message) : base(message)
         {
-            User = new UGUI(src.User);
-            HomeRegionID = src.HomeRegionID;
-            HomePosition = src.HomePosition;
-            HomeLookAt = src.HomeLookAt;
-            LastRegionID = src.LastRegionID;
-            LastPosition = src.LastPosition;
-            LastLookAt = src.LastLookAt;
-            IsOnline = src.IsOnline;
-            LastLogin = new Date(src.LastLogin);
-            LastLogout = new Date(src.LastLogout);
+        }
+
+        public SetHomeNotPossibleForForeignersException(string message, Exception innerException) : base(message, innerException)
+        {
+        }
+
+        private SetHomeNotPossibleForForeignersException(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
         }
     }
 }

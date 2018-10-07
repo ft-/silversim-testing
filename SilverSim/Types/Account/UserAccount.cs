@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Types.Agent;
 using System.Collections.Generic;
 
 namespace SilverSim.Types.Account
@@ -30,11 +31,15 @@ namespace SilverSim.Types.Account
         public string Email = string.Empty;
         public Date Created = new Date();
         public int UserLevel = -1;
-        public uint UserFlags;
+        public UserFlags UserFlags;
         public string UserTitle = string.Empty;
         public bool IsLocalToGrid;
         public bool IsEverLoggedIn;
         public Dictionary<string, string> ServiceURLs = new Dictionary<string,string>(); /* only valid when IsLocalToGrid is set to false */
+        public Date LastLogout = Date.Now;
+
+        public UserRegionData LastRegion;
+        public UserRegionData HomeRegion;
 
         public UserAccount()
         {
@@ -51,6 +56,9 @@ namespace SilverSim.Types.Account
             UserTitle = src.UserTitle;
             ServiceURLs = new Dictionary<string, string>(src.ServiceURLs);
             IsEverLoggedIn = src.IsEverLoggedIn;
+            LastLogout = new Date(src.LastLogout);
+            LastRegion = src.LastRegion?.Clone();
+            HomeRegion = src.HomeRegion?.Clone();
         }
     }
 }

@@ -32,7 +32,6 @@ using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Economy;
 using SilverSim.ServiceInterfaces.Friends;
 using SilverSim.ServiceInterfaces.Grid;
-using SilverSim.ServiceInterfaces.GridUser;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.IM;
 using SilverSim.ServiceInterfaces.Inventory;
@@ -57,7 +56,6 @@ namespace SilverSim.Scene.Npc
 
         private readonly InventoryServiceInterface m_InventoryService;
         private readonly ProfileServiceInterface m_ProfileService;
-        private readonly GridUserServiceInterface m_GridUserService;
         private readonly PresenceServiceInterface m_PresenceService;
 
         private ChatServiceInterface m_ChatService;
@@ -107,7 +105,6 @@ namespace SilverSim.Scene.Npc
             LastName = npcID.LastName;
             m_InventoryService = serviceList.Get<InventoryServiceInterface>();
             m_ProfileService = serviceList.Get<ProfileServiceInterface>();
-            m_GridUserService = serviceList.Get<GridUserServiceInterface>();
             m_PresenceService = serviceList.Get<PresenceServiceInterface>();
             NpcPresenceService = serviceList.Get<NpcPresenceServiceInterface>();
             m_UpdateInfo = new AgentUpdateInfo(this, UUID.Zero);
@@ -218,18 +215,6 @@ namespace SilverSim.Scene.Npc
         }
 
         public NpcPresenceServiceInterface NpcPresenceService { get; }
-
-        public override GridUserServiceInterface GridUserService
-        {
-            get
-            {
-                if (m_GridUserService == null)
-                {
-                    throw new NotSupportedException();
-                }
-                return m_GridUserService;
-            }
-        }
 
         public override GroupsServiceInterface GroupsService
         {

@@ -29,7 +29,6 @@ using SilverSim.ServiceInterfaces.Account;
 using SilverSim.ServiceInterfaces.AuthInfo;
 using SilverSim.ServiceInterfaces.Friends;
 using SilverSim.ServiceInterfaces.Grid;
-using SilverSim.ServiceInterfaces.GridUser;
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.ServerParam;
@@ -41,7 +40,6 @@ using SilverSim.Types.Agent;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Friends;
 using SilverSim.Types.Grid;
-using SilverSim.Types.GridUser;
 using SilverSim.Types.Inventory;
 using SilverSim.Types.Presence;
 using SilverSim.Types.StructuredData.Json;
@@ -80,7 +78,6 @@ namespace SilverSim.Grid.Login
         private bool m_AllowLoginViaHttpWhenHttpsIsConfigured;
 
         private UserAccountServiceInterface m_UserAccountService;
-        private GridUserServiceInterface m_GridUserService;
         private GridServiceInterface m_GridService;
         private InventoryServiceInterface m_InventoryService;
         private PresenceServiceInterface m_PresenceService;
@@ -91,7 +88,6 @@ namespace SilverSim.Grid.Login
         private List<ILoginUserCapsGetInterface> m_UserCapsGetters;
 
         private readonly string m_UserAccountServiceName;
-        private readonly string m_GridUserServiceName;
         private readonly string m_GridServiceName;
         private readonly string m_InventoryServiceName;
         private readonly string m_PresenceServiceName;
@@ -119,7 +115,6 @@ namespace SilverSim.Grid.Login
         public XmlRpcLoginHandler(IConfig ownSection)
         {
             m_UserAccountServiceName = ownSection.GetString("UserAccountService", "UserAccountService");
-            m_GridUserServiceName = ownSection.GetString("GridUserService", "GridUserService");
             m_GridServiceName = ownSection.GetString("GridService", "GridService");
             m_InventoryServiceName = ownSection.GetString("InventoryService", "InventoryService");
             m_PresenceServiceName = ownSection.GetString("PresenceService", "PresenceService");
@@ -139,7 +134,6 @@ namespace SilverSim.Grid.Login
             m_XmlRpcServer = loader.XmlRpcServer;
             m_GatekeeperUri = loader.GatekeeperURI;
             m_UserAccountService = loader.GetService<UserAccountServiceInterface>(m_UserAccountServiceName);
-            m_GridUserService = loader.GetService<GridUserServiceInterface>(m_GridUserServiceName);
             m_GridService = loader.GetService<GridServiceInterface>(m_GridServiceName);
             m_InventoryService = loader.GetService<InventoryServiceInterface>(m_InventoryServiceName);
             m_PresenceService = loader.GetService<PresenceServiceInterface>(m_PresenceServiceName);
@@ -618,26 +612,11 @@ namespace SilverSim.Grid.Login
 
             try
             {
-                return LoginAuthenticatedAndPresenceAdded(req, loginData);
-            }
-            catch
-            {
-                m_PresenceService.Logout(pInfo.SessionID, pInfo.UserID.ID);
-                throw;
-            }
-        }
-
-        private XmlRpc.XmlRpcResponse LoginAuthenticatedAndPresenceAdded(XmlRpc.XmlRpcRequest req, LoginData loginData)
-        {
-            m_GridUserService.LoggedInAdd(loginData.Account.Principal);
-            try
-            {
                 return LoginAuthenticatedAndPresenceAndGridUserAdded(req, loginData);
             }
             catch
             {
-                GridUserInfo gui = m_GridUserService[loginData.Account.Principal];
-                m_GridUserService.LoggedOut(gui.User, gui.LastRegionID, gui.LastPosition, gui.LastLookAt);
+                m_PresenceService.Logout(pInfo.SessionID, pInfo.UserID.ID);
                 throw;
             }
         }

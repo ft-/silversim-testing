@@ -20,8 +20,9 @@
 // exception statement from your version.
 
 using SilverSim.Scene.Types.Object;
-using SilverSim.ServiceInterfaces.GridUser;
+using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.Types;
+using SilverSim.Types.Agent;
 using SilverSim.Types.Parcel;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.StartLocation;
@@ -72,16 +73,17 @@ namespace SilverSim.Viewer.Core
 
             if(canSetHome)
             {
-                if(Agent.GridUserService == null)
-                {
-                    Agent.SendAlertMessage(this.GetLanguageString(Agent.CurrentCulture, "SettingHomeForForeignersNotPossible", "Setting home for foreign visitors is not possible."), Scene.ID);
-                    return;
-                }
                 try
                 {
-                    Agent.GridUserService.SetHome(agentOwner, Scene.ID, req.LocationPos, req.LocationLookAt);
+                    Agent.UserAgentService.SetHomeRegion(agentOwner, new UserRegionData
+                    {
+                        RegionID = Scene.ID,
+                        Position = req.LocationPos,
+                        LookAt = req.LocationLookAt,
+                        GatekeeperURI = new URI(Scene.GatekeeperURI)
+                    });
                 }
-                catch(GridUserSetHomeNotPossibleForForeignerException)
+                catch(SetHomeNotPossibleForForeignersException)
                 {
                     Agent.SendAlertMessage(this.GetLanguageString(Agent.CurrentCulture, "SettingHomeForForeignersNotPossible", "Setting home for foreign visitors is not possible."), Scene.ID);
                     return;

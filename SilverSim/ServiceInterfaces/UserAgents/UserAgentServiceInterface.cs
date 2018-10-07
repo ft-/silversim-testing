@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using SilverSim.Types;
+using SilverSim.Types.Agent;
 using SilverSim.Types.Grid;
 using SilverSim.Types.ServerURIs;
 using System;
@@ -56,6 +57,13 @@ namespace SilverSim.ServiceInterfaces.UserAgents
         public abstract UGUIWithName GetUUI(UGUI user, UGUI targetUserID);
 
         public abstract DestinationInfo GetHomeRegion(UGUI user);
+
+        public abstract void SetHomeRegion(UGUI user, UserRegionData info);
+
+        public virtual void SetLastRegion(UGUI user, UserRegionData info)
+        {
+            /* intentionally left empty */
+        }
 
         public abstract bool IsOnline(UGUI user);
 

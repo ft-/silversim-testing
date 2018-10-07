@@ -29,12 +29,12 @@ using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.ServiceInterfaces.Teleport;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.ServiceInterfaces.Account;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Authorization;
 using SilverSim.ServiceInterfaces.Economy;
 using SilverSim.ServiceInterfaces.Friends;
 using SilverSim.ServiceInterfaces.Grid;
-using SilverSim.ServiceInterfaces.GridUser;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.IM;
 using SilverSim.ServiceInterfaces.Inventory;
@@ -47,7 +47,6 @@ using SilverSim.Types.Account;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Asset.Format;
 using SilverSim.Types.Grid;
-using SilverSim.Types.GridUser;
 using SilverSim.Types.Presence;
 using SilverSim.Viewer.Core;
 using SilverSim.Viewer.Core.Teleport;
@@ -66,10 +65,11 @@ namespace SilverSim.Grid.Standalone
     public sealed class LocalLoginConnector : IPlugin, ILoginConnectorServiceInterface
     {
         private static readonly ILog m_Log = LogManager.GetLogger("LOCAL LOGIN HANDLER");
-        private GridUserServiceInterface m_GridUserService;
         private GridServiceInterface m_GridService;
         private BaseHttpServer m_HttpServer;
 
+        private readonly string m_LocalUserAccountServiceName;
+        private UserAccountServiceInterface m_LocalUserAccountService;
         private readonly string m_LocalInventoryServiceName;
         private InventoryServiceInterface m_LocalInventoryService;
         private readonly string m_LocalAssetServiceName;
@@ -97,7 +97,6 @@ namespace SilverSim.Grid.Standalone
         private SceneList m_Scenes;
         private CommandRegistry m_CommandRegistry;
 
-        private readonly string m_GridUserServiceName;
         private readonly string m_GridServiceName;
 
         private CommandRegistry Commands { get; set; }
@@ -127,7 +126,7 @@ namespace SilverSim.Grid.Standalone
 
         public LocalLoginConnector(IConfig ownConfig)
         {
-            m_GridUserServiceName = ownConfig.GetString("GridUserService", "GridUserService");
+            m_LocalUserAccountServiceName = ownConfig.GetString("UserAccountService", "UserAccountService");
             m_GridServiceName = ownConfig.GetString("GridService", "GridService");
             m_LocalInventoryServiceName = ownConfig.GetString("LocalInventoryService", "InventoryService");
             m_LocalAssetServiceName = ownConfig.GetString("LocalAssetService", "AssetService");
@@ -148,25 +147,25 @@ namespace SilverSim.Grid.Standalone
             m_CapsRedirector = loader.CapsRedirector;
             m_AuthorizationServices = loader.GetServicesByValue<AuthorizationServiceInterface>();
             m_HttpServer = loader.HttpServer;
-            m_GridUserService = loader.GetService<GridUserServiceInterface>(m_GridUserServiceName);
             m_GridService = loader.GetService<GridServiceInterface>(m_GridServiceName);
             Commands = loader.CommandRegistry;
             m_PacketHandlerPlugins = loader.GetServicesByValue<IProtocolExtender>();
             m_GatekeeperURI = loader.GatekeeperURI;
 
-            m_LocalAssetService = loader.GetService<AssetServiceInterface>(m_LocalAssetServiceName);
-            m_LocalInventoryService = loader.GetService<InventoryServiceInterface>(m_LocalInventoryServiceName);
+            loader.GetService(m_LocalUserAccountServiceName, out m_LocalUserAccountService);
+            loader.GetService(m_LocalAssetServiceName, out m_LocalAssetService);
+            loader.GetService(m_LocalInventoryServiceName, out m_LocalInventoryService);
             if (!string.IsNullOrEmpty(m_LocalProfileServiceName))
             {
-                m_LocalProfileService = loader.GetService<ProfileServiceInterface>(m_LocalProfileServiceName);
+                loader.GetService(m_LocalProfileServiceName, out m_LocalProfileService);
             }
-            m_LocalFriendsService = loader.GetService<FriendsServiceInterface>(m_LocalFriendsServiceName);
-            m_LocalPresenceService = loader.GetService<PresenceServiceInterface>(m_LocalPresenceServiceName);
-            m_LocalOfflineIMService = loader.GetService<OfflineIMServiceInterface>(m_LocalOfflineIMServiceName);
-            m_LocalTravelingDataService = loader.GetService<TravelingDataServiceInterface>(m_LocalTravelingDataServiceName);
+            loader.GetService(m_LocalFriendsServiceName, out m_LocalFriendsService);
+            loader.GetService(m_LocalPresenceServiceName, out m_LocalPresenceService);
+            loader.GetService(m_LocalOfflineIMServiceName, out m_LocalOfflineIMService);
+            loader.GetService(m_LocalTravelingDataServiceName, out m_LocalTravelingDataService);
             if (!string.IsNullOrEmpty(m_LocalGroupsServiceName))
             {
-                m_LocalGroupsService = loader.GetService<GroupsServiceInterface>(m_LocalGroupsServiceName);
+                loader.GetService(m_LocalGroupsServiceName, out m_LocalGroupsService);
             }
             if (!loader.TryGetService(m_LocalEconomyServiceName, out m_LocalEconomyService))
             {
@@ -176,28 +175,28 @@ namespace SilverSim.Grid.Standalone
 
         public void LoginTo(UserAccount account, ClientInfo clientInfo, SessionInfo sessionInfo, DestinationInfo destinationInfo, CircuitInfo circuitInfo, AppearanceInfo appearance, TeleportFlags flags, out string seedCapsURI)
         {
-            GridUserInfo gu;
+            UserRegionData userRegion;
             RegionInfo ri;
             switch (destinationInfo.StartLocation)
             {
                 case "home":
-                    if (m_GridUserService.TryGetValue(account.Principal.ID, out gu) &&
-                        m_GridService.TryGetValue(gu.HomeRegionID, out ri))
+                    if (m_LocalUserAccountService.TryGetHomeRegion(account.ScopeID, account.Principal.ID, out userRegion) &&
+                        m_GridService.TryGetValue(userRegion.RegionID, out ri))
                     {
                         destinationInfo.UpdateFromRegion(ri);
-                        destinationInfo.Position = gu.HomePosition;
-                        destinationInfo.LookAt = gu.HomeLookAt;
+                        destinationInfo.Position = userRegion.Position;
+                        destinationInfo.LookAt = userRegion.LookAt;
                         destinationInfo.TeleportFlags = flags | TeleportFlags.ViaHome;
                     }
                     break;
 
                 case "last":
-                    if (m_GridUserService.TryGetValue(account.Principal.ID, out gu) &&
-                        m_GridService.TryGetValue(gu.LastRegionID, out ri))
+                    if (m_LocalUserAccountService.TryGetLastRegion(account.ScopeID, account.Principal.ID, out userRegion) &&
+                        m_GridService.TryGetValue(userRegion.RegionID, out ri))
                     {
                         destinationInfo.UpdateFromRegion(ri);
-                        destinationInfo.Position = gu.HomePosition;
-                        destinationInfo.LookAt = gu.HomeLookAt;
+                        destinationInfo.Position = userRegion.Position;
+                        destinationInfo.LookAt = userRegion.LookAt;
                         destinationInfo.TeleportFlags = flags | TeleportFlags.ViaLocation;
                     }
                     break;
@@ -396,7 +395,6 @@ namespace SilverSim.Grid.Standalone
             }
             serviceList.Add(m_LocalFriendsService);
             serviceList.Add(new StandalonePresenceService(m_LocalPresenceService, m_LocalTravelingDataService));
-            serviceList.Add(m_GridUserService);
             serviceList.Add(gridService);
             serviceList.Add(m_LocalOfflineIMService);
             if (m_LocalEconomyService != null)
@@ -499,16 +497,19 @@ namespace SilverSim.Grid.Standalone
             {
                 /* make agent a root agent */
                 agent.SceneID = scene.ID;
-                if (m_GridUserService != null)
+                try
                 {
-                    try
+                    m_LocalUserAccountService.SetPosition(account.ScopeID, account.Principal.ID, new UserRegionData
                     {
-                        m_GridUserService.SetPosition(agent.Owner, scene.ID, agent.GlobalPosition, agent.LookAt);
-                    }
-                    catch (Exception e)
-                    {
-                        m_Log.Warn("Could not contact GridUserService", e);
-                    }
+                        RegionID = scene.ID,
+                        Position = agent.GlobalPosition,
+                        LookAt = agent.LookAt,
+                        GatekeeperURI = new URI(scene.GatekeeperURI)
+                    });
+                }
+                catch (Exception e)
+                {
+                    m_Log.Warn("Could not contact UserAccountService", e);
                 }
             }
 
