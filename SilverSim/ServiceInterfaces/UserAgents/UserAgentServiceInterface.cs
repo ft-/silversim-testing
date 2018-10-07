@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using SilverSim.Types;
+using SilverSim.Types.Account;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Grid;
 using SilverSim.Types.ServerURIs;
@@ -35,7 +36,7 @@ namespace SilverSim.ServiceInterfaces.UserAgents
         {
             public string FirstName;
             public string LastName;
-            public uint UserFlags;
+            public UserFlags UserFlags;
             public Date UserCreated;
             public string UserTitle;
         }
