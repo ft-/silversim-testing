@@ -441,7 +441,7 @@ namespace SilverSim.Main.Common
             foreach(string serviceName in serviceNames)
             {
                 T service;
-                GetService(serviceName, out service);
+                GetService(serviceName.Trim(), out service);
                 services.Add(service);
             }
         }
