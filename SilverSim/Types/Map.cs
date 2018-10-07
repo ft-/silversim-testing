@@ -57,30 +57,21 @@ namespace SilverSim.Types
 
         #endregion Constructors
         #region Add methods
-        public void Add(string key, bool val)
-        {
-            base.Add(key, new ABoolean(val));
-        }
+        public void Add(string key, bool val) => base.Add(key, new ABoolean(val));
 
-        public void Add(string key, double val)
-        {
-            base.Add(key, new Real(val));
-        }
+        public void Add(string key, double val) => base.Add(key, new Real(val));
 
-        public void Add(string key, string val)
-        {
-            base.Add(key, new AString(val));
-        }
+        public void Add(string key, string val) => base.Add(key, new AString(val));
 
-        public void Add(string key, Uri val)
-        {
-            base.Add(key, new URI(val.ToString()));
-        }
+        public void Add(string key, Uri val) => base.Add(key, new URI(val.ToString()));
 
-        public void Add(string key, Int32 val)
-        {
-            base.Add(key, new Integer(val));
-        }
+        public void Add(string key, uint val) => base.Add(key, new Integer((int)val));
+
+        public void Add(string key, int val) => base.Add(key, new Integer(val));
+
+        public void Add(string key, long val) => base.Add(key, new LongInteger(val));
+
+        public void Add(string key, ulong val) => base.Add(key, new LongInteger((long)val));
         #endregion Add methods
 
         public bool TryGetValue<T>(string key, out T val)

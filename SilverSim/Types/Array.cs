@@ -72,35 +72,21 @@ namespace SilverSim.Types
         }
 
         #region Add methods
-        public void Add(bool val)
-        {
-            base.Add(new ABoolean(val));
-        }
+        public void Add(bool val) => base.Add(new ABoolean(val));
 
-        public void Add(double val)
-        {
-            base.Add(new Real(val));
-        }
+        public void Add(double val) => base.Add(new Real(val));
 
-        public void Add(string val)
-        {
-            base.Add(new AString(val));
-        }
+        public void Add(string val) => base.Add(new AString(val));
 
-        public void Add(Uri val)
-        {
-            base.Add(new URI(val.ToString()));
-        }
+        public void Add(Uri val) => base.Add(new URI(val.ToString()));
 
-        public void Add(Int32 val)
-        {
-            base.Add(new Integer(val));
-        }
+        public void Add(int val) => base.Add(new Integer(val));
 
-        public void AddLongInt(long val)
-        {
-            base.Add(new LongInteger(val));
-        }
+        public void Add(uint val) => base.Add(new Integer((int)val));
+
+        public void Add(long val) => base.Add(new LongInteger(val));
+
+        public void Add(ulong val) => base.Add(new LongInteger((long)val));
 
         public static AnArray operator +(AnArray a, AnArray b)
         {
