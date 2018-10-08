@@ -612,7 +612,7 @@ namespace SilverSim.Grid.Login
 
             try
             {
-                return LoginAuthenticatedAndPresenceAndGridUserAdded(req, loginData);
+                return LoginAuthenticatedAndPresenceAdded(req, loginData);
             }
             catch
             {
@@ -621,7 +621,7 @@ namespace SilverSim.Grid.Login
             }
         }
 
-        private XmlRpc.XmlRpcResponse LoginAuthenticatedAndPresenceAndGridUserAdded(XmlRpc.XmlRpcRequest req, LoginData loginData)
+        private XmlRpc.XmlRpcResponse LoginAuthenticatedAndPresenceAdded(XmlRpc.XmlRpcRequest req, LoginData loginData)
         {
             var hgdata = new TravelingDataInfo
             {
@@ -645,7 +645,7 @@ namespace SilverSim.Grid.Login
 
             try
             {
-                return LoginAuthenticatedAndPresenceAndGridUserAndHGTravelingDataAdded(req, loginData);
+                return LoginAuthenticatedAndPresenceAndHGTravelingDataAdded(req, loginData);
             }
             catch
             {
@@ -654,7 +654,7 @@ namespace SilverSim.Grid.Login
             }
         }
 
-        private XmlRpc.XmlRpcResponse LoginAuthenticatedAndPresenceAndGridUserAndHGTravelingDataAdded(XmlRpc.XmlRpcRequest req, LoginData loginData)
+        private XmlRpc.XmlRpcResponse LoginAuthenticatedAndPresenceAndHGTravelingDataAdded(XmlRpc.XmlRpcRequest req, LoginData loginData)
         {
             var flags = TeleportFlags.None;
             if(loginData.Account.UserLevel >= 200)
