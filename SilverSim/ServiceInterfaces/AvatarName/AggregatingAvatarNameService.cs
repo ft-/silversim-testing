@@ -190,5 +190,17 @@ namespace SilverSim.ServiceInterfaces.AvatarName
 
             return isRemoved;
         }
+
+        public override bool ContainsKey(UGUI input)
+        {
+            foreach(var service in m_ServiceList)
+            {
+                if(service.ContainsKey(input))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }

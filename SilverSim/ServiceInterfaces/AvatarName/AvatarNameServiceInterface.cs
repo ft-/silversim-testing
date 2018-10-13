@@ -106,6 +106,8 @@ namespace SilverSim.ServiceInterfaces.AvatarName
             }
         }
 
+        public abstract bool ContainsKey(UGUI input);
+
         public bool TryGetValue(UGUI input, out UGUI ugui)
         {
             UGUI uui;

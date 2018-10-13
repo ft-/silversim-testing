@@ -79,5 +79,11 @@ namespace SilverSim.Database.Memory.AvatarName
                 from data in m_Data.Values where data.FirstName.ToLower().Contains(names[0].ToLower()) && data.LastName.ToLower().Contains(names[1].ToLower()) select new UGUIWithName(data);
             return new List<UGUIWithName>(res);
         }
+
+        public override bool ContainsKey(UGUI input)
+        {
+            UGUIWithName entry;
+            return m_Data.TryGetValue(input.ID, out entry) && input.EqualsGrid(entry);
+        }
     }
 }
