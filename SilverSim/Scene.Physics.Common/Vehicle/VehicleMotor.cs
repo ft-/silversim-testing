@@ -449,7 +449,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
                         Vector3 currentvelocity = scene.Environment.Wind[pos - new Vector3(0, 0, -halfBoundBoxSizeZ / 2)] / linearReferenceFrame;
 
                         #region Linear Current Affector
-                        linearBodyForce += LinearCurrentForce = (currentvelocity - velocity).ElementMultiply(m_Params[VehicleVectorParamId.LinearWindEfficiency]) * dt;
+                        linearBodyForce += LinearCurrentForce = (currentvelocity - velocity).ElementMultiply(m_Params[VehicleVectorParamId.LinearCurrentEfficiency]) * dt;
                         #endregion
 
                         #region Angular Current Affector
@@ -468,7 +468,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
                             currentvelocity.Y = 0;
                         }
 
-                        angularBodyTorque += AngularCurrentTorque = currentvelocity.ElementMultiply(m_Params[VehicleVectorParamId.AngularWindEfficiency]) * dt * (1 - windCurrentMix);
+                        angularBodyTorque += AngularCurrentTorque = currentvelocity.ElementMultiply(m_Params[VehicleVectorParamId.AngularCurrentEfficiency]) * dt * (1 - windCurrentMix);
                         #endregion
                     }
                 }

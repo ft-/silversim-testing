@@ -394,6 +394,10 @@ namespace SilverSim.Scene.Types.Object
                             writer.WriteNamedValue("LinearWindEfficiency", VehicleParams[VehicleVectorParamId.LinearWindEfficiency]);
                             writer.WriteNamedValue("AngularWindEfficiency", VehicleParams[VehicleVectorParamId.AngularWindEfficiency]);
 
+                            /* current */
+                            writer.WriteNamedValue("LinearCurrentEfficiency", VehicleParams[VehicleVectorParamId.LinearCurrentEfficiency]);
+                            writer.WriteNamedValue("AngularCurrentEfficiency", VehicleParams[VehicleVectorParamId.AngularCurrentEfficiency]);
+
                             /* mouselook */
                             writer.WriteNamedValue("MouselookAzimuth", VehicleParams[VehicleFloatParamId.MouselookAzimuth]);
                             writer.WriteNamedValue("MouselookAltitude", VehicleParams[VehicleFloatParamId.MouselookAltitude]);
@@ -1140,6 +1144,14 @@ namespace SilverSim.Scene.Types.Object
 
                             case "AngularWindEfficiency":
                                 part.VehicleParams[VehicleVectorParamId.AngularWindEfficiency] = reader.ReadElementChildsAsVector3();
+                                break;
+
+                            case "LinearCurrentEfficiency":
+                                part.VehicleParams[VehicleVectorParamId.LinearCurrentEfficiency] = reader.ReadElementChildsAsVector3();
+                                break;
+
+                            case "AngularCurrentEfficiency":
+                                part.VehicleParams[VehicleVectorParamId.AngularCurrentEfficiency] = reader.ReadElementChildsAsVector3();
                                 break;
 
                             case "MouselookAzimuth":

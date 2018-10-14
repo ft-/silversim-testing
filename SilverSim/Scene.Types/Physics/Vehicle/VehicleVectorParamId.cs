@@ -43,6 +43,8 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
 
         LinearWindEfficiency = 12001,
         AngularWindEfficiency = 12002,
+        LinearCurrentEfficiency = 12003,
+        AngularCurrentEfficiency = 12004,
 
         LinearMotorAccelPosTimescale = 13000,
         LinearMotorDecelPosTimescale = 13001,
