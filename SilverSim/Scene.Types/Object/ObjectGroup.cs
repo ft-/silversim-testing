@@ -1268,6 +1268,8 @@ namespace SilverSim.Scene.Types.Object
                 return false;
             }
 
+            public IAgent[] Agents => m_Group.m_SittingAgents.Keys1.ToArray();
+
             public int Count => m_Group.m_SittingAgents.Count;
 
             private static readonly Vector3 SIT_TARGET_OFFSET = new Vector3(0, 0, 0.4);
