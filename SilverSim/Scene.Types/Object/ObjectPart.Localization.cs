@@ -129,6 +129,8 @@ namespace SilverSim.Scene.Types.Object
             return m_DefaultLocalization;
         }
 
+        public ObjectPartLocalizedInfo GetDefaultLocalization() => m_DefaultLocalization;
+
         public byte[] GetFullUpdateData(CultureInfo culture) => GetLocalization(culture).FullUpdateData;
 
         public byte[] GetTerseUpdateData(CultureInfo culture) => GetLocalization(culture).TerseUpdateData;
