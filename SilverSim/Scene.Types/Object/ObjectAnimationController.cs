@@ -180,5 +180,51 @@ namespace SilverSim.Scene.Types.Object
             }
             return res;
         }
+
+        public Dictionary<UUID, uint> GetActiveAnimationDetails()
+        {
+            var res = new Dictionary<UUID, uint>();
+            lock(m_Lock)
+            {
+                foreach(var info in m_ActiveAnimations)
+                {
+                    res.Add(info.AnimID, info.AnimSeq);
+                }
+            }
+
+            return res;
+        }
+
+        public void RestoreAnimation(UUID animid, uint seqid)
+        {
+            lock (m_Lock)
+            {
+                for (int i = 0; i < m_ActiveAnimations.Count; ++i)
+                {
+                    if (m_ActiveAnimations[i].AnimID == animid)
+                    {
+                        m_ActiveAnimations[i] = new AnimationInfo(animid, seqid);
+                        return;
+                    }
+                }
+                m_ActiveAnimations.Add(new AnimationInfo(animid, seqid));
+            }
+            SendAnimations();
+        }
+
+        public uint NextAnimSeqNumber
+        {
+            get
+            {
+                return m_NextAnimSeqNumber;
+            }
+            set
+            {
+                lock(m_Lock)
+                {
+                    m_NextAnimSeqNumber = value;
+                }
+            }
+        }
     }
 }
