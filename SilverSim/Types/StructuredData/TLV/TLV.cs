@@ -52,7 +52,9 @@ namespace SilverSim.Types.StructuredData.TLV
             UGUIWithName = 21,
             URI = 22,
             TLV = 23,
-            GridVector = 24
+            GridVector = 24,
+            Color = 25,
+            ColorAlpha = 26
         }
 
         public struct Header
@@ -298,6 +300,12 @@ namespace SilverSim.Types.StructuredData.TLV
 
         public void Write(ushort tlvId, sbyte value) =>
             Write_Blob(tlvId, EntryType.Int8, new byte[] { (byte)value });
+
+        public void Write(ushort tlvIds, Color color) =>
+            Write_Blob(tlvIds, EntryType.Color, color.AsByte);
+
+        public void Write(ushort tlvIds, ColorAlpha color) =>
+            Write_Blob(tlvIds, EntryType.ColorAlpha, color.AsByte);
 
         public bool TryReadTypedValue<T>(Header header, out T data)
         {
@@ -730,6 +738,30 @@ namespace SilverSim.Types.StructuredData.TLV
                         Array.Reverse(readdata);
                     }
                     data = new GridVector { RegionHandle = BitConverter.ToUInt64(readdata, 0) };
+                    return true;
+
+                case EntryType.Color:
+                    if (!TryReadData(header.Length, out readdata))
+                    {
+                        return false;
+                    }
+                    if (header.Length != 3)
+                    {
+                        return false;
+                    }
+                    data = Color.FromRgb(readdata[0], readdata[1], readdata[2]);
+                    return true;
+
+                case EntryType.ColorAlpha:
+                    if (!TryReadData(header.Length, out readdata))
+                    {
+                        return false;
+                    }
+                    if (header.Length != 3)
+                    {
+                        return false;
+                    }
+                    data = ColorAlpha.FromRgba(readdata[0], readdata[1], readdata[2], readdata[3]);
                     return true;
 
                 default:
