@@ -27,11 +27,11 @@ namespace SilverSim.Scene.Types.Object.Localization
     public sealed partial class ObjectPartLocalizedInfo
     {
         #region Media Properties
-        public PrimitiveMedia m_Media;
+        private PrimitiveMedia m_Media;
 
         public PrimitiveMedia Media => m_Media ?? m_ParentInfo?.m_Media;
 
-        internal void SetMedia(PrimitiveMedia media)
+        public void RestoreMedia(PrimitiveMedia media)
         {
             lock (m_DataLock)
             {

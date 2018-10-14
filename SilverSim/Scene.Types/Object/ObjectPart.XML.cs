@@ -781,7 +781,7 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "Media":
-                                part.m_DefaultLocalization.SetMedia(PrimitiveMedia.FromXml(reader));
+                                part.m_DefaultLocalization.RestoreMedia(PrimitiveMedia.FromXml(reader));
                                 break;
 
                             case "PhysicsShapeType":

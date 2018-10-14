@@ -54,7 +54,8 @@ namespace SilverSim.Types.StructuredData.TLV
             TLV = 23,
             GridVector = 24,
             Color = 25,
-            ColorAlpha = 26
+            ColorAlpha = 26,
+            Null = 27
         }
 
         public struct Header
@@ -165,6 +166,8 @@ namespace SilverSim.Types.StructuredData.TLV
             }
             Write_Blob(tlvId, type, data);
         }
+
+        public void WriteNull(ushort tlvId) => Write_Header(tlvId, EntryType.Null, 0);
 
         public void Write(ushort tlvId, Enum value)
         {
@@ -405,6 +408,14 @@ namespace SilverSim.Types.StructuredData.TLV
             byte[] readdata;
             switch (header.Type)
             {
+                case EntryType.Null:
+                    if(header.Length != 0)
+                    {
+                        return false;
+                    }
+                    data = null;
+                    return true;
+
                 case EntryType.End:
                     if(header.Length != 0)
                     {
