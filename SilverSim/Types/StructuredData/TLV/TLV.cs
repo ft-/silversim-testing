@@ -167,6 +167,8 @@ namespace SilverSim.Types.StructuredData.TLV
             Write_Blob(tlvId, type, data);
         }
 
+        public void WriteEnd() => Write_Header(0, EntryType.End, 0);
+
         public void WriteNull(ushort tlvId) => Write_Header(tlvId, EntryType.Null, 0);
 
         public void Write(ushort tlvId, Enum value)
