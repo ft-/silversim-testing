@@ -19,14 +19,22 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Types;
 using SilverSim.Types.Account;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Grid;
+using System.Collections.Generic;
 
 namespace SilverSim.Scene.ServiceInterfaces.Teleport
 {
     public interface ILoginConnectorServiceInterface
     {
         void LoginTo(UserAccount account, ClientInfo clientInfo, SessionInfo sessionInfo, DestinationInfo destinationInfo, CircuitInfo circuitInfo, AppearanceInfo appearance, TeleportFlags flags, out string seedCapsURI);
+
+        string Name { get; }
+        bool IsProtocolSupported(string url);
+        bool IsProtocolSupported(string url, Dictionary<string, string> cachedheaders);
+        bool TryGetRegion(string url, UUID regionID, out RegionInfo rInfo);
+        bool TryGetRegion(string url, string regionName, out RegionInfo rInfo);
     }
 }

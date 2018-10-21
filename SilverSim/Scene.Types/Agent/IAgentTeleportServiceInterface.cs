@@ -23,6 +23,7 @@ using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.Types;
 using SilverSim.Types.Grid;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace SilverSim.Scene.Types.Agent
@@ -60,5 +61,9 @@ namespace SilverSim.Scene.Types.Agent
 
         /* following function returns true if it accepts a teleport request or if it wants to distribute more specific error message except home location not available */
         bool TeleportHome(SceneInterface sceneInterface);
+
+        string Name { get; }
+        bool IsProtocolSupported(string url);
+        bool IsProtocolSupported(string url, Dictionary<string, string> cachedheaders);
     }
 }

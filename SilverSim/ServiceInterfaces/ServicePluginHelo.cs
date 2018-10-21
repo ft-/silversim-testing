@@ -75,5 +75,9 @@ namespace SilverSim.ServiceInterfaces
         public bool IsProtocolSupported(string url) => HeloRequest_HandleType(url).Contains(Name);
 
         public bool IsProtocolSupported(string url, Dictionary<string, string> cachedheaders) => HeloRequest_HandleType(url, cachedheaders).Contains(Name);
+
+        public static bool IsProtocolSupported(string url, string name) => HeloRequest_HandleType(url).Contains(name);
+
+        public static bool IsProtocolSupported(string url, string name, Dictionary<string, string> cachedheaders) => HeloRequest_HandleType(url, cachedheaders).Contains(name);
     }
 }

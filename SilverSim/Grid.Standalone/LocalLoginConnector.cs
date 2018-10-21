@@ -40,7 +40,6 @@ using SilverSim.ServiceInterfaces.IM;
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.Profile;
-using SilverSim.ServiceInterfaces.Teleport;
 using SilverSim.ServiceInterfaces.Traveling;
 using SilverSim.Types;
 using SilverSim.Types.Account;
@@ -53,10 +52,8 @@ using SilverSim.Viewer.Core.Teleport;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Net;
 using System.Runtime.Serialization;
-using System.Text.RegularExpressions;
 
 namespace SilverSim.Grid.Standalone
 {
@@ -175,60 +172,9 @@ namespace SilverSim.Grid.Standalone
 
         public void LoginTo(UserAccount account, ClientInfo clientInfo, SessionInfo sessionInfo, DestinationInfo destinationInfo, CircuitInfo circuitInfo, AppearanceInfo appearance, TeleportFlags flags, out string seedCapsURI)
         {
-            UserRegionData userRegion;
-            RegionInfo ri;
-            switch (destinationInfo.StartLocation)
+            if(!destinationInfo.LocalToGrid)
             {
-                case "home":
-                    if (m_LocalUserAccountService.TryGetHomeRegion(account.ScopeID, account.Principal.ID, out userRegion) &&
-                        m_GridService.TryGetValue(userRegion.RegionID, out ri))
-                    {
-                        destinationInfo.UpdateFromRegion(ri);
-                        destinationInfo.Position = userRegion.Position;
-                        destinationInfo.LookAt = userRegion.LookAt;
-                        destinationInfo.TeleportFlags = flags | TeleportFlags.ViaHome;
-                    }
-                    break;
-
-                case "last":
-                    if (m_LocalUserAccountService.TryGetLastRegion(account.ScopeID, account.Principal.ID, out userRegion) &&
-                        m_GridService.TryGetValue(userRegion.RegionID, out ri))
-                    {
-                        destinationInfo.UpdateFromRegion(ri);
-                        destinationInfo.Position = userRegion.Position;
-                        destinationInfo.LookAt = userRegion.LookAt;
-                        destinationInfo.TeleportFlags = flags | TeleportFlags.ViaLocation;
-                    }
-                    break;
-
-                default:
-                    Regex uriRegex = new Regex(@"^uri:([^&]+)&(\d+)&(\d+)&(\d+)$");
-                    Match uriMatch = uriRegex.Match(destinationInfo.StartLocation);
-                    if (!uriMatch.Success)
-                    {
-                        throw new LoginFailedException("Invalid URI");
-                    }
-                    else
-                    {
-                        string regionName = uriMatch.Groups[1].Value;
-                        if (regionName.Contains('@'))
-                        {
-                            /* HG URL */
-                            throw new LoginFailedException("HG URI not implemented");
-                        }
-                        else if (m_GridService.TryGetValue(account.ScopeID, uriMatch.Groups[1].Value, out ri))
-                        {
-                            destinationInfo.UpdateFromRegion(ri);
-                            destinationInfo.LookAt = Vector3.UnitY;
-                            destinationInfo.Position = new Vector3(
-                                double.Parse(uriMatch.Groups[2].Value, System.Globalization.CultureInfo.InvariantCulture),
-                                double.Parse(uriMatch.Groups[3].Value, System.Globalization.CultureInfo.InvariantCulture),
-                                double.Parse(uriMatch.Groups[4].Value, System.Globalization.CultureInfo.InvariantCulture));
-                            destinationInfo.StartLocation = "url";
-                            destinationInfo.TeleportFlags = flags | TeleportFlags.ViaLocation;
-                        }
-                    }
-                    break;
+                throw new NotSupportedException("Remote login not supported");
             }
 
             string lastMessage = string.Empty;
@@ -236,7 +182,7 @@ namespace SilverSim.Grid.Standalone
             if (destinationInfo.ID != UUID.Zero)
             {
                 /* try specified destination first */
-                destinationInfo.TeleportFlags = flags | (destinationInfo.LocalToGrid ? TeleportFlags.ViaLogin : TeleportFlags.ViaHGLogin);
+                destinationInfo.TeleportFlags = flags | TeleportFlags.ViaLogin;
                 try
                 {
                     QueryAccess(destinationInfo, account, destinationInfo.Position);
@@ -529,6 +475,21 @@ namespace SilverSim.Grid.Standalone
             }
             circuit.LogIncomingAgent(m_Log, circuitInfo.IsChild);
             capsPath = m_CapsRedirector.NewCapsURL(circuitInfo.CapsPath);
+        }
+
+        /* prevent auto-resolver on this one */
+        public string Name => "Local";
+        public bool IsProtocolSupported(string url) => false;
+        public bool IsProtocolSupported(string url, Dictionary<string, string> cachedheaders) => false;
+        public bool TryGetRegion(string url, string regionName, out RegionInfo rInfo)
+        {
+            rInfo = default(RegionInfo);
+            return false;
+        }
+        public bool TryGetRegion(string url, UUID regionID, out RegionInfo rInfo)
+        {
+            rInfo = default(RegionInfo);
+            return false;
         }
     }
 }

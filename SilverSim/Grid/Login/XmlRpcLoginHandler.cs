@@ -48,8 +48,9 @@ using SilverSim.Types.TravelingData;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
+using CultureInfo = System.Globalization.CultureInfo;
 using System.Net;
+using System.Text.RegularExpressions;
 
 namespace SilverSim.Grid.Login
 {
@@ -84,7 +85,8 @@ namespace SilverSim.Grid.Login
         private FriendsServiceInterface m_FriendsService;
         private AuthInfoServiceInterface m_AuthInfoService;
         private TravelingDataServiceInterface m_TravelingDataService;
-        private ILoginConnectorServiceInterface m_LoginConnectorService;
+        private ILoginConnectorServiceInterface m_LocalLoginConnectorService;
+        private List<ILoginConnectorServiceInterface> m_RemoteLoginConnectorServices;
         private List<ILoginUserCapsGetInterface> m_UserCapsGetters;
 
         private readonly string m_UserAccountServiceName;
@@ -94,7 +96,7 @@ namespace SilverSim.Grid.Login
         private readonly string m_FriendsServiceName;
         private readonly string m_AuthInfoServiceName;
         private readonly string m_TravelingDataServiceName;
-        private readonly string m_LoginConnectorServiceName;
+        private readonly string m_LocalLoginConnectorServiceName;
         private UUID m_GridLibraryOwner = new UUID("11111111-1111-0000-0000-000100bba000");
         private UUID m_GridLibaryFolderId = new UUID("00000112-000f-0000-0000-000100bba000");
         private string m_WelcomeMessage = "Welcome to your new world!";
@@ -121,7 +123,7 @@ namespace SilverSim.Grid.Login
             m_FriendsServiceName = ownSection.GetString("FriendsService", "FriendsService");
             m_AuthInfoServiceName = ownSection.GetString("AuthInfoService", "AuthInfoService");
             m_TravelingDataServiceName = ownSection.GetString("TravelingDataService", "TravelingDataService");
-            m_LoginConnectorServiceName = ownSection.GetString("LoginConnectorService", "LoginConnectorService");
+            m_LocalLoginConnectorServiceName = ownSection.GetString("LocalLoginConnectorService", string.Empty);
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -141,7 +143,12 @@ namespace SilverSim.Grid.Login
             m_AuthInfoService = loader.GetService<AuthInfoServiceInterface>(m_AuthInfoServiceName);
             m_AuthInfoService = loader.GetService<AuthInfoServiceInterface>(m_AuthInfoServiceName);
             m_TravelingDataService = loader.GetService<TravelingDataServiceInterface>(m_TravelingDataServiceName);
-            m_LoginConnectorService = loader.GetService<ILoginConnectorServiceInterface>(m_LoginConnectorServiceName);
+            if (!string.IsNullOrEmpty(m_LocalLoginConnectorServiceName))
+            {
+                m_LocalLoginConnectorService = loader.GetService<ILoginConnectorServiceInterface>(m_LocalLoginConnectorServiceName);
+            }
+            m_RemoteLoginConnectorServices = loader.GetServicesByValue<ILoginConnectorServiceInterface>();
+            m_RemoteLoginConnectorServices.Remove(m_LocalLoginConnectorService);
 
             m_ConfigurationIssues = loader.KnownConfigurationIssues;
             m_HttpServer = loader.HttpServer;
@@ -656,7 +663,7 @@ namespace SilverSim.Grid.Login
 
         private XmlRpc.XmlRpcResponse LoginAuthenticatedAndPresenceAndHGTravelingDataAdded(XmlRpc.XmlRpcRequest req, LoginData loginData)
         {
-            var flags = TeleportFlags.None;
+            var flags = TeleportFlags.ViaLogin;
             if(loginData.Account.UserLevel >= 200)
             {
                 flags |= TeleportFlags.Godlike;
@@ -668,11 +675,191 @@ namespace SilverSim.Grid.Login
             }
 
             string seedCapsURI;
+            ILoginConnectorServiceInterface loginConnector = null;
+            UserRegionData userRegion;
+            RegionInfo ri = null;
+
+            switch (loginData.DestinationInfo.StartLocation)
+            {
+                case "home":
+                    if (m_UserAccountService.TryGetHomeRegion(loginData.Account.ScopeID, loginData.Account.Principal.ID, out userRegion))
+                    {
+                        if(userRegion.GatekeeperURI != null)
+                        {
+                            loginData.DestinationInfo.GridURI = userRegion.GatekeeperURI.ToString();
+                            Dictionary<string, string> cachedHeaders = ServicePluginHelo.HeloRequest(loginData.DestinationInfo.GridURI);
+                            foreach (ILoginConnectorServiceInterface connector in m_RemoteLoginConnectorServices)
+                            {
+                                if (connector.IsProtocolSupported(loginData.DestinationInfo.GridURI, cachedHeaders) &&
+                                    connector.TryGetRegion(loginData.DestinationInfo.GridURI, userRegion.RegionID, out ri))
+                                {
+                                    loginConnector = connector;
+                                    loginData.DestinationInfo.UpdateFromRegion(ri);
+                                    loginData.DestinationInfo.LookAt = userRegion.LookAt;
+                                    loginData.DestinationInfo.Position = userRegion.Position;
+                                    loginData.DestinationInfo.StartLocation = "home";
+                                    loginData.DestinationInfo.TeleportFlags = flags | TeleportFlags.ViaHGLogin | TeleportFlags.ViaHome;
+                                    loginData.DestinationInfo.LocalToGrid = false;
+                                    break;
+                                }
+                            }
+                        }
+                        else if(m_GridService != null && m_LocalLoginConnectorService != null)
+                        {
+                            loginData.DestinationInfo.GridURI = null;
+                            if(m_GridService.TryGetValue(userRegion.RegionID, out ri))
+                            {
+                                loginConnector = m_LocalLoginConnectorService;
+                                loginData.DestinationInfo.UpdateFromRegion(ri);
+                                loginData.DestinationInfo.LookAt = userRegion.LookAt;
+                                loginData.DestinationInfo.Position = userRegion.Position;
+                                loginData.DestinationInfo.StartLocation = "home";
+                                loginData.DestinationInfo.TeleportFlags = flags | TeleportFlags.ViaHome;
+                                loginData.DestinationInfo.LocalToGrid = true;
+                            }
+                        }
+                    }
+                    break;
+
+                case "last":
+                    if (m_UserAccountService.TryGetLastRegion(loginData.Account.ScopeID, loginData.Account.Principal.ID, out userRegion))
+                    {
+                        if (userRegion.GatekeeperURI != null)
+                        {
+                            loginData.DestinationInfo.GridURI = userRegion.GatekeeperURI.ToString();
+                            Dictionary<string, string> cachedHeaders = ServicePluginHelo.HeloRequest(loginData.DestinationInfo.GridURI);
+                            foreach (ILoginConnectorServiceInterface connector in m_RemoteLoginConnectorServices)
+                            {
+                                if (connector.IsProtocolSupported(loginData.DestinationInfo.GridURI, cachedHeaders) &&
+                                    connector.TryGetRegion(loginData.DestinationInfo.GridURI, userRegion.RegionID, out ri))
+                                {
+                                    loginConnector = connector;
+                                    loginData.DestinationInfo.UpdateFromRegion(ri);
+                                    loginData.DestinationInfo.LookAt = userRegion.LookAt;
+                                    loginData.DestinationInfo.Position = userRegion.Position;
+                                    loginData.DestinationInfo.StartLocation = "last";
+                                    loginData.DestinationInfo.TeleportFlags = flags | TeleportFlags.ViaHGLogin | TeleportFlags.ViaLocation;
+                                    loginData.DestinationInfo.LocalToGrid = false;
+                                    break;
+                                }
+                            }
+                        }
+                        else if (m_GridService != null && m_LocalLoginConnectorService != null)
+                        {
+                            loginData.DestinationInfo.GridURI = null;
+                            if (m_GridService.TryGetValue(userRegion.RegionID, out ri))
+                            {
+                                loginConnector = m_LocalLoginConnectorService;
+                                loginData.DestinationInfo.UpdateFromRegion(ri);
+                                loginData.DestinationInfo.LookAt = userRegion.LookAt;
+                                loginData.DestinationInfo.Position = userRegion.Position;
+                                loginData.DestinationInfo.StartLocation = "last";
+                                loginData.DestinationInfo.TeleportFlags = flags | TeleportFlags.ViaLocation;
+                                loginData.DestinationInfo.LocalToGrid = true;
+                            }
+                        }
+                    }
+                    break;
+
+                default:
+                    Regex uriRegex = new Regex(@"^uri:([^&]+)&(\d+)&(\d+)&(\d+)$");
+                    Match uriMatch = uriRegex.Match(loginData.DestinationInfo.StartLocation);
+                    if (!uriMatch.Success)
+                    {
+                        throw new LoginFailResponseException("key", "Invalid URI");
+                    }
+                    else
+                    {
+                        string regionName = uriMatch.Groups[1].Value;
+                        if (regionName.Contains("@"))
+                        {
+                            /* HG URL */
+                            string[] parts = regionName.Split(new char[] { '@' }, 2);
+                            Dictionary<string, string> cachedHeaders = ServicePluginHelo.HeloRequest(loginData.DestinationInfo.GridURI);
+                            loginData.DestinationInfo.GridURI = parts[1];
+                            foreach(ILoginConnectorServiceInterface connector in m_RemoteLoginConnectorServices)
+                            {
+                                if(connector.IsProtocolSupported(parts[1], cachedHeaders) &&
+                                    connector.TryGetRegion(parts[1], parts[0], out ri))
+                                {
+                                    loginConnector = connector;
+                                    break;
+                                }
+                            }
+
+                            if (loginConnector != null)
+                            {
+                                loginData.DestinationInfo.UpdateFromRegion(ri);
+                                loginData.DestinationInfo.LookAt = Vector3.UnitY;
+                                loginData.DestinationInfo.Position = new Vector3(
+                                    double.Parse(uriMatch.Groups[2].Value, CultureInfo.InvariantCulture),
+                                    double.Parse(uriMatch.Groups[3].Value, CultureInfo.InvariantCulture),
+                                    double.Parse(uriMatch.Groups[4].Value, CultureInfo.InvariantCulture));
+                                loginData.DestinationInfo.StartLocation = "url";
+                                loginData.DestinationInfo.TeleportFlags = flags | TeleportFlags.ViaLocation | TeleportFlags.ViaHGLogin;
+                                loginData.DestinationInfo.LocalToGrid = false;
+                            }
+                        }
+                        else if (m_GridService.TryGetValue(loginData.Account.ScopeID, uriMatch.Groups[1].Value, out ri))
+                        {
+                            loginData.DestinationInfo.UpdateFromRegion(ri);
+                            loginData.DestinationInfo.LookAt = Vector3.UnitY;
+                            loginData.DestinationInfo.Position = new Vector3(
+                                double.Parse(uriMatch.Groups[2].Value, CultureInfo.InvariantCulture),
+                                double.Parse(uriMatch.Groups[3].Value, CultureInfo.InvariantCulture),
+                                double.Parse(uriMatch.Groups[4].Value, CultureInfo.InvariantCulture));
+                            loginData.DestinationInfo.StartLocation = "url";
+                            loginData.DestinationInfo.TeleportFlags = flags | TeleportFlags.ViaLocation;
+                            loginData.DestinationInfo.LocalToGrid = true;
+                        }
+                    }
+                    break;
+            }
+
+            if(loginConnector != null)
+            {
+                /* already looked for */
+            }
+            else if (loginData.DestinationInfo.LocalToGrid)
+            {
+                loginConnector = m_LocalLoginConnectorService;
+            }
+            else
+            {
+                Dictionary<string, string> cachedHeaders = ServicePluginHelo.HeloRequest(loginData.DestinationInfo.GridURI);
+                loginConnector = null;
+                foreach(ILoginConnectorServiceInterface connector in m_RemoteLoginConnectorServices)
+                {
+                    if(connector.IsProtocolSupported(loginData.DestinationInfo.GridURI, cachedHeaders))
+                    {
+                        loginConnector = connector;
+                        break;
+                    }
+                }
+            }
+
+            if (loginConnector == null)
+            {
+                /* fallback region logic */
+                loginData.DestinationInfo.ID = UUID.Zero;
+                loginData.DestinationInfo.LocalToGrid = true;
+                loginData.DestinationInfo.StartLocation = "safe";
+                loginData.DestinationInfo.TeleportFlags = flags;
+                loginData.DestinationInfo.Position = new Vector3(128, 128, 23);
+                loginData.DestinationInfo.LookAt = Vector3.UnitX;
+                loginConnector = m_LocalLoginConnectorService;
+                if (loginConnector == null)
+                {
+                    m_Log.Error("Login to simulator failed - No supported protocol");
+                    throw new LoginFailResponseException("key", "no supported protocol");
+                }
+            }
+
             try
             {
-                m_LoginConnectorService.LoginTo(loginData.Account, loginData.ClientInfo, loginData.SessionInfo, loginData.DestinationInfo, loginData.CircuitInfo, loginData.AppearanceInfo, flags, out seedCapsURI);
+                loginConnector.LoginTo(loginData.Account, loginData.ClientInfo, loginData.SessionInfo, loginData.DestinationInfo, loginData.CircuitInfo, loginData.AppearanceInfo, flags, out seedCapsURI);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 m_Log.Error("Login to simulator failed", e);
                 throw new LoginFailResponseException("key", e.Message);

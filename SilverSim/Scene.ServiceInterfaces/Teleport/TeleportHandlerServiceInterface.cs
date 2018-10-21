@@ -25,6 +25,7 @@ using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.Types;
 using SilverSim.Types.Grid;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
 
@@ -74,5 +75,9 @@ namespace SilverSim.ServiceInterfaces.Teleport
 
         /* following function returns true if it accepts a teleport request or if it wants to distribute more specific error message except home location not available */
         public abstract bool TeleportHome(SceneInterface sceneInterface);
+
+        public abstract string Name { get; }
+        public abstract bool IsProtocolSupported(string url);
+        public abstract bool IsProtocolSupported(string url, Dictionary<string, string> cachedheaders);
     }
 }
