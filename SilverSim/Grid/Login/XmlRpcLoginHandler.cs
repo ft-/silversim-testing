@@ -686,6 +686,9 @@ namespace SilverSim.Grid.Login
                     {
                         if(userRegion.GatekeeperURI != null)
                         {
+#if DEBUG
+                            m_Log.DebugFormat("Home for agent {0} set to inter-grid location", loginData.Account.Principal);
+#endif
                             loginData.DestinationInfo.GridURI = userRegion.GatekeeperURI.ToString();
                             Dictionary<string, string> cachedHeaders = ServicePluginHelo.HeloRequest(loginData.DestinationInfo.GridURI);
                             foreach (ILoginConnectorServiceInterface connector in m_RemoteLoginConnectorServices)
@@ -693,6 +696,9 @@ namespace SilverSim.Grid.Login
                                 if (connector.IsProtocolSupported(loginData.DestinationInfo.GridURI, cachedHeaders) &&
                                     connector.TryGetRegion(loginData.DestinationInfo.GridURI, userRegion.RegionID, out ri))
                                 {
+#if DEBUG
+                                    m_Log.DebugFormat("Home for agent {0} found", loginData.Account.Principal);
+#endif
                                     loginConnector = connector;
                                     loginData.DestinationInfo.UpdateFromRegion(ri);
                                     loginData.DestinationInfo.LookAt = userRegion.LookAt;
@@ -706,9 +712,15 @@ namespace SilverSim.Grid.Login
                         }
                         else if(m_GridService != null && m_LocalLoginConnectorService != null)
                         {
+#if DEBUG
+                            m_Log.DebugFormat("Home for agent {0} set to own-grid location", loginData.Account.Principal);
+#endif
                             loginData.DestinationInfo.GridURI = null;
                             if(m_GridService.TryGetValue(userRegion.RegionID, out ri))
                             {
+#if DEBUG
+                                m_Log.DebugFormat("Home for agent {0} found", loginData.Account.Principal);
+#endif
                                 loginConnector = m_LocalLoginConnectorService;
                                 loginData.DestinationInfo.UpdateFromRegion(ri);
                                 loginData.DestinationInfo.LookAt = userRegion.LookAt;
@@ -719,6 +731,12 @@ namespace SilverSim.Grid.Login
                             }
                         }
                     }
+#if DEBUG
+                    else
+                    {
+                        m_Log.DebugFormat("No home for agent {0} set", loginData.Account.Principal);
+                    }
+#endif
                     break;
 
                 case "last":
@@ -726,6 +744,9 @@ namespace SilverSim.Grid.Login
                     {
                         if (userRegion.GatekeeperURI != null)
                         {
+#if DEBUG
+                            m_Log.DebugFormat("Last for agent {0} set to inter-grid location", loginData.Account.Principal);
+#endif
                             loginData.DestinationInfo.GridURI = userRegion.GatekeeperURI.ToString();
                             Dictionary<string, string> cachedHeaders = ServicePluginHelo.HeloRequest(loginData.DestinationInfo.GridURI);
                             foreach (ILoginConnectorServiceInterface connector in m_RemoteLoginConnectorServices)
@@ -733,6 +754,9 @@ namespace SilverSim.Grid.Login
                                 if (connector.IsProtocolSupported(loginData.DestinationInfo.GridURI, cachedHeaders) &&
                                     connector.TryGetRegion(loginData.DestinationInfo.GridURI, userRegion.RegionID, out ri))
                                 {
+#if DEBUG
+                                    m_Log.DebugFormat("Last for agent {0} found", loginData.Account.Principal);
+#endif
                                     loginConnector = connector;
                                     loginData.DestinationInfo.UpdateFromRegion(ri);
                                     loginData.DestinationInfo.LookAt = userRegion.LookAt;
@@ -744,11 +768,23 @@ namespace SilverSim.Grid.Login
                                 }
                             }
                         }
-                        else if (m_GridService != null && m_LocalLoginConnectorService != null)
+                        else if(m_GridService == null || m_LocalLoginConnectorService == null)
                         {
+#if DEBUG
+                            m_Log.DebugFormat("Last for agent {0} not usable", loginData.Account.Principal);
+#endif
+                        }
+                        else
+                        {
+#if DEBUG
+                            m_Log.DebugFormat("Last for agent {0} set to own-grid location", loginData.Account.Principal);
+#endif
                             loginData.DestinationInfo.GridURI = null;
                             if (m_GridService.TryGetValue(userRegion.RegionID, out ri))
                             {
+#if DEBUG
+                                m_Log.DebugFormat("Last for agent {0} found", loginData.Account.Principal);
+#endif
                                 loginConnector = m_LocalLoginConnectorService;
                                 loginData.DestinationInfo.UpdateFromRegion(ri);
                                 loginData.DestinationInfo.LookAt = userRegion.LookAt;
@@ -773,7 +809,10 @@ namespace SilverSim.Grid.Login
                         string regionName = uriMatch.Groups[1].Value;
                         if (regionName.Contains("@"))
                         {
-                            /* HG URL */
+                            /* Inter-Grid URL */
+#if DEBUG
+                            m_Log.DebugFormat("URI for agent {0} is inter-grid", loginData.Account.Principal);
+#endif
                             string[] parts = regionName.Split(new char[] { '@' }, 2);
                             Dictionary<string, string> cachedHeaders = ServicePluginHelo.HeloRequest(loginData.DestinationInfo.GridURI);
                             loginData.DestinationInfo.GridURI = parts[1];
@@ -782,6 +821,9 @@ namespace SilverSim.Grid.Login
                                 if(connector.IsProtocolSupported(parts[1], cachedHeaders) &&
                                     connector.TryGetRegion(parts[1], parts[0], out ri))
                                 {
+#if DEBUG
+                                    m_Log.DebugFormat("URI for agent {0} found", loginData.Account.Principal);
+#endif
                                     loginConnector = connector;
                                     break;
                                 }
@@ -800,8 +842,18 @@ namespace SilverSim.Grid.Login
                                 loginData.DestinationInfo.LocalToGrid = false;
                             }
                         }
+                        else if(m_GridService == null || m_LocalLoginConnectorService == null)
+                        {
+                            /* insufficient services */
+#if DEBUG
+                            m_Log.DebugFormat("URI for agent {0} is not usable", loginData.Account.Principal);
+#endif
+                        }
                         else if (m_GridService.TryGetValue(loginData.Account.ScopeID, uriMatch.Groups[1].Value, out ri))
                         {
+#if DEBUG
+                            m_Log.DebugFormat("URI for agent {0} is own-grid", loginData.Account.Principal);
+#endif
                             loginData.DestinationInfo.UpdateFromRegion(ri);
                             loginData.DestinationInfo.LookAt = Vector3.UnitY;
                             loginData.DestinationInfo.Position = new Vector3(
@@ -811,6 +863,7 @@ namespace SilverSim.Grid.Login
                             loginData.DestinationInfo.StartLocation = "url";
                             loginData.DestinationInfo.TeleportFlags = flags | TeleportFlags.ViaLocation;
                             loginData.DestinationInfo.LocalToGrid = true;
+                            loginConnector = m_LocalLoginConnectorService;
                         }
                     }
                     break;
@@ -822,6 +875,9 @@ namespace SilverSim.Grid.Login
             }
             else if (loginData.DestinationInfo.LocalToGrid)
             {
+#if DEBUG
+                m_Log.DebugFormat("Select local login connector for agent {0}", loginData.Account.Principal);
+#endif
                 loginConnector = m_LocalLoginConnectorService;
             }
             else
@@ -833,6 +889,9 @@ namespace SilverSim.Grid.Login
                     if(connector.IsProtocolSupported(loginData.DestinationInfo.GridURI, cachedHeaders))
                     {
                         loginConnector = connector;
+#if DEBUG
+                        m_Log.DebugFormat("Select remote login connector for agent {0}", loginData.Account.Principal);
+#endif
                         break;
                     }
                 }
