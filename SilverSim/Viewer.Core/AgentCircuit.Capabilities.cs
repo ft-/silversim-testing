@@ -421,6 +421,17 @@ namespace SilverSim.Viewer.Core
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);
+            AddDefCapabilityFactory("UpdateSettingsAgentInventory", regionSeedID, (agent) =>
+            {
+                UploadAssetAbstractCapability capability = new UpdateSettingsAgentInventory(
+                    agent,
+                    agent.InventoryService,
+                    agent.AssetService,
+                    localHostName,
+                    RemoteIP);
+                m_UploadCapabilities.Add(capability);
+                return capability;
+            }, capConfig);
             AddDefCapabilityFactory("UpdateScriptAgent", regionSeedID, (agent) =>
             {
                 UploadAssetAbstractCapability capability = new UpdateScriptAgent(
@@ -455,6 +466,16 @@ namespace SilverSim.Viewer.Core
             AddDefCapabilityFactory("UpdateNotecardTaskInventory", regionSeedID, (agent) =>
             {
                 UploadAssetAbstractCapability capability = new UpdateNotecardTaskInventory(
+                    agent,
+                    Server.Scene,
+                    localHostName,
+                    RemoteIP);
+                m_UploadCapabilities.Add(capability);
+                return capability;
+            }, capConfig);
+            AddDefCapabilityFactory("UpdateSettingsTaskInventory", regionSeedID, (agent) =>
+            {
+                UploadAssetAbstractCapability capability = new UpdateSettingsTaskInventory(
                     agent,
                     Server.Scene,
                     localHostName,
