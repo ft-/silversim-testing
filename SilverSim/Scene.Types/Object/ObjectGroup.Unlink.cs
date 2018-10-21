@@ -146,6 +146,8 @@ namespace SilverSim.Scene.Types.Object
                         part.LocalPosition = newChildPos[id];
                         part.LocalRotation = newChildRot[id];
                         part.IsSandbox = false;
+                        /* re-trigger update */
+                        part.IncSerialNumber();
                         newGrp.PostEvent(new ChangedEvent(ChangedEvent.ChangedFlags.Link));
                         unlinkedPrims.Add(newGrp);
                     }
