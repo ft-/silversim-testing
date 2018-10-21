@@ -232,7 +232,10 @@ namespace SilverSim.Main.Common.HttpServer
         public void Shutdown()
         {
             m_Log.InfoFormat("Stopping HTTP Server");
-            m_CertificateWatcher.EnableRaisingEvents = false;
+            if (m_CertificateWatcher != null)
+            {
+                m_CertificateWatcher.EnableRaisingEvents = false;
+            }
             m_CertificateWatcher = null;
             m_StoppingListeners = true;
             m_ListenerSocket.Close();
