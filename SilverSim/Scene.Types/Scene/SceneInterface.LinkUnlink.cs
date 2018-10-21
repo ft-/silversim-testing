@@ -73,6 +73,7 @@ namespace SilverSim.Scene.Types.Scene
                             {
                                 newPart.Inventory.ResumeScripts();
                                 newPart.TriggerOnUpdate(UpdateChangedFlags.Link);
+                                newGrp.Scene?.ScheduleUpdate(newPart.UpdateInfo);
                             }
                         }
                     }
@@ -131,7 +132,6 @@ namespace SilverSim.Scene.Types.Scene
                     part.LocalRotation = newChildRot[part.ID];
                     part.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.All);
                     part.Inventory.ResumeScripts();
-                    part.IncSerialNumber(); /* retrigger store */
                 }
             }
 

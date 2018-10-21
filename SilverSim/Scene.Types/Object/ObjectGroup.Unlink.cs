@@ -34,6 +34,8 @@ namespace SilverSim.Scene.Types.Object
                 part.ObjectGroup = this;
                 Add(Count + 1, part.ID, part);
             }
+            part.IncSerialNumber();
+            Scene?.ScheduleUpdate(part.UpdateInfo);
         }
 
         private readonly object m_LinkUnlinkLock = new object();
