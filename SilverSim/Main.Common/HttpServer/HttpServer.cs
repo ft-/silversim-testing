@@ -62,6 +62,7 @@ namespace SilverSim.Main.Common.HttpServer
         private X509Certificate2 m_ServerCertificate;
         private readonly SslProtocols m_SslProtocols = SslProtocols.Tls12;
         private readonly string m_CertificateFileName;
+        private FileSystemWatcher m_CertificateWatcher;
         readonly internal Type m_SslStreamPreload;
         private readonly Socket m_ListenerSocket;
         private readonly Thread m_ListenerThread;
@@ -183,6 +184,16 @@ namespace SilverSim.Main.Common.HttpServer
                     m_Log.Error("Loading certificate failed", e);
                     throw new ConfigurationLoader.ConfigurationErrorException("Loading certificate failed");
                 }
+                m_CertificateWatcher = new FileSystemWatcher
+                {
+                    Path = Path.GetDirectoryName(m_CertificateFileName),
+                    Filter = Path.GetFileName(m_CertificateFileName),
+                    NotifyFilter = NotifyFilters.LastWrite
+                };
+                m_CertificateWatcher.Changed += OnCertChanged;
+                m_CertificateWatcher.Created += OnCertChanged;
+                m_CertificateWatcher.EnableRaisingEvents = true;
+
                 m_Log.InfoFormat("Starting HTTPS Server");
             }
             else
@@ -191,22 +202,29 @@ namespace SilverSim.Main.Common.HttpServer
             }
         }
 
+        private void OnCertChanged(object source, FileSystemEventArgs args)
+        {
+            ReloadCertificate();
+        }
+
         public void ReloadCertificate()
         {
-            if(Scheme != Uri.UriSchemeHttps)
+            X509Certificate2 newCert;
+            if (Scheme != Uri.UriSchemeHttps)
             {
                 throw new InvalidOperationException();
             }
 
             try
             {
-                m_ServerCertificate = new X509Certificate2(m_CertificateFileName);
+                newCert = new X509Certificate2(m_CertificateFileName);
             }
             catch (Exception e)
             {
                 m_Log.Error("Reloading certificate failed", e);
                 throw;
             }
+            m_ServerCertificate = newCert;
         }
 
         public ShutdownOrder ShutdownOrder => ShutdownOrder.Any;
@@ -214,6 +232,8 @@ namespace SilverSim.Main.Common.HttpServer
         public void Shutdown()
         {
             m_Log.InfoFormat("Stopping HTTP Server");
+            m_CertificateWatcher.EnableRaisingEvents = false;
+            m_CertificateWatcher = null;
             m_StoppingListeners = true;
             m_ListenerSocket.Close();
             while (m_ActiveThreadCount > 0)
