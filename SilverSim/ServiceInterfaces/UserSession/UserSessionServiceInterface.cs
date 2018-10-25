@@ -25,7 +25,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.ServiceInterfaces.UserSession
 {
-    public abstract class UserSessionServiceInterface
+    public abstract class UserSessionServiceInterface : IPresenceServiceInterface
     {
         public abstract UserSessionInfo CreateSession(UGUI user);
         public abstract UserSessionInfo CreateSession(UGUI user, UUID sessionID, UUID secureSessionID);
@@ -34,6 +34,7 @@ namespace SilverSim.ServiceInterfaces.UserSession
         public abstract UserSessionInfo this[UUID sessionID] { get; }
         public abstract List<UserSessionInfo> this[UGUI user] { get; }
         public abstract bool TryGetValue(UUID sessionID, out UserSessionInfo sessionInfo);
+        public abstract bool TryGetSecureValue(UUID secureSessionID, out UserSessionInfo sessionInfo);
         public abstract bool ContainsKey(UUID sessionID);
         public abstract bool ContainsKey(UGUI user);
         public abstract bool Remove(UUID sessionID);

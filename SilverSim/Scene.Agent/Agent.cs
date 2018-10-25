@@ -35,9 +35,9 @@ using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.IM;
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.ServiceInterfaces.MuteList;
-using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.ServiceInterfaces.UserAgents;
+using SilverSim.ServiceInterfaces.UserSession;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Account;
@@ -969,7 +969,7 @@ namespace SilverSim.Scene.Agent
         public abstract ProfileServiceInterface ProfileService { get; }
         public abstract FriendsServiceInterface FriendsService { get; }
         public abstract UserAgentServiceInterface UserAgentService { get; }
-        public abstract PresenceServiceInterface PresenceService { get; }
+        public abstract IPresenceServiceInterface PresenceService { get; }
         public abstract EconomyServiceInterface EconomyService { get; }
         public abstract MuteListServiceInterface MuteListService { get; }
         public abstract OfflineIMServiceInterface OfflineIMService { get; }

@@ -39,6 +39,7 @@ using SilverSim.ServiceInterfaces.MuteList;
 using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.ServiceInterfaces.UserAgents;
+using SilverSim.ServiceInterfaces.UserSession;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Account;
@@ -56,7 +57,7 @@ namespace SilverSim.Scene.Npc
 
         private readonly InventoryServiceInterface m_InventoryService;
         private readonly ProfileServiceInterface m_ProfileService;
-        private readonly PresenceServiceInterface m_PresenceService;
+        private readonly IPresenceServiceInterface m_PresenceService;
 
         private ChatServiceInterface m_ChatService;
         private ChatServiceInterface.Listener m_ChatListener;
@@ -105,7 +106,7 @@ namespace SilverSim.Scene.Npc
             LastName = npcID.LastName;
             m_InventoryService = serviceList.Get<InventoryServiceInterface>();
             m_ProfileService = serviceList.Get<ProfileServiceInterface>();
-            m_PresenceService = serviceList.Get<PresenceServiceInterface>();
+            m_PresenceService = serviceList.Get<IPresenceServiceInterface>();
             NpcPresenceService = serviceList.Get<NpcPresenceServiceInterface>();
             m_UpdateInfo = new AgentUpdateInfo(this, UUID.Zero);
             OnAppearanceUpdate += HandleAppearanceUpdate;
@@ -278,7 +279,7 @@ namespace SilverSim.Scene.Npc
 
         #endregion
 
-        public override PresenceServiceInterface PresenceService
+        public override IPresenceServiceInterface PresenceService
         {
             get
             {

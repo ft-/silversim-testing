@@ -32,6 +32,7 @@ namespace SilverSim.Database.Memory.UserSession
     public sealed class MemoryUserSessionService : UserSessionServiceInterface, IPlugin
     {
         private readonly Dictionary<UUID, UserSessionInfo> m_UserSessions = new Dictionary<UUID, UserSessionInfo>();
+        private readonly Dictionary<UUID, UUID> m_UserSecureSessions = new Dictionary<UUID, UUID>();
         private readonly object m_UserSessionLock = new object();
 
         public void Startup(ConfigurationLoader loader)
@@ -159,6 +160,15 @@ namespace SilverSim.Database.Memory.UserSession
             lock(m_UserSessionLock)
             {
                 m_UserSessions.Add(userSessionInfo.SessionID, new UserSessionInfo(userSessionInfo));
+                try
+                {
+                    m_UserSecureSessions.Add(userSessionInfo.SecureSessionID, userSessionInfo.SessionID);
+                }
+                catch
+                {
+                    m_UserSessions.Remove(userSessionInfo.SessionID);
+                    throw;
+                }
             }
             return userSessionInfo;
         }
@@ -174,6 +184,15 @@ namespace SilverSim.Database.Memory.UserSession
             lock (m_UserSessionLock)
             {
                 m_UserSessions.Add(userSessionInfo.SessionID, new UserSessionInfo(userSessionInfo));
+                try
+                {
+                    m_UserSecureSessions.Add(userSessionInfo.SecureSessionID, userSessionInfo.SessionID);
+                }
+                catch
+                {
+                    m_UserSessions.Remove(userSessionInfo.SessionID);
+                    throw;
+                }
             }
             return userSessionInfo;
         }
@@ -182,6 +201,11 @@ namespace SilverSim.Database.Memory.UserSession
         {
             lock(m_UserSessionLock)
             {
+                UserSessionInfo info;
+                if(m_UserSessions.TryGetValue(sessionID, out info))
+                {
+                    m_UserSecureSessions.Remove(info.SecureSessionID);
+                }
                 return m_UserSessions.Remove(sessionID);
             }
         }
@@ -193,6 +217,22 @@ namespace SilverSim.Database.Memory.UserSession
                 UserSessionInfo info;
                 return m_UserSessions.TryGetValue(sessionID, out info) && info.DynamicData.Remove($"{assoc}/{varname}");
             }
+        }
+
+        public override bool TryGetSecureValue(UUID secureSessionID, out UserSessionInfo sessionInfo)
+        {
+            lock (m_UserSessionLock)
+            {
+                UserSessionInfo info;
+                UUID sessionID;
+                if (m_UserSecureSessions.TryGetValue(secureSessionID, out sessionID) && m_UserSessions.TryGetValue(sessionID, out info))
+                {
+                    sessionInfo = new UserSessionInfo(info);
+                    return true;
+                }
+            }
+            sessionInfo = default(UserSessionInfo);
+            return false;
         }
 
         public override bool TryGetValue(UUID sessionID, out UserSessionInfo sessionInfo)

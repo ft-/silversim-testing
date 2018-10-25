@@ -25,10 +25,9 @@ using SilverSim.Main.Common.HttpServer;
 using SilverSim.ServiceInterfaces;
 using SilverSim.ServiceInterfaces.Account;
 using SilverSim.ServiceInterfaces.IM;
-using SilverSim.ServiceInterfaces.Presence;
-using SilverSim.ServiceInterfaces.Traveling;
+using SilverSim.ServiceInterfaces.UserSession;
 using SilverSim.Types;
-using SilverSim.Types.TravelingData;
+using SilverSim.Types.UserSession;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Net;
@@ -39,12 +38,11 @@ namespace SilverSim.Viewer.OfflineIM
     [PluginName("ViewerOfflineIMUserCapServer")]
     public sealed class ViewerOfflineIMUserCapServer : ViewerOfflineIMServerBase, IPlugin, ILoginUserCapsGetInterface
     {
-        private PresenceServiceInterface m_PresenceService;
-        private TravelingDataServiceInterface m_TravelingDataService;
+        private UserSessionServiceInterface m_UserSessionService;
         private OfflineIMServiceInterface m_OfflineIMService;
         private UserAccountServiceInterface m_UserAccountService;
         private readonly string m_PresenceServiceName;
-        private readonly string m_TravelingDataServiceName;
+        private readonly string m_UserSessionServiceName;
         private readonly string m_OfflineIMServiceName;
         private readonly string m_UserAccountServiceName;
 
@@ -54,17 +52,14 @@ namespace SilverSim.Viewer.OfflineIM
         /* prefix url is /CAPS/ReadOfflineMsgs/<sessionid>/ */
         public ViewerOfflineIMUserCapServer(IConfig ownSection)
         {
-            m_PresenceServiceName = ownSection.GetString("PresenceService", "PresenceService");
-            m_TravelingDataServiceName = ownSection.GetString("TravelingDataService", "TravelingDataService");
+            m_UserSessionServiceName = ownSection.GetString("UserSessionService", "UserSessionService");
             m_OfflineIMServiceName = ownSection.GetString("OfflineIMService", "OfflineIMService");
             m_UserAccountServiceName = ownSection.GetString("UserAccountService", "UserAccountService");
         }
 
         public void Startup(ConfigurationLoader loader)
         {
-            m_PresenceService = loader.GetService<PresenceServiceInterface>(m_PresenceServiceName);
-            m_TravelingDataService = loader.GetService<TravelingDataServiceInterface>(m_TravelingDataServiceName);
-
+            m_UserSessionService = loader.GetService<UserSessionServiceInterface>(m_UserSessionServiceName);
             m_OfflineIMService = loader.GetService<OfflineIMServiceInterface>(m_OfflineIMServiceName);
             m_UserAccountService = loader.GetService<UserAccountServiceInterface>(m_UserAccountServiceName);
             m_HttpServer = loader.HttpServer;
@@ -97,10 +92,10 @@ namespace SilverSim.Viewer.OfflineIM
             UUID agent = UUID.Zero;
             try
             {
-                TravelingDataInfo trv = m_TravelingDataService.GetTravelingData(sessionid);
+                UserSessionInfo trv = m_UserSessionService[sessionid];
                 if (trv.ClientIPAddress == req.CallerIP)
                 {
-                    agent = trv.UserID;
+                    agent = trv.User.ID;
                     foundIP = true;
                 }
             }

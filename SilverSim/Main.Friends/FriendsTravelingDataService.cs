@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+#if OLD
 using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.CmdIO;
@@ -158,3 +159,4 @@ namespace SilverSim.Main.Friends
         }
     }
 }
+#endif

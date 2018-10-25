@@ -28,6 +28,7 @@ namespace SilverSim.Types.UserSession
         public UGUI User = UGUI.Unknown;
         public UUID SessionID = UUID.Zero;
         public UUID SecureSessionID = UUID.Zero;
+        public string ClientIPAddress = string.Empty;
         /* key is <protocol-association>/<variable-name> */
         public readonly Dictionary<string, string> DynamicData = new Dictionary<string, string>();
         public Date Timestamp = Date.Now;
@@ -40,6 +41,7 @@ namespace SilverSim.Types.UserSession
         {
             User = new UGUI(src.User);
             SessionID = src.SessionID;
+            ClientIPAddress = src.ClientIPAddress;
             SecureSessionID = src.SecureSessionID;
             foreach(KeyValuePair<string, string> kvp in src.DynamicData)
             {

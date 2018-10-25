@@ -52,6 +52,7 @@ using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.ServiceInterfaces.Purge;
 using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.ServiceInterfaces.UserAgents;
+using SilverSim.ServiceInterfaces.UserSession;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.StructuredData.XmlRpc;
@@ -358,7 +359,8 @@ namespace SilverSim.Main.Common
             FeaturesTable[typeof(AssetServiceInterface)] = "Asset Service";
             FeaturesTable[typeof(InventoryServiceInterface)] = "Inventory Service";
             FeaturesTable[typeof(AvatarNameServiceInterface)] = "Avatar Name Lookup Service";
-            FeaturesTable[typeof(PresenceServiceInterface)] = "Presence Service";
+            FeaturesTable[typeof(IPresenceServiceInterface)] = "Presence Service";
+            FeaturesTable[typeof(UserSessionServiceInterface)] = "UserSession Service";
             FeaturesTable[typeof(GridServiceInterface)] = "Grid Service";
             FeaturesTable[typeof(UserAccountServiceInterface)] = "UserAccount Service";
             FeaturesTable[typeof(IInventoryServicePlugin)] = "Inventory Service HELO Instantiator";

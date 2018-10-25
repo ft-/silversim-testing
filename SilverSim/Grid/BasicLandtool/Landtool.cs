@@ -23,10 +23,10 @@ using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.ServiceInterfaces;
-using SilverSim.ServiceInterfaces.Presence;
+using SilverSim.ServiceInterfaces.UserSession;
 using SilverSim.Types;
-using SilverSim.Types.Presence;
 using SilverSim.Types.StructuredData.XmlRpc;
+using SilverSim.Types.UserSession;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
@@ -37,13 +37,13 @@ namespace SilverSim.Grid.BasicLandtool
     [PluginName("BasicLandtool")]
     public class Landtool : IPlugin, IGridInfoServiceInterface
     {
-        private readonly string m_PresenceServiceName;
-        private PresenceServiceInterface m_PresenceService;
+        private readonly string m_UserSessionServiceName;
+        private UserSessionServiceInterface m_UserSessionService;
         private BaseHttpServer m_HttpServer;
 
         public Landtool(IConfig ownSection)
         {
-            m_PresenceServiceName = ownSection.GetString("PresenceService", "PresenceService");
+            m_UserSessionServiceName = ownSection.GetString("UserSessionService", "UserSessionService");
         }
 
         public void GetGridInfo(Dictionary<string, string> dict)
@@ -54,7 +54,7 @@ namespace SilverSim.Grid.BasicLandtool
         public void Startup(ConfigurationLoader loader)
         {
             m_HttpServer = loader.HttpServer;
-            m_PresenceService = loader.GetService<PresenceServiceInterface>(m_PresenceServiceName);
+            m_UserSessionService = loader.GetService<UserSessionServiceInterface>(m_UserSessionServiceName);
             loader.XmlRpcServer.XmlRpcMethods.Add("preflightBuyLandPrep", HandlePreFlightBuyLandPrep);
         }
 
@@ -85,13 +85,10 @@ namespace SilverSim.Grid.BasicLandtool
             }
 
             bool validated = false;
-            foreach(PresenceInfo pinfo in m_PresenceService[agentId])
+            UserSessionInfo sessionInfo;
+            if(m_UserSessionService.TryGetSecureValue(secureSessionId, out sessionInfo) && sessionInfo.User.ID == agentId)
             {
-                if(pinfo.SecureSessionID == secureSessionId)
-                {
-                    validated = true;
-                    break;
-                }
+                validated = true;
             }
 
             var resdata = new Map();
@@ -156,13 +153,10 @@ namespace SilverSim.Grid.BasicLandtool
                 throw new XmlRpc.XmlRpcFaultException(4, "Missing parameters");
             }
             bool validated = false;
-            foreach (PresenceInfo pinfo in m_PresenceService[agentId])
+            UserSessionInfo sessionInfo;
+            if (m_UserSessionService.TryGetSecureValue(secureSessionId, out sessionInfo) && sessionInfo.User.ID == agentId)
             {
-                if (pinfo.SecureSessionID == secureSessionId)
-                {
-                    validated = true;
-                    break;
-                }
+                validated = true;
             }
 
             var resdata = new Map();

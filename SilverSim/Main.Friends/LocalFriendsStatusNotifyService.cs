@@ -22,9 +22,9 @@
 using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Friends;
-using SilverSim.ServiceInterfaces.Presence;
+using SilverSim.ServiceInterfaces.UserSession;
 using SilverSim.Types;
-using SilverSim.Types.Presence;
+using SilverSim.Types.UserSession;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -35,14 +35,14 @@ namespace SilverSim.Main.Friends
     [Description("Local friends status notification")]
     public sealed class LocalFriendsStatusNotifyService : IFriendsStatusNotifyServiceInterface, IPlugin
     {
-        private PresenceServiceInterface m_PresenceService;
-        private readonly string m_PresenceServiceName;
+        private UserSessionServiceInterface m_UserSessionService;
+        private readonly string m_UserSessionServiceName;
         private IFriendsSimStatusNotifyService m_FriendsSimStatusNotifyService;
         private readonly string m_FriendsSimStatusNotifyServiceName;
 
         public LocalFriendsStatusNotifyService(IConfig section)
         {
-            m_PresenceServiceName = section.GetString("PresenceService", "PresenceService");
+            m_UserSessionServiceName = section.GetString("UserSessionService", "UserSessionService");
             m_FriendsSimStatusNotifyServiceName = section.GetString("FriendsSimStatusNotifyService", "FriendsSimStatusNotifyService");
         }
 
@@ -66,17 +66,22 @@ namespace SilverSim.Main.Friends
 
             foreach(KeyValuePair<UGUI, string> kvp in list)
             {
-                List<PresenceInfo> presences = m_PresenceService[kvp.Key.ID];
+                List<UserSessionInfo> presences = m_UserSessionService[kvp.Key];
 
                 List<UGUI> notifiedInRegion;
-                foreach (PresenceInfo pinfo in presences)
+                foreach (UserSessionInfo pinfo in presences)
                 {
-                    if (!notified.TryGetValue(pinfo.RegionID, out notifiedInRegion))
+                    string regionId;
+                    UUID regionID;
+                    if (pinfo.DynamicData.TryGetValue("grid/region-id", out regionId) && UUID.TryParse(regionId, out regionID))
                     {
-                        notifiedInRegion = new List<UGUI>();
-                        notified.Add(pinfo.RegionID, notifiedInRegion);
+                        if (!notified.TryGetValue(regionID, out notifiedInRegion))
+                        {
+                            notifiedInRegion = new List<UGUI>();
+                            notified.Add(regionID, notifiedInRegion);
+                        }
+                        notifiedInRegion.Add(pinfo.User);
                     }
-                    notifiedInRegion.Add(pinfo.UserID);
                 }
             }
 
@@ -88,7 +93,7 @@ namespace SilverSim.Main.Friends
 
         public void Startup(ConfigurationLoader loader)
         {
-            m_PresenceService = loader.GetService<PresenceServiceInterface>(m_PresenceServiceName);
+            m_UserSessionService = loader.GetService<UserSessionServiceInterface>(m_UserSessionServiceName);
             m_FriendsSimStatusNotifyService = loader.GetService<IFriendsSimStatusNotifyService>(m_FriendsSimStatusNotifyServiceName);
         }
     }

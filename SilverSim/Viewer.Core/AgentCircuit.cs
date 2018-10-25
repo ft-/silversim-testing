@@ -922,7 +922,7 @@ namespace SilverSim.Viewer.Core
             Agent.DetachAllAttachments();
             try
             {
-                Agent.PresenceService.Logout(SessionID, AgentID);
+                Agent.PresenceService.Remove(SessionID);
             }
             catch(Exception e)
             {

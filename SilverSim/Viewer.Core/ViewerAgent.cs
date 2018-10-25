@@ -41,6 +41,7 @@ using SilverSim.ServiceInterfaces.MuteList;
 using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.ServiceInterfaces.UserAgents;
+using SilverSim.ServiceInterfaces.UserSession;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Account;
@@ -411,7 +412,7 @@ namespace SilverSim.Viewer.Core
 
         public override UserAgentServiceInterface UserAgentService => m_UserAgentService;
 
-        public override PresenceServiceInterface PresenceService => m_PresenceService;
+        public override IPresenceServiceInterface PresenceService => m_PresenceService;
 
         public override EconomyServiceInterface EconomyService { get; }
         #endregion
@@ -506,7 +507,7 @@ namespace SilverSim.Viewer.Core
         private ProfileServiceInterface m_ProfileService;
         private FriendsServiceInterface m_FriendsService;
         private UserAgentServiceInterface m_UserAgentService;
-        private PresenceServiceInterface m_PresenceService;
+        private IPresenceServiceInterface m_PresenceService;
 
         #endregion
 
@@ -706,7 +707,7 @@ namespace SilverSim.Viewer.Core
             m_ProfileService = serviceList.Get<ProfileServiceInterface>();
             m_FriendsService = serviceList.Get<FriendsServiceInterface>();
             m_UserAgentService = serviceList.Get<UserAgentServiceInterface>();
-            m_PresenceService = serviceList.Get<PresenceServiceInterface>();
+            m_PresenceService = serviceList.Get<IPresenceServiceInterface>();
             EconomyService = serviceList.Get<EconomyServiceInterface>();
             OfflineIMService = serviceList.Get<OfflineIMServiceInterface>();
             MuteListService = serviceList.Get<MuteListServiceInterface>();
