@@ -30,9 +30,8 @@ using SilverSim.ServiceInterfaces.AuthInfo;
 using SilverSim.ServiceInterfaces.Friends;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.Inventory;
-using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.ServerParam;
-using SilverSim.ServiceInterfaces.Traveling;
+using SilverSim.ServiceInterfaces.UserSession;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Account;
@@ -41,16 +40,15 @@ using SilverSim.Types.Asset;
 using SilverSim.Types.Friends;
 using SilverSim.Types.Grid;
 using SilverSim.Types.Inventory;
-using SilverSim.Types.Presence;
 using SilverSim.Types.StructuredData.Json;
 using SilverSim.Types.StructuredData.XmlRpc;
-using SilverSim.Types.TravelingData;
+using SilverSim.Types.UserSession;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using CultureInfo = System.Globalization.CultureInfo;
 using System.Net;
 using System.Text.RegularExpressions;
+using CultureInfo = System.Globalization.CultureInfo;
 
 namespace SilverSim.Grid.Login
 {
@@ -81,10 +79,9 @@ namespace SilverSim.Grid.Login
         private UserAccountServiceInterface m_UserAccountService;
         private GridServiceInterface m_GridService;
         private InventoryServiceInterface m_InventoryService;
-        private PresenceServiceInterface m_PresenceService;
+        private UserSessionServiceInterface m_UserSessionService;
         private FriendsServiceInterface m_FriendsService;
         private AuthInfoServiceInterface m_AuthInfoService;
-        private TravelingDataServiceInterface m_TravelingDataService;
         private ILoginConnectorServiceInterface m_LocalLoginConnectorService;
         private List<ILoginConnectorServiceInterface> m_RemoteLoginConnectorServices;
         private List<ILoginUserCapsGetInterface> m_UserCapsGetters;
@@ -92,10 +89,9 @@ namespace SilverSim.Grid.Login
         private readonly string m_UserAccountServiceName;
         private readonly string m_GridServiceName;
         private readonly string m_InventoryServiceName;
-        private readonly string m_PresenceServiceName;
         private readonly string m_FriendsServiceName;
         private readonly string m_AuthInfoServiceName;
-        private readonly string m_TravelingDataServiceName;
+        private readonly string m_UserSessionServiceName;
         private readonly string m_LocalLoginConnectorServiceName;
         private UUID m_GridLibraryOwner = new UUID("11111111-1111-0000-0000-000100bba000");
         private UUID m_GridLibaryFolderId = new UUID("00000112-000f-0000-0000-000100bba000");
@@ -119,10 +115,9 @@ namespace SilverSim.Grid.Login
             m_UserAccountServiceName = ownSection.GetString("UserAccountService", "UserAccountService");
             m_GridServiceName = ownSection.GetString("GridService", "GridService");
             m_InventoryServiceName = ownSection.GetString("InventoryService", "InventoryService");
-            m_PresenceServiceName = ownSection.GetString("PresenceService", "PresenceService");
             m_FriendsServiceName = ownSection.GetString("FriendsService", "FriendsService");
             m_AuthInfoServiceName = ownSection.GetString("AuthInfoService", "AuthInfoService");
-            m_TravelingDataServiceName = ownSection.GetString("TravelingDataService", "TravelingDataService");
+            m_UserSessionServiceName = ownSection.GetString("UserSessionService", "UserSessionService");
             m_LocalLoginConnectorServiceName = ownSection.GetString("LocalLoginConnectorService", string.Empty);
         }
 
@@ -138,11 +133,10 @@ namespace SilverSim.Grid.Login
             m_UserAccountService = loader.GetService<UserAccountServiceInterface>(m_UserAccountServiceName);
             m_GridService = loader.GetService<GridServiceInterface>(m_GridServiceName);
             m_InventoryService = loader.GetService<InventoryServiceInterface>(m_InventoryServiceName);
-            m_PresenceService = loader.GetService<PresenceServiceInterface>(m_PresenceServiceName);
+            m_UserSessionService = loader.GetService<UserSessionServiceInterface>(m_UserSessionServiceName);
             m_FriendsService = loader.GetService<FriendsServiceInterface>(m_FriendsServiceName);
             m_AuthInfoService = loader.GetService<AuthInfoServiceInterface>(m_AuthInfoServiceName);
             m_AuthInfoService = loader.GetService<AuthInfoServiceInterface>(m_AuthInfoServiceName);
-            m_TravelingDataService = loader.GetService<TravelingDataServiceInterface>(m_TravelingDataServiceName);
             if (!string.IsNullOrEmpty(m_LocalLoginConnectorServiceName))
             {
                 m_LocalLoginConnectorService = loader.GetService<ILoginConnectorServiceInterface>(m_LocalLoginConnectorServiceName);
@@ -585,15 +579,7 @@ namespace SilverSim.Grid.Login
             {
                 try
                 {
-                    m_PresenceService.Remove(loginData.Account.ScopeID, loginData.Account.Principal.ID);
-                }
-                catch
-                {
-                    /* intentionally ignored */
-                }
-                try
-                {
-                    m_TravelingDataService.RemoveByAgentUUID(loginData.Account.Principal.ID);
+                    m_UserSessionService.Remove(loginData.Account.Principal);
                 }
                 catch
                 {
@@ -601,15 +587,10 @@ namespace SilverSim.Grid.Login
                 }
             }
 
-            var pInfo = new PresenceInfo
-            {
-                UserID = loginData.Account.Principal,
-                SessionID = loginData.SessionInfo.SessionID,
-                SecureSessionID = loginData.SessionInfo.SecureSessionID
-            };
+            UserSessionInfo userSessionInfo;
             try
             {
-                m_PresenceService.Login(pInfo);
+                userSessionInfo = m_UserSessionService.CreateSession(loginData.Account.Principal, loginData.ClientInfo.ClientIP);
             }
             catch(Exception e)
             {
@@ -617,51 +598,20 @@ namespace SilverSim.Grid.Login
                 throw new LoginFailResponseException("key", "Error connecting to the desired location. Try connecting to another region. (A)");
             }
 
+            loginData.SessionInfo.SessionID = userSessionInfo.SessionID;
+            loginData.SessionInfo.SecureSessionID = userSessionInfo.SecureSessionID;
             try
             {
                 return LoginAuthenticatedAndPresenceAdded(req, loginData);
             }
             catch
             {
-                m_PresenceService.Logout(pInfo.SessionID, pInfo.UserID.ID);
+                m_UserSessionService.Remove(userSessionInfo.SessionID);
                 throw;
             }
         }
 
         private XmlRpc.XmlRpcResponse LoginAuthenticatedAndPresenceAdded(XmlRpc.XmlRpcRequest req, LoginData loginData)
-        {
-            var hgdata = new TravelingDataInfo
-            {
-                SessionID = loginData.SessionInfo.SessionID,
-                UserID = loginData.Account.Principal.ID,
-                GridExternalName = m_GatekeeperUri,
-                ServiceToken = UUID.Random.ToString(),
-                ClientIPAddress = loginData.ClientInfo.ClientIP
-            };
-            loginData.SessionInfo.ServiceSessionID = hgdata.GridExternalName + ";" + UUID.Random.ToString();
-
-            try
-            {
-                m_TravelingDataService.Store(hgdata);
-            }
-            catch(Exception e)
-            {
-                m_Log.Error("Failed to store current grid location data", e);
-                throw new LoginFailResponseException("key", "Error connecting to the desired location. Failed to store current grid location data.");
-            }
-
-            try
-            {
-                return LoginAuthenticatedAndPresenceAndHGTravelingDataAdded(req, loginData);
-            }
-            catch
-            {
-                m_TravelingDataService.Remove(loginData.SessionInfo.SessionID);
-                throw;
-            }
-        }
-
-        private XmlRpc.XmlRpcResponse LoginAuthenticatedAndPresenceAndHGTravelingDataAdded(XmlRpc.XmlRpcRequest req, LoginData loginData)
         {
             var flags = TeleportFlags.ViaLogin;
             if(loginData.Account.UserLevel >= 200)

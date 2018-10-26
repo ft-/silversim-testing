@@ -307,7 +307,6 @@ namespace SilverSim.Scene.Npc
         {
             SessionID = UUID.Zero,
             SecureSessionID = UUID.Zero,
-            ServiceSessionID = string.Empty
         };
 
         public override List<GridType> SupportedGridTypes => new List<GridType>();

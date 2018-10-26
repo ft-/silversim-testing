@@ -25,6 +25,5 @@ namespace SilverSim.Types.Account
     {
         public UUID SessionID;
         public UUID SecureSessionID;
-        public string ServiceSessionID;
     }
 }

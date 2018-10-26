@@ -93,7 +93,6 @@ namespace SilverSim.Viewer.Core
         {
             SessionID = SessionID,
             SecureSessionID = m_SecureSessionID,
-            ServiceSessionID = m_ServiceSessionID
         };
 
         public override List<GridType> SupportedGridTypes
@@ -683,7 +682,6 @@ namespace SilverSim.Viewer.Core
             Uri homeURI,
             UUID sessionID,
             UUID secureSessionID,
-            string serviceSessionID,
             ClientInfo clientInfo,
             UserAccount untrustedAccountInfo,
             AgentServiceList serviceList)
@@ -699,7 +697,6 @@ namespace SilverSim.Viewer.Core
             SessionID = sessionID;
             m_UntrustedAccountInfo = untrustedAccountInfo;
             m_SecureSessionID = secureSessionID;
-            m_ServiceSessionID = serviceSessionID;
             Client = clientInfo;
             m_AssetService = serviceList.Get<AssetServiceInterface>();
             m_InventoryService = serviceList.Get<InventoryServiceInterface>();

@@ -149,13 +149,14 @@ namespace SilverSim.Database.Memory.UserSession
             }
         }
 
-        public override UserSessionInfo CreateSession(UGUI user)
+        public override UserSessionInfo CreateSession(UGUI user, string clientIPAddress)
         {
             var userSessionInfo = new UserSessionInfo
             {
                 User = user,
                 SessionID = UUID.Random,
-                SecureSessionID = UUID.Random
+                SecureSessionID = UUID.Random,
+                ClientIPAddress = clientIPAddress
             };
             lock(m_UserSessionLock)
             {
@@ -173,13 +174,14 @@ namespace SilverSim.Database.Memory.UserSession
             return userSessionInfo;
         }
 
-        public override UserSessionInfo CreateSession(UGUI user, UUID sessionID, UUID secureSessionID)
+        public override UserSessionInfo CreateSession(UGUI user, string clientIPAddress, UUID sessionID, UUID secureSessionID)
         {
             var userSessionInfo = new UserSessionInfo
             {
                 User = user,
                 SessionID = sessionID,
-                SecureSessionID = secureSessionID
+                SecureSessionID = secureSessionID,
+                ClientIPAddress = clientIPAddress
             };
             lock (m_UserSessionLock)
             {
@@ -208,6 +210,19 @@ namespace SilverSim.Database.Memory.UserSession
                 }
                 return m_UserSessions.Remove(sessionID);
             }
+        }
+
+        public override bool Remove(UGUI user)
+        {
+            List<UserSessionInfo> sessions = this[user];
+            lock(m_UserSessionLock)
+            {
+                foreach(UserSessionInfo info in sessions)
+                {
+                    m_UserSessions.Remove(info.SessionID);
+                }
+            }
+            return sessions.Count != 0;
         }
 
         public override bool Remove(UUID sessionID, string assoc, string varname)

@@ -27,8 +27,8 @@ namespace SilverSim.ServiceInterfaces.UserSession
 {
     public abstract class UserSessionServiceInterface : IPresenceServiceInterface
     {
-        public abstract UserSessionInfo CreateSession(UGUI user);
-        public abstract UserSessionInfo CreateSession(UGUI user, UUID sessionID, UUID secureSessionID);
+        public abstract UserSessionInfo CreateSession(UGUI user, string clientIPAddress);
+        public abstract UserSessionInfo CreateSession(UGUI user, string clientIPAddress, UUID sessionID, UUID secureSessionID);
 
         #region Session access
         public abstract UserSessionInfo this[UUID sessionID] { get; }
@@ -38,6 +38,7 @@ namespace SilverSim.ServiceInterfaces.UserSession
         public abstract bool ContainsKey(UUID sessionID);
         public abstract bool ContainsKey(UGUI user);
         public abstract bool Remove(UUID sessionID);
+        public abstract bool Remove(UGUI user);
         #endregion
 
         #region Session variable access
@@ -49,5 +50,54 @@ namespace SilverSim.ServiceInterfaces.UserSession
         public abstract bool ContainsKey(UUID sessionID, string assoc, string varname);
         public abstract bool Remove(UUID sessionID, string assoc, string varname);
         #endregion
+
+        public string this[UUID sessionID, KnownUserSessionInfoVariables varid]
+        {
+            get
+            {
+                string assoc;
+                string varname;
+                string value;
+                if(!UserSessionInfo.TryGetVarInfo(varid, out assoc, out varname) ||
+                    !TryGetValue(sessionID, assoc, varname, out value))
+                {
+                    throw new KeyNotFoundException();
+                }
+                return value;
+            }
+
+            set
+            {
+                string assoc;
+                string varname;
+                if (!UserSessionInfo.TryGetVarInfo(varid, out assoc, out varname))
+                {
+                    throw new KeyNotFoundException();
+                }
+                this[sessionID, assoc, varname] = value;
+            }
+        }
+
+        public bool TryGetValue(UUID sessionID, KnownUserSessionInfoVariables varid, out string value)
+        {
+            value = default(string);
+            string assoc;
+            string varname;
+            return UserSessionInfo.TryGetVarInfo(varid, out assoc, out varname) && TryGetValue(sessionID, assoc, varname, out value);
+        }
+
+        public bool ContainsKey(UUID sessionID, KnownUserSessionInfoVariables varid)
+        {
+            string assoc;
+            string varname;
+            return UserSessionInfo.TryGetVarInfo(varid, out assoc, out varname) && ContainsKey(sessionID, assoc, varname);
+        }
+
+        public bool Remove(UUID sessionID, KnownUserSessionInfoVariables varid)
+        {
+            string assoc;
+            string varname;
+            return UserSessionInfo.TryGetVarInfo(varid, out assoc, out varname) && Remove(sessionID, assoc, varname);
+        }
     }
 }

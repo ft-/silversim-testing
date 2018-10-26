@@ -38,15 +38,14 @@ using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.IM;
 using SilverSim.ServiceInterfaces.Inventory;
-using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.Profile;
-using SilverSim.ServiceInterfaces.Traveling;
+using SilverSim.ServiceInterfaces.UserSession;
 using SilverSim.Types;
 using SilverSim.Types.Account;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Asset.Format;
 using SilverSim.Types.Grid;
-using SilverSim.Types.Presence;
+using SilverSim.Types.UserSession;
 using SilverSim.Viewer.Core;
 using SilverSim.Viewer.Core.Teleport;
 using System;
@@ -73,10 +72,8 @@ namespace SilverSim.Grid.Standalone
         private AssetServiceInterface m_LocalAssetService;
         private readonly string m_LocalProfileServiceName;
         private ProfileServiceInterface m_LocalProfileService;
-        private readonly string m_LocalPresenceServiceName;
-        private PresenceServiceInterface m_LocalPresenceService;
-        private readonly string m_LocalTravelingDataServiceName;
-        private TravelingDataServiceInterface m_LocalTravelingDataService;
+        private readonly string m_LocalUserSessionServiceName;
+        private UserSessionServiceInterface m_LocalUserSessionService;
         private readonly string m_LocalFriendsServiceName;
         private FriendsServiceInterface m_LocalFriendsService;
         private readonly string m_LocalOfflineIMServiceName;
@@ -129,11 +126,10 @@ namespace SilverSim.Grid.Standalone
             m_LocalAssetServiceName = ownConfig.GetString("LocalAssetService", "AssetService");
             m_LocalProfileServiceName = ownConfig.GetString("LocalProfileService", "ProfileService");
             m_LocalFriendsServiceName = ownConfig.GetString("LocalFriendsService", "FriendsService");
-            m_LocalPresenceServiceName = ownConfig.GetString("LocalPresenceService", "PresenceService");
+            m_LocalUserSessionServiceName = ownConfig.GetString("LocalUserSessionService", "UserSessionService");
             m_LocalOfflineIMServiceName = ownConfig.GetString("LocalOfflineIMService", "OfflineIMService");
             m_LocalGroupsServiceName = ownConfig.GetString("LocalGroupsService", string.Empty);
             m_LocalEconomyServiceName = ownConfig.GetString("LocalEconomyService", "EconomyService");
-            m_LocalTravelingDataServiceName = ownConfig.GetString("LocalTravelingDataService", "TravelingDataService");
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -157,9 +153,8 @@ namespace SilverSim.Grid.Standalone
                 loader.GetService(m_LocalProfileServiceName, out m_LocalProfileService);
             }
             loader.GetService(m_LocalFriendsServiceName, out m_LocalFriendsService);
-            loader.GetService(m_LocalPresenceServiceName, out m_LocalPresenceService);
+            loader.GetService(m_LocalUserSessionServiceName, out m_LocalUserSessionService);
             loader.GetService(m_LocalOfflineIMServiceName, out m_LocalOfflineIMService);
-            loader.GetService(m_LocalTravelingDataServiceName, out m_LocalTravelingDataService);
             if (!string.IsNullOrEmpty(m_LocalGroupsServiceName))
             {
                 loader.GetService(m_LocalGroupsServiceName, out m_LocalGroupsService);
@@ -230,43 +225,17 @@ namespace SilverSim.Grid.Standalone
             }
         }
 
-        public class StandalonePresenceService : PresenceServiceInterface
+        public class StandalonePresenceService : IPresenceServiceInterface
         {
-            private readonly PresenceServiceInterface m_PresenceService;
-            private readonly TravelingDataServiceInterface m_TravelingDataService;
+            private readonly UserSessionServiceInterface m_UserSessionService;
 
-            public StandalonePresenceService(PresenceServiceInterface presenceService, TravelingDataServiceInterface travelingDataService)
+            public StandalonePresenceService(UserSessionServiceInterface userSessionService)
             {
-                m_PresenceService = presenceService;
-                m_TravelingDataService = travelingDataService;
+                m_UserSessionService = userSessionService;
             }
 
-            public override List<PresenceInfo> this[UUID userID] => m_PresenceService[userID];
-
-            public override PresenceInfo this[UUID sessionID, UUID userID] => m_PresenceService[sessionID, userID];
-
-            public override List<PresenceInfo> GetPresencesInRegion(UUID regionId) => m_PresenceService.GetPresencesInRegion(regionId);
-
-            public override void Login(PresenceInfo pInfo) => m_PresenceService.Login(pInfo);
-
-            public override void Logout(UUID sessionID, UUID userID)
-            {
-                m_PresenceService.Logout(sessionID, userID);
-                m_TravelingDataService.Remove(sessionID);
-            }
-
-            public override void LogoutRegion(UUID regionID)
-            {
-                m_PresenceService.LogoutRegion(regionID);
-                foreach (PresenceInfo pinfo in GetPresencesInRegion(regionID))
-                {
-                    m_TravelingDataService.Remove(pinfo.SessionID);
-                }
-            }
-
-            public override void Remove(UUID scopeID, UUID accountID) => m_PresenceService.Remove(scopeID, accountID);
-
-            public override void Report(PresenceInfo pInfo) => m_PresenceService.Report(pInfo);
+            public bool Remove(UUID sessionID) =>
+                m_UserSessionService.Remove(sessionID);
         }
 
         private void PostAgent_Local(UserAccount account, ClientInfo clientInfo, SessionInfo sessionInfo, DestinationInfo destinationInfo, CircuitInfo circuitInfo, AppearanceInfo appearance, UUID capsId, int maxAllowedWearables, out string capsPath)
@@ -340,7 +309,7 @@ namespace SilverSim.Grid.Standalone
                 serviceList.Add(m_LocalProfileService);
             }
             serviceList.Add(m_LocalFriendsService);
-            serviceList.Add(new StandalonePresenceService(m_LocalPresenceService, m_LocalTravelingDataService));
+            serviceList.Add(new StandalonePresenceService(m_LocalUserSessionService));
             serviceList.Add(gridService);
             serviceList.Add(m_LocalOfflineIMService);
             if (m_LocalEconomyService != null)
@@ -360,7 +329,6 @@ namespace SilverSim.Grid.Standalone
                 account.Principal.HomeURI,
                 sessionInfo.SessionID,
                 sessionInfo.SecureSessionID,
-                sessionInfo.ServiceSessionID,
                 clientInfo,
                 account,
                 serviceList)
@@ -461,13 +429,7 @@ namespace SilverSim.Grid.Standalone
 
             try
             {
-                m_LocalPresenceService.Report(new PresenceInfo
-                {
-                    UserID = agent.Owner,
-                    SessionID = agent.SessionID,
-                    SecureSessionID = sessionInfo.SecureSessionID,
-                    RegionID = scene.ID
-                });
+                m_LocalUserSessionService[agent.SessionID, KnownUserSessionInfoVariables.LocationRegionID] = scene.ID.ToString();
             }
             catch (Exception e)
             {
