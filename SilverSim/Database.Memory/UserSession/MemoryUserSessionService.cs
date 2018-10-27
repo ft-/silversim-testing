@@ -42,22 +42,6 @@ namespace SilverSim.Database.Memory.UserSession
             /* intentionally left empty */
         }
 
-        public override UserSessionInfo this[UUID sessionID]
-        {
-            get
-            {
-                lock (m_UserSessionLock)
-                {
-                    UserSessionInfo info;
-                    if (m_UserSessions.TryGetValue(sessionID, out info))
-                    {
-                        return new UserSessionInfo(info);
-                    }
-                }
-                throw new KeyNotFoundException();
-            }
-        }
-
         public override List<UserSessionInfo> this[UGUI user]
         {
             get

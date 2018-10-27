@@ -32,7 +32,19 @@ namespace SilverSim.ServiceInterfaces.UserSession
         public abstract UserSessionInfo CreateSession(UGUI user, string clientIPAddress, UUID sessionID, UUID secureSessionID);
 
         #region Session access
-        public abstract UserSessionInfo this[UUID sessionID] { get; }
+        public UserSessionInfo this[UUID sessionID]
+        {
+            get
+            {
+                UserSessionInfo info;
+                if(!TryGetValue(sessionID , out info))
+                {
+                    throw new KeyNotFoundException();
+                }
+                return info;
+            }
+        }
+
         public abstract List<UserSessionInfo> this[UGUI user] { get; }
         public abstract bool TryGetValue(UUID sessionID, out UserSessionInfo sessionInfo);
         public abstract bool TryGetSecureValue(UUID secureSessionID, out UserSessionInfo sessionInfo);
