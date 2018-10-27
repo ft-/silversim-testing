@@ -27,6 +27,6 @@ namespace SilverSim.ServiceInterfaces.Account
     /**<summary>Defines account deletion service</summary>**/
     public interface IUserAccountDeleteServiceInterface
     {
-        void Remove(UUID scopeID, UUID accountID);
+        void Remove(UUID accountID);
     }
 }

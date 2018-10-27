@@ -90,10 +90,6 @@ namespace SilverSim.WebIF.Admin.UserServer
             }
             account.Principal.FirstName = firstname;
             account.Principal.LastName = lastname;
-            if (!jsondata.TryGetValue("scopeid", out account.ScopeID))
-            {
-                account.ScopeID = UUID.Zero;
-            }
             int ival;
             string sval;
             uint uval;
@@ -138,7 +134,7 @@ namespace SilverSim.WebIF.Admin.UserServer
             }
             catch
             {
-                m_UserAccountService.Remove(account.ScopeID, account.Principal.ID);
+                m_UserAccountService.Remove(account.Principal.ID);
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotPossible);
                 return;
             }
@@ -165,7 +161,7 @@ namespace SilverSim.WebIF.Admin.UserServer
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
                 return;
             }
-            if(!m_UserAccountService.TryGetValue(UUID.Zero, userid, out account))
+            if(!m_UserAccountService.TryGetValue(userid, out account))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
                 return;
@@ -187,15 +183,15 @@ namespace SilverSim.WebIF.Admin.UserServer
             {
                 if (jsondata.TryGetValue("usertitle", out sval))
                 {
-                    m_UserAccountService.SetUserTitle(account.ScopeID, account.Principal.ID, sval);
+                    m_UserAccountService.SetUserTitle(account.Principal.ID, sval);
                 }
                 if (jsondata.TryGetValue("userflags", out uval))
                 {
-                    m_UserAccountService.SetUserFlags(account.ScopeID, account.Principal.ID, (UserFlags)uval);
+                    m_UserAccountService.SetUserFlags(account.Principal.ID, (UserFlags)uval);
                 }
                 if (jsondata.TryGetValue("email", out sval))
                 {
-                    m_UserAccountService.SetEmail(account.ScopeID, account.Principal.ID, sval);
+                    m_UserAccountService.SetEmail(account.Principal.ID, sval);
                 }
             }
             catch
@@ -210,18 +206,13 @@ namespace SilverSim.WebIF.Admin.UserServer
         private void HandleUserAccountDelete(HttpRequest req, Map jsondata)
         {
             UUID id;
-            UUID scopeid;
             if (!jsondata.TryGetValue("id", out id))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
                 return;
             }
-            if (!jsondata.TryGetValue("scopeid", out scopeid))
-            {
-                scopeid = UUID.Zero;
-            }
 
-            if (!m_UserAccountService.ContainsKey(scopeid, id))
+            if (!m_UserAccountService.ContainsKey(id))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
@@ -231,7 +222,7 @@ namespace SilverSim.WebIF.Admin.UserServer
                 {
                     try
                     {
-                        delService.Remove(scopeid, id);
+                        delService.Remove(id);
                     }
                     catch
                     {
@@ -254,7 +245,7 @@ namespace SilverSim.WebIF.Admin.UserServer
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
                 return;
             }
-            else if (!m_UserAccountService.ContainsKey(UUID.Zero, id))
+            else if (!m_UserAccountService.ContainsKey(id))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
@@ -292,14 +283,9 @@ namespace SilverSim.WebIF.Admin.UserServer
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
                 return;
             }
-            UUID scopeid;
-            if (!jsondata.TryGetValue("scopeid", out scopeid))
-            {
-                scopeid = UUID.Zero;
-            }
 
             UserAccount acc;
-            if (m_UserAccountService.TryGetValue(scopeid, id, out acc))
+            if (m_UserAccountService.TryGetValue(id, out acc))
             {
                 var result = new Map
                 {
@@ -328,13 +314,8 @@ namespace SilverSim.WebIF.Admin.UserServer
         {
             var res = new Map();
             var accountsRes = new AnArray();
-            UUID scopeid;
             int start = 0;
             int count = 1000;
-            if (!jsondata.TryGetValue("scopeid", out scopeid))
-            {
-                scopeid = UUID.Zero;
-            }
             string query;
             if (!jsondata.TryGetValue("query", out query))
             {
@@ -354,7 +335,7 @@ namespace SilverSim.WebIF.Admin.UserServer
             {
                 count = 1000;
             }
-            foreach (var acc in m_UserAccountService.GetAccounts(scopeid, query))
+            foreach (var acc in m_UserAccountService.GetAccounts(query))
             {
                 if (start > 0)
                 {
@@ -368,7 +349,6 @@ namespace SilverSim.WebIF.Admin.UserServer
                     }
                     var accountData = new Map
                     {
-                        { "scopeid", acc.ScopeID },
                         { "id", acc.Principal.ID },
                         { "firstname", acc.Principal.FirstName },
                         { "lastname", acc.Principal.LastName }

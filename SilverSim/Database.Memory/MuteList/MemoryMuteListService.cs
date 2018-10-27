@@ -63,7 +63,7 @@ namespace SilverSim.Database.Memory.MuteList
             return m_MuteLists.TryGetValue(muteListOwnerID, out list) && list.Remove(GetKey(muteID, muteName));
         }
 
-        public void Remove(UUID scopeID, UUID accountID)
+        public void Remove(UUID accountID)
         {
             m_MuteLists.Remove(accountID);
         }

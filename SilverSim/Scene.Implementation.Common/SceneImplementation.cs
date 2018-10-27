@@ -175,7 +175,6 @@ namespace SilverSim.Scene.Implementation.Common
             Name = ri.Name;
             Owner = ri.Owner;
             GridPosition = ri.Location;
-            ScopeID = ri.ScopeID;
             ProductName = ri.ProductName;
             RegionPort = ri.ServerPort;
             m_ExternalHostNameService = sceneParams.ExternalHostNameService;
@@ -470,10 +469,9 @@ namespace SilverSim.Scene.Implementation.Common
                 if (timeLeft == 0)
                 {
                     UUID sceneID = scene.ID;
-                    UUID scopeID = scene.ScopeID;
                     RegionInfo rInfo;
                     m_WeakScene.Target = null;
-                    if (m_RegionStorage.TryGetValue(scopeID, sceneID, out rInfo))
+                    if (m_RegionStorage.TryGetValue(sceneID, out rInfo))
                     {
                         m_Log.InfoFormat("Restarting Region {0} ({1})", rInfo.Name, rInfo.ID.ToString());
                         m_Scenes.Remove(scene,

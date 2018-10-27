@@ -284,8 +284,7 @@ namespace SilverSim.Scene.Types.Scene
             var reqmap = new Map
             {
                 ["to_region_id"] = destinationInfo.ID,
-                ["from_region_id"] = ID,
-                ["scope_id"] = ScopeID
+                ["from_region_id"] = ID
             };
             byte[] reqdata;
             using(var ms = new MemoryStream())

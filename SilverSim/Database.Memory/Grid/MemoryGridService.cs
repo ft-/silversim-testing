@@ -78,9 +78,9 @@ namespace SilverSim.Database.MySQL.Grid
         #endregion
 
         #region Accessors
-        public override bool TryGetValue(UUID scopeID, UUID regionID, out RegionInfo rInfo)
+        public override bool TryGetValue(UUID regionID, out RegionInfo rInfo)
         {
-            if(m_Data.TryGetValue(regionID, out rInfo) && rInfo.ScopeID == scopeID)
+            if(m_Data.TryGetValue(regionID, out rInfo))
             {
                 rInfo = new RegionInfo(rInfo);
                 return true;
@@ -88,18 +88,17 @@ namespace SilverSim.Database.MySQL.Grid
             return false;
         }
 
-        public override bool ContainsKey(UUID scopeID, UUID regionID)
+        public override bool ContainsKey(UUID regionID)
         {
             RegionInfo rInfo;
-            return m_Data.TryGetValue(regionID, out rInfo) && (scopeID == UUID.Zero || scopeID == rInfo.ScopeID);
+            return m_Data.TryGetValue(regionID, out rInfo);
         }
 
-        public override bool TryGetValue(UUID scopeID, uint gridX, uint gridY, out RegionInfo rInfo)
+        public override bool TryGetValue(uint gridX, uint gridY, out RegionInfo rInfo)
         {
             var res = from region in m_Data.Values
                                           where region.Location.X <= gridX && region.Location.Y <= gridY &&
-             region.Location.X + region.Size.X > gridX && region.Location.Y + region.Size.Y > gridY &&
-             (scopeID == UUID.Zero || scopeID == region.ScopeID)
+             region.Location.X + region.Size.X > gridX && region.Location.Y + region.Size.Y > gridY
                                           select region;
             foreach(RegionInfo regionInfo in res)
             {
@@ -111,12 +110,11 @@ namespace SilverSim.Database.MySQL.Grid
             return false;
         }
 
-        public override bool ContainsKey(UUID scopeID, uint gridX, uint gridY)
+        public override bool ContainsKey(uint gridX, uint gridY)
         {
             var res = from region in m_Data.Values
                                           where region.Location.X <= gridX && region.Location.Y <= gridY &&
-             region.Location.X + region.Size.X > gridX && region.Location.Y + region.Size.Y > gridY &&
-             (scopeID == UUID.Zero || scopeID == region.ScopeID)
+             region.Location.X + region.Size.X > gridX && region.Location.Y + region.Size.Y > gridY
                                           select true;
             foreach (bool f in res)
             {
@@ -126,11 +124,10 @@ namespace SilverSim.Database.MySQL.Grid
             return false;
         }
 
-        public override bool TryGetValue(UUID scopeID, string regionName, out RegionInfo rInfo)
+        public override bool TryGetValue(string regionName, out RegionInfo rInfo)
         {
             var res = from region in m_Data.Values
-                                          where region.Name.Equals(regionName, StringComparison.OrdinalIgnoreCase) &&
-             (scopeID == UUID.Zero || scopeID == region.ScopeID)
+                                          where region.Name.Equals(regionName, StringComparison.OrdinalIgnoreCase)
                                           select region;
             foreach (RegionInfo regionInfo in res)
             {
@@ -142,11 +139,10 @@ namespace SilverSim.Database.MySQL.Grid
             return false;
         }
 
-        public override bool ContainsKey(UUID scopeID, string regionName)
+        public override bool ContainsKey(string regionName)
         {
             var res = from region in m_Data.Values
-                                          where region.Name.Equals(regionName, StringComparison.OrdinalIgnoreCase) &&
-             (scopeID == UUID.Zero || scopeID == region.ScopeID)
+                                          where region.Name.Equals(regionName, StringComparison.OrdinalIgnoreCase)
                                           select true;
             foreach (bool f in res)
             {
@@ -155,10 +151,6 @@ namespace SilverSim.Database.MySQL.Grid
 
             return false;
         }
-
-        public override bool TryGetValue(UUID regionID, out RegionInfo rInfo) => m_Data.TryGetValue(regionID, out rInfo);
-
-        public override bool ContainsKey(UUID regionID) => m_Data.ContainsKey(regionID);
         #endregion
 
         #region Region Registration
@@ -193,7 +185,7 @@ namespace SilverSim.Database.MySQL.Grid
             }
 
             RegionInfo oldRegion = null;
-            if (!AllowDuplicateRegionNames && TryGetValue(regionInfo.ScopeID, regionInfo.Name, out oldRegion) && oldRegion.ID != regionInfo.ID)
+            if (!AllowDuplicateRegionNames && TryGetValue(regionInfo.Name, out oldRegion) && oldRegion.ID != regionInfo.ID)
             {
                 throw new GridRegionUpdateFailedException("Duplicate region name");
             }
@@ -213,7 +205,7 @@ namespace SilverSim.Database.MySQL.Grid
                                            region.Location.Y + region.Size.Y > regionInfo.Location.Y &&
                                            region.Location.X + region.Size.X < regionInfo.Location.X + regionInfo.Size.X &&
                                            region.Location.Y + region.Size.Y < regionInfo.Location.Y + regionInfo.Size.Y)) &&
-                                           region.ID != regionInfo.ID && region.ScopeID == regionInfo.ScopeID
+                                           region.ID != regionInfo.ID
                                     select true;
 
             foreach(bool f in res)
@@ -224,62 +216,59 @@ namespace SilverSim.Database.MySQL.Grid
             m_Data[regionInfo.ID] = regionInfo;
         }
 
-        public override void UnregisterRegion(UUID scopeID, UUID regionID)
+        public override void UnregisterRegion(UUID regionID)
         {
             if(IsDeleteOnUnregister)
             {
                 /* first line deletes only when region is not persistent */
-                m_Data.RemoveIf(regionID, (RegionInfo regInfo) => (scopeID == UUID.Zero || regInfo.ScopeID == scopeID) && (regInfo.Flags & RegionFlags.Persistent) == 0);
+                m_Data.RemoveIf(regionID, (RegionInfo regInfo) => (regInfo.Flags & RegionFlags.Persistent) == 0);
                 /* second step is to set it offline when it is persistent */
             }
 
             RegionInfo rInfo;
-            if(m_Data.TryGetValue(regionID, out rInfo) && (scopeID == UUID.Zero || rInfo.ScopeID == scopeID))
+            if(m_Data.TryGetValue(regionID, out rInfo))
             {
                 rInfo.Flags &= ~RegionFlags.RegionOnline;
             }
         }
 
-        public override void DeleteRegion(UUID scopeID, UUID regionID)
+        public override void DeleteRegion(UUID regionID)
         {
-            m_Data.RemoveIf(regionID, (RegionInfo rInfo) => scopeID == UUID.Zero || rInfo.ScopeID == scopeID);
+            m_Data.Remove(regionID);
         }
 
         #endregion
 
         #region List accessors
-        private List<RegionInfo> GetRegionsByFlag(UUID scopeID, RegionFlags flags)
+        private List<RegionInfo> GetRegionsByFlag(RegionFlags flags)
         {
-            var res = from region in m_Data.Values where (scopeID == UUID.Zero || region.ScopeID == scopeID) && (region.Flags & flags) != 0 select new RegionInfo(region);
+            var res = from region in m_Data.Values where (region.Flags & flags) != 0 select new RegionInfo(region);
             return new List<RegionInfo>(res);
         }
 
-        public override List<RegionInfo> GetHyperlinks(UUID scopeID) => GetRegionsByFlag(scopeID, RegionFlags.Hyperlink);
+        public override List<RegionInfo> GetHyperlinks() => GetRegionsByFlag(RegionFlags.Hyperlink);
 
-        public override List<RegionInfo> GetDefaultRegions(UUID scopeID) => GetRegionsByFlag(scopeID, RegionFlags.DefaultRegion);
+        public override List<RegionInfo> GetDefaultRegions() => GetRegionsByFlag(RegionFlags.DefaultRegion);
 
-        public override List<RegionInfo> GetOnlineRegions(UUID scopeID) => GetRegionsByFlag(scopeID, RegionFlags.RegionOnline);
+        public override List<RegionInfo> GetOnlineRegions() => GetRegionsByFlag(RegionFlags.RegionOnline);
 
-        public override List<RegionInfo> GetOnlineRegions() => GetRegionsByFlag(UUID.Zero, RegionFlags.RegionOnline);
+        public override List<RegionInfo> GetFallbackRegions() => GetRegionsByFlag(RegionFlags.FallbackRegion);
 
-        public override List<RegionInfo> GetFallbackRegions(UUID scopeID) => GetRegionsByFlag(scopeID, RegionFlags.FallbackRegion);
+        public override List<RegionInfo> GetDefaultIntergridRegions() => GetRegionsByFlag(RegionFlags.DefaultIntergridRegion);
 
-        public override List<RegionInfo> GetDefaultIntergridRegions(UUID scopeID) => GetRegionsByFlag(scopeID, RegionFlags.DefaultIntergridRegion);
-
-        public override List<RegionInfo> GetRegionsByRange(UUID scopeID, GridVector min, GridVector max)
+        public override List<RegionInfo> GetRegionsByRange(GridVector min, GridVector max)
         {
             var res = from region in m_Data.Values where
-                                            (region.Location.X + region.Size.X >= min.X && region.Location.X <= max.X && 
-                                            region.Location.Y + region.Size.Y > min.Y && region.Location.Y <= max.Y) &&
-                                            (scopeID == UUID.Zero || scopeID == region.ScopeID)
+                                            region.Location.X + region.Size.X >= min.X && region.Location.X <= max.X && 
+                                            region.Location.Y + region.Size.Y > min.Y && region.Location.Y <= max.Y
                                             select new RegionInfo(region);
 
             return new List<RegionInfo>(res);
         }
 
-        public override List<RegionInfo> GetNeighbours(UUID scopeID, UUID regionID)
+        public override List<RegionInfo> GetNeighbours(UUID regionID)
         {
-            RegionInfo ri = this[scopeID, regionID];
+            RegionInfo ri = this[regionID];
             var res = from region in m_Data.Values
                                           where
                                           (
@@ -287,18 +276,16 @@ namespace SilverSim.Database.MySQL.Grid
                                           (region.Location.Y <= ri.Location.Y + ri.Size.Y && region.Location.Y + region.Size.Y >= ri.Location.Y)) ||
                                           ((region.Location.Y == ri.Location.Y + ri.Size.Y || region.Location.Y + region.Size.Y == ri.Location.Y) &&
                                           (region.Location.X <= ri.Location.X + ri.Size.X && region.Location.X + region.Size.X >= ri.Location.X)))
-                                          &&
-             (scopeID == UUID.Zero || scopeID == region.ScopeID)
                                           select new RegionInfo(region);
 
             return new List<RegionInfo>(res);
         }
 
-        public override List<RegionInfo> GetAllRegions(UUID scopeID) =>
-            new List<RegionInfo>(from region in m_Data.Values where scopeID == UUID.Zero || region.ScopeID == scopeID select new RegionInfo(region));
+        public override List<RegionInfo> GetAllRegions() =>
+            new List<RegionInfo>(m_Data.Values);
 
-        public override List<RegionInfo> SearchRegionsByName(UUID scopeID, string searchString) =>
-            new List<RegionInfo>(from region in m_Data.Values where (scopeID == UUID.Zero || region.ScopeID == scopeID) && region.Name.StartsWith(searchString, StringComparison.OrdinalIgnoreCase) select new RegionInfo(region));
+        public override List<RegionInfo> SearchRegionsByName(string searchString) =>
+            new List<RegionInfo>(from region in m_Data.Values where region.Name.StartsWith(searchString, StringComparison.OrdinalIgnoreCase) select new RegionInfo(region));
 
         public override Dictionary<string, string> GetGridExtraFeatures() =>
             new Dictionary<string, string>();

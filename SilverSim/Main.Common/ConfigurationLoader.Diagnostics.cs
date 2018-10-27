@@ -163,7 +163,7 @@ namespace SilverSim.Main.Common
             if (m_RegionStorage != null)
             {
                 sb.Append("\nUDP Ports:\n----------------------------------------------\n");
-                foreach (RegionInfo region in m_RegionStorage.GetAllRegions(UUID.Zero))
+                foreach (RegionInfo region in m_RegionStorage.GetAllRegions())
                 {
                     string status = Scenes.ContainsKey(region.ID) ? "online" : "offline";
                     sb.AppendFormat("Region \"{0}\" ({1})\n- Port: {2}\n- Status: ({3})\n", region.Name, region.ID, region.ServerPort, status);

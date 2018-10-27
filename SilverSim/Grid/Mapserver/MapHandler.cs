@@ -40,14 +40,12 @@ namespace SilverSim.Grid.Mapserver
         private readonly string m_MaptileServiceName;
         private MaptileServiceInterface m_MaptileService;
         private Regex m_Regex = new Regex("/^map-(?<ZOOM>[0-9]+)-(?<X>[0-9]+)-(?<Y>[0-9]+)-.+\\.jpg$/");
-        private UUID m_ScopeID = UUID.Zero;
         private BaseHttpServer m_HttpServer;
         private BaseHttpServer m_HttpsServer;
 
         public MapHandler(IConfig ownSection)
         {
             m_MaptileServiceName = ownSection.GetString("MaptileService", "MaptileService");
-            m_ScopeID = UUID.Parse(ownSection.GetString("ScopeID", UUID.Zero.ToString()));
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -87,7 +85,7 @@ namespace SilverSim.Grid.Mapserver
                     };
 
                     MaptileData maptile;
-                    if(m_MaptileService.TryGetValue(m_ScopeID, gv, zoom, out maptile))
+                    if(m_MaptileService.TryGetValue(gv, zoom, out maptile))
                     {
                         using (HttpResponse res = req.BeginResponse(maptile.ContentType))
                         {

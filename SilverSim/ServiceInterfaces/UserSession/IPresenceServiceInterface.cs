@@ -25,6 +25,10 @@ namespace SilverSim.ServiceInterfaces.UserSession
 {
     public interface IPresenceServiceInterface
     {
-        bool Remove(UUID sessionID);
+        bool Logout();
+
+        bool Logout(UUID regionID, Vector3 position, Vector3 lookAt);
+
+        bool Report(UUID regionID);
     }
 }

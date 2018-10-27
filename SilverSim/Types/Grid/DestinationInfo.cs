@@ -49,7 +49,6 @@ namespace SilverSim.Types.Grid
             RegionSecret = ri.RegionSecret;
             Owner = new UGUI(ri.Owner);
             Flags = ri.Flags;
-            ScopeID = ri.ScopeID;
         }
         #endregion
 

@@ -53,7 +53,6 @@ namespace SilverSim.Types.Grid
             GridURI = src.GridURI;
             AuthenticatingPrincipal = new UGUI(src.AuthenticatingPrincipal);
             AuthenticatingToken = src.AuthenticatingToken;
-            ScopeID = src.ScopeID;
         }
         #endregion
 
@@ -107,10 +106,6 @@ namespace SilverSim.Types.Grid
         #region Authentication Info
         public UGUI AuthenticatingPrincipal = UGUI.Unknown;
         public string AuthenticatingToken = string.Empty;
-        #endregion
-
-        #region Informational Fields
-        public UUID ScopeID = UUID.Zero;
         #endregion
     }
 }

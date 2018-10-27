@@ -42,11 +42,9 @@ namespace SilverSim.WebIF.Admin.MapServer
         private GridServiceInterface m_GridService;
         private RegionDefaultFlagsServiceInterface m_RegionDefaultFlagsService;
         private IAdminWebIF m_WebIF;
-        private readonly UUID m_ScopeID;
 
         public MapServerAdmin(IConfig ownSection)
         {
-            m_ScopeID = new UUID(ownSection.GetString("ScopeID", UUID.Zero.ToString()));
             m_GridServiceName = ownSection.GetString("GridService", "GridService");
             m_RegionDefaultFlagsServiceName = ownSection.GetString("RegionDefaultFlagsService", "RegionDefaultFlagsService");
         }
@@ -98,13 +96,13 @@ namespace SilverSim.WebIF.Admin.MapServer
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
-            else if(!m_GridService.ContainsKey(m_ScopeID, regionId))
+            else if(!m_GridService.ContainsKey(regionId))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
             else
             {
-                m_GridService.UnregisterRegion(m_ScopeID, regionId);
+                m_GridService.UnregisterRegion(regionId);
                 m_WebIF.SuccessResponse(req, new Map());
             }
         }
@@ -200,7 +198,7 @@ namespace SilverSim.WebIF.Admin.MapServer
             List<RegionInfo> regions;
             try
             {
-                regions = m_GridService.GetDefaultIntergridRegions(m_ScopeID);
+                regions = m_GridService.GetDefaultIntergridRegions();
             }
             catch
             {
@@ -216,7 +214,7 @@ namespace SilverSim.WebIF.Admin.MapServer
             List<RegionInfo> regions;
             try
             {
-                regions = m_GridService.GetDefaultRegions(m_ScopeID);
+                regions = m_GridService.GetDefaultRegions();
             }
             catch
             {
@@ -232,7 +230,7 @@ namespace SilverSim.WebIF.Admin.MapServer
             List<RegionInfo> regions;
             try
             {
-                regions = m_GridService.GetFallbackRegions(m_ScopeID);
+                regions = m_GridService.GetFallbackRegions();
             }
             catch
             {
@@ -255,7 +253,7 @@ namespace SilverSim.WebIF.Admin.MapServer
             List<RegionInfo> regions;
             try
             {
-                regions = m_GridService.SearchRegionsByName(UUID.Zero, searchkey);
+                regions = m_GridService.SearchRegionsByName(searchkey);
             }
             catch
             {

@@ -203,7 +203,7 @@ namespace SilverSim.Viewer.Profile
             get { return new DummyProperties(); }
         }
 
-        public override void Remove(UUID scopeID, UUID accountID)
+        public override void Remove(UUID accountID)
         {
             throw new NotSupportedException();
         }

@@ -612,7 +612,7 @@ namespace SilverSim.Viewer.Parcel
                     HandleParcelInfoOnLocal(circuit, location, scene, req);
                 }
             }
-            else if (scene.GridService.TryGetValue(scene.ScopeID, req.ParcelID.Location, out regionInfo))
+            else if (scene.GridService.TryGetValue(req.ParcelID.Location, out regionInfo))
             {
                 SceneInterface remoteSceneLocal;
                 if(m_Scenes.TryGetValue(regionInfo.ID, out remoteSceneLocal))
@@ -682,7 +682,7 @@ namespace SilverSim.Viewer.Parcel
                     {
                         parcelid = new ParcelID(v, new Vector3(x, y, 0));
                     }
-                    else if(scene.GridService.TryGetValue(scene.ScopeID, v, out rInfo))
+                    else if(scene.GridService.TryGetValue(v, out rInfo))
                     {
                         /* shift coordinate to actual region begin */
                         Vector3 offset = (Vector3)v - rInfo.Location;

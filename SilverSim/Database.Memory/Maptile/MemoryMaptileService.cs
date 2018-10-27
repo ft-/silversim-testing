@@ -35,18 +35,18 @@ namespace SilverSim.Database.Memory.Maptile
     {
         private readonly RwLockedDictionary<string, MaptileData> m_Maptiles = new RwLockedDictionary<string, MaptileData>();
 
-        private static string GetKey(UUID scopeid, GridVector loc, int zoomlevel) =>
-            string.Format("{0}-{1}-{2}-{3}", scopeid.ToString(), loc.X, loc.Y, zoomlevel);
+        private static string GetKey(GridVector loc, int zoomlevel) =>
+            string.Format("{0}-{1}-{2}", loc.X, loc.Y, zoomlevel);
 
         private static string GetKey(MaptileData data) =>
-            GetKey(data.ScopeID, data.Location, data.ZoomLevel);
+            GetKey(data.Location, data.ZoomLevel);
 
-        public override List<MaptileInfo> GetUpdateTimes(UUID scopeid, GridVector minloc, GridVector maxloc, int zoomlevel)
+        public override List<MaptileInfo> GetUpdateTimes(GridVector minloc, GridVector maxloc, int zoomlevel)
         {
             var infos = new List<MaptileInfo>();
             foreach(MaptileData data in m_Maptiles.Values)
             {
-                if(data.ScopeID == scopeid && data.ZoomLevel == zoomlevel && data.Location.X >= minloc.X && data.Location.Y >= minloc.Y && data.Location.X <= maxloc.X && data.Location.Y <= maxloc.Y)
+                if(data.ZoomLevel == zoomlevel && data.Location.X >= minloc.X && data.Location.Y >= minloc.Y && data.Location.X <= maxloc.X && data.Location.Y <= maxloc.Y)
                 {
                     infos.Add(new MaptileInfo(data));
                 }
@@ -64,10 +64,10 @@ namespace SilverSim.Database.Memory.Maptile
             m_Maptiles[GetKey(data)] = new MaptileData(data);
         }
 
-        public override bool Remove(UUID scopeid, GridVector location, int zoomlevel) =>
-            m_Maptiles.Remove(GetKey(scopeid, location, zoomlevel));
+        public override bool Remove(GridVector location, int zoomlevel) =>
+            m_Maptiles.Remove(GetKey(location, zoomlevel));
 
-        public override bool TryGetValue(UUID scopeid, GridVector location, int zoomlevel, out MaptileData data) =>
-            m_Maptiles.TryGetValue(GetKey(scopeid, location, zoomlevel), out data);
+        public override bool TryGetValue(GridVector location, int zoomlevel, out MaptileData data) =>
+            m_Maptiles.TryGetValue(GetKey(location, zoomlevel), out data);
     }
 }

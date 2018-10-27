@@ -42,7 +42,7 @@ namespace SilverSim.Database.Memory.Profile
 
         public override IPropertiesInterface Properties => this;
 
-        public override void Remove(UUID scopeID, UUID accountID)
+        public override void Remove(UUID accountID)
         {
             m_Classifieds.Remove(accountID);
             m_Notes.Remove(accountID);

@@ -392,32 +392,20 @@ namespace SilverSim.Grid.Login
             loginData.ClientInfo.ClientIP = req.CallerIP;
             loginData.DestinationInfo.StartLocation = loginParams["start"];
 
-            UUID scopeId = UUID.Zero;
             IValue iv;
-            if(structParam.TryGetValue("scope_id", out iv) &&
-                !UUID.TryParse(iv.ToString(), out scopeId))
-            {
-                m_Log.ErrorFormat("Request from {0} does not contain invalid parameter scope_id", req.CallerIP);
-                throw new XmlRpc.XmlRpcFaultException(4, "Invalid parameter scope_id");
-            }
 
             try
             {
-                loginData.Account = m_UserAccountService[scopeId, firstName, lastName];
+                loginData.Account = m_UserAccountService[firstName, lastName];
             }
             catch
             {
-                m_Log.ErrorFormat("Request from {0} does not reference a known account {2} {3} (Scope {1})", req.CallerIP, scopeId, firstName, lastName);
-                return LoginFailResponse("key", "Could not authenticate your avatar. Please check your username and password, and check the grid if problems persist.");
-            }
-            if (scopeId != loginData.Account.ScopeID && loginData.Account.ScopeID != UUID.Zero)
-            {
-                m_Log.ErrorFormat("Request from {0} does not reference a valid account {2} {3} (Scope {1})", req.CallerIP, scopeId, firstName, lastName);
+                m_Log.ErrorFormat("Request from {0} does not reference a known account {1} {2}", req.CallerIP, firstName, lastName);
                 return LoginFailResponse("key", "Could not authenticate your avatar. Please check your username and password, and check the grid if problems persist.");
             }
             if(loginData.Account.UserLevel < 0)
             {
-                m_Log.ErrorFormat("Request from {0} does not reference an enabled account {2} {3} (Scope {1})", req.CallerIP, scopeId, firstName, lastName);
+                m_Log.ErrorFormat("Request from {0} does not reference an enabled account {1} {2}", req.CallerIP, firstName, lastName);
                 return LoginFailResponse("key", "Could not authenticate your avatar. Account has been disabled.");
             }
             loginData.Account.Principal.HomeURI = new Uri(m_HomeUri, UriKind.Absolute);
@@ -429,7 +417,7 @@ namespace SilverSim.Grid.Login
                 {
                     loginData.LoginOptions.Add(ivopt.ToString());
 #if DEBUG
-                    m_Log.DebugFormat("Requested login option {0} for {1} {2} (Scope {3})", ivopt.ToString(), firstName, lastName, scopeId);
+                    m_Log.DebugFormat("Requested login option {0} for {1} {2}", ivopt.ToString(), firstName, lastName);
 #endif
                 }
             }
@@ -445,7 +433,7 @@ namespace SilverSim.Grid.Login
                 (Exception e)
 #endif
             {
-                m_Log.ErrorFormat("Request from {0} failed to authenticate account {2} {3} (Scope {1})", req.CallerIP, scopeId, firstName, lastName);
+                m_Log.ErrorFormat("Request from {0} failed to authenticate account {1} {2}", req.CallerIP, firstName, lastName);
 #if DEBUG
                 m_Log.Debug("Exception", e);
 #endif
@@ -632,7 +620,7 @@ namespace SilverSim.Grid.Login
             switch (loginData.DestinationInfo.StartLocation)
             {
                 case "home":
-                    if (m_UserAccountService.TryGetHomeRegion(loginData.Account.ScopeID, loginData.Account.Principal.ID, out userRegion))
+                    if (m_UserAccountService.TryGetHomeRegion(loginData.Account.Principal.ID, out userRegion))
                     {
                         if(userRegion.GatekeeperURI != null)
                         {
@@ -690,7 +678,7 @@ namespace SilverSim.Grid.Login
                     break;
 
                 case "last":
-                    if (m_UserAccountService.TryGetLastRegion(loginData.Account.ScopeID, loginData.Account.Principal.ID, out userRegion))
+                    if (m_UserAccountService.TryGetLastRegion(loginData.Account.Principal.ID, out userRegion))
                     {
                         if (userRegion.GatekeeperURI != null)
                         {
@@ -799,7 +787,7 @@ namespace SilverSim.Grid.Login
                             m_Log.DebugFormat("URI for agent {0} is not usable", loginData.Account.Principal);
 #endif
                         }
-                        else if (m_GridService.TryGetValue(loginData.Account.ScopeID, uriMatch.Groups[1].Value, out ri))
+                        else if (m_GridService.TryGetValue(uriMatch.Groups[1].Value, out ri))
                         {
 #if DEBUG
                             m_Log.DebugFormat("URI for agent {0} is own-grid", loginData.Account.Principal);
@@ -963,7 +951,7 @@ namespace SilverSim.Grid.Login
                 var userCaps = new Dictionary<string, string>();
 
 #if DEBUG
-                m_Log.DebugFormat("Providing user caps for {0} {1} (Scope {2})", loginData.Account.Principal.FirstName, loginData.Account.Principal.LastName, loginData.Account.ScopeID);
+                m_Log.DebugFormat("Providing user caps for {0} {1}", loginData.Account.Principal.FirstName, loginData.Account.Principal.LastName);
 #endif
 
                 foreach (ILoginUserCapsGetInterface service in m_UserCapsGetters)
@@ -974,7 +962,7 @@ namespace SilverSim.Grid.Login
                 foreach(KeyValuePair<string, string> kvp in userCaps)
                 {
 #if DEBUG
-                    m_Log.DebugFormat("Providing user caps {0} for {1} {2} (Scope {3})", kvp.Key, loginData.Account.Principal.FirstName, loginData.Account.Principal.LastName, loginData.Account.ScopeID);
+                    m_Log.DebugFormat("Providing user caps {0} for {1} {2}", kvp.Key, loginData.Account.Principal.FirstName, loginData.Account.Principal.LastName);
 #endif
                     usercaparray.Add(new Map
                     {
@@ -1179,7 +1167,7 @@ namespace SilverSim.Grid.Login
             {
                 try
                 {
-                    m_UserAccountService.SetEverLoggedIn(loginData.Account.ScopeID, loginData.Account.Principal.ID);
+                    m_UserAccountService.SetEverLoggedIn(loginData.Account.Principal.ID);
                 }
                 catch
                 {

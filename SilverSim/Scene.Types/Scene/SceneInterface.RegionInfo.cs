@@ -33,7 +33,7 @@ namespace SilverSim.Scene.Types.Scene
             Viewer.Messages.Region.RegionIDAndHandleReply res;
 
             RegionInfo ri;
-            if(GridService.TryGetValue(ScopeID, out ri))
+            if(GridService.TryGetValue(req.RegionID, out ri))
             {
                 res = new Viewer.Messages.Region.RegionIDAndHandleReply
                 {

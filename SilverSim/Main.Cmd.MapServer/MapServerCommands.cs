@@ -70,7 +70,7 @@ namespace SilverSim.Main.Cmd.MapServer
             else
             {
                 var sb = new StringBuilder("Regions:\n--------------------------------------------------\n");
-                foreach (RegionInfo ri in m_GridService.SearchRegionsByName(UUID.Zero, args[2]))
+                foreach (RegionInfo ri in m_GridService.SearchRegionsByName(args[2]))
                 {
                     sb.AppendFormat("Region {0}\n- ID: ({1})\n- Flags: {2}\n", ri.Name, ri.ID, ri.Flags.ToString());
                 }
@@ -103,7 +103,7 @@ namespace SilverSim.Main.Cmd.MapServer
                         break;
 
                     case "name":
-                        if (!m_GridService.TryGetValue(UUID.Zero, args[3], out ri))
+                        if (!m_GridService.TryGetValue(args[3], out ri))
                         {
                             io.WriteFormatted("region \"{0}\" is not known", args[3]);
                             return;
@@ -118,7 +118,7 @@ namespace SilverSim.Main.Cmd.MapServer
 
                 try
                 {
-                    m_GridService.UnregisterRegion(UUID.Zero, id);
+                    m_GridService.UnregisterRegion(id);
                 }
                 catch
                 {
@@ -182,7 +182,7 @@ namespace SilverSim.Main.Cmd.MapServer
                 else if(args[2] == "name")
                 {
                     RegionInfo ri;
-                    if(m_GridService.TryGetValue(UUID.Zero, args[3], out ri))
+                    if(m_GridService.TryGetValue(args[3], out ri))
                     {
                         id = ri.ID;
                     }
@@ -318,7 +318,7 @@ namespace SilverSim.Main.Cmd.MapServer
                 else if (args[2] == "name")
                 {
                     RegionInfo ri;
-                    if (m_GridService.TryGetValue(UUID.Zero, args[3], out ri))
+                    if (m_GridService.TryGetValue(args[3], out ri))
                     {
                         id = ri.ID;
                     }

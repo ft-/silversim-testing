@@ -550,7 +550,6 @@ namespace SilverSim.Main.Cmd.Region
                     "Parameters:\n" +
                     "name <name>\n" +
                     "port <port>\n" +
-                    "scopeid <uuid>\n" +
                     "productname <regiontype>\n" +
                     "owner <uui>|<uuid>|<firstname>.<lastname>\n" +
                     "estate <name>\n" +
@@ -558,7 +557,7 @@ namespace SilverSim.Main.Cmd.Region
                     "access pg|mature|adult\n" +
                     "staticmaptile <uuid>\n");
             }
-            else if (!m_RegionStorage.TryGetValue(UUID.Zero, args[2], out rInfo))
+            else if (!m_RegionStorage.TryGetValue(args[2], out rInfo))
             {
                 io.WriteFormatted("Region with name {0} does not exist.", args[2]);
             }
@@ -590,15 +589,6 @@ namespace SilverSim.Main.Cmd.Region
                             if (rInfo.ServerPort < 1 || rInfo.ServerPort > 65535)
                             {
                                 io.WriteFormatted("Port {0} is not valid", args[argi + 1]);
-                                return;
-                            }
-                            changeRegionData = true;
-                            break;
-
-                        case "scopeid":
-                            if (!UUID.TryParse(args[argi + 1], out rInfo.ScopeID))
-                            {
-                                io.WriteFormatted("{0} is not a valid UUID.", args[argi + 1]);
                                 return;
                             }
                             changeRegionData = true;
@@ -763,7 +753,6 @@ namespace SilverSim.Main.Cmd.Region
                         Flags = RegionFlags.RegionOnline,
                         ProductName = regionEntry.GetString("RegionType", "Mainland"),
                         Owner = new UGUI(regionEntry.GetString("Owner")),
-                        ScopeID = regionEntry.GetString("ScopeID", "00000000-0000-0000-0000-000000000000"),
                         ServerHttpPort = m_HttpServer.Port,
                         RegionMapTexture = regionEntry.GetString("MaptileStaticUUID", "00000000-0000-0000-0000-000000000000")
                     };
@@ -785,7 +774,7 @@ namespace SilverSim.Main.Cmd.Region
 
                     r.ServerIP = string.Empty;
                     RegionInfo rInfoCheck;
-                    if (m_RegionStorage.TryGetValue(UUID.Zero, r.Name, out rInfoCheck))
+                    if (m_RegionStorage.TryGetValue(r.Name, out rInfoCheck))
                     {
                         if (msg.Length != 0)
                         {
@@ -836,7 +825,6 @@ namespace SilverSim.Main.Cmd.Region
                 io.Write("create region <regionname> <port> <location> parameters...\n\n" +
                     "Parameters:\n" +
                     "regionid <uuid> - if not specified, a random uuid will be generated\n" +
-                    "scopeid <uuid>\n" +
                     "size <x>,<y> - region size (in number of regions)\n" +
                     "productname <regiontype>\n" +
                     "owner <uui>|<uuid>|<firstname>.<lastname>\n" +
@@ -855,7 +843,7 @@ namespace SilverSim.Main.Cmd.Region
                 io.WriteFormatted("Naming an region based on URI structure is not allowed. See {0}", args[2]);
                 return;
             }
-            else if (m_RegionStorage.TryGetValue(UUID.Zero, args[2], out rInfo))
+            else if (m_RegionStorage.TryGetValue(args[2], out rInfo))
             {
                 io.WriteFormatted("Region with name {0} already exists.", args[2]);
             }
@@ -869,7 +857,6 @@ namespace SilverSim.Main.Cmd.Region
                     ID = UUID.Random,
                     Access = RegionAccess.Mature,
                     ServerHttpPort = m_HttpServer.Port,
-                    ScopeID = UUID.Zero,
                     ServerIP = string.Empty,
                     Size = GridVector.StandardRegionSize,
                     ProductName = "Mainland"
@@ -910,14 +897,6 @@ namespace SilverSim.Main.Cmd.Region
 
                         case "regionid":
                             if (!UUID.TryParse(args[argi + 1], out rInfo.ID))
-                            {
-                                io.WriteFormatted("{0} is not a valid UUID.", args[argi + 1]);
-                                return;
-                            }
-                            break;
-
-                        case "scopeid":
-                            if (!UUID.TryParse(args[argi + 1], out rInfo.ScopeID))
                             {
                                 io.WriteFormatted("{0} is not a valid UUID.", args[argi + 1]);
                                 return;
@@ -1063,7 +1042,7 @@ namespace SilverSim.Main.Cmd.Region
             else
             {
                 RegionInfo rInfo;
-                if(!m_RegionStorage.TryGetValue(UUID.Zero, args[2], out rInfo))
+                if(!m_RegionStorage.TryGetValue(args[2], out rInfo))
                 {
                     io.WriteFormatted("Region '{0}' not found", args[2]);
                 }
@@ -1075,7 +1054,7 @@ namespace SilverSim.Main.Cmd.Region
                 {
                     m_SimulationData.RemoveRegion(rInfo.ID);
                     m_EstateService.RegionMap.Remove(rInfo.ID);
-                    m_RegionStorage.DeleteRegion(UUID.Zero, rInfo.ID);
+                    m_RegionStorage.DeleteRegion(rInfo.ID);
                     io.WriteFormatted("Region '{0}' deleted.", args[2]);
                 }
             }
@@ -1089,7 +1068,7 @@ namespace SilverSim.Main.Cmd.Region
             {
                 io.Write("restart region <regionname> seconds\nrestart region <regionname> abort");
             }
-            else if (!m_RegionStorage.TryGetValue(UUID.Zero, args[2], out rInfo))
+            else if (!m_RegionStorage.TryGetValue(args[2], out rInfo))
             {
                 io.Write("No region selected");
             }
@@ -1137,7 +1116,7 @@ namespace SilverSim.Main.Cmd.Region
             {
                 io.Write("missing region name");
             }
-            else if (m_RegionStorage.TryGetValue(UUID.Zero, args[2], out rInfo))
+            else if (m_RegionStorage.TryGetValue(args[2], out rInfo))
             {
                 m_RegionStorage.AddRegionFlags(rInfo.ID, RegionFlags.RegionOnline);
             }
@@ -1162,7 +1141,7 @@ namespace SilverSim.Main.Cmd.Region
             {
                 io.Write("missing region name");
             }
-            else if (m_RegionStorage.TryGetValue(UUID.Zero, args[2], out rInfo))
+            else if (m_RegionStorage.TryGetValue(args[2], out rInfo))
             {
                 m_RegionStorage.RemoveRegionFlags(rInfo.ID, RegionFlags.RegionOnline);
             }
@@ -1187,7 +1166,7 @@ namespace SilverSim.Main.Cmd.Region
             {
                 io.Write("missing region name");
             }
-            else if (m_RegionStorage.TryGetValue(UUID.Zero, args[2], out rInfo))
+            else if (m_RegionStorage.TryGetValue(args[2], out rInfo))
             {
                 SceneInterface si;
                 if (m_Scenes.TryGetValue(rInfo.ID, out si))
@@ -1235,7 +1214,7 @@ namespace SilverSim.Main.Cmd.Region
             {
                 io.Write("missing region name");
             }
-            else if (m_RegionStorage.TryGetValue(UUID.Zero, args[2], out rInfo))
+            else if (m_RegionStorage.TryGetValue(args[2], out rInfo))
             {
                 SceneInterface si;
                 if (!m_Scenes.TryGetValue(rInfo.ID, out si))
@@ -1612,7 +1591,7 @@ namespace SilverSim.Main.Cmd.Region
         private object GetRegionIdNamePairDataSource()
         {
             var result = new Dictionary<string, string>();
-            foreach (RegionInfo ri in m_RegionStorage.GetAllRegions(UUID.Zero))
+            foreach (RegionInfo ri in m_RegionStorage.GetAllRegions())
             {
                 result.Add(ri.ID.ToString(), ri.Name);
             }
@@ -1622,7 +1601,7 @@ namespace SilverSim.Main.Cmd.Region
         private object GetRegionIdsDataSource()
         {
             var result = new List<string>();
-            foreach (RegionInfo ri in m_RegionStorage.GetAllRegions(UUID.Zero))
+            foreach (RegionInfo ri in m_RegionStorage.GetAllRegions())
             {
                 result.Add(ri.ID.ToString());
             }
@@ -1642,7 +1621,7 @@ namespace SilverSim.Main.Cmd.Region
         private object GetDisabledRegionIdsDataSource()
         {
             var result = new List<string>();
-            foreach (RegionInfo ri in from rInfo in m_RegionStorage.GetAllRegions(UUID.Zero) where (rInfo.Flags & RegionFlags.RegionOnline) == 0 select rInfo)
+            foreach (RegionInfo ri in from rInfo in m_RegionStorage.GetAllRegions() where (rInfo.Flags & RegionFlags.RegionOnline) == 0 select rInfo)
             {
                 result.Add(ri.ID.ToString());
             }
@@ -1669,7 +1648,7 @@ namespace SilverSim.Main.Cmd.Region
             {
                 onlineRegions.Add(scene.ID);
             }
-            regions = from rInfo in m_RegionStorage.GetAllRegions(UUID.Zero) where !onlineRegions.Contains(rInfo.ID) select rInfo;
+            regions = from rInfo in m_RegionStorage.GetAllRegions() where !onlineRegions.Contains(rInfo.ID) select rInfo;
 
             foreach (RegionInfo ri in regions)
             {
@@ -1689,7 +1668,7 @@ namespace SilverSim.Main.Cmd.Region
             }
             else if (args.Count < 3)
             {
-                regions = m_RegionStorage.GetAllRegions(UUID.Zero);
+                regions = m_RegionStorage.GetAllRegions();
             }
             else if (args[2] == "enabled")
             {
@@ -1697,7 +1676,7 @@ namespace SilverSim.Main.Cmd.Region
             }
             else if (args[2] == "disabled")
             {
-                regions = from rInfo in m_RegionStorage.GetAllRegions(UUID.Zero) where (rInfo.Flags & RegionFlags.RegionOnline) == 0 select rInfo;
+                regions = from rInfo in m_RegionStorage.GetAllRegions() where (rInfo.Flags & RegionFlags.RegionOnline) == 0 select rInfo;
             }
             else if (args[2] == "online")
             {
@@ -1716,7 +1695,7 @@ namespace SilverSim.Main.Cmd.Region
                 {
                     onlineRegions.Add(scene.ID);
                 }
-                regions = from rInfo in m_RegionStorage.GetAllRegions(UUID.Zero) where !onlineRegions.Contains(rInfo.ID) select rInfo;
+                regions = from rInfo in m_RegionStorage.GetAllRegions() where !onlineRegions.Contains(rInfo.ID) select rInfo;
             }
             else
             {

@@ -179,7 +179,6 @@ namespace SilverSim.Scene.Types.Scene
         #endregion
 
         public UUID ID { get; protected set; }
-        public UUID ScopeID { get; protected set; }
         public UUID RegionSecret { get; }
         public uint RegionPort { get; protected set; }
         public abstract uint ServerHttpPort { get; }
@@ -408,7 +407,6 @@ namespace SilverSim.Scene.Types.Scene
             ParcelMapTexture = ParcelMapTexture,
             RegionMapTexture = RegionMapTexture,
             RegionSecret = (string)RegionSecret,
-            ScopeID = UUID.Zero,
             ServerIP = ExternalHostName,
             ServerPort = RegionPort,
             Size = new GridVector(SizeX, SizeY)

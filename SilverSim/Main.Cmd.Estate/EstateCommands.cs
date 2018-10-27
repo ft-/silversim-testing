@@ -345,7 +345,7 @@ namespace SilverSim.Main.Cmd.Estate
                     foreach (UUID rID in regions)
                     {
                         Types.Grid.RegionInfo rInfo;
-                        if (m_RegionStorage.TryGetValue(UUID.Zero, rID, out rInfo))
+                        if (m_RegionStorage.TryGetValue(rID, out rInfo))
                         {
                             Vector3 gridcoord = rInfo.Location;
                             output.AppendFormat("\nRegion {0} [{1}]:\n  Location={2} (grid coordinate {5})\n  Size={3}\n  Owner={4}\n", rInfo.Name, rInfo.ID, gridcoord.ToString(), rInfo.Size.ToString(), ResolveName(rInfo.Owner).FullName, gridcoord.X_String + "," + gridcoord.Y_String);

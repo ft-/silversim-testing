@@ -100,60 +100,6 @@ namespace SilverSim.ServiceInterfaces.Grid
     public abstract class GridServiceInterface
     {
         #region Accessors
-        public RegionInfo this[UUID scopeID, UUID regionID]
-        {
-            get
-            {
-                RegionInfo ri;
-                if(!TryGetValue(scopeID, regionID, out ri))
-                {
-                    throw new GridRegionNotFoundException();
-                }
-                return ri;
-            }
-        }
-
-        public abstract bool TryGetValue(UUID scopeID, UUID regionID, out RegionInfo rInfo);
-        public abstract bool ContainsKey(UUID scopeID, UUID regionID);
-
-        public RegionInfo this[UUID scopeID, GridVector position] => this[scopeID, position.X, position.Y];
-
-        public bool TryGetValue(UUID scopeID, GridVector position, out RegionInfo rInfo) => TryGetValue(scopeID, position.X, position.Y, out rInfo);
-
-        public bool ContainsKey(UUID scopeID, GridVector position) => ContainsKey(scopeID, position.X, position.Y);
-
-        public RegionInfo this[UUID scopeID, uint gridX, uint gridY]
-        {
-            get
-            {
-                RegionInfo ri;
-                if(!TryGetValue(scopeID, gridX, gridY, out ri))
-                {
-                    throw new GridRegionNotFoundException();
-                }
-                return ri;
-            }
-        }
-
-        public abstract bool TryGetValue(UUID scopeID, uint gridX, uint gridY, out RegionInfo rInfo);
-        public abstract bool ContainsKey(UUID scopeID, uint gridX, uint gridY);
-
-        public RegionInfo this[UUID scopeID, string regionName]
-        {
-            get
-            {
-                RegionInfo ri;
-                if(!TryGetValue(scopeID, regionName, out ri))
-                {
-                    throw new GridRegionNotFoundException();
-                }
-                return ri;
-            }
-        }
-
-        public abstract bool TryGetValue(UUID scopeID, string regionName, out RegionInfo rInfo);
-        public abstract bool ContainsKey(UUID scopeID, string regionName);
-
         public RegionInfo this[UUID regionID]
         {
             get
@@ -170,6 +116,44 @@ namespace SilverSim.ServiceInterfaces.Grid
         public abstract bool TryGetValue(UUID regionID, out RegionInfo rInfo);
         public abstract bool ContainsKey(UUID regionID);
 
+        public RegionInfo this[GridVector position] => this[position.X, position.Y];
+
+        public bool TryGetValue(GridVector position, out RegionInfo rInfo) => TryGetValue(position.X, position.Y, out rInfo);
+
+        public bool ContainsKey(GridVector position) => ContainsKey(position.X, position.Y);
+
+        public RegionInfo this[uint gridX, uint gridY]
+        {
+            get
+            {
+                RegionInfo ri;
+                if(!TryGetValue(gridX, gridY, out ri))
+                {
+                    throw new GridRegionNotFoundException();
+                }
+                return ri;
+            }
+        }
+
+        public abstract bool TryGetValue(uint gridX, uint gridY, out RegionInfo rInfo);
+        public abstract bool ContainsKey(uint gridX, uint gridY);
+
+        public RegionInfo this[string regionName]
+        {
+            get
+            {
+                RegionInfo ri;
+                if(!TryGetValue(regionName, out ri))
+                {
+                    throw new GridRegionNotFoundException();
+                }
+                return ri;
+            }
+        }
+
+        public abstract bool TryGetValue(string regionName, out RegionInfo rInfo);
+        public abstract bool ContainsKey(string regionName);
+
         #endregion
 
         #region Region Registration
@@ -182,8 +166,8 @@ namespace SilverSim.ServiceInterfaces.Grid
             }
             RegisterRegion(regionInfo);
         }
-        public abstract void UnregisterRegion(UUID scopeID, UUID regionID);
-        public abstract void DeleteRegion(UUID scopeID, UUID regionID);
+        public abstract void UnregisterRegion(UUID regionID);
+        public abstract void DeleteRegion(UUID regionID);
         public virtual void AddRegionFlags(UUID regionID, RegionFlags setflags)
         {
             throw new NotSupportedException();
@@ -196,18 +180,17 @@ namespace SilverSim.ServiceInterfaces.Grid
         #endregion
 
         #region List accessors
-        public abstract List<RegionInfo> GetHyperlinks(UUID scopeID);
-        public abstract List<RegionInfo> GetDefaultRegions(UUID scopeID);
-        public abstract List<RegionInfo> GetFallbackRegions(UUID scopeID);
-        public abstract List<RegionInfo> GetDefaultIntergridRegions(UUID scopeID);
-        public abstract List<RegionInfo> GetRegionsByRange(UUID scopeID, GridVector min, GridVector max);
-        public abstract List<RegionInfo> GetNeighbours(UUID scopeID, UUID regionID);
-        public abstract List<RegionInfo> GetAllRegions(UUID scopeID);
-        public abstract List<RegionInfo> GetOnlineRegions(UUID scopeID);
+        public abstract List<RegionInfo> GetHyperlinks();
+        public abstract List<RegionInfo> GetDefaultRegions();
+        public abstract List<RegionInfo> GetFallbackRegions();
+        public abstract List<RegionInfo> GetDefaultIntergridRegions();
+        public abstract List<RegionInfo> GetRegionsByRange(GridVector min, GridVector max);
+        public abstract List<RegionInfo> GetNeighbours(UUID regionID);
+        public abstract List<RegionInfo> GetAllRegions();
         public abstract List<RegionInfo> GetOnlineRegions();
         public abstract Dictionary<string, string> GetGridExtraFeatures();
 
-        public abstract List<RegionInfo> SearchRegionsByName(UUID scopeID, string searchString);
+        public abstract List<RegionInfo> SearchRegionsByName(string searchString);
         #endregion
 
         public virtual IRemoteParcelServiceInterface RemoteParcelService => new NoRemoteParcelService();

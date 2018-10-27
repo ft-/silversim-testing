@@ -118,7 +118,7 @@ namespace SilverSim.Main.Cmd.UserServer
             {
                 io.Write("show user not allowed on limited console");
             }
-            else if(m_UserAccountService.TryGetValue(UUID.Zero, args[2], args[3], out account))
+            else if(m_UserAccountService.TryGetValue(args[2], args[3], out account))
             {
                 var sb = new StringBuilder();
                 sb.AppendFormat("ID: {0}\n", account.Principal.ID);
@@ -148,7 +148,7 @@ namespace SilverSim.Main.Cmd.UserServer
             {
                 io.Write("reset user password not allowed on limited console");
             }
-            else if (m_UserAccountService.TryGetValue(UUID.Zero, args[3], args[4], out account))
+            else if (m_UserAccountService.TryGetValue(args[3], args[4], out account))
             {
                 var authInfo = new UserAuthInfo
                 {
@@ -179,7 +179,7 @@ namespace SilverSim.Main.Cmd.UserServer
             {
                 io.Write("change user not allowed on limited console");
             }
-            else if(m_UserAccountService.TryGetValue(UUID.Zero, args[2], args[3], out account))
+            else if(m_UserAccountService.TryGetValue(args[2], args[3], out account))
             {
                 for(int argi = 4; argi < args.Count; argi += 2)
                 {
@@ -192,17 +192,17 @@ namespace SilverSim.Main.Cmd.UserServer
                                 io.WriteFormatted("User level parameter {0} is not valid", account.UserLevel);
                                 return;
                             }
-                            m_UserAccountService.SetUserLevel(account.ScopeID, account.Principal.ID, account.UserLevel);
+                            m_UserAccountService.SetUserLevel(account.Principal.ID, account.UserLevel);
                             break;
 
                         case "email":
                             account.Email = args[argi + 1];
-                            m_UserAccountService.SetEmail(account.ScopeID, account.Principal.ID, account.Email);
+                            m_UserAccountService.SetEmail(account.Principal.ID, account.Email);
                             break;
 
                         case "usertitle":
                             account.UserTitle = args[argi + 1];
-                            m_UserAccountService.SetUserTitle(account.ScopeID, account.Principal.ID, account.UserTitle);
+                            m_UserAccountService.SetUserTitle(account.Principal.ID, account.UserTitle);
                             break;
 
                         default:
@@ -232,7 +232,7 @@ namespace SilverSim.Main.Cmd.UserServer
             {
                 io.Write("name can only contains letters or digits");
             }
-            else if (m_UserAccountService.ContainsKey(UUID.Zero, args[1], args[2]))
+            else if (m_UserAccountService.ContainsKey(args[1], args[2]))
             {
                 io.Write("user already created");
             }
@@ -267,7 +267,7 @@ namespace SilverSim.Main.Cmd.UserServer
                 }
                 catch
                 {
-                    m_UserAccountService.Remove(account.ScopeID, account.Principal.ID);
+                    m_UserAccountService.Remove(account.Principal.ID);
                     io.WriteFormatted("Could not add user account");
                 }
             }
@@ -290,7 +290,7 @@ namespace SilverSim.Main.Cmd.UserServer
             else if (args.Count == 3)
             {
                 UUID userid;
-                if (UUID.TryParse(args[2], out userid) && m_UserAccountService.TryGetValue(UUID.Zero, userid, out account))
+                if (UUID.TryParse(args[2], out userid) && m_UserAccountService.TryGetValue(userid, out account))
                 {
                     /* account found */
                 }
@@ -302,7 +302,7 @@ namespace SilverSim.Main.Cmd.UserServer
             }
             else
             {
-                if(m_UserAccountService.TryGetValue(UUID.Zero, args[2], args[3], out account))
+                if(m_UserAccountService.TryGetValue(args[2], args[3], out account))
                 {
                     /* account found */
                 }
@@ -322,7 +322,7 @@ namespace SilverSim.Main.Cmd.UserServer
             {
                 try
                 {
-                    delService.Remove(account.ScopeID, account.Principal.ID);
+                    delService.Remove(account.Principal.ID);
                 }
                 catch
                 {

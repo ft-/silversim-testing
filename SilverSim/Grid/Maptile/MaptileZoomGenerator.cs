@@ -58,7 +58,7 @@ namespace SilverSim.Grid.Maptile
             }
         }
 
-        public override bool TryGetValue(UUID scopeid, GridVector rawlocation, int zoomlevel, out MaptileData data)
+        public override bool TryGetValue(GridVector rawlocation, int zoomlevel, out MaptileData data)
         {
             data = null;
             if (zoomlevel < 1)
@@ -67,7 +67,7 @@ namespace SilverSim.Grid.Maptile
             }
             GridVector location = rawlocation.AlignToZoomlevel(zoomlevel);
 
-            if(m_MaptileService.TryGetValue(scopeid, location, zoomlevel, out data))
+            if(m_MaptileService.TryGetValue(location, zoomlevel, out data))
             {
                 return true;
             }
@@ -83,7 +83,7 @@ namespace SilverSim.Grid.Maptile
             MaptileData map11;
             MaptileData outmap;
 
-            if (!TryGetValue(scopeid, location, zoomlevel - 1, out map00))
+            if (!TryGetValue(location, zoomlevel - 1, out map00))
             {
                 map00 = null;
             }
@@ -92,9 +92,9 @@ namespace SilverSim.Grid.Maptile
             v2.X += zoomsize / 2;
             v2.Y += zoomsize / 2;
 
-            if (m_MaptileService.TryGetValue(scopeid, v, zoomlevel, out outmap))
+            if (m_MaptileService.TryGetValue(v, zoomlevel, out outmap))
             {
-                List<MaptileInfo> upperInfo = m_MaptileService.GetUpdateTimes(scopeid, v, v2, zoomlevel - 1);
+                List<MaptileInfo> upperInfo = m_MaptileService.GetUpdateTimes(v, v2, zoomlevel - 1);
                 Date ownUpdate = outmap.LastUpdate;
                 bool haveNewer = false;
                 foreach (MaptileInfo up in upperInfo)
@@ -115,27 +115,26 @@ namespace SilverSim.Grid.Maptile
                 {
                     Location = location,
                     ZoomLevel = zoomlevel,
-                    ScopeID = scopeid
                 };
             }
             outmap.LastUpdate = Date.Now;
             outmap.ContentType = "image/jpeg";
 
             v.Y += zoomsize / 2;
-            if (!TryGetValue(scopeid, v, zoomlevel - 1, out map01))
+            if (!TryGetValue(v, zoomlevel - 1, out map01))
             {
                 map01 = null;
             }
             v = location;
             v.X += zoomsize / 2;
-            if (!TryGetValue(scopeid, location, zoomlevel - 1, out map10))
+            if (!TryGetValue(location, zoomlevel - 1, out map10))
             {
                 map10 = null;
             }
             v = location;
             v.X += zoomsize / 2;
             v.Y += zoomsize / 2;
-            if (!TryGetValue(scopeid, location, zoomlevel - 1, out map11))
+            if (!TryGetValue(location, zoomlevel - 1, out map11))
             {
                 map11 = null;
             }
@@ -191,28 +190,27 @@ namespace SilverSim.Grid.Maptile
             m_MaptileService.Store(data);
             int zoomlevel = data.ZoomLevel;
             GridVector location = data.Location;
-            UUID scopeid = data.ScopeID;
             while (++zoomlevel < MaxZoomLevel)
             {
                 location = location.AlignToZoomlevel(zoomlevel);
-                m_MaptileService.Remove(scopeid, location, zoomlevel);
+                m_MaptileService.Remove(location, zoomlevel);
             }
         }
 
-        public override bool Remove(UUID scopeid, GridVector location, int zoomlevel)
+        public override bool Remove(GridVector location, int zoomlevel)
         {
-            bool removed = m_MaptileService.Remove(scopeid, location, zoomlevel);
+            bool removed = m_MaptileService.Remove(location, zoomlevel);
             while (++zoomlevel < MaxZoomLevel)
             {
                 location = location.AlignToZoomlevel(zoomlevel);
-                m_MaptileService.Remove(scopeid, location, zoomlevel);
+                m_MaptileService.Remove(location, zoomlevel);
             }
             return removed;
         }
 
-        public override List<MaptileInfo> GetUpdateTimes(UUID scopeid, GridVector minloc, GridVector maxloc, int zoomlevel)
+        public override List<MaptileInfo> GetUpdateTimes(GridVector minloc, GridVector maxloc, int zoomlevel)
         {
-            return m_MaptileService.GetUpdateTimes(scopeid, minloc, maxloc, zoomlevel);
+            return m_MaptileService.GetUpdateTimes(minloc, maxloc, zoomlevel);
         }
     }
 }

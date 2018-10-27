@@ -27,7 +27,6 @@ namespace SilverSim.Types.Account
     public class UserAccount
     {
         public UGUIWithName Principal = UGUIWithName.Unknown;
-        public UUID ScopeID = UUID.Zero;
         public string Email = string.Empty;
         public Date Created = new Date();
         public int UserLevel = -1;
@@ -48,7 +47,6 @@ namespace SilverSim.Types.Account
         public UserAccount(UserAccount src)
         {
             Principal = new UGUIWithName(src.Principal);
-            ScopeID = src.ScopeID;
             Email = src.Email;
             Created = src.Created;
             UserLevel = src.UserLevel;

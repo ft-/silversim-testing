@@ -57,6 +57,6 @@ namespace SilverSim.ServiceInterfaces.Presence
 
         public abstract void Store(NpcPresenceInfo presenceInfo);
 
-        public abstract void Remove(UUID scopeID, UUID npcID);
+        public abstract void Remove(UUID npcID);
     }
 }

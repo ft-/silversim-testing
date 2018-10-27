@@ -74,15 +74,15 @@ namespace SilverSim.Database.Memory.UserAccounts
         }
         #endregion
 
-        public override bool ContainsKey(UUID scopeID, UUID accountID)
+        public override bool ContainsKey(UUID accountID)
         {
             UserAccount acc;
-            return m_Data.TryGetValue(accountID, out acc) && (scopeID == UUID.Zero || acc.ScopeID == scopeID);
+            return m_Data.TryGetValue(accountID, out acc);
         }
 
-        public override bool TryGetValue(UUID scopeID, UUID accountID, out UserAccount account)
+        public override bool TryGetValue(UUID accountID, out UserAccount account)
         {
-            if(m_Data.TryGetValue(accountID, out account) && (scopeID == UUID.Zero || account.ScopeID == scopeID))
+            if(m_Data.TryGetValue(accountID, out account))
             {
                 account = new UserAccount(account)
                 {
@@ -93,11 +93,10 @@ namespace SilverSim.Database.Memory.UserAccounts
             return false;
         }
 
-        public override bool ContainsKey(UUID scopeID, string email)
+        public override bool ContainsKey(string email)
         {
             var result = from account in m_Data.Values
-                                              where account.Email.Equals(email, StringComparison.OrdinalIgnoreCase) &&
-                       (scopeID == UUID.Zero || account.ScopeID == scopeID)
+                                              where account.Email.Equals(email, StringComparison.OrdinalIgnoreCase)
                                               select true;
             foreach(bool acc in result)
             {
@@ -107,11 +106,10 @@ namespace SilverSim.Database.Memory.UserAccounts
             return false;
         }
 
-        public override bool TryGetValue(UUID scopeID, string email, out UserAccount account)
+        public override bool TryGetValue(string email, out UserAccount account)
         {
             var result = from accountdata in m_Data.Values
-                                       where accountdata.Email.Equals(email, StringComparison.OrdinalIgnoreCase) &&
-                (scopeID == UUID.Zero || accountdata.ScopeID == scopeID)
+                                       where accountdata.Email.Equals(email, StringComparison.OrdinalIgnoreCase)
                                        select accountdata;
             foreach(UserAccount acc in result)
             {
@@ -125,12 +123,11 @@ namespace SilverSim.Database.Memory.UserAccounts
             return false;
         }
 
-        public override bool ContainsKey(UUID scopeID, string firstName, string lastName)
+        public override bool ContainsKey(string firstName, string lastName)
         {
             var result = from account in m_Data.Values
                                        where account.Principal.FirstName.Equals(firstName, StringComparison.OrdinalIgnoreCase) &&
-                                       account.Principal.LastName.Equals(lastName, StringComparison.OrdinalIgnoreCase) &&
-                (scopeID == UUID.Zero || account.ScopeID == scopeID)
+                                       account.Principal.LastName.Equals(lastName, StringComparison.OrdinalIgnoreCase)
                                        select true;
             foreach (bool acc in result)
             {
@@ -140,12 +137,11 @@ namespace SilverSim.Database.Memory.UserAccounts
             return false;
         }
 
-        public override bool TryGetValue(UUID scopeID, string firstName, string lastName, out UserAccount account)
+        public override bool TryGetValue(string firstName, string lastName, out UserAccount account)
         {
             var result = from accountdata in m_Data.Values
                                        where accountdata.Principal.FirstName.Equals(firstName, StringComparison.OrdinalIgnoreCase) &&
-                                       accountdata.Principal.LastName.Equals(lastName, StringComparison.OrdinalIgnoreCase) &&
-                (scopeID == UUID.Zero || accountdata.ScopeID == scopeID)
+                                       accountdata.Principal.LastName.Equals(lastName, StringComparison.OrdinalIgnoreCase)
                                        select accountdata;
             foreach (UserAccount acc in result)
             {
@@ -160,7 +156,7 @@ namespace SilverSim.Database.Memory.UserAccounts
             return false;
         }
 
-        public override List<UserAccount> GetAccounts(UUID scopeID, string query)
+        public override List<UserAccount> GetAccounts(string query)
         {
             string[] words = query.Split(new char[] {' '}, 2);
             var accounts = new List<UserAccount>();
@@ -190,13 +186,13 @@ namespace SilverSim.Database.Memory.UserAccounts
             Interlocked.Increment(ref m_SerialNumber);
         }
 
-        public override void Remove(UUID scopeID, UUID accountID)
+        public override void Remove(UUID accountID)
         {
-            m_Data.RemoveIf(accountID, (UserAccount acc) => acc.ScopeID == scopeID || scopeID == UUID.Zero);
+            m_Data.Remove(accountID);
         }
 
         #region Online Status
-        public override void LoggedOut(UUID scopeID, UUID accountID, UserRegionData regionData)
+        public override void LoggedOut(UUID accountID, UserRegionData regionData)
         {
             UserAccount ua = m_Data[accountID];
             ua.LastLogout = Date.Now;
@@ -206,7 +202,7 @@ namespace SilverSim.Database.Memory.UserAccounts
             }
         }
 
-        public override void SetHome(UUID scopeID, UUID accountID, UserRegionData regionData)
+        public override void SetHome(UUID accountID, UserRegionData regionData)
         {
             if (regionData == null)
             {
@@ -216,7 +212,7 @@ namespace SilverSim.Database.Memory.UserAccounts
             ua.HomeRegion = regionData.Clone();
         }
 
-        public override void SetPosition(UUID scopeID, UUID accountID, UserRegionData regionData)
+        public override void SetPosition(UUID accountID, UserRegionData regionData)
         {
             if (regionData == null)
             {
@@ -228,7 +224,7 @@ namespace SilverSim.Database.Memory.UserAccounts
         #endregion
 
         #region Optionally supported services
-        public override void SetEverLoggedIn(UUID scopeID, UUID accountID)
+        public override void SetEverLoggedIn(UUID accountID)
         {
             UserAccount ua;
             if(m_Data.TryGetValue(accountID, out ua))
@@ -237,7 +233,7 @@ namespace SilverSim.Database.Memory.UserAccounts
             }
         }
 
-        public override void SetEmail(UUID scopeID, UUID accountID, string email)
+        public override void SetEmail(UUID accountID, string email)
         {
             if (email == null)
             {
@@ -247,7 +243,7 @@ namespace SilverSim.Database.Memory.UserAccounts
             ua.Email = email;
         }
 
-        public override void SetUserLevel(UUID scopeID, UUID accountID, int userLevel)
+        public override void SetUserLevel(UUID accountID, int userLevel)
         {
             if (userLevel < -1 || userLevel > 255)
             {
@@ -257,13 +253,13 @@ namespace SilverSim.Database.Memory.UserAccounts
             ua.UserLevel = userLevel;
         }
 
-        public override void SetUserFlags(UUID scopeID, UUID accountID, UserFlags userFlags)
+        public override void SetUserFlags(UUID accountID, UserFlags userFlags)
         {
             UserAccount ua = m_Data[accountID];
             ua.UserFlags = userFlags;
         }
 
-        public override void SetUserTitle(UUID scopeID, UUID accountID, string title)
+        public override void SetUserTitle(UUID accountID, string title)
         {
             if (title == null)
             {

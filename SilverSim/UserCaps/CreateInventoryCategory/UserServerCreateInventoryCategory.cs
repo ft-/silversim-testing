@@ -105,7 +105,7 @@ namespace SilverSim.UserCaps.CreateInventoryCategory
             }
 
             UserAccount account;
-            if (!foundIP || !m_UserAccountService.TryGetValue(UUID.Zero, agent, out account))
+            if (!foundIP || !m_UserAccountService.TryGetValue(agent, out account))
             {
                 req.ErrorResponse(HttpStatusCode.NotFound, "Not found");
                 return;

@@ -53,12 +53,12 @@ namespace SilverSim.ServiceInterfaces.Account
 
     public abstract class UserAccountServiceInterface : IUserAccountDeleteServiceInterface
     {
-        public virtual UserAccount this[UUID scopeID, UUID accountID]
+        public virtual UserAccount this[UUID accountID]
         {
             get
             {
                 UserAccount account;
-                if(!TryGetValue(scopeID, accountID, out account))
+                if(!TryGetValue(accountID, out account))
                 {
                     throw new UserAccountNotFoundException();
                 }
@@ -66,12 +66,12 @@ namespace SilverSim.ServiceInterfaces.Account
             }
         }
 
-        public virtual UserAccount this[UUID scopeID, string email]
+        public virtual UserAccount this[string email]
         {
             get
             {
                 UserAccount account;
-                if(!TryGetValue(scopeID, email, out account))
+                if(!TryGetValue(email, out account))
                 {
                     throw new UserAccountNotFoundException();
                 }
@@ -79,12 +79,12 @@ namespace SilverSim.ServiceInterfaces.Account
             }
         }
 
-        public virtual UserAccount this[UUID scopeID, string firstName, string lastName]
+        public virtual UserAccount this[string firstName, string lastName]
         {
             get
             {
                 UserAccount account;
-                if(!TryGetValue(scopeID, firstName, lastName, out account))
+                if(!TryGetValue(firstName, lastName, out account))
                 {
                     throw new UserAccountNotFoundException();
                 }
@@ -92,21 +92,21 @@ namespace SilverSim.ServiceInterfaces.Account
             }
         }
 
-        public abstract bool ContainsKey(UUID scopeID, UUID accountID);
-        public abstract bool ContainsKey(UUID scopeID, string email);
-        public abstract bool ContainsKey(UUID scopeID, string firstName, string lastName);
+        public abstract bool ContainsKey(UUID accountID);
+        public abstract bool ContainsKey(string email);
+        public abstract bool ContainsKey(string firstName, string lastName);
 
-        public abstract bool TryGetValue(UUID scopeID, UUID accountID, out UserAccount account);
-        public abstract bool TryGetValue(UUID scopeID, string email, out UserAccount account);
-        public abstract bool TryGetValue(UUID scopeID, string firstName, string lastName, out UserAccount account);
+        public abstract bool TryGetValue(UUID accountID, out UserAccount account);
+        public abstract bool TryGetValue(string email, out UserAccount account);
+        public abstract bool TryGetValue(string firstName, string lastName, out UserAccount account);
 
-        public abstract List<UserAccount> GetAccounts(UUID scopeID, string query);
+        public abstract List<UserAccount> GetAccounts(string query);
 
-        public bool TryGetHomeRegion(UUID scopeID, UUID accountID, out UserRegionData homeRegion)
+        public bool TryGetHomeRegion(UUID accountID, out UserRegionData homeRegion)
         {
             UserAccount ua;
             homeRegion = default(UserRegionData);
-            if(TryGetValue(scopeID, accountID, out ua))
+            if(TryGetValue(accountID, out ua))
             {
                 homeRegion = ua.HomeRegion;
                 return homeRegion != null;
@@ -114,11 +114,11 @@ namespace SilverSim.ServiceInterfaces.Account
             return false;
         }
 
-        public bool TryGetLastRegion(UUID scopeID, UUID accountID, out UserRegionData lastRegion)
+        public bool TryGetLastRegion(UUID accountID, out UserRegionData lastRegion)
         {
             UserAccount ua;
             lastRegion = default(UserRegionData);
-            if (TryGetValue(scopeID, accountID, out ua))
+            if (TryGetValue(accountID, out ua))
             {
                 lastRegion = ua.LastRegion;
                 return lastRegion != null;
@@ -127,19 +127,19 @@ namespace SilverSim.ServiceInterfaces.Account
         }
 
         #region Online Status
-        public abstract void LoggedOut(UUID scopeID, UUID accountID, UserRegionData regionData = null);
-        public abstract void SetHome(UUID scopeID, UUID accountID, UserRegionData regionData);
-        public abstract void SetPosition(UUID scopeID, UUID accountID, UserRegionData regionData);
+        public abstract void LoggedOut(UUID accountID, UserRegionData regionData = null);
+        public abstract void SetHome(UUID accountID, UserRegionData regionData);
+        public abstract void SetPosition(UUID accountID, UserRegionData regionData);
         #endregion
 
         #region Optionally supported services
-        public abstract void SetEverLoggedIn(UUID scopeID, UUID accountID);
+        public abstract void SetEverLoggedIn(UUID accountID);
         public abstract void Add(UserAccount userAccount);
-        public abstract void SetEmail(UUID scopeID, UUID accountID, string email);
-        public abstract void SetUserLevel(UUID scopeID, UUID accountID, int userLevel);
-        public abstract void SetUserFlags(UUID scopeID, UUID accountID, UserFlags userFlags);
-        public abstract void SetUserTitle(UUID scopeID, UUID accountID, string title);
-        public abstract void Remove(UUID scopeID, UUID accountID);
+        public abstract void SetEmail(UUID accountID, string email);
+        public abstract void SetUserLevel(UUID accountID, int userLevel);
+        public abstract void SetUserFlags(UUID accountID, UserFlags userFlags);
+        public abstract void SetUserTitle(UUID accountID, string title);
+        public abstract void Remove(UUID accountID);
         #endregion
     }
 }

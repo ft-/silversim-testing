@@ -26,7 +26,6 @@ namespace SilverSim.Types.Maptile
         public GridVector Location = GridVector.Zero;
         public Date LastUpdate = Date.Now;
         public int ZoomLevel = 1;
-        public UUID ScopeID = UUID.Zero;
 
         public MaptileInfo()
         {
@@ -37,7 +36,6 @@ namespace SilverSim.Types.Maptile
             Location = info.Location;
             LastUpdate = new Date(info.LastUpdate);
             ZoomLevel = info.ZoomLevel;
-            ScopeID = info.ScopeID;
         }
     }
 }

@@ -64,7 +64,7 @@ namespace SilverSim.Scene.Npc
                 return false;
             }
 
-            public override void Remove(UUID scopeID, UUID npcID)
+            public override void Remove(UUID npcID)
             {
                 /* nothing to do */
             }
@@ -244,8 +244,8 @@ namespace SilverSim.Scene.Npc
             foreach (KeyValuePair<UUID, NpcAgent> kvp in removeList)
             {
                 /* we have to call the next two removes explicitly. We only want to act upon non-persisted data */
-                m_NonpersistentInventoryService.Remove(UUID.Zero, kvp.Key);
-                m_NonpersistentProfileService?.Remove(UUID.Zero, kvp.Key);
+                m_NonpersistentInventoryService.Remove(kvp.Key);
+                m_NonpersistentProfileService?.Remove(kvp.Key);
                 NpcAgent npc = kvp.Value;
                 IObject obj = npc.SittingOnObject;
                 var presenceInfo = new NpcPresenceInfo
@@ -320,9 +320,9 @@ namespace SilverSim.Scene.Npc
                 {
                     if(m_NpcPresenceService != null)
                     {
-                        presenceService.Remove(UUID.Zero, agent.ID);
+                        presenceService.Remove(agent.ID);
                     }
-                    inventoryService.Remove(UUID.Zero, agent.ID);
+                    inventoryService.Remove(agent.ID);
                     m_NpcAgents.Remove(agent.ID);
                     throw;
                 }
@@ -361,10 +361,10 @@ namespace SilverSim.Scene.Npc
         private void RemoveNpcData(NpcAgent npc)
         {
             UUID npcId = npc.ID;
-            npc.InventoryService.Remove(UUID.Zero, npcId);
+            npc.InventoryService.Remove(npcId);
             try
             {
-                npc.ProfileService.Remove(UUID.Zero, npcId);
+                npc.ProfileService.Remove(npcId);
             }
             catch
             {
@@ -372,7 +372,7 @@ namespace SilverSim.Scene.Npc
             }
             try
             {
-                npc.NpcPresenceService.Remove(UUID.Zero, npcId);
+                npc.NpcPresenceService.Remove(npcId);
             }
             catch
             {

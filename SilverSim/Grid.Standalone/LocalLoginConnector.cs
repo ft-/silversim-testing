@@ -191,7 +191,7 @@ namespace SilverSim.Grid.Standalone
                 }
             }
 
-            foreach (RegionInfo fallbackRegion in m_GridService.GetFallbackRegions(account.ScopeID))
+            foreach (RegionInfo fallbackRegion in m_GridService.GetFallbackRegions())
             {
                 destinationInfo.UpdateFromRegion(fallbackRegion);
                 destinationInfo.StartLocation = "safe";
@@ -228,14 +228,49 @@ namespace SilverSim.Grid.Standalone
         public class StandalonePresenceService : IPresenceServiceInterface
         {
             private readonly UserSessionServiceInterface m_UserSessionService;
+            private readonly UserAccountServiceInterface m_UserAccountService;
+            private readonly UUID m_SessionID;
+            private readonly UGUI m_User;
 
-            public StandalonePresenceService(UserSessionServiceInterface userSessionService)
+            public StandalonePresenceService(
+                UserAccountServiceInterface userAccountService, UGUI user, 
+                UserSessionServiceInterface userSessionService, UUID sessionID)
             {
+                m_UserAccountService = userAccountService;
+                m_User = user;
                 m_UserSessionService = userSessionService;
+                m_SessionID = sessionID;
             }
 
-            public bool Remove(UUID sessionID) =>
-                m_UserSessionService.Remove(sessionID);
+            public bool Logout()
+            {
+                bool f = m_UserSessionService.Remove(m_SessionID);
+                if (f)
+                {
+                    m_UserAccountService.LoggedOut(m_User.ID);
+                }
+                return f;
+            }
+
+            public bool Logout(UUID regionID, Vector3 position, Vector3 lookAt)
+            {
+                bool f = m_UserSessionService.Remove(m_SessionID);
+                if (f)
+                {
+                    m_UserAccountService.LoggedOut(m_User.ID, new UserRegionData
+                    {
+                        RegionID = regionID,
+                        Position = position,
+                        LookAt = lookAt
+                    });
+                }
+                return f;
+            }
+
+            public bool Report(UUID regionID)
+            {
+                return false;
+            }
         }
 
         private void PostAgent_Local(UserAccount account, ClientInfo clientInfo, SessionInfo sessionInfo, DestinationInfo destinationInfo, CircuitInfo circuitInfo, AppearanceInfo appearance, UUID capsId, int maxAllowedWearables, out string capsPath)
@@ -309,7 +344,7 @@ namespace SilverSim.Grid.Standalone
                 serviceList.Add(m_LocalProfileService);
             }
             serviceList.Add(m_LocalFriendsService);
-            serviceList.Add(new StandalonePresenceService(m_LocalUserSessionService));
+            serviceList.Add(new StandalonePresenceService(m_LocalUserAccountService, account.Principal, m_LocalUserSessionService, sessionInfo.SessionID));
             serviceList.Add(gridService);
             serviceList.Add(m_LocalOfflineIMService);
             if (m_LocalEconomyService != null)
@@ -413,7 +448,7 @@ namespace SilverSim.Grid.Standalone
                 agent.SceneID = scene.ID;
                 try
                 {
-                    m_LocalUserAccountService.SetPosition(account.ScopeID, account.Principal.ID, new UserRegionData
+                    m_LocalUserAccountService.SetPosition(account.Principal.ID, new UserRegionData
                     {
                         RegionID = scene.ID,
                         Position = agent.GlobalPosition,

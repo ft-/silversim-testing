@@ -103,7 +103,7 @@ namespace SilverSim.UserCaps.FetchInventoryDescendents2Base
                 /* entry not found */
             }
 
-            if (!foundIP || !m_UserAccountService.ContainsKey(UUID.Zero, agent))
+            if (!foundIP || !m_UserAccountService.ContainsKey(agent))
             {
                 req.ErrorResponse(HttpStatusCode.NotFound, "Not found");
                 return;

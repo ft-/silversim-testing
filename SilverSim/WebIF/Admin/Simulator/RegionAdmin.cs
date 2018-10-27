@@ -199,7 +199,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
             var udpdata = new Map();
             resdata.Add("udp", udpdata);
-            foreach (RegionInfo region in m_RegionStorage.GetAllRegions(UUID.Zero))
+            foreach (RegionInfo region in m_RegionStorage.GetAllRegions())
             {
                 var regiondata = new Map
                 {
@@ -284,7 +284,7 @@ namespace SilverSim.WebIF.Admin.Simulator
         [AdminWebIfRequiredRight("regions.view")]
         private void HandleList(HttpRequest req, Map jsondata)
         {
-            var regions = m_RegionStorage.GetAllRegions(UUID.Zero);
+            var regions = m_RegionStorage.GetAllRegions();
 
             var res = new Map();
             var regionsRes = new AnArray();
@@ -645,7 +645,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NoEstates);
             }
-            else if (m_RegionStorage.TryGetValue(UUID.Zero, jsondata["name"].ToString(), out rInfo))
+            else if (m_RegionStorage.TryGetValue(jsondata["name"].ToString(), out rInfo))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.AlreadyExists);
             }
@@ -658,7 +658,6 @@ namespace SilverSim.WebIF.Admin.Simulator
                     ID = UUID.Random,
                     Access = RegionAccess.Mature,
                     ServerHttpPort = m_HttpServer.Port,
-                    ScopeID = UUID.Zero,
                     ServerIP = string.Empty,
                     ServerPort = port,
                     Size = GridVector.StandardRegionSize,
@@ -694,12 +693,6 @@ namespace SilverSim.WebIF.Admin.Simulator
                 }
                 if(jsondata.ContainsKey("regionid") &&
                     !UUID.TryParse(jsondata["regionid"].ToString(), out rInfo.ID))
-                {
-                    m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
-                    return;
-                }
-                if (jsondata.ContainsKey("scopeid") &&
-                    !UUID.TryParse(jsondata["scopeid"].ToString(), out rInfo.ScopeID))
                 {
                     m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                     return;
@@ -841,7 +834,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidRequest);
             }
-            else if (!m_RegionStorage.TryGetValue(UUID.Zero, regionid, out rInfo))
+            else if (!m_RegionStorage.TryGetValue(regionid, out rInfo))
             {
                 m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.NotFound);
             }
@@ -864,15 +857,6 @@ namespace SilverSim.WebIF.Admin.Simulator
                 {
                     rInfo.ServerPort = jsondata["port"].AsUInt;
                     if(rInfo.ServerPort < 1 || rInfo.ServerPort > 65535)
-                    {
-                        m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
-                        return;
-                    }
-                    changeRegionData = true;
-                }
-                if(jsondata.ContainsKey("scopeid"))
-                {
-                    if (!UUID.TryParse(jsondata["scopeid"].ToString(), out rInfo.ScopeID))
                     {
                         m_WebIF.ErrorResponse(req, AdminWebIfErrorResult.InvalidParameter);
                         return;
@@ -987,7 +971,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                 {
                     m_SimulationData.RemoveRegion(region.ID);
                     m_EstateService.RegionMap.Remove(region.ID);
-                    m_RegionStorage.DeleteRegion(UUID.Zero, region.ID);
+                    m_RegionStorage.DeleteRegion(region.ID);
                 }
                 catch (Exception e)
                 {

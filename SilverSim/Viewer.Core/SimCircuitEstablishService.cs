@@ -80,7 +80,6 @@ namespace SilverSim.Viewer.Core
 
             var regionID = reqmap["to_region_id"].AsUUID;
             var fromRegionID = reqmap["from_region_id"].AsUUID;
-            var scopeID = reqmap["scope_id"].AsUUID;
 
             SceneInterface scene;
             try
@@ -103,7 +102,7 @@ namespace SilverSim.Viewer.Core
             RegionInfo regionInfo;
             try
             {
-                regionInfo = gridService[scopeID, fromRegionID];
+                regionInfo = gridService[fromRegionID];
             }
             catch
             {

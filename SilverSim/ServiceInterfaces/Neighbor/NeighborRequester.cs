@@ -91,7 +91,7 @@ namespace SilverSim.ServiceInterfaces.Neighbor
             northEastCorner.X += MAXIMUM_VIEW_RANGE;
             northEastCorner.Y += MAXIMUM_VIEW_RANGE;
 
-            var regions = gridService.GetRegionsByRange(ownRegion.ScopeID, southWestCorner, northEastCorner);
+            var regions = gridService.GetRegionsByRange(southWestCorner, northEastCorner);
             var actualNeighbors = new List<RegionInfo>();
 
             foreach(var ri in regions)

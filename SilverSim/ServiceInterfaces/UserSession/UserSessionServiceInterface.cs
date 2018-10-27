@@ -26,7 +26,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.ServiceInterfaces.UserSession
 {
-    public abstract class UserSessionServiceInterface : IPresenceServiceInterface
+    public abstract class UserSessionServiceInterface
     {
         public UserSessionInfo CreateSession(UGUI user, string clientIPAddress) => CreateSession(user, clientIPAddress, UUID.Random, UUID.Random);
 

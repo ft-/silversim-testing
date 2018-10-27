@@ -346,7 +346,6 @@ namespace SilverSim.Scene.Npc
         {
             Principal = NamedOwner,
             IsLocalToGrid = true,
-            ScopeID = UUID.Zero,
             UserLevel = 0
         };
 

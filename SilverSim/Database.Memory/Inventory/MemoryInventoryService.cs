@@ -67,7 +67,7 @@ namespace SilverSim.Database.Memory.Inventory
             /* nothing to do */
         }
 
-        public override void Remove(UUID scopeID, UUID userAccount)
+        public override void Remove(UUID userAccount)
         {
             m_Items.Remove(userAccount);
             m_Folders.Remove(userAccount);

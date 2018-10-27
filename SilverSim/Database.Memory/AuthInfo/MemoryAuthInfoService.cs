@@ -57,7 +57,7 @@ namespace SilverSim.Database.Memory.AuthInfo
             /* intentionally left empty */
         }
 
-        public void Remove(UUID scopeID, UUID accountID)
+        public void Remove(UUID accountID)
         {
             m_AuthInfos.Remove(accountID);
             var tokenIds = new List<UUID>();

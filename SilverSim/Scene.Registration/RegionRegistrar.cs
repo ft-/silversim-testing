@@ -72,7 +72,7 @@ namespace SilverSim.Scene.Registration
 
         public void RegionRemoved(SceneInterface scene)
         {
-            scene.GridService.UnregisterRegion(UUID.Zero, scene.ID);
+            scene.GridService.UnregisterRegion(scene.ID);
             m_RegisteredScenes.Remove(scene);
         }
     }

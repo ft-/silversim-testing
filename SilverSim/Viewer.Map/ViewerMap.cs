@@ -140,7 +140,7 @@ namespace SilverSim.Viewer.Map
             List<RegionInfo> ris;
             try
             {
-                ris = scene.GridService.GetRegionsByRange(scene.ScopeID, req.Min, req.Max);
+                ris = scene.GridService.GetRegionsByRange(req.Min, req.Max);
             }
             catch
             {
@@ -276,7 +276,7 @@ namespace SilverSim.Viewer.Map
                     List<RegionInfo> ris;
                     try
                     {
-                        ris = service.SearchRegionsByName(scene.ScopeID, regionAddress.RegionName);
+                        ris = service.SearchRegionsByName(regionAddress.RegionName);
                     }
                     catch
                     {
