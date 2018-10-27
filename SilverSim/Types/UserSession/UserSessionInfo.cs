@@ -29,15 +29,30 @@ namespace SilverSim.Types.UserSession
         LocationGridURI = 2
     }
 
-
     public sealed class UserSessionInfo
     {
+        public sealed class Entry
+        {
+            public string Value = string.Empty;
+            public Date ExpiryDate;
+
+            public Entry()
+            {
+            }
+
+            public Entry(Entry src)
+            {
+                Value = src.Value;
+                ExpiryDate = new Date(src.ExpiryDate);
+            }
+        }
+
         public UGUI User = UGUI.Unknown;
         public UUID SessionID = UUID.Zero;
         public UUID SecureSessionID = UUID.Zero;
         public string ClientIPAddress = string.Empty;
         /* key is <protocol-association>/<variable-name> */
-        public readonly Dictionary<string, string> DynamicData = new Dictionary<string, string>();
+        public readonly Dictionary<string, Entry> DynamicData = new Dictionary<string, Entry>();
         public Date Timestamp = Date.Now;
 
         public UserSessionInfo()
@@ -50,9 +65,9 @@ namespace SilverSim.Types.UserSession
             SessionID = src.SessionID;
             ClientIPAddress = src.ClientIPAddress;
             SecureSessionID = src.SecureSessionID;
-            foreach(KeyValuePair<string, string> kvp in src.DynamicData)
+            foreach(KeyValuePair<string, Entry> kvp in src.DynamicData)
             {
-                DynamicData.Add(kvp.Key, kvp.Value);
+                DynamicData.Add(kvp.Key, new Entry(kvp.Value));
             }
         }
 
@@ -75,7 +90,12 @@ namespace SilverSim.Types.UserSession
         {
             get
             {
-                return DynamicData[$"{assoc}/{varname}"];
+                Entry entry = DynamicData[$"{assoc}/{varname}"];
+                if (!TryGetValue(assoc, varname, out entry))
+                {
+                    throw new KeyNotFoundException();
+                }
+                return entry.Value;
             }
         }
 
@@ -83,25 +103,62 @@ namespace SilverSim.Types.UserSession
         {
             get
             {
-                string assoc;
-                string varname;
-                string value;
-                if(!TryGetVarInfo(varid, out assoc, out varname) || 
-                    !DynamicData.TryGetValue($"{assoc}/{varname}", out value))
+                Entry value;
+                if(!TryGetValue(varid, out value))
                 {
                     throw new KeyNotFoundException();
                 }
-                return value;
+                return value.Value;
             }
         }
 
-        public bool TryGetValue(string assoc, string varname, out string val) => DynamicData.TryGetValue($"{assoc}/{varname}", out val);
+        public bool TryGetValue(string assoc, string varname, out Entry entry)
+        {
+            bool f = DynamicData.TryGetValue($"{assoc}/{varname}", out entry);
+            if (f && entry.ExpiryDate != null && entry.ExpiryDate.AsULong < Date.Now.AsULong)
+            {
+                f = false;
+                entry = default(Entry);
+            }
+            return f;
+        }
 
-        public bool ContainsKey(string assoc, string varname) => DynamicData.ContainsKey($"{assoc}/{varname}");
+        public bool TryGetValue(string assoc, string varname, out string val)
+        {
+            Entry entry;
+            val = default(string);
+            bool f = TryGetValue(assoc, varname, out entry);
+            if (f)
+            {
+                val = entry.Value;
+            }
+            return f;
+        }
+
+        public bool ContainsKey(string assoc, string varname)
+        {
+            Entry entry;
+            return TryGetValue(assoc, varname, out entry);
+        }
 
         public bool TryGetValue(KnownUserSessionInfoVariables varid, out string val)
         {
             val = default(string);
+            string assoc;
+            string varname;
+            return TryGetVarInfo(varid, out assoc, out varname) && TryGetValue(assoc, varname, out val);
+        }
+
+        public bool TryGetValue(KnownUserSessionInfoVariables varid, out UUID id)
+        {
+            id = default(UUID);
+            string val;
+            return TryGetValue(varid, out val) && UUID.TryParse(val, out id);
+        }
+
+        public bool TryGetValue(KnownUserSessionInfoVariables varid, out Entry val)
+        {
+            val = default(Entry);
             string assoc;
             string varname;
             return TryGetVarInfo(varid, out assoc, out varname) && TryGetValue(assoc, varname, out val);

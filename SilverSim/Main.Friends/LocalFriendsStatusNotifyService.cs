@@ -71,9 +71,8 @@ namespace SilverSim.Main.Friends
                 List<UGUI> notifiedInRegion;
                 foreach (UserSessionInfo pinfo in presences)
                 {
-                    string regionId;
                     UUID regionID;
-                    if (pinfo.DynamicData.TryGetValue("grid/region-id", out regionId) && UUID.TryParse(regionId, out regionID))
+                    if (pinfo.TryGetValue(KnownUserSessionInfoVariables.LocationRegionID, out regionID))
                     {
                         if (!notified.TryGetValue(regionID, out notifiedInRegion))
                         {

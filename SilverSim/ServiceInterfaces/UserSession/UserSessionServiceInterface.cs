@@ -21,6 +21,7 @@
 
 using SilverSim.Types;
 using SilverSim.Types.UserSession;
+using System;
 using System.Collections.Generic;
 
 namespace SilverSim.ServiceInterfaces.UserSession
@@ -46,10 +47,32 @@ namespace SilverSim.ServiceInterfaces.UserSession
         {
             get; set;
         }
+        public abstract void SetExpiringValue(UUID sessionID, string assoc, string varname, string value, TimeSpan span);
+        public abstract bool TryGetValueExtendLifetime(UUID sessionID, string assoc, string varname, TimeSpan span, out UserSessionInfo.Entry value);
         public abstract bool TryGetValue(UUID sessionID, string assoc, string varname, out string value);
+        public abstract bool TryGetValue(UUID sessionID, string assoc, string varname, out UserSessionInfo.Entry value);
         public abstract bool ContainsKey(UUID sessionID, string assoc, string varname);
         public abstract bool Remove(UUID sessionID, string assoc, string varname);
         #endregion
+
+        public void SetExpiringValue(UUID sessionID, KnownUserSessionInfoVariables varid, string value, TimeSpan span)
+        {
+            string assoc;
+            string varname;
+            if(!UserSessionInfo.TryGetVarInfo(varid, out assoc, out varname))
+            {
+                throw new ArgumentOutOfRangeException(nameof(varid));
+            }
+            SetExpiringValue(sessionID, assoc, varname, value, span);
+        }
+
+        public bool TryGetValueExtendLifetime(UUID sessionID, KnownUserSessionInfoVariables varid, TimeSpan span, out UserSessionInfo.Entry value)
+        {
+            string assoc;
+            string varname;
+            value = default(UserSessionInfo.Entry);
+            return UserSessionInfo.TryGetVarInfo(varid, out assoc, out varname) && TryGetValueExtendLifetime(sessionID, assoc, varname, span, out value);
+        }
 
         public string this[UUID sessionID, KnownUserSessionInfoVariables varid]
         {
@@ -81,6 +104,14 @@ namespace SilverSim.ServiceInterfaces.UserSession
         public bool TryGetValue(UUID sessionID, KnownUserSessionInfoVariables varid, out string value)
         {
             value = default(string);
+            string assoc;
+            string varname;
+            return UserSessionInfo.TryGetVarInfo(varid, out assoc, out varname) && TryGetValue(sessionID, assoc, varname, out value);
+        }
+
+        public bool TryGetValue(UUID sessionID, KnownUserSessionInfoVariables varid, out UserSessionInfo.Entry value)
+        {
+            value = default(UserSessionInfo.Entry);
             string assoc;
             string varname;
             return UserSessionInfo.TryGetVarInfo(varid, out assoc, out varname) && TryGetValue(sessionID, assoc, varname, out value);

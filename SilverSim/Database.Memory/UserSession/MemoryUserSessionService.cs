@@ -79,14 +79,15 @@ namespace SilverSim.Database.Memory.UserSession
         {
             get
             {
-                string value;
+                UserSessionInfo.Entry value;
                 lock(m_UserSessionLock)
                 {
                     UserSessionInfo info;
                     if(m_UserSessions.TryGetValue(sessionID, out info) &&
-                        info.DynamicData.TryGetValue($"{assoc}/{varname}", out value))
+                        info.DynamicData.TryGetValue($"{assoc}/{varname}", out value) &&
+                        (value.ExpiryDate == null || value.ExpiryDate.AsULong < Date.Now.AsULong))
                     {
-                        return value;
+                        return value.Value;
                     }
                 }
                 throw new KeyNotFoundException();
@@ -106,7 +107,7 @@ namespace SilverSim.Database.Memory.UserSession
                     UserSessionInfo info;
                     if(m_UserSessions.TryGetValue(sessionID, out info))
                     {
-                        info.DynamicData[$"{assoc}/{varname}"] = value;
+                        info.DynamicData[$"{assoc}/{varname}"] = new UserSessionInfo.Entry { Value = value };
                     }
                     else
                     {
@@ -250,6 +251,52 @@ namespace SilverSim.Database.Memory.UserSession
             return false;
         }
 
+        public override void SetExpiringValue(UUID sessionID, string assoc, string varname, string value, TimeSpan span)
+        {
+            if (assoc.Contains("/"))
+            {
+                throw new ArgumentOutOfRangeException(nameof(assoc));
+            }
+            if (varname.Contains("/"))
+            {
+                throw new ArgumentOutOfRangeException(nameof(varname));
+            }
+            lock (m_UserSessionLock)
+            {
+                UserSessionInfo info;
+                if (m_UserSessions.TryGetValue(sessionID, out info))
+                {
+                    info.DynamicData[$"{assoc}/{varname}"] = new UserSessionInfo.Entry { Value = value, ExpiryDate = Date.Now.Add(span) };
+                }
+                else
+                {
+                    throw new KeyNotFoundException();
+                }
+            }
+        }
+
+        public override bool TryGetValueExtendLifetime(UUID sessionID, string assoc, string varname, TimeSpan span, out UserSessionInfo.Entry value)
+        {
+            value = default(UserSessionInfo.Entry);
+            lock(m_UserSessionLock)
+            {
+                UserSessionInfo info;
+                if(!m_UserSessions.TryGetValue(sessionID, out info))
+                {
+                    return false;
+                }
+                if(info.TryGetValue(assoc, varname, out value))
+                {
+                    if (value.ExpiryDate != null)
+                    {
+                        value.ExpiryDate = value.ExpiryDate.Add(span);
+                    }
+                    return true;
+                }
+                return false;
+            }
+        }
+
         public override bool TryGetValue(UUID sessionID, out UserSessionInfo sessionInfo)
         {
             lock (m_UserSessionLock)
@@ -271,7 +318,22 @@ namespace SilverSim.Database.Memory.UserSession
             lock(m_UserSessionLock)
             {
                 UserSessionInfo info;
-                return m_UserSessions.TryGetValue(sessionID, out info) && info.DynamicData.TryGetValue($"{assoc}/{varname}", out value);
+                return m_UserSessions.TryGetValue(sessionID, out info) && info.TryGetValue(assoc, varname, out value);
+            }
+        }
+
+        public override bool TryGetValue(UUID sessionID, string assoc, string varname, out UserSessionInfo.Entry value)
+        {
+            value = default(UserSessionInfo.Entry);
+            lock (m_UserSessionLock)
+            {
+                UserSessionInfo info;
+                bool f = m_UserSessions.TryGetValue(sessionID, out info) && info.TryGetValue(assoc, varname, out value);
+                if(f)
+                {
+                    value = new UserSessionInfo.Entry(value);
+                }
+                return f;
             }
         }
     }
