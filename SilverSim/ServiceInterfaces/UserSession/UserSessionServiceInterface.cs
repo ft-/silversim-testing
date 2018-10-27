@@ -28,7 +28,8 @@ namespace SilverSim.ServiceInterfaces.UserSession
 {
     public abstract class UserSessionServiceInterface : IPresenceServiceInterface
     {
-        public abstract UserSessionInfo CreateSession(UGUI user, string clientIPAddress);
+        public UserSessionInfo CreateSession(UGUI user, string clientIPAddress) => CreateSession(user, clientIPAddress, UUID.Random, UUID.Random);
+
         public abstract UserSessionInfo CreateSession(UGUI user, string clientIPAddress, UUID sessionID, UUID secureSessionID);
 
         #region Session access

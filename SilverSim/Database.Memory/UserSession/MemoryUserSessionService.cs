@@ -136,31 +136,6 @@ namespace SilverSim.Database.Memory.UserSession
             }
         }
 
-        public override UserSessionInfo CreateSession(UGUI user, string clientIPAddress)
-        {
-            var userSessionInfo = new UserSessionInfo
-            {
-                User = user,
-                SessionID = UUID.Random,
-                SecureSessionID = UUID.Random,
-                ClientIPAddress = clientIPAddress
-            };
-            lock(m_UserSessionLock)
-            {
-                m_UserSessions.Add(userSessionInfo.SessionID, new UserSessionInfo(userSessionInfo));
-                try
-                {
-                    m_UserSecureSessions.Add(userSessionInfo.SecureSessionID, userSessionInfo.SessionID);
-                }
-                catch
-                {
-                    m_UserSessions.Remove(userSessionInfo.SessionID);
-                    throw;
-                }
-            }
-            return userSessionInfo;
-        }
-
         public override UserSessionInfo CreateSession(UGUI user, string clientIPAddress, UUID sessionID, UUID secureSessionID)
         {
             var userSessionInfo = new UserSessionInfo
