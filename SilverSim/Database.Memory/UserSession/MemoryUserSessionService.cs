@@ -314,16 +314,6 @@ namespace SilverSim.Database.Memory.UserSession
             return false;
         }
 
-        public override bool TryGetValue(UUID sessionID, string assoc, string varname, out string value)
-        {
-            value = default(string);
-            lock(m_UserSessionLock)
-            {
-                UserSessionInfo info;
-                return m_UserSessions.TryGetValue(sessionID, out info) && info.TryGetValue(assoc, varname, out value);
-            }
-        }
-
         public override bool TryGetValue(UUID sessionID, string assoc, string varname, out UserSessionInfo.Entry value)
         {
             value = default(UserSessionInfo.Entry);
