@@ -225,54 +225,6 @@ namespace SilverSim.Grid.Standalone
             }
         }
 
-        public class StandalonePresenceService : IPresenceServiceInterface
-        {
-            private readonly UserSessionServiceInterface m_UserSessionService;
-            private readonly UserAccountServiceInterface m_UserAccountService;
-            private readonly UUID m_SessionID;
-            private readonly UGUI m_User;
-
-            public StandalonePresenceService(
-                UserAccountServiceInterface userAccountService, UGUI user, 
-                UserSessionServiceInterface userSessionService, UUID sessionID)
-            {
-                m_UserAccountService = userAccountService;
-                m_User = user;
-                m_UserSessionService = userSessionService;
-                m_SessionID = sessionID;
-            }
-
-            public bool Logout()
-            {
-                bool f = m_UserSessionService.Remove(m_SessionID);
-                if (f)
-                {
-                    m_UserAccountService.LoggedOut(m_User.ID);
-                }
-                return f;
-            }
-
-            public bool Logout(UUID regionID, Vector3 position, Vector3 lookAt)
-            {
-                bool f = m_UserSessionService.Remove(m_SessionID);
-                if (f)
-                {
-                    m_UserAccountService.LoggedOut(m_User.ID, new UserRegionData
-                    {
-                        RegionID = regionID,
-                        Position = position,
-                        LookAt = lookAt
-                    });
-                }
-                return f;
-            }
-
-            public bool Report(UUID regionID)
-            {
-                return false;
-            }
-        }
-
         private void PostAgent_Local(UserAccount account, ClientInfo clientInfo, SessionInfo sessionInfo, DestinationInfo destinationInfo, CircuitInfo circuitInfo, AppearanceInfo appearance, UUID capsId, int maxAllowedWearables, out string capsPath)
         {
             SceneInterface scene;
