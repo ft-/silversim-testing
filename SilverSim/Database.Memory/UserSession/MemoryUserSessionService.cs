@@ -25,9 +25,11 @@ using SilverSim.Types;
 using SilverSim.Types.UserSession;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace SilverSim.Database.Memory.UserSession
 {
+    [Description("Memory UserSession Backend")]
     [PluginName("UserSession")]
     public sealed class MemoryUserSessionService : UserSessionServiceInterface, IPlugin
     {
