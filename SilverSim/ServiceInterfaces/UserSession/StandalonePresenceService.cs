@@ -20,11 +20,10 @@
 // exception statement from your version.
 
 using SilverSim.ServiceInterfaces.Account;
-using SilverSim.ServiceInterfaces.UserSession;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
 
-namespace SilverSim.Grid.Standalone
+namespace SilverSim.ServiceInterfaces.UserSession
 {
     public class StandalonePresenceService : IPresenceServiceInterface
     {

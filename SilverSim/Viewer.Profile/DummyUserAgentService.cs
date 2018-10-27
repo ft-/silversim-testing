@@ -40,16 +40,6 @@ namespace SilverSim.Viewer.Profile
             set { throw new NotSupportedException(); }
         }
 
-        public override void VerifyAgent(UUID sessionID, string token)
-        {
-            throw new NotSupportedException();
-        }
-
-        public override void VerifyClient(UUID sessionID, string token)
-        {
-            throw new NotSupportedException();
-        }
-
         public override List<UUID> NotifyStatus(List<KeyValuePair<UGUI, string>> friends, UGUI user, bool online)
         {
             throw new NotSupportedException();

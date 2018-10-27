@@ -43,10 +43,6 @@ namespace SilverSim.ServiceInterfaces.UserAgents
 
         public abstract IDisplayNameAccessor DisplayName { get; }
 
-        public abstract void VerifyAgent(UUID sessionID, string token);
-
-        public abstract void VerifyClient(UUID sessionID, string token);
-
         public abstract List<UUID> NotifyStatus(List<KeyValuePair<UGUI, string>> friends, UGUI user, bool online);
 
         public abstract UserInfo GetUserInfo(UGUI user);
