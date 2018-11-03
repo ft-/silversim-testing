@@ -85,6 +85,7 @@ namespace SilverSim.Grid.Login
         private ILoginConnectorServiceInterface m_LocalLoginConnectorService;
         private List<ILoginConnectorServiceInterface> m_RemoteLoginConnectorServices;
         private List<ILoginUserCapsGetInterface> m_UserCapsGetters;
+        private List<IUserSessionExtensionHandler> m_UserSessionExtensionServices;
 
         private readonly string m_UserAccountServiceName;
         private readonly string m_GridServiceName;
@@ -127,6 +128,7 @@ namespace SilverSim.Grid.Login
             m_ServiceURLsGetters = loader.GetServicesByValue<IServiceURLsGetInterface>();
             m_GridInfoGetters = loader.GetServicesByValue<IGridInfoServiceInterface>();
             m_LoginResponseGetters = loader.GetServicesByValue<ILoginResponseServiceInterface>();
+            m_UserSessionExtensionServices = loader.GetServicesByValue<IUserSessionExtensionHandler>();
             m_HomeUri = loader.HomeURI;
             m_XmlRpcServer = loader.XmlRpcServer;
             m_GatekeeperUri = loader.GatekeeperURI;
@@ -392,8 +394,6 @@ namespace SilverSim.Grid.Login
             loginData.ClientInfo.ClientIP = req.CallerIP;
             loginData.DestinationInfo.StartLocation = loginParams["start"];
 
-            IValue iv;
-
             try
             {
                 loginData.Account = m_UserAccountService[firstName, lastName];
@@ -590,6 +590,10 @@ namespace SilverSim.Grid.Login
             loginData.SessionInfo.SecureSessionID = userSessionInfo.SecureSessionID;
             try
             {
+                foreach(IUserSessionExtensionHandler handler in m_UserSessionExtensionServices)
+                {
+                    handler.UserSessionLogin(userSessionInfo.SessionID);
+                }
                 return LoginAuthenticatedAndPresenceAdded(req, loginData);
             }
             catch
@@ -1205,6 +1209,18 @@ namespace SilverSim.Grid.Login
                 : base(message)
             {
                 Reason = reason;
+            }
+
+            public LoginFailResponseException() : base()
+            {
+            }
+
+            public LoginFailResponseException(string message) : base(message)
+            {
+            }
+
+            public LoginFailResponseException(string message, Exception innerException) : base(message, innerException)
+            {
             }
         }
 
