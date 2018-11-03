@@ -269,6 +269,7 @@ namespace SilverSim.Database.Memory.UserSession
                     {
                         value.ExpiryDate = value.ExpiryDate.Add(span);
                     }
+                    value = new UserSessionInfo.Entry(value);
                     return true;
                 }
                 return false;
@@ -291,6 +292,7 @@ namespace SilverSim.Database.Memory.UserSession
                     {
                         value.ExpiryDate = value.ExpiryDate.Add(span);
                     }
+                    value = new UserSessionInfo.Entry(value);
                     return true;
                 }
                 return false;
@@ -314,6 +316,7 @@ namespace SilverSim.Database.Memory.UserSession
                     {
                         value.ExpiryDate = value.ExpiryDate.Add(span);
                     }
+                    value = new UserSessionInfo.Entry(value);
                     return true;
                 }
                 value = default(UserSessionInfo.Entry);
