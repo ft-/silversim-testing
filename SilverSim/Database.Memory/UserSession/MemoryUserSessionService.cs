@@ -196,6 +196,23 @@ namespace SilverSim.Database.Memory.UserSession
             }
         }
 
+        public override bool CompareAndRemove(UUID sessionID, string assoc, string varname, string value)
+        {
+            lock (m_UserSessionLock)
+            {
+                UserSessionInfo info;
+                if (m_UserSessions.TryGetValue(sessionID, out info))
+                {
+                    UserSessionInfo.Entry val;
+                    if(info.DynamicData.TryGetValue($"{assoc}/{varname}", out val) && value == val.Value)
+                    {
+                        return info.DynamicData.Remove($"{assoc}/{varname}");
+                    }
+                }
+            }
+            return false;
+        }
+
         public override bool TryGetSecureValue(UUID secureSessionID, out UserSessionInfo sessionInfo)
         {
             lock (m_UserSessionLock)
@@ -254,6 +271,52 @@ namespace SilverSim.Database.Memory.UserSession
                     }
                     return true;
                 }
+                return false;
+            }
+        }
+
+        public override bool TryCompareValueExtendLifetime(UUID sessionID, string assoc, string varname, string oldvalue, TimeSpan span, out UserSessionInfo.Entry value)
+        {
+            value = default(UserSessionInfo.Entry);
+            lock (m_UserSessionLock)
+            {
+                UserSessionInfo info;
+                if (!m_UserSessions.TryGetValue(sessionID, out info))
+                {
+                    return false;
+                }
+                if (info.TryGetValue(assoc, varname, out value) && value.Value == oldvalue)
+                {
+                    if (value.ExpiryDate != null)
+                    {
+                        value.ExpiryDate = value.ExpiryDate.Add(span);
+                    }
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        public override bool TryCompareAndChangeValueExtendLifetime(UUID sessionID, string assoc, string varname, string oldvalue, string newvalue, TimeSpan span, out UserSessionInfo.Entry value)
+        {
+            value = default(UserSessionInfo.Entry);
+            lock (m_UserSessionLock)
+            {
+                UserSessionInfo info;
+                if (!m_UserSessions.TryGetValue(sessionID, out info))
+                {
+                    return false;
+                }
+                if (info.TryGetValue(assoc, varname, out value) && value.Value == oldvalue)
+                {
+                    value.Value = newvalue;
+                    if (value.ExpiryDate != null)
+                    {
+                        value.ExpiryDate = value.ExpiryDate.Add(span);
+                    }
+                    return true;
+                }
+                value = default(UserSessionInfo.Entry);
                 return false;
             }
         }

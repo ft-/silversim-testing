@@ -62,6 +62,8 @@ namespace SilverSim.ServiceInterfaces.UserSession
         }
         public abstract void SetExpiringValue(UUID sessionID, string assoc, string varname, string value, TimeSpan span);
         public abstract bool TryGetValueExtendLifetime(UUID sessionID, string assoc, string varname, TimeSpan span, out UserSessionInfo.Entry value);
+        public abstract bool TryCompareValueExtendLifetime(UUID sessionID, string assoc, string varname, string oldvalue, TimeSpan span, out UserSessionInfo.Entry value);
+        public abstract bool TryCompareAndChangeValueExtendLifetime(UUID sessionID, string assoc, string varname, string oldvalue, string newvalue, TimeSpan span, out UserSessionInfo.Entry value);
         public bool TryGetValue(UUID sessionID, string assoc, string varname, out string value)
         {
             UserSessionInfo.Entry entry;
@@ -76,6 +78,7 @@ namespace SilverSim.ServiceInterfaces.UserSession
         public abstract bool TryGetValue(UUID sessionID, string assoc, string varname, out UserSessionInfo.Entry value);
         public abstract bool ContainsKey(UUID sessionID, string assoc, string varname);
         public abstract bool Remove(UUID sessionID, string assoc, string varname);
+        public abstract bool CompareAndRemove(UUID sessionID, string assoc, string varname, string value);
         #endregion
 
         public void SetExpiringValue(UUID sessionID, KnownUserSessionInfoVariables varid, string value, TimeSpan span)
