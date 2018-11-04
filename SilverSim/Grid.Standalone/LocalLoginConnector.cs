@@ -82,7 +82,8 @@ namespace SilverSim.Grid.Standalone
         private GroupsServiceInterface m_LocalGroupsService;
         private readonly string m_LocalEconomyServiceName;
         private EconomyServiceInterface m_LocalEconomyService;
-        public List<ITeleportHandlerFactoryServiceInterface> m_TeleportProtocols = new List<ITeleportHandlerFactoryServiceInterface>();
+        private List<ITeleportHandlerFactoryServiceInterface> m_TeleportProtocols = new List<ITeleportHandlerFactoryServiceInterface>();
+        private List<IUserSessionStatusHandler> m_UserSessionStatusServices;
 
         private List<AuthorizationServiceInterface> m_AuthorizationServices;
         private List<IProtocolExtender> m_PacketHandlerPlugins = new List<IProtocolExtender>();
@@ -136,6 +137,7 @@ namespace SilverSim.Grid.Standalone
         {
             m_CommandRegistry = loader.CommandRegistry;
             m_TeleportProtocols = loader.GetServicesByValue<ITeleportHandlerFactoryServiceInterface>();
+            m_UserSessionStatusServices = loader.GetServicesByValue<IUserSessionStatusHandler>();
             m_Scenes = loader.Scenes;
             m_CapsRedirector = loader.CapsRedirector;
             m_AuthorizationServices = loader.GetServicesByValue<AuthorizationServiceInterface>();
@@ -296,7 +298,7 @@ namespace SilverSim.Grid.Standalone
                 serviceList.Add(m_LocalProfileService);
             }
             serviceList.Add(m_LocalFriendsService);
-            serviceList.Add(new StandalonePresenceService(m_LocalUserAccountService, account.Principal, m_LocalUserSessionService, sessionInfo.SessionID));
+            serviceList.Add(new StandalonePresenceService(m_LocalUserAccountService, account.Principal, m_LocalUserSessionService, sessionInfo.SessionID, m_UserSessionStatusServices));
             serviceList.Add(gridService);
             serviceList.Add(m_LocalOfflineIMService);
             if (m_LocalEconomyService != null)

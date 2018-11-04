@@ -22,6 +22,7 @@
 using SilverSim.ServiceInterfaces.Account;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
+using System.Collections.Generic;
 
 namespace SilverSim.ServiceInterfaces.UserSession
 {
@@ -31,15 +32,33 @@ namespace SilverSim.ServiceInterfaces.UserSession
         private readonly UserAccountServiceInterface m_UserAccountService;
         private readonly UUID m_SessionID;
         private readonly UGUI m_User;
+        private List<IUserSessionStatusHandler> m_UserSessionStatusServices;
 
         public StandalonePresenceService(
             UserAccountServiceInterface userAccountService, UGUI user,
-            UserSessionServiceInterface userSessionService, UUID sessionID)
+            UserSessionServiceInterface userSessionService, UUID sessionID,
+            List<IUserSessionStatusHandler> UserSessionStatusServices)
         {
             m_UserAccountService = userAccountService;
             m_User = user;
             m_UserSessionService = userSessionService;
             m_SessionID = sessionID;
+            m_UserSessionStatusServices = UserSessionStatusServices;
+        }
+
+        private void SendOffline()
+        {
+            foreach (IUserSessionStatusHandler handler in m_UserSessionStatusServices)
+            {
+                try
+                {
+                    handler.UserSessionLogout(m_SessionID, m_User);
+                }
+                catch
+                {
+                    /* intentionally ignored */
+                }
+            }
         }
 
         public bool Logout()
@@ -47,7 +66,14 @@ namespace SilverSim.ServiceInterfaces.UserSession
             bool f = m_UserSessionService.Remove(m_SessionID);
             if (f)
             {
-                m_UserAccountService.LoggedOut(m_User.ID);
+                try
+                {
+                    m_UserAccountService.LoggedOut(m_User.ID);
+                }
+                finally
+                {
+                    SendOffline();
+                }
             }
             return f;
         }
@@ -57,12 +83,19 @@ namespace SilverSim.ServiceInterfaces.UserSession
             bool f = m_UserSessionService.Remove(m_SessionID);
             if (f)
             {
-                m_UserAccountService.LoggedOut(m_User.ID, new UserRegionData
+                try
                 {
-                    RegionID = regionID,
-                    Position = position,
-                    LookAt = lookAt
-                });
+                    m_UserAccountService.LoggedOut(m_User.ID, new UserRegionData
+                    {
+                        RegionID = regionID,
+                        Position = position,
+                        LookAt = lookAt
+                    });
+                }
+                finally
+                {
+                    SendOffline();
+                }
             }
             return f;
         }

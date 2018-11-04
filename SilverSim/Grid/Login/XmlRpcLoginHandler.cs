@@ -86,6 +86,7 @@ namespace SilverSim.Grid.Login
         private List<ILoginConnectorServiceInterface> m_RemoteLoginConnectorServices;
         private List<ILoginUserCapsGetInterface> m_UserCapsGetters;
         private List<IUserSessionExtensionHandler> m_UserSessionExtensionServices;
+        private List<IUserSessionStatusHandler> m_UserSessionStatusServices;
 
         private readonly string m_UserAccountServiceName;
         private readonly string m_GridServiceName;
@@ -129,6 +130,7 @@ namespace SilverSim.Grid.Login
             m_GridInfoGetters = loader.GetServicesByValue<IGridInfoServiceInterface>();
             m_LoginResponseGetters = loader.GetServicesByValue<ILoginResponseServiceInterface>();
             m_UserSessionExtensionServices = loader.GetServicesByValue<IUserSessionExtensionHandler>();
+            m_UserSessionStatusServices = loader.GetServicesByValue<IUserSessionStatusHandler>();
             m_HomeUri = loader.HomeURI;
             m_XmlRpcServer = loader.XmlRpcServer;
             m_GatekeeperUri = loader.GatekeeperURI;
@@ -588,19 +590,32 @@ namespace SilverSim.Grid.Login
 
             loginData.SessionInfo.SessionID = userSessionInfo.SessionID;
             loginData.SessionInfo.SecureSessionID = userSessionInfo.SecureSessionID;
+            XmlRpc.XmlRpcResponse res;
             try
             {
                 foreach(IUserSessionExtensionHandler handler in m_UserSessionExtensionServices)
                 {
                     handler.UserSessionLogin(userSessionInfo.SessionID);
                 }
-                return LoginAuthenticatedAndPresenceAdded(req, loginData);
+                res = LoginAuthenticatedAndPresenceAdded(req, loginData);
             }
             catch
             {
                 m_UserSessionService.Remove(userSessionInfo.SessionID);
                 throw;
             }
+            foreach(IUserSessionStatusHandler handler in m_UserSessionStatusServices)
+            {
+                try
+                {
+                    handler.UserSessionLogin(userSessionInfo.SessionID, userSessionInfo.User);
+                }
+                catch
+                {
+                    /* intentionally ignored */
+                }
+            }
+            return res;
         }
 
         private XmlRpc.XmlRpcResponse LoginAuthenticatedAndPresenceAdded(XmlRpc.XmlRpcRequest req, LoginData loginData)
@@ -1246,7 +1261,7 @@ namespace SilverSim.Grid.Login
             }
         }
 
-#region Server Parameters
+        #region Server Parameters
         private readonly object m_ConfigUpdateLock = new object();
 
         private const string ConfigIssueText = "Server parameter \"AllowLoginViaHttpWhenHttpsIsConfigured\" is set to true. Please disable it.";
@@ -1426,6 +1441,6 @@ namespace SilverSim.Grid.Login
             }
             m_GridNick = value;
         }
-#endregion
+        #endregion
     }
 }
