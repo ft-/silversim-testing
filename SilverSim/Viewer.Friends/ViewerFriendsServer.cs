@@ -77,7 +77,6 @@ namespace SilverSim.Viewer.Friends
         private readonly string m_IMServiceName;
         private List<IFriendsServicePlugin> m_FriendsPlugins;
         private List<IUserAgentServicePlugin> m_UserAgentPlugins;
-        private List<IFriendsStatusNotifyServicePlugin> m_FriendsStatusNotifyPlugins;
         private SceneList m_Scenes;
 
         private bool m_ShutdownFriends;
@@ -93,7 +92,6 @@ namespace SilverSim.Viewer.Friends
             m_IMService = loader.GetService<IMServiceInterface>(m_IMServiceName);
             m_FriendsPlugins = loader.GetServicesByValue<IFriendsServicePlugin>();
             m_UserAgentPlugins = loader.GetServicesByValue<IUserAgentServicePlugin>();
-            m_FriendsStatusNotifyPlugins = loader.GetServicesByValue<IFriendsStatusNotifyServicePlugin>();
             ThreadManager.CreateThread(HandlerThread).Start();
         }
 
@@ -211,7 +209,7 @@ namespace SilverSim.Viewer.Friends
             IAgent testagent;
             UGUIWithName destagent;
             FriendInfo friendInfo;
-            IFriendsStatusNotifyServiceInterface otherFriendsStatusNotifyService;
+            UserAgentServiceInterface userAgentService;
             if (scene.Agents.TryGetValue(destid, out testagent))
             {
                 var outmsg = new OnlineNotification();
@@ -222,13 +220,15 @@ namespace SilverSim.Viewer.Friends
             {
                 return;
             }
-            else if(!TryGetFriendsStatusNotifyService(destagent, out otherFriendsStatusNotifyService))
+            else if(m_UserAgentPlugins.TryIdentify(destagent.HomeURI.ToString(), out userAgentService))
             {
                 return;
             }
-            else if(agent.FriendsService.TryGetValue(agent.Owner, destagent, out friendInfo) && (friendInfo.FriendGivenFlags & FriendRightFlags.SeeOnline) != 0)
+            else if(agent.FriendsService.TryGetValue(agent.Owner, destagent, out friendInfo) && (friendInfo.FriendGivenFlags & FriendRightFlags.SeeOnline) != 0 && userAgentService.IsOnline(destagent))
             {
-                otherFriendsStatusNotifyService.NotifyAsOnline(agent.Owner, new List<KeyValuePair<UGUI, string>> { new KeyValuePair<UGUI, string>(destagent, friendInfo.Secret) });
+                var outmsg = new OnlineNotification();
+                outmsg.AgentIDs.Add(destid);
+                agent.SendMessageAlways(outmsg, m.CircuitSceneID);
             }
         }
 
@@ -762,78 +762,6 @@ namespace SilverSim.Viewer.Friends
             }
 
             foreach (var service in m_FriendsPlugins)
-            {
-                if (handlerType.Contains(service.Name))
-                {
-                    friendsService = service.Instantiate(friendsUri);
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        public bool TryGetFriendsStatusNotifyService(UGUI agent, out IFriendsStatusNotifyServiceInterface friendsService)
-        {
-            friendsService = null;
-            if (agent.HomeURI == null)
-            {
-                return false;
-            }
-
-            string[] handlerType;
-            var homeURI = agent.HomeURI.ToString();
-            try
-            {
-                handlerType = ServicePluginHelo.HeloRequest_HandleType(homeURI);
-            }
-            catch
-            {
-                return false;
-            }
-
-            UserAgentServiceInterface userAgentService = null;
-
-            foreach (var service in m_UserAgentPlugins)
-            {
-                if (handlerType.Contains(service.Name))
-                {
-                    userAgentService = service.Instantiate(homeURI);
-                    break;
-                }
-            }
-
-            if (userAgentService == null)
-            {
-                return false;
-            }
-
-            string friendsUri;
-            Dictionary<string, string> serviceurls;
-            try
-            {
-                serviceurls = userAgentService.GetServerURLs(agent);
-            }
-            catch
-            {
-                return false;
-            }
-
-            if (!serviceurls.TryGetValue("FriendsServerURI", out friendsUri))
-            {
-                return false;
-            }
-
-            try
-            {
-                handlerType = ServicePluginHelo.HeloRequest_HandleType(friendsUri);
-            }
-            catch
-            {
-                return false;
-            }
-
-            foreach (var service in m_FriendsStatusNotifyPlugins)
             {
                 if (handlerType.Contains(service.Name))
                 {

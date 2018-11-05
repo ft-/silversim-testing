@@ -377,9 +377,6 @@ namespace SilverSim.Main.Common
             FeaturesTable[typeof(IAssetPurgeServiceInterface)] = "Asset purging service";
             FeaturesTable[typeof(ExperienceServiceInterface)] = "Experience Service";
             FeaturesTable[typeof(IFriendsSimStatusNotifyService)] = "Friends Sim Status Notify Service";
-            FeaturesTable[typeof(IFriendsStatusNotifer)] = "Friends Status Notifier";
-            FeaturesTable[typeof(IFriendsStatusNotifyServicePlugin)] = "Friends status notify service HELO Instantiator";
-            FeaturesTable[typeof(IFriendsStatusNotifyServiceInterface)] = "Friends status notify service";
             FeaturesTable[typeof(EconomyServiceInterface)] = "Economy service";
 
             FeaturesTable[typeof(IPluginShutdown)] = "Shutdown Handler";

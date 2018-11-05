@@ -32,15 +32,16 @@ namespace SilverSim.Main.Friends
 {
     [PluginName("LocalFriendsSimNotifier")]
     [Description("Local friends on regions notifier")]
-    public sealed class LocalFriendsSimStatusNotifyService : IFriendsSimStatusNotifyService, IPlugin, IFriendsStatusNotifyServiceInterface
+    public sealed class LocalFriendsSimStatusNotifyService : IFriendsSimStatusNotifyService, IPlugin
     {
         private SceneList m_Scenes;
-        public void NotifyAsOffline(UUID regionid, UGUI notifier, List<UGUI> list)
+        public void NotifyAsOffline(UGUI notifier, List<UGUI> list)
         {
-            foreach(UGUI id in list)
+            foreach (UGUI id in list)
             {
                 IAgent agent;
-                if(m_Scenes.TryFindRootAgent(regionid, id.ID, out agent))
+                UUID regionid;
+                if (m_Scenes.TryFindRootAgent(id.ID, out agent, out regionid))
                 {
                     var offlineNotification = new OfflineNotification();
                     offlineNotification.AgentIDs.Add(notifier.ID);
@@ -49,46 +50,17 @@ namespace SilverSim.Main.Friends
             }
         }
 
-        public void NotifyAsOffline(UGUI notifier, List<KeyValuePair<UGUI, string>> list)
-        {
-            foreach (KeyValuePair<UGUI, string> kvp in list)
-            {
-                IAgent agent;
-                UUID sceneID;
-                if(m_Scenes.TryFindRootAgent(kvp.Key.ID, out agent, out sceneID))
-                {
-                    var offlineNotification = new OfflineNotification();
-                    offlineNotification.AgentIDs.Add(notifier.ID);
-                    agent.SendMessageAlways(offlineNotification, sceneID);
-                }
-            }
-        }
-
-        public void NotifyAsOnline(UUID regionid, UGUI notifier, List<UGUI> list)
+        public void NotifyAsOnline(UGUI notifier, List<UGUI> list)
         {
             foreach (UGUI id in list)
             {
                 IAgent agent;
-                if (m_Scenes.TryFindRootAgent(regionid, id.ID, out agent))
+                UUID regionid;
+                if (m_Scenes.TryFindRootAgent(id.ID, out agent, out regionid))
                 {
                     var onlineNotification = new OnlineNotification();
                     onlineNotification.AgentIDs.Add(notifier.ID);
                     agent.SendMessageAlways(onlineNotification, regionid);
-                }
-            }
-        }
-
-        public void NotifyAsOnline(UGUI notifier, List<KeyValuePair<UGUI, string>> list)
-        {
-            foreach (KeyValuePair<UGUI, string> kvp in list)
-            {
-                IAgent agent;
-                UUID sceneID;
-                if (m_Scenes.TryFindRootAgent(kvp.Key.ID, out agent, out sceneID))
-                {
-                    var onlineNotification = new OnlineNotification();
-                    onlineNotification.AgentIDs.Add(notifier.ID);
-                    agent.SendMessageAlways(onlineNotification, sceneID);
                 }
             }
         }

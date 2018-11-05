@@ -20,14 +20,36 @@
 // exception statement from your version.
 
 using System.Collections.Generic;
+using System.Linq;
 
-namespace SilverSim.ServiceInterfaces.Friends
+namespace SilverSim.ServiceInterfaces.UserAgents
 {
-    public interface IFriendsStatusNotifyServicePlugin
+    public static class UserAgentServiceExtensionMethods
     {
-        IFriendsStatusNotifyServiceInterface Instantiate(string url);
-        string Name { get; }
-        bool IsProtocolSupported(string url);
-        bool IsProtocolSupported(string url, Dictionary<string, string> cachedheaders);
+        public static bool TryIdentify(this IList<IUserAgentServicePlugin> plugins, string homeURI, out UserAgentServiceInterface userAgentService)
+        {
+            userAgentService = null;
+
+            string[] handlerType;
+            try
+            {
+                handlerType = ServicePluginHelo.HeloRequest_HandleType(homeURI);
+            }
+            catch
+            {
+                return false;
+            }
+
+            foreach (var service in plugins)
+            {
+                if (handlerType.Contains(service.Name))
+                {
+                    userAgentService = service.Instantiate(homeURI);
+                    break;
+                }
+            }
+
+            return userAgentService != null;
+        }
     }
 }

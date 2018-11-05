@@ -2,7 +2,13 @@
 <package>
 	<name>SilverSim.Main.Friends</name>
 	<default-configuration>
-		<source>SilverSim.Main.Friends:PackageConfig.ini</source>
+		<source>SilverSim.Main.Friends:FriendsStatusNotifier.ini</source>
+		<use-if-started-as>grid</use-if-started-as>
+		<use-if-started-as>standalone</use-if-started-as>
+	</default-configuration>
+	<default-configuration>
+		<source>SilverSim.Main.Friends:LocalStatusNotifier.ini</source>
+		<use-if-started-as>standalone</use-if-started-as>
 	</default-configuration>
 	<files>
 		<file name="bin/plugins/SilverSim.Main.Friends.dll" is-version-src="true"/>

@@ -24,180 +24,230 @@ using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces;
 using SilverSim.ServiceInterfaces.Friends;
+using SilverSim.ServiceInterfaces.UserAgents;
+using SilverSim.ServiceInterfaces.UserSession;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Friends;
-using SilverSim.Types.ServerURIs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Threading;
 
 namespace SilverSim.Main.Friends
 {
-    [PluginName("FriendsNotifier")]
-    [Description("Friends status notification service")]
-    public class FriendsStatusNotifier : IFriendsStatusNotifer, IPlugin, IPluginShutdown
+    [PluginName("FriendsStatusNotifier")]
+    [Description("Friends status notifier")]
+    public sealed class FriendsStatusNotifier : IPlugin, IPluginShutdown, IUserSessionStatusHandler
     {
         private static readonly ILog m_Log = LogManager.GetLogger("FRIENDS STATUS NOTIFIER");
-        private List<IFriendsStatusNotifyServicePlugin> m_Plugins;
+        private BlockingQueue<KeyValuePair<UGUI, bool>> m_StatusQueue = new BlockingQueue<KeyValuePair<UGUI, bool>>();
+        private bool m_ShutdownThreads;
+        private int m_ActiveThreads;
+        private UserSessionServiceInterface m_UserSessionService;
+        private readonly string m_UserSessionServiceName;
         private FriendsServiceInterface m_FriendsService;
         private readonly string m_FriendsServiceName;
-        private IFriendsStatusNotifyServiceInterface m_LocalFriendsStatusNotifyService;
-        private readonly string m_LocalFriendsStatusNotifyServiceName;
+        private IFriendsSimStatusNotifyService m_FriendsSimStatusNotifierService;
+        private readonly string m_FriendsSimStatusNotifierServiceName;
         private string m_HomeURI;
+        private List<IUserAgentServicePlugin> m_UserAgentServicePlugins;
 
-        public ShutdownOrder ShutdownOrder => ShutdownOrder.LogoutDatabase;
-
-        private class FriendsStatusRequest
-        {
-            public readonly UGUI Notifier;
-            public readonly bool IsOnline;
-            public readonly FriendsServiceInterface FriendsService;
-
-            public FriendsStatusRequest(UGUI notifier, bool isOnline, FriendsServiceInterface friendsService)
-            {
-                Notifier = notifier;
-                IsOnline = isOnline;
-                FriendsService = friendsService;
-            }
-        }
+        public ShutdownOrder ShutdownOrder => ShutdownOrder.LogoutRegion;
 
         public FriendsStatusNotifier(IConfig config)
         {
-            m_FriendsServiceName = config.GetString("FriendsService", string.Empty);
-            m_LocalFriendsStatusNotifyServiceName = config.GetString("LocalFriendsNotifyService", string.Empty);
-        }
-
-        public void NotifyAsOffline(UGUI notifier, FriendsServiceInterface friendsService = null) =>
-            m_NotificationQueue.Enqueue(new FriendsStatusRequest(notifier, false, friendsService ?? m_FriendsService));
-
-        public void NotifyAsOnline(UGUI notifier, FriendsServiceInterface friendsService = null) =>
-            m_NotificationQueue.Enqueue(new FriendsStatusRequest(notifier, true, friendsService ?? m_FriendsService));
-
-        private readonly BlockingQueue<FriendsStatusRequest> m_NotificationQueue = new BlockingQueue<FriendsStatusRequest>();
-        private bool m_ShutdownThread;
-
-        private void NotifyThread()
-        {
-            Thread.CurrentThread.Name = "Friend status notifier";
-            FriendsStatusRequest notifyReq;
-
-            while(!m_ShutdownThread)
-            {
-                try
-                {
-                    notifyReq = m_NotificationQueue.Dequeue(1000);
-                }
-                catch(TimeoutException)
-                {
-                    continue;
-                }
-
-                try
-                {
-                    Notify(notifyReq.Notifier, notifyReq.IsOnline, notifyReq.FriendsService);
-                }
-                catch(Exception e)
-                {
-                    m_Log.Debug("Exception at friends status", e);
-                }
-            }
-        }
-
-        private void Notify(UGUI notifier, bool isOnline, FriendsServiceInterface friendsService)
-        {
-            var friendsPerHomeUri = new Dictionary<Uri, List<KeyValuePair<UGUI, string>>>();
-
-            if(friendsService != null)
-            {
-                foreach(FriendInfo fi in friendsService[notifier])
-                {
-                    if((fi.FriendGivenFlags & FriendRightFlags.SeeOnline) != 0)
-                    {
-                        Uri homeURI = fi.Friend.HomeURI;
-                        List <KeyValuePair<UGUI, string>> list;
-                        if(!friendsPerHomeUri.TryGetValue(homeURI, out list))
-                        {
-                            list = new List<KeyValuePair<UGUI, string>>();
-                            friendsPerHomeUri.Add(homeURI, list);
-                        }
-
-                        list.Add(new KeyValuePair<UGUI, string>(fi.Friend, fi.Secret));
-                    }
-                }
-
-                foreach(KeyValuePair<Uri, List<KeyValuePair<UGUI, string>>> kvp in friendsPerHomeUri)
-                {
-                    Uri uri = kvp.Key ?? new Uri(m_HomeURI);
-                    try
-                    {
-                        InnerNotify(notifier, uri, kvp.Value, isOnline);
-                    }
-                    catch(Exception e)
-                    {
-                        m_Log.Warn($"Could not connect to {uri}", e);
-                    }
-                }
-            }
-        }
-
-        private void InnerNotify(UGUI notifier, Uri uri, List<KeyValuePair<UGUI, string>> list, bool isOnline)
-        {
-            string url = uri?.ToString() ?? m_HomeURI;
-            if (url.Equals(m_HomeURI, StringComparison.InvariantCultureIgnoreCase))
-            {
-                if (isOnline)
-                {
-                    m_LocalFriendsStatusNotifyService?.NotifyAsOnline(notifier, list);
-                }
-                else
-                {
-                    m_LocalFriendsStatusNotifyService?.NotifyAsOffline(notifier, list);
-                }
-            }
-            else
-            {
-                var serverurls = new ServerURIs();
-                serverurls.GetServerURLs(UGUI.Unknown, url);
-
-                Dictionary<string, string> cachedheaders = ServicePluginHelo.HeloRequest(serverurls.FriendsServerURI);
-                foreach (IFriendsStatusNotifyServicePlugin plugin in m_Plugins)
-                {
-                    if (plugin.IsProtocolSupported(url, cachedheaders))
-                    {
-                        IFriendsStatusNotifyServiceInterface service = plugin.Instantiate(url);
-                        if (isOnline)
-                        {
-                            service.NotifyAsOnline(notifier, list);
-                        }
-                        else
-                        {
-                            service.NotifyAsOffline(notifier, list);
-                        }
-                    }
-                }
-            }
-        }
-
-        public void Startup(ConfigurationLoader loader)
-        {
-            m_Plugins = loader.GetServicesByValue<IFriendsStatusNotifyServicePlugin>();
-            m_HomeURI = loader.HomeURI;
-            if(!string.IsNullOrEmpty(m_FriendsServiceName))
-            {
-                m_FriendsService = loader.GetService<FriendsServiceInterface>(m_FriendsServiceName);
-            }
-            if(!string.IsNullOrEmpty(m_LocalFriendsStatusNotifyServiceName))
-            {
-                m_LocalFriendsStatusNotifyService = loader.GetService<IFriendsStatusNotifyServiceInterface>(m_LocalFriendsStatusNotifyServiceName);
-            }
-            ThreadManager.CreateThread(NotifyThread).Start();
+            m_UserSessionServiceName = config.GetString("UserSessionService", "UserSessionService");
+            m_FriendsServiceName = config.GetString("FriendsService", "FriendsService");
+            m_FriendsSimStatusNotifierServiceName = config.GetString("FriendsSimStatusNotifier", string.Empty);
         }
 
         public void Shutdown()
         {
-            m_ShutdownThread = true;
+            m_Log.Info("Stopping friends status handler");
+            m_ShutdownThreads = true;
+            while (m_ActiveThreads != 0)
+            {
+                Thread.Sleep(1);
+            }
+            m_Log.Info("Stopped friends status handler");
+        }
+
+        public void Startup(ConfigurationLoader loader)
+        {
+            m_HomeURI = loader.HomeURI;
+            loader.GetService(m_UserSessionServiceName, out m_UserSessionService);
+            loader.GetService(m_FriendsServiceName, out m_FriendsService);
+            if (!string.IsNullOrEmpty(m_FriendsSimStatusNotifierServiceName))
+            {
+                loader.GetService(m_FriendsSimStatusNotifierServiceName, out m_FriendsSimStatusNotifierService);
+            }
+            m_UserAgentServicePlugins = loader.GetServicesByValue<IUserAgentServicePlugin>();
+        }
+
+        public void UserSessionLogin(UUID sessionID, UGUI user)
+        {
+            m_StatusQueue.Enqueue(new KeyValuePair<UGUI, bool>(user, true));
+            if (!m_ShutdownThreads && m_ActiveThreads < 50)
+            {
+                Interlocked.Increment(ref m_ActiveThreads);
+                Thread thread = ThreadManager.CreateThread(Run);
+                thread.Start();
+            }
+        }
+
+        public void UserSessionLogout(UUID sessionID, UGUI user)
+        {
+            m_StatusQueue.Enqueue(new KeyValuePair<UGUI, bool>(user, false));
+            if (!m_ShutdownThreads && m_ActiveThreads < 50)
+            {
+                Interlocked.Increment(ref m_ActiveThreads);
+                ThreadManager.CreateThread(Run).Start();
+            }
+        }
+
+        private void Run()
+        {
+            while (!m_ShutdownThreads)
+            {
+                KeyValuePair<UGUI, bool> statusMsg;
+                try
+                {
+                    statusMsg = m_StatusQueue.Dequeue(1000);
+                }
+                catch (TimeoutException)
+                {
+                    break;
+                }
+
+                try
+                {
+                    HandleStatusMsg(statusMsg);
+                }
+                catch (Exception e)
+                {
+                    m_Log.Debug($"Exception when signaling {statusMsg.Key}", e);
+                }
+            }
+            Interlocked.Decrement(ref m_ActiveThreads);
+        }
+
+        private void HandleStatusMsg(KeyValuePair<UGUI, bool> statusMsg)
+        {
+            bool isOnline = statusMsg.Value;
+            UGUI user = statusMsg.Key;
+
+            var signalingTo = new Dictionary<string, List<FriendInfo>>();
+
+            if (isOnline)
+            {
+                foreach (FriendInfo fi in m_FriendsService[user])
+                {
+                    string homeURI = fi.User.HomeURI?.ToString() ?? m_HomeURI;
+                    List<FriendInfo> friendsPerHomeURI;
+                    if ((fi.FriendGivenFlags & FriendRightFlags.SeeOnline) != 0)
+                    {
+                        if (!signalingTo.TryGetValue(homeURI, out friendsPerHomeURI))
+                        {
+                            friendsPerHomeURI = new List<FriendInfo>();
+                            signalingTo.Add(homeURI, friendsPerHomeURI);
+                        }
+                        friendsPerHomeURI.Add(fi);
+                    }
+                }
+            }
+            else if (!m_UserSessionService.ContainsKey(user))
+            {
+                foreach (FriendInfo fi in m_FriendsService[user])
+                {
+                    string homeURI = fi.User.HomeURI?.ToString() ?? m_HomeURI;
+                    List<FriendInfo> friendsPerHomeURI;
+                    if ((fi.FriendGivenFlags & FriendRightFlags.SeeOnline) != 0)
+                    {
+                        if (!signalingTo.TryGetValue(homeURI, out friendsPerHomeURI))
+                        {
+                            friendsPerHomeURI = new List<FriendInfo>();
+                            signalingTo.Add(homeURI, friendsPerHomeURI);
+                        }
+                        friendsPerHomeURI.Add(fi);
+                    }
+                }
+            }
+
+            if (signalingTo.Count == 0)
+            {
+                return;
+            }
+
+            foreach (KeyValuePair<string, List<FriendInfo>> kvp in signalingTo)
+            {
+                Dictionary<string, string> heloheaders;
+                try
+                {
+                    heloheaders = ServicePluginHelo.HeloRequest(kvp.Key);
+                }
+                catch (Exception e)
+                {
+                    m_Log.Debug("Failed to retrieve user agent HELO", e);
+                    continue;
+                }
+
+                if (kvp.Key == m_HomeURI)
+                {
+                    /* local stuff */
+                    if(m_FriendsSimStatusNotifierService != null)
+                    {
+                        try
+                        {
+                            if (isOnline)
+                            {
+                                m_FriendsSimStatusNotifierService.NotifyAsOnline(user, new List<UGUI>(from x in kvp.Value select x.Friend));
+                            }
+                            else
+                            {
+                                m_FriendsSimStatusNotifierService.NotifyAsOffline(user, new List<UGUI>(from x in kvp.Value select x.Friend));
+                            }
+                        }
+                        catch(Exception e)
+                        {
+                            m_Log.Debug($"Failed to send status to {kvp.Key}", e);
+                        }
+                    }
+                }
+                else
+                {
+                    UserAgentServiceInterface userAgentService = null;
+                    foreach (IUserAgentServicePlugin userAgentPlugin in m_UserAgentServicePlugins)
+                    {
+                        if (userAgentPlugin.IsProtocolSupported(kvp.Key))
+                        {
+                            userAgentService = userAgentPlugin.Instantiate(kvp.Key);
+                            break;
+                        }
+                    }
+
+                    if (userAgentService == null)
+                    {
+                        continue;
+                    }
+
+                    List<KeyValuePair<UGUI, string>> notifiedFriends = new List<KeyValuePair<UGUI, string>>();
+                    foreach (FriendInfo fi in kvp.Value)
+                    {
+                        notifiedFriends.Add(new KeyValuePair<UGUI, string>(fi.Friend, fi.Secret));
+                    }
+
+                    try
+                    {
+                        userAgentService.NotifyStatus(notifiedFriends, user, isOnline);
+                    }
+                    catch (Exception e)
+                    {
+                        m_Log.Debug($"Failed to send status to {kvp.Key}", e);
+                    }
+                }
+            }
         }
     }
 }
