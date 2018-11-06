@@ -24,9 +24,9 @@ using System.Collections.Generic;
 
 namespace SilverSim.ServiceInterfaces.Friends
 {
-    public interface IFriendsSimStatusNotifyService
+    public interface IFriendsSimStatusConnector
     {
         /** <summary>list is all people being notified</summary> */
-        void NotifyStatus(UGUI notifier, List<UGUI> list, bool isOnline);
+        void NotifyStatus(string uri, UUID regionid, UGUI notifier, List<UGUI> list, bool isOnline);
     }
 }

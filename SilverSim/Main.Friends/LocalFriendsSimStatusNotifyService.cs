@@ -35,22 +35,8 @@ namespace SilverSim.Main.Friends
     public sealed class LocalFriendsSimStatusNotifyService : IFriendsSimStatusNotifyService, IPlugin
     {
         private SceneList m_Scenes;
-        public void NotifyAsOffline(UGUI notifier, List<UGUI> list)
-        {
-            foreach (UGUI id in list)
-            {
-                IAgent agent;
-                UUID regionid;
-                if (m_Scenes.TryFindRootAgent(id.ID, out agent, out regionid))
-                {
-                    var offlineNotification = new OfflineNotification();
-                    offlineNotification.AgentIDs.Add(notifier.ID);
-                    agent.SendMessageAlways(offlineNotification, regionid);
-                }
-            }
-        }
 
-        public void NotifyAsOnline(UGUI notifier, List<UGUI> list)
+        public void NotifyStatus(UGUI notifier, List<UGUI> list, bool isOnline)
         {
             foreach (UGUI id in list)
             {
@@ -58,9 +44,18 @@ namespace SilverSim.Main.Friends
                 UUID regionid;
                 if (m_Scenes.TryFindRootAgent(id.ID, out agent, out regionid))
                 {
-                    var onlineNotification = new OnlineNotification();
-                    onlineNotification.AgentIDs.Add(notifier.ID);
-                    agent.SendMessageAlways(onlineNotification, regionid);
+                    if (isOnline)
+                    {
+                        var onlineNotification = new OnlineNotification();
+                        onlineNotification.AgentIDs.Add(notifier.ID);
+                        agent.SendMessageAlways(onlineNotification, regionid);
+                    }
+                    else
+                    {
+                        var offlineNotification = new OfflineNotification();
+                        offlineNotification.AgentIDs.Add(notifier.ID);
+                        agent.SendMessageAlways(offlineNotification, regionid);
+                    }
                 }
             }
         }

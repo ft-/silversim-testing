@@ -51,7 +51,7 @@ namespace SilverSim.Main.Friends
         private readonly string m_FriendsServiceName;
         private IFriendsSimStatusNotifyService m_FriendsSimStatusNotifierService;
         private readonly string m_FriendsSimStatusNotifierServiceName;
-        private string m_HomeURI;
+        private string m_GatekeeperURI;
         private List<IUserAgentServicePlugin> m_UserAgentServicePlugins;
 
         public ShutdownOrder ShutdownOrder => ShutdownOrder.LogoutRegion;
@@ -76,7 +76,7 @@ namespace SilverSim.Main.Friends
 
         public void Startup(ConfigurationLoader loader)
         {
-            m_HomeURI = loader.HomeURI;
+            m_GatekeeperURI = loader.GatekeeperURI;
             loader.GetService(m_UserSessionServiceName, out m_UserSessionService);
             loader.GetService(m_FriendsServiceName, out m_FriendsService);
             if (!string.IsNullOrEmpty(m_FriendsSimStatusNotifierServiceName))
@@ -144,7 +144,7 @@ namespace SilverSim.Main.Friends
             {
                 foreach (FriendInfo fi in m_FriendsService[user])
                 {
-                    string homeURI = fi.User.HomeURI?.ToString() ?? m_HomeURI;
+                    string homeURI = fi.User.HomeURI?.ToString() ?? m_GatekeeperURI;
                     List<FriendInfo> friendsPerHomeURI;
                     if ((fi.FriendGivenFlags & FriendRightFlags.SeeOnline) != 0)
                     {
@@ -161,7 +161,7 @@ namespace SilverSim.Main.Friends
             {
                 foreach (FriendInfo fi in m_FriendsService[user])
                 {
-                    string homeURI = fi.User.HomeURI?.ToString() ?? m_HomeURI;
+                    string homeURI = fi.User.HomeURI?.ToString() ?? m_GatekeeperURI;
                     List<FriendInfo> friendsPerHomeURI;
                     if ((fi.FriendGivenFlags & FriendRightFlags.SeeOnline) != 0)
                     {
@@ -193,21 +193,14 @@ namespace SilverSim.Main.Friends
                     continue;
                 }
 
-                if (kvp.Key == m_HomeURI)
+                if (kvp.Key == m_GatekeeperURI)
                 {
                     /* local stuff */
                     if(m_FriendsSimStatusNotifierService != null)
                     {
                         try
                         {
-                            if (isOnline)
-                            {
-                                m_FriendsSimStatusNotifierService.NotifyAsOnline(user, new List<UGUI>(from x in kvp.Value select x.Friend));
-                            }
-                            else
-                            {
-                                m_FriendsSimStatusNotifierService.NotifyAsOffline(user, new List<UGUI>(from x in kvp.Value select x.Friend));
-                            }
+                            m_FriendsSimStatusNotifierService.NotifyStatus(user, new List<UGUI>(from x in kvp.Value select x.Friend), isOnline);
                         }
                         catch(Exception e)
                         {
