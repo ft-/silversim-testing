@@ -92,8 +92,7 @@ namespace SilverSim.Main.Friends
             if (!m_ShutdownThreads && m_ActiveThreads < 50)
             {
                 Interlocked.Increment(ref m_ActiveThreads);
-                Thread thread = ThreadManager.CreateThread(Run);
-                thread.Start();
+                ThreadManager.CreateThread(Run).Start();
             }
         }
 
