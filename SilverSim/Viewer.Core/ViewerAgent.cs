@@ -178,7 +178,7 @@ namespace SilverSim.Viewer.Core
 
         #region ViewerAgent Properties
         public UUID SessionID { get; }
-        public double m_DrawDistance;
+        private double m_DrawDistance;
         public override double DrawDistance => m_DrawDistance;
         #endregion
 
