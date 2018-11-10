@@ -234,6 +234,10 @@ namespace SilverSim.Scene.Types.Agent
 
         Quaternion HeadRotation { get; set; }
 
+        AgentState State { get; set; }
+
+        double DrawDistance { get; }
+
         void ResetAnimationOverride();
         void ResetAnimationOverride(AgentAnimationController.AnimationState anim_state);
         void SetAnimationOverride(AgentAnimationController.AnimationState anim_state, UUID anim);

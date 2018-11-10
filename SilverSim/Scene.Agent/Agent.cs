@@ -83,14 +83,14 @@ namespace SilverSim.Scene.Agent
         {
             get
             {
-                lock(m_DataLock)
+                lock (m_DataLock)
                 {
                     return m_TracksAgentID;
                 }
             }
             set
             {
-                lock(m_DataLock)
+                lock (m_DataLock)
                 {
                     m_TracksAgentID = value;
                 }
@@ -192,6 +192,7 @@ namespace SilverSim.Scene.Agent
         public abstract List<GridType> SupportedGridTypes { get; }
         public abstract IAgentTeleportServiceInterface ActiveTeleportService { get; set; }
         public abstract bool IsAway { get; }
+        public virtual double DrawDistance { get; }
 
         public void GetBoundingBox(out BoundingBox box) => box = new BoundingBox
         {
@@ -1147,6 +1148,8 @@ namespace SilverSim.Scene.Agent
                 }
             }
         }
+
+        public AgentState State { get; set; }
 
         public virtual void SetAssetUploadAsCompletionAction(UUID transactionID, UUID sceneID, Action<UUID> action)
         {

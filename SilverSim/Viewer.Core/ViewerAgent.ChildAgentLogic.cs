@@ -85,7 +85,7 @@ namespace SilverSim.Viewer.Core
                             LeftAxis = CameraLeftAxis,
                             UpAxis = CameraUpAxis,
                             ChangedGrid = false,
-                            Far = DrawDistance,
+                            Far = m_DrawDistance,
                             Aspect = 1,
                             Throttles = new byte[9],
                             //m.LocomotionState;
