@@ -236,6 +236,8 @@ namespace SilverSim.Scene.Types.Agent
 
         AgentState State { get; set; }
 
+        List<AgentControlData> ActiveControls { get; }
+
         double DrawDistance { get; }
 
         void ResetAnimationOverride();

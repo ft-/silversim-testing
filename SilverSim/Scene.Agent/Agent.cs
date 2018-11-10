@@ -193,6 +193,7 @@ namespace SilverSim.Scene.Agent
         public abstract IAgentTeleportServiceInterface ActiveTeleportService { get; set; }
         public abstract bool IsAway { get; }
         public virtual double DrawDistance { get; }
+        public abstract List<AgentControlData> ActiveControls { get; }
 
         public void GetBoundingBox(out BoundingBox box) => box = new BoundingBox
         {

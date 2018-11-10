@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Scene.Types.Script.Events;
@@ -34,9 +35,8 @@ namespace SilverSim.Viewer.Core
 {
     public partial class ViewerAgent
     {
+
         #region Agent Controls Field
-        private ControlFlags m_TakenControls;
-        private ControlFlags m_IgnoredControls;
         private ControlFlags m_ActiveAgentControlFlags;
         private bool m_IsRunning;
         private bool m_IsAway;
@@ -76,6 +76,29 @@ namespace SilverSim.Viewer.Core
             this[instance] = null;
         }
 
+        public override List<AgentControlData> ActiveControls
+        {
+            get
+            {
+                var list = new List<AgentControlData>();
+                lock(m_ScriptControls)
+                {
+                    foreach(KeyValuePair<ScriptInstance, ScriptControlData> kvp in m_ScriptControls)
+                    {
+                        list.Add(new AgentControlData
+                        {
+                            PartID = kvp.Key.Part.ID,
+                            ItemID = kvp.Key.Item.ID,
+                            Taken = kvp.Value.Taken,
+                            Ignored = kvp.Value.Ignored
+                        });
+                    }
+                }
+                return list;
+            }
+        }
+
+
         public ScriptControlData this[ScriptInstance instance]
         {
             get
@@ -102,16 +125,16 @@ namespace SilverSim.Viewer.Core
                     {
                         m_ScriptControls.Remove(instance);
                     }
-                    m_TakenControls = ControlFlags.None;
-                    m_IgnoredControls = ControlFlags.None;
+                    TakenControls = ControlFlags.None;
+                    IgnoredControls = ControlFlags.None;
                     foreach(var sc in m_ScriptControls.Values)
                     {
-                        m_TakenControls |= sc.Taken;
-                        m_IgnoredControls |= sc.Ignored;
+                        TakenControls |= sc.Taken;
+                        IgnoredControls |= sc.Ignored;
                     }
                 }
-                ControlFlags taken = m_TakenControls;
-                ControlFlags ignored = m_IgnoredControls;
+                ControlFlags taken = TakenControls;
+                ControlFlags ignored = IgnoredControls;
 
                 var msg = new ScriptControlChange();
                 if(taken != ignored)
@@ -152,9 +175,9 @@ namespace SilverSim.Viewer.Core
         }
 
         #region Script Controls
-        public ControlFlags TakenControls => m_TakenControls;
+        public ControlFlags TakenControls { get; private set; }
 
-        public ControlFlags IgnoredControls => m_IgnoredControls;
+        public ControlFlags IgnoredControls { get; private set; }
         #endregion
 
         [PacketHandler(MessageType.ForceScriptControlRelease)]
@@ -170,8 +193,8 @@ namespace SilverSim.Viewer.Core
             lock (m_ScriptControls)
             {
                 m_ScriptControls.Clear();
-                m_TakenControls = ControlFlags.None;
-                m_IgnoredControls = ControlFlags.None;
+                TakenControls = ControlFlags.None;
+                IgnoredControls = ControlFlags.None;
             }
         }
 

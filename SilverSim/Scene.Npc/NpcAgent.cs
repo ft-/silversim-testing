@@ -427,6 +427,9 @@ namespace SilverSim.Scene.Npc
             throw new NotImplementedException();
         }
 
+
+        public override List<AgentControlData> ActiveControls => new List<AgentControlData>();
+
         public override bool TeleportHome(SceneInterface sceneInterface)
         {
             throw new NotImplementedException();
