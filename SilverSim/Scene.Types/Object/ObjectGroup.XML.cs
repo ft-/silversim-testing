@@ -107,6 +107,40 @@ namespace SilverSim.Scene.Types.Object
             }
             writer.WriteEndElement();
         }
+
+        public void ScriptStateToXml(XmlTextWriter writer)
+        {
+            List<ObjectPart> parts = Values;
+            writer.WriteStartElement("ScriptData");
+            bool haveScriptState = false;
+            foreach (ObjectPart p in parts)
+            {
+                foreach (ObjectPartInventoryItem i in p.Inventory.Values)
+                {
+                    IScriptState scriptState = i.ScriptState;
+                    if (scriptState != null)
+                    {
+                        if (!haveScriptState)
+                        {
+                            writer.WriteStartElement("ScriptStates");
+                            haveScriptState = true;
+                        }
+
+                        writer.WriteStartElement("State");
+                        writer.WriteAttributeString("UUID", i.ID.ToString());
+
+                        scriptState.ToXml(writer);
+
+                        writer.WriteEndElement();
+                    }
+                }
+            }
+            if (haveScriptState)
+            {
+                writer.WriteEndElement();
+            }
+            writer.WriteEndElement();
+        }
         #endregion
 
         #region XML Deserialization
@@ -483,6 +517,150 @@ namespace SilverSim.Scene.Types.Object
 
                     case XmlNodeType.EndElement:
                         if (nodeName != "GroupScriptStates")
+                        {
+                            throw new InvalidObjectXmlException();
+                        }
+                        return;
+
+                    default:
+                        break;
+                }
+            }
+        }
+
+        public void LoadXmlSavedScriptStateData(XmlTextReader reader)
+        {
+            for(; ;)
+            {
+                if(!reader.Read())
+                {
+                    throw new InvalidObjectXmlException();
+                }
+
+                switch(reader.NodeType)
+                {
+                    case XmlNodeType.Element:
+                        if(reader.Name != "ScriptData")
+                        {
+                            throw new InvalidObjectXmlException();
+                        }
+                        LoadXmlSavedScriptData(this, reader);
+                        break;
+
+                    case XmlNodeType.EndElement:
+                        throw new InvalidObjectXmlException();
+
+                    default:
+                        break;
+                }
+            }
+        }
+
+        private static void LoadXmlSavedScriptData(ObjectGroup group, XmlTextReader reader)
+        {
+            if(reader.IsEmptyElement)
+            {
+                return;
+            }
+
+            for (; ; )
+            {
+                if (!reader.Read())
+                {
+                    throw new InvalidObjectXmlException();
+                }
+
+                bool isEmptyElement = reader.IsEmptyElement;
+                string nodeName = reader.Name;
+
+                switch (reader.NodeType)
+                {
+                    case XmlNodeType.Element:
+                        if (isEmptyElement)
+                        {
+                            break;
+                        }
+                        switch (nodeName)
+                        {
+                            case "ScriptStates":
+                                LoadXmlSavedScriptStates(group, reader);
+                                break;
+
+                            default:
+                                reader.ReadToEndElement();
+                                break;
+                        }
+                        break;
+
+                    case XmlNodeType.EndElement:
+                        if (nodeName != "ScriptData")
+                        {
+                            throw new InvalidObjectXmlException();
+                        }
+                        return;
+
+                    default:
+                        break;
+                }
+            }
+        }
+
+        private static void LoadXmlSavedScriptStates(ObjectGroup group, XmlTextReader reader)
+        {
+            var itemID = UUID.Zero;
+
+            for (; ; )
+            {
+                if (!reader.Read())
+                {
+                    throw new InvalidObjectXmlException();
+                }
+
+                bool isEmptyElement = reader.IsEmptyElement;
+                string nodeName = reader.Name;
+
+                switch (reader.NodeType)
+                {
+                    case XmlNodeType.Element:
+                        if (isEmptyElement)
+                        {
+                            break;
+                        }
+                        switch (nodeName)
+                        {
+                            case "State":
+                                itemID = UUID.Zero;
+                                if (reader.MoveToFirstAttribute())
+                                {
+                                    do
+                                    {
+                                        switch (reader.Name)
+                                        {
+                                            case "UUID":
+                                                if (!UUID.TryParse(reader.Value, out itemID))
+                                                {
+                                                    throw new InvalidObjectXmlException();
+                                                }
+                                                break;
+
+                                            default:
+                                                break;
+                                        }
+                                    }
+                                    while (reader.MoveToNextAttribute());
+                                }
+
+                                FromXmlSavedScriptState(reader, group, itemID);
+                                break;
+
+                            default:
+                                reader.ReadToEndElement();
+                                break;
+                        }
+                        break;
+
+                    case XmlNodeType.EndElement:
+                        if (nodeName != "ScriptStates")
                         {
                             throw new InvalidObjectXmlException();
                         }
