@@ -35,25 +35,25 @@ namespace SilverSim.Viewer.Core
 
             if (httpreq.CallerIP != RemoteIP)
             {
-                httpreq.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
+                httpreq.ErrorResponse(HttpStatusCode.Forbidden);
                 return;
             }
             if (httpreq.Method != "GET")
             {
-                httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method Not Allowed");
+                httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed);
                 return;
             }
 
             if (parts.Length < 4)
             {
-                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                httpreq.ErrorResponse(HttpStatusCode.NotFound);
                 return;
             }
 
             UUID textureID;
             if(parts[3].Substring(0, 1) != "?")
             {
-                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                httpreq.ErrorResponse(HttpStatusCode.NotFound);
                 return;
             }
 
@@ -68,13 +68,10 @@ namespace SilverSim.Viewer.Core
                     texID = texreqentry.Substring(11);
                 }
             }
-            try
+            
+            if(!UUID.TryParse(texID, out textureID))
             {
-                textureID = UUID.Parse(texID);
-            }
-            catch
-            {
-                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                httpreq.ErrorResponse(HttpStatusCode.NotFound);
                 return;
             }
 
@@ -93,7 +90,7 @@ namespace SilverSim.Viewer.Core
                 }
                 if (!j2k_accepted)
                 {
-                    httpreq.ErrorResponse(HttpStatusCode.NotAcceptable, "Not acceptable");
+                    httpreq.ErrorResponse(HttpStatusCode.NotAcceptable);
                     return;
                 }
             }
@@ -101,43 +98,50 @@ namespace SilverSim.Viewer.Core
             AssetData asset;
             try
             {
-                /* let us prefer the sim asset service */
-                asset = Scene.AssetService[textureID];
-            }
-            catch(Exception e1)
-            {
-                try
+                if (Scene.AssetService.TryGetValue(textureID, out asset))
                 {
-                    asset = Agent.AssetService[textureID];
+                    /* let us prefer the sim asset service */
+                }
+                else if (Agent.AssetService.TryGetValue(textureID, out asset))
+                {
                     try
                     {
                         /* try to store the asset on our sim's asset service */
                         asset.Temporary = true;
                         Scene.AssetService.Store(asset);
                     }
-                    catch(Exception e3)
+                    catch (Exception e3)
                     {
                         m_Log.DebugFormat("Failed to store asset {0} locally (Cap_GetTexture): {1}", textureID, e3.Message);
                     }
                 }
-                catch(Exception e2)
+                else
                 {
                     if (Server.LogAssetFailures)
                     {
-                        m_Log.DebugFormat("Failed to download image {0} (Cap_GetTexture): {1} or {2}\nA: {3}\nB: {4}", textureID, e1.Message, e2.Message, e1.StackTrace, e2.StackTrace);
+                        m_Log.DebugFormat("Failed to download image {0} (Cap_GetTexture): {1} or {2}\nA: Not Found\nB: Not Found", textureID);
                     }
-                    httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                    httpreq.ErrorResponse(HttpStatusCode.NotFound);
                     return;
                 }
             }
+            catch (Exception e2)
+            {
+                if (Server.LogAssetFailures)
+                {
+                    m_Log.DebugFormat("Failed to download image {0} (Cap_GetTexture): {1}\n{4}", textureID, e2.Message, e2.StackTrace);
+                }
+                httpreq.ErrorResponse(HttpStatusCode.NotFound);
+                return;
+            }
 
-            if(asset.Type != AssetType.Texture)
+            if (asset.Type != AssetType.Texture)
             {
                 if(asset.Type != AssetType.Mesh)
                 {
                     m_Log.DebugFormat("Failed to download image (Cap_GetTexture): Viewer for AgentID {0} tried to download non-texture asset ({1})", AgentID, asset.Type.ToString());
                 }
-                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                httpreq.ErrorResponse(HttpStatusCode.NotFound);
                 return;
             }
 

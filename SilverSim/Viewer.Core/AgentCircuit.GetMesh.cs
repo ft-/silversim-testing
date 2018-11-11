@@ -35,25 +35,25 @@ namespace SilverSim.Viewer.Core
 
             if (httpreq.CallerIP != RemoteIP)
             {
-                httpreq.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
+                httpreq.ErrorResponse(HttpStatusCode.Forbidden);
                 return;
             }
             if (httpreq.Method != "GET")
             {
-                httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method Not Allowed");
+                httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed);
                 return;
             }
 
             if (parts.Length < 4)
             {
-                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                httpreq.ErrorResponse(HttpStatusCode.NotFound);
                 return;
             }
 
             UUID meshID;
             if (parts[3].Substring(0, 1) != "?")
             {
-                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                httpreq.ErrorResponse(HttpStatusCode.NotFound);
                 return;
             }
 
@@ -69,33 +69,27 @@ namespace SilverSim.Viewer.Core
                 }
             }
 
-            try
+            if(!UUID.TryParse(mID, out meshID))
             {
-                meshID = UUID.Parse(mID);
-            }
-            catch
-            {
-                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                httpreq.ErrorResponse(HttpStatusCode.NotFound);
                 return;
             }
 
             AssetData asset;
             try
             {
-                /* let us prefer the sim asset service */
-                asset = Scene.AssetService[meshID];
-            }
-            catch
-            {
-                try
+                if (Scene.AssetService.TryGetValue(meshID, out asset))
                 {
-                    asset = Agent.AssetService[meshID];
+                    /* let us prefer the sim asset service */
+                }
+                else if (Agent.AssetService.TryGetValue(meshID, out asset))
+                {
                     try
                     {
                         /* try to store the asset on our sim's asset service */
                         Scene.AssetService.Store(asset);
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         m_Log.WarnFormat("Storing of asset failed: {0}: {1}\n{2}",
                             e.GetType().FullName,
@@ -103,16 +97,21 @@ namespace SilverSim.Viewer.Core
                             e.StackTrace);
                     }
                 }
-                catch
+                else
                 {
-                    httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                    httpreq.ErrorResponse(HttpStatusCode.NotFound);
                     return;
                 }
+            }
+            catch
+            {
+                httpreq.ErrorResponse(HttpStatusCode.NotFound);
+                return;
             }
 
             if (asset.Type != AssetType.Mesh)
             {
-                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                httpreq.ErrorResponse(HttpStatusCode.NotFound);
                 return;
             }
 
