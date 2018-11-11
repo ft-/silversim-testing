@@ -2377,15 +2377,18 @@ namespace SilverSim.Scene.Types.Object
                                 try
                                 {
                                     Material mat = ObjectGroup?.Scene?.GetMaterial(materialID);
-                                    UUID id = mat.SpecMap;
-                                    if(id != UUID.Zero)
+                                    if (mat != null)
                                     {
-                                        list[id] = true;
-                                    }
-                                    id = mat.NormMap;
-                                    if (id != UUID.Zero)
-                                    {
-                                        list[id] = true;
+                                        UUID id = mat.SpecMap;
+                                        if (id != UUID.Zero)
+                                        {
+                                            list[id] = true;
+                                        }
+                                        id = mat.NormMap;
+                                        if (id != UUID.Zero)
+                                        {
+                                            list[id] = true;
+                                        }
                                     }
                                 }
                                 catch
