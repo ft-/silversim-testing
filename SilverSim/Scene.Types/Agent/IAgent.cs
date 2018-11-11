@@ -287,5 +287,7 @@ namespace SilverSim.Scene.Types.Agent
         void ScheduleUpdate(AgentUpdateInfo info, UUID fromSceneID);
 
         bool IsAvatarFreezed { get; set; }
+
+        bool OwnsAssetID(UUID id);
     }
 }

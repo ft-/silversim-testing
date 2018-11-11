@@ -467,5 +467,6 @@ namespace SilverSim.Scene.Npc
             CurrentScene?.SendAgentObjectToAllAgents(this);
         }
 
+        public override bool OwnsAssetID(UUID id) => false; /* NPCs are dealt with on scene's asset service */
     }
 }

@@ -1158,5 +1158,7 @@ namespace SilverSim.Scene.Agent
         }
 
         public bool IsAvatarFreezed { get; set; }
+
+        public abstract bool OwnsAssetID(UUID id);
     }
 }

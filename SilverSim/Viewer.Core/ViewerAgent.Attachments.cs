@@ -23,6 +23,7 @@
 #pragma warning disable RCS1029
 
 using SilverSim.Scene.Types.Object;
+using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Asset;
@@ -213,7 +214,6 @@ namespace SilverSim.Viewer.Core
                     if (item.AssetType != AssetType.Object)
                     {
                         SendAlertMessage(this.GetLanguageString(CurrentCulture, "CouldNotStoreAttachmentData", "Could not store attachment data"), SceneID);
-                        return;
                     }
                     else
                     {
@@ -224,9 +224,20 @@ namespace SilverSim.Viewer.Core
                 catch
                 {
                     SendAlertMessage(this.GetLanguageString(CurrentCulture, "CouldNotStoreAttachmentDataWithinItem", "Could not store attachment data within item"), SceneID);
-                    return;
                 }
             }
+        }
+
+        public override bool OwnsAssetID(UUID id)
+        {
+            foreach (ObjectGroup attachment in Attachments.All)
+            {
+                if(attachment.OwnsAssetId(id))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

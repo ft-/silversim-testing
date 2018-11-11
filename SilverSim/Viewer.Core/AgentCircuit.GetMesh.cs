@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using SilverSim.Main.Common.HttpServer;
+using SilverSim.Scene.Types.Agent;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using System;
@@ -76,13 +77,15 @@ namespace SilverSim.Viewer.Core
             }
 
             AssetData asset;
+            IAgent referee;
             try
             {
                 if (Scene.AssetService.TryGetValue(meshID, out asset))
                 {
                     /* let us prefer the sim asset service */
                 }
-                else if (Agent.AssetService.TryGetValue(meshID, out asset))
+                else if (Agent.AssetService.TryGetValue(meshID, out asset) ||
+                    (Scene.TryGetAgentForAsset(meshID, out referee) && referee.AssetService.TryGetValue(meshID, out asset)))
                 {
                     try
                     {

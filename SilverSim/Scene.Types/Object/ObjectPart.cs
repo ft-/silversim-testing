@@ -662,6 +662,12 @@ namespace SilverSim.Scene.Types.Object
                 }
             }
 
+            /* trigger cache rebuild */
+            if((flags & (UpdateChangedFlags.Texture | UpdateChangedFlags.Shape)) != 0)
+            {
+                Interlocked.Increment(ref m_StaleCount);
+            }
+
             UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.All);
             ObjectGroup.Scene?.ScheduleUpdate(UpdateInfo);
         }
@@ -2336,5 +2342,73 @@ namespace SilverSim.Scene.Types.Object
             }
             throw new KeyNotFoundException("Unsupported asset type for include");
         }
+
+        #region Cache for Mesh and Texture asset ids
+        private UUID[] m_TextureAssetIds = new UUID[0];
+        private int m_StaleCount;
+        private int m_StaleCountAck = -1;
+        private readonly object m_CacheUpdateLock = new object();
+
+        public UUID[] UsedMeshesAndTextures
+        {
+            get
+            {
+                int limitCount = 3;
+                UUID[] returnArray = m_TextureAssetIds;
+                int processingCount;
+                /* occasionally this will do more work than actually needed but keeping the mutex time to a minimum keeps code from holding off each other */
+                while ((processingCount = m_StaleCount) != m_StaleCountAck && limitCount-- > 0)
+                {
+                    var list = new Dictionary<UUID, bool>();
+                    PrimitiveShape shape = Shape;
+                    if (shape.Type == PrimitiveShapeType.Sculpt)
+                    {
+                        list[shape.SculptMap] = true;
+                    }
+
+                    foreach (ObjectPartLocalizedInfo localized in Localizations)
+                    {
+                        foreach (TextureEntryFace face in localized.GetFaces(ObjectPartLocalizedInfo.ALL_SIDES))
+                        {
+                            list[face.TextureID] = true;
+                            UUID materialID = face.MaterialID;
+                            if(materialID != UUID.Zero)
+                            {
+                                try
+                                {
+                                    Material mat = ObjectGroup?.Scene?.GetMaterial(materialID);
+                                    UUID id = mat.SpecMap;
+                                    if(id != UUID.Zero)
+                                    {
+                                        list[id] = true;
+                                    }
+                                    id = mat.NormMap;
+                                    if (id != UUID.Zero)
+                                    {
+                                        list[id] = true;
+                                    }
+                                }
+                                catch
+                                {
+                                    /* intentionally ignored */
+                                }
+                            }
+                        }
+                    }
+
+                    returnArray = list.Keys.ToArray();
+                    lock(m_CacheUpdateLock)
+                    {
+                        if(processingCount == m_StaleCount)
+                        {
+                            m_TextureAssetIds = returnArray;
+                            m_StaleCountAck = m_StaleCount;
+                        }
+                    }
+                }
+                return returnArray;
+            }
+        }
+        #endregion
     }
 }

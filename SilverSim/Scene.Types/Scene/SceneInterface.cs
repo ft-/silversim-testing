@@ -220,6 +220,20 @@ namespace SilverSim.Scene.Types.Scene
         public Date m_StartTime = new Date();
         public readonly Map SimulatorFeaturesExtrasMap = new Map();
 
+        public bool TryGetAgentForAsset(UUID assetid, out IAgent foundagent)
+        {
+            foreach(IAgent agent in Agents)
+            {
+                if(agent.OwnsAssetID(assetid))
+                {
+                    foundagent = agent;
+                    return true;
+                }
+            }
+            foundagent = null;
+            return false;
+        }
+
         protected List<IUserAgentServicePlugin> UserAgentServicePlugins = new List<IUserAgentServicePlugin>();
         protected List<IAssetServicePlugin> AssetServicePlugins = new List<IAssetServicePlugin>();
         protected List<IInventoryServicePlugin> InventoryServicePlugins = new List<IInventoryServicePlugin>();

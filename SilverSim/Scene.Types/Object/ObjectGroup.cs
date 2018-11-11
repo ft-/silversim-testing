@@ -22,6 +22,7 @@
 using log4net;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.KeyframedMotion;
+using SilverSim.Scene.Types.Object.Localization;
 using SilverSim.Scene.Types.Object.Parameters;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script;
@@ -37,6 +38,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 
 namespace SilverSim.Scene.Types.Object
 {
@@ -154,6 +156,20 @@ namespace SilverSim.Scene.Types.Object
                 }
             }
         }
+
+        #region Cache for Mesh and Texture asset ids
+        public bool OwnsAssetId(UUID assetID)
+        {
+            foreach(ObjectPart part in Values)
+            {
+                if(part.UsedMeshesAndTextures.Contains(assetID))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        #endregion
 
         #region Constructor
         public ObjectGroup()
