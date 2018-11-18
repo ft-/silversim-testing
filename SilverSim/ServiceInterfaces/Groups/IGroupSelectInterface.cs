@@ -25,9 +25,9 @@ namespace SilverSim.ServiceInterfaces.Groups
 {
     public interface IGroupSelectInterface
     {
-        UGI this[UGUI requestingAgent, UGUI princialID] { get; set; }
+        UGI this[UGUI requestingAgent, UGUI principal] { get; set; }
 
-        bool TryGetValue(UGUI requestingAgent, UGUI principalID, out UGI ugi);
+        bool TryGetValue(UGUI requestingAgent, UGUI principal, out UGI ugi);
 
         /* get/set active role id */
         UUID this[UGUI requestingAgent, UGI group, UGUI principal] { get; set; }
