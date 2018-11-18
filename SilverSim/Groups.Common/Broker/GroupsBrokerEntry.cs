@@ -20,18 +20,21 @@
 // exception statement from your version.
 
 using SilverSim.ServiceInterfaces.Groups;
+using SilverSim.Threading;
 
 namespace SilverSim.Groups.Common.Broker
 {
-    internal sealed class GroupsBrokerEntry : GroupsServiceInterface
-    {
+    internal sealed partial class GroupsBrokerEntry : GroupsServiceInterface
+    { 
+        private static TimeProvider m_ClockSource = TimeProvider.StopWatch;
+
         private GroupsServiceInterface InnerGroupsService { get; }
 
         public override IGroupsInterface Groups => InnerGroupsService.Groups;
 
-        public override IGroupRolesInterface Roles => InnerGroupsService.Roles;
+        public override IGroupRolesInterface Roles => this;
 
-        public override IGroupMembersInterface Members => InnerGroupsService.Members;
+        public override IGroupMembersInterface Members => this;
 
         public override IGroupMembershipsInterface Memberships => InnerGroupsService.Memberships;
 
@@ -51,6 +54,22 @@ namespace SilverSim.Groups.Common.Broker
         {
             InnerGroupsService = innerGroupsService;
             ExpiryTickCount = expiryTickCount;
+        }
+
+        internal void ExpireHandler()
+        {
+            foreach(UGUI_UGUI id in m_PrincipalGroupRoleCache.Keys)
+            {
+                m_PrincipalGroupRoleCache.RemoveIf(id, (entry) => m_ClockSource.TicksElapsed(m_ClockSource.TickCount, entry.ExpiryTickCount) > m_ClockSource.SecsToTicks(RoleCacheTimeout));
+            }
+            foreach (UGUI_UGI id in m_GroupMemberCache.Keys)
+            {
+                m_GroupMemberCache.RemoveIf(id, (entry) => m_ClockSource.TicksElapsed(m_ClockSource.TickCount, entry.ExpiryTickCount) > m_ClockSource.SecsToTicks(RoleCacheTimeout));
+            }
+            foreach (UGUI_UGUI id in m_PrincipalGroupMemberCache.Keys)
+            {
+                m_PrincipalGroupMemberCache.RemoveIf(id, (entry) => m_ClockSource.TicksElapsed(m_ClockSource.TickCount, entry.ExpiryTickCount) > m_ClockSource.SecsToTicks(RoleCacheTimeout));
+            }
         }
     }
 }

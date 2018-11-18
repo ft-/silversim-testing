@@ -30,13 +30,16 @@ using SilverSim.Types.ServerURIs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Timers;
 
 namespace SilverSim.Groups.Common.Broker
 {
     [Description("Groups brokering service")]
     [PluginName("GroupsBroker")]
-    public sealed partial class GroupsBrokerService : GroupsServiceInterface, IPlugin
+    public sealed partial class GroupsBrokerService : GroupsServiceInterface, IPlugin, IPluginShutdown
     {
+        private readonly Timer m_Timer = new Timer(60000);
+
         private TimeProvider m_ClockSource;
 
         public override IGroupsInterface Groups => this;
@@ -148,7 +151,7 @@ namespace SilverSim.Groups.Common.Broker
             }
 
             PrincipalCacheEntry entry;
-            if(m_PrincipalCache.TryGetValue(principal, out entry) && m_ClockSource.TicksElapsed(m_ClockSource.TickCount, entry.ExpiryTickCount) > m_ClockSource.SecsToTicks(120))
+            if(m_PrincipalCache.TryGetValue(principal, out entry) && m_ClockSource.TicksElapsed(m_ClockSource.TickCount, entry.ExpiryTickCount) < m_ClockSource.SecsToTicks(120))
             {
                 if(string.IsNullOrEmpty(entry.GroupsServerURI))
                 {
@@ -186,7 +189,7 @@ namespace SilverSim.Groups.Common.Broker
         {
             UGI group;
             NameCacheEntry entry;
-            if(m_NameCache.TryGetValue(groupID, out entry) && m_ClockSource.TicksElapsed(m_ClockSource.TickCount, entry.ExpiryTickCount) > m_ClockSource.SecsToTicks(120))
+            if(m_NameCache.TryGetValue(groupID, out entry) && m_ClockSource.TicksElapsed(m_ClockSource.TickCount, entry.ExpiryTickCount) < m_ClockSource.SecsToTicks(120))
             {
                 return TryGetGroupsService(entry.Group, out groupsService);
             }
@@ -216,7 +219,7 @@ namespace SilverSim.Groups.Common.Broker
             groupsService = default(GroupsServiceInterface);
             Dictionary<string, string> cachedheaders;
             GroupsBrokerEntry entry;
-            if(m_Cache.TryGetValue(groupsServerURI, out entry) && m_ClockSource.TicksElapsed(m_ClockSource.TickCount, entry.ExpiryTickCount) > m_ClockSource.SecsToTicks(120))
+            if(m_Cache.TryGetValue(groupsServerURI, out entry) && m_ClockSource.TicksElapsed(m_ClockSource.TickCount, entry.ExpiryTickCount) < m_ClockSource.SecsToTicks(120))
             {
                 groupsService = entry;
                 return true;
@@ -262,6 +265,50 @@ namespace SilverSim.Groups.Common.Broker
                 loader.GetService(m_GroupsServiceName, out m_GroupsService);
             }
             m_GroupsHomeURI = loader.HomeURI;
+            m_Timer.Elapsed += ExpireHandler;
+            m_Timer.Start();
+        }
+
+        public void Shutdown()
+        {
+            m_Timer.Stop();
+            m_Timer.Elapsed -= ExpireHandler;
+        }
+
+        public ShutdownOrder ShutdownOrder => ShutdownOrder.Any;
+
+        private void ExpireHandler(object o, ElapsedEventArgs args)
+        {
+            try
+            {
+                foreach (UUID id in m_NameCache.Keys)
+                {
+                    m_NameCache.RemoveIf(id, (entry) => m_ClockSource.TicksElapsed(m_ClockSource.TickCount, entry.ExpiryTickCount) > m_ClockSource.SecsToTicks(120));
+                }
+                foreach (UGUI id in m_PrincipalCache.Keys)
+                {
+                    m_PrincipalCache.RemoveIf(id, (entry) => m_ClockSource.TicksElapsed(m_ClockSource.TickCount, entry.ExpiryTickCount) > m_ClockSource.SecsToTicks(120));
+                }
+                foreach (string id in m_Cache.Keys)
+                {
+                    GroupsBrokerEntry entry;
+                    if (m_Cache.TryGetValue(id, out entry))
+                    {
+                        if (m_ClockSource.TicksElapsed(m_ClockSource.TickCount, entry.ExpiryTickCount) > m_ClockSource.SecsToTicks(120))
+                        {
+                            m_Cache.Remove(id);
+                        }
+                        else
+                        {
+                            entry.ExpireHandler();
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                /* do not pass these to timer handler */
+            }
         }
     }
 }

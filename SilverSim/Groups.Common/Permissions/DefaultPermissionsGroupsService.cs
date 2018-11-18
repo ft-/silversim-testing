@@ -38,6 +38,11 @@ namespace SilverSim.Groups.Common.Permissions
             m_GroupsServiceName = ownSection.GetString("GroupsStorage", "GroupsStorage");
         }
 
+        public DefaultPermissionsGroupsService(GroupsServiceInterface service)
+        {
+            m_InnerService = service;
+        }
+
         public override IGroupSelectInterface ActiveGroup => m_InnerService.ActiveGroup;
 
         public override IActiveGroupMembershipInterface ActiveMembership => m_InnerService.ActiveMembership;
