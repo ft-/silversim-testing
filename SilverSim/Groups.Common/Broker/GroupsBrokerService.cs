@@ -28,7 +28,6 @@ using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.Threading;
 using SilverSim.Types;
-using SilverSim.Types.ServerURIs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
