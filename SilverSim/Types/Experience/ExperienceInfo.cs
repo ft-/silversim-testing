@@ -41,7 +41,6 @@ namespace SilverSim.Types.Experience
     public class ExperienceInfo
     {
         public UEI ID = UEI.Unknown;
-        public string Name = string.Empty;
         public string Description = string.Empty;
         public ExperiencePropertyFlags Properties;
         public UGUI Owner = UGUI.Unknown;
@@ -85,7 +84,6 @@ namespace SilverSim.Types.Experience
         public ExperienceInfo(ExperienceInfo info)
         {
             ID = info.ID;
-            Name = info.Name;
             Description = info.Description;
             Properties = info.Properties;
             Creator = new UGUI(info.Creator);

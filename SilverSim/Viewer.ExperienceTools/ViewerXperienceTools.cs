@@ -217,8 +217,8 @@ namespace SilverSim.Viewer.ExperienceTools
             {
                 ExperienceInfo info = new ExperienceInfo
                 {
-                    /* ID is setup by ExperienceService */
-                    Name = "New Experience",
+                    /* ID's HomeURI is setup by ExperienceService */
+                    ID = new UEI(UUID.Random) { ExperienceName = "New Experience" },
                     Owner = agent.Owner,
                     Creator = agent.Owner,
                 };
@@ -877,7 +877,7 @@ namespace SilverSim.Viewer.ExperienceTools
 
                 if(reqmap.TryGetValue("name", out iv))
                 {
-                    info.Name = iv.ToString();
+                    info.ID.ExperienceName = iv.ToString();
                 }
 
                 if(reqmap.TryGetValue("description", out iv))

@@ -57,7 +57,7 @@ namespace SilverSim.Database.Memory.Experience
             var res = new List<UEI>();
             foreach (KeyValuePair<UEI, ExperienceInfo> kvp in m_Experiences)
             {
-                if (kvp.Value.Name.Contains(query))
+                if (kvp.Key.ExperienceName.Contains(query))
                 {
                     res.Add(kvp.Key);
                 }
@@ -70,7 +70,7 @@ namespace SilverSim.Database.Memory.Experience
             var res = new List<ExperienceInfo>();
             foreach (KeyValuePair<UEI, ExperienceInfo> kvp in m_Experiences)
             {
-                if (kvp.Value.Name.Contains(query))
+                if (kvp.Key.ExperienceName.Contains(query))
                 {
                     res.Add(new ExperienceInfo(kvp.Value));
                 }
