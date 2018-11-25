@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Types;
 using System.Collections.Generic;
 
 namespace SilverSim.ServiceInterfaces.Groups
@@ -26,6 +27,7 @@ namespace SilverSim.ServiceInterfaces.Groups
     public interface IGroupsServicePlugin
     {
         GroupsServiceInterface Instantiate(string url);
+        GroupsServiceInterface Instantiate(UGI ugi);
         string Name { get; }
         bool IsProtocolSupported(string url);
         bool IsProtocolSupported(string url, Dictionary<string, string> cachedheaders);
