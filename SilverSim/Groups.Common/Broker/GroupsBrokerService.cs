@@ -21,6 +21,8 @@
 
 using Nini.Config;
 using SilverSim.Main.Common;
+using SilverSim.Scene.Management.Scene;
+using SilverSim.Scene.Types.Agent;
 using SilverSim.ServiceInterfaces;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.UserAgents;
@@ -66,25 +68,12 @@ namespace SilverSim.Groups.Common.Broker
         private GroupsServiceInterface m_GroupsService;
         private readonly string m_GroupsServiceName;
         private string m_GroupsHomeURI;
+        private SceneList m_Scenes;
 
         private List<IGroupsServicePlugin> m_GroupsServicePlugins;
         private List<IUserAgentServicePlugin> m_UserAgentServicePlugins;
 
-        private readonly RwLockedDictionary<string, GroupsBrokerEntry> m_Cache = new RwLockedDictionary<string, GroupsBrokerEntry>();
-
-        private sealed class NameCacheEntry
-        {
-            public UGI Group;
-            public long ExpiryTickCount;
-        }
-        private readonly RwLockedDictionary<UUID, NameCacheEntry> m_NameCache = new RwLockedDictionary<UUID, NameCacheEntry>();
-
-        private sealed class PrincipalCacheEntry
-        {
-            public string GroupsServerURI;
-            public long ExpiryTickCount;
-        }
-        private readonly RwLockedDictionary<UGUI, PrincipalCacheEntry> m_PrincipalCache = new RwLockedDictionary<UGUI, PrincipalCacheEntry>();
+        private readonly RwLockedDictionary<UUID, GroupsBrokerEntry> m_NameCache = new RwLockedDictionary<UUID, GroupsBrokerEntry>();
 
         [Serializable]
         public class GroupsServiceNotFoundException : KeyNotFoundException
@@ -144,91 +133,49 @@ namespace SilverSim.Groups.Common.Broker
 
         private bool TryGetGroupsService(UGUI principal, out GroupsServiceInterface groupsService)
         {
-            groupsService = default(GroupsServiceInterface);
-            if(principal.HomeURI == null)
+            groupsService = null;
+            IAgent agent;
+            UUID regionID;
+            if(m_Scenes.TryFindRootAgent(principal.ID, out agent, out regionID))
             {
-                return false;
+                groupsService = agent.GroupsService;
             }
-
-            PrincipalCacheEntry entry;
-            if(m_PrincipalCache.TryGetValue(principal, out entry) && m_ClockSource.TicksElapsed(m_ClockSource.TickCount, entry.ExpiryTickCount) < m_ClockSource.SecsToTicks(120))
-            {
-                if(string.IsNullOrEmpty(entry.GroupsServerURI))
-                {
-                    return false;
-                }
-                return TryGetGroupsService(entry.GroupsServerURI, out groupsService);
-            }
-
-            string homeURI = principal.HomeURI.ToString();
-            Dictionary<string, string> cachedheaders = ServicePluginHelo.HeloRequest(homeURI);
-            foreach (IUserAgentServicePlugin plugin in m_UserAgentServicePlugins)
-            {
-                if (plugin.IsProtocolSupported(homeURI, cachedheaders))
-                {
-                    UserAgentServiceInterface service = plugin.Instantiate(homeURI);
-                    ServerURIs serveruris = service.GetServerURLs(principal);
-                    entry = new PrincipalCacheEntry
-                    {
-                        GroupsServerURI = serveruris.GroupsServerURI,
-                        ExpiryTickCount = m_ClockSource.TickCount
-                    };
-                    m_PrincipalCache[principal] = entry;
-                    if (string.IsNullOrEmpty(entry.GroupsServerURI))
-                    {
-                        return false;
-                    }
-                    return TryGetGroupsService(serveruris.GroupsServerURI, out groupsService);
-                }
-            }
-
-            return false;
+            return groupsService != null;
         }
 
         private bool TryGetGroupsService(UUID groupID, out GroupsServiceInterface groupsService)
         {
             UGI group;
-            NameCacheEntry entry;
-            if(m_NameCache.TryGetValue(groupID, out entry) && m_ClockSource.TicksElapsed(m_ClockSource.TickCount, entry.ExpiryTickCount) < m_ClockSource.SecsToTicks(120))
+            GroupsBrokerEntry entry;
+            if (m_NameCache.TryGetValue(groupID, out entry) && m_ClockSource.TicksElapsed(m_ClockSource.TickCount, entry.ExpiryTickCount) < m_ClockSource.SecsToTicks(120))
             {
-                return TryGetGroupsService(entry.Group, out groupsService);
+                groupsService = entry;
+                return true;
             }
             if (!m_GroupsNameService.TryGetValue(groupID, out group))
             {
                 groupsService = default(GroupsServiceInterface);
                 return false;
             }
-            entry = new NameCacheEntry { Group = group, ExpiryTickCount = m_ClockSource.TickCount };
-            m_NameCache[groupID] = entry;
             return TryGetGroupsService(group, out groupsService);
         }
 
-        private bool TryGetGroupsService(UGI group, out GroupsServiceInterface groupsService)
-        {
-            groupsService = default(GroupsServiceInterface);
-            Uri uri = group.HomeURI;
-            if (uri == null)
-            {
-                return false;
-            }
-            return TryGetGroupsService(uri.ToString(), out groupsService);
-        }
-
-        private bool TryGetGroupsService(string groupsServerURI, out GroupsServiceInterface groupsService)
+        private bool TryGetGroupsService(UGI ugi, out GroupsServiceInterface groupsService)
         {
             groupsService = default(GroupsServiceInterface);
             Dictionary<string, string> cachedheaders;
             GroupsBrokerEntry entry;
-            if(m_Cache.TryGetValue(groupsServerURI, out entry) && m_ClockSource.TicksElapsed(m_ClockSource.TickCount, entry.ExpiryTickCount) < m_ClockSource.SecsToTicks(120))
+            if(ugi.HomeURI == null)
             {
-                groupsService = entry;
-                return true;
+                return false;
             }
+
+            string groupsServerURI = ugi.HomeURI.ToString();
 
             if (m_GroupsService != null && m_GroupsHomeURI == groupsServerURI)
             {
                 entry = new GroupsBrokerEntry(m_GroupsService, m_ClockSource.TickCount);
-                m_Cache[groupsServerURI] = entry;
+                m_NameCache[ugi.ID] = entry;
                 groupsService = entry;
                 return true;
             }
@@ -238,9 +185,9 @@ namespace SilverSim.Groups.Common.Broker
             {
                 if(plugin.IsProtocolSupported(groupsServerURI, cachedheaders))
                 {
-                    GroupsServiceInterface service = plugin.Instantiate(groupsServerURI);
+                    GroupsServiceInterface service = plugin.Instantiate(ugi);
                     entry = new GroupsBrokerEntry(service, m_ClockSource.TickCount);
-                    m_Cache[groupsServerURI] = entry;
+                    m_NameCache[ugi.ID] = entry;
                     groupsService = entry;
                     return true;
                 }
@@ -257,6 +204,7 @@ namespace SilverSim.Groups.Common.Broker
 
         public void Startup(ConfigurationLoader loader)
         {
+            m_Scenes = loader.Scenes;
             m_GroupsServicePlugins = loader.GetServicesByValue<IGroupsServicePlugin>();
             m_UserAgentServicePlugins = loader.GetServicesByValue<IUserAgentServicePlugin>();
             loader.GetService(m_GroupsNameServiceName, out m_GroupsNameService);
@@ -283,20 +231,12 @@ namespace SilverSim.Groups.Common.Broker
             {
                 foreach (UUID id in m_NameCache.Keys)
                 {
-                    m_NameCache.RemoveIf(id, (entry) => m_ClockSource.TicksElapsed(m_ClockSource.TickCount, entry.ExpiryTickCount) > m_ClockSource.SecsToTicks(120));
-                }
-                foreach (UGUI id in m_PrincipalCache.Keys)
-                {
-                    m_PrincipalCache.RemoveIf(id, (entry) => m_ClockSource.TicksElapsed(m_ClockSource.TickCount, entry.ExpiryTickCount) > m_ClockSource.SecsToTicks(120));
-                }
-                foreach (string id in m_Cache.Keys)
-                {
                     GroupsBrokerEntry entry;
-                    if (m_Cache.TryGetValue(id, out entry))
+                    if (m_NameCache.TryGetValue(id, out entry))
                     {
                         if (m_ClockSource.TicksElapsed(m_ClockSource.TickCount, entry.ExpiryTickCount) > m_ClockSource.SecsToTicks(120))
                         {
-                            m_Cache.Remove(id);
+                            m_NameCache.Remove(id);
                         }
                         else
                         {
