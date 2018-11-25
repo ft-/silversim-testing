@@ -209,7 +209,9 @@ namespace SilverSim.ServiceInterfaces.Groups
             }
         }
 
-        /** <summary>Support authorization data to be granted</summary> */
+        /** <summary>Support authorization data to be granted.</summary>
+         * When granted, it adds AuthorizationToken data to UGI which needs to be stored on GroupsNameStorage.
+         */
         public virtual bool TryRequestAuthorization(UGUI requestingAgent, UGI ugi) => false;
 
         public virtual GroupInfo CreateGroup(UGUI requestingAgent, GroupInfo ginfo, GroupPowers everyonePowers, GroupPowers ownerPowers)
