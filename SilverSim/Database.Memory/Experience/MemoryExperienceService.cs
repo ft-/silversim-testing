@@ -34,7 +34,7 @@ namespace SilverSim.Database.Memory.Experience
     [PluginName("Experience")]
     public sealed partial class MemoryExperienceService : ExperienceServiceInterface, IPlugin
     {
-        private readonly RwLockedDictionary<UEI, ExperienceInfo> m_Experiences = new RwLockedDictionary<UEI, ExperienceInfo>();
+        private readonly RwLockedDictionary<UUID, ExperienceInfo> m_Experiences = new RwLockedDictionary<UUID, ExperienceInfo>();
 
         public override IExperiencePermissionsInterface Permissions => this;
         public override IExperienceAdminInterface Admins => this;
@@ -49,17 +49,17 @@ namespace SilverSim.Database.Memory.Experience
         public override void Add(ExperienceInfo info)
         {
             info.ID.HomeURI = !string.IsNullOrEmpty(m_HomeURI) ? new Uri(m_HomeURI) : null;
-            m_Experiences.Add(info.ID, info);
+            m_Experiences.Add(info.ID.ID, info);
         }
 
         public override List<UEI> FindExperienceByName(string query)
         {
             var res = new List<UEI>();
-            foreach (KeyValuePair<UEI, ExperienceInfo> kvp in m_Experiences)
+            foreach (KeyValuePair<UUID, ExperienceInfo> kvp in m_Experiences)
             {
-                if (kvp.Key.ExperienceName.Contains(query))
+                if (kvp.Value.ID.ExperienceName.Contains(query))
                 {
-                    res.Add(kvp.Key);
+                    res.Add(kvp.Value.ID);
                 }
             }
             return res;
@@ -68,9 +68,9 @@ namespace SilverSim.Database.Memory.Experience
         public override List<ExperienceInfo> FindExperienceInfoByName(string query)
         {
             var res = new List<ExperienceInfo>();
-            foreach (KeyValuePair<UEI, ExperienceInfo> kvp in m_Experiences)
+            foreach (KeyValuePair<UUID, ExperienceInfo> kvp in m_Experiences)
             {
-                if (kvp.Key.ExperienceName.Contains(query))
+                if (kvp.Value.ID.ExperienceName.Contains(query))
                 {
                     res.Add(new ExperienceInfo(kvp.Value));
                 }
@@ -81,11 +81,11 @@ namespace SilverSim.Database.Memory.Experience
         public override List<UEI> GetCreatorExperiences(UGUI creator)
         {
             var res = new List<UEI>();
-            foreach (KeyValuePair<UEI, ExperienceInfo> kvp in m_Experiences)
+            foreach (KeyValuePair<UUID, ExperienceInfo> kvp in m_Experiences)
             {
                 if (kvp.Value.Creator.Equals(creator))
                 {
-                    res.Add(kvp.Key);
+                    res.Add(kvp.Value.ID);
                 }
             }
             return res;
@@ -94,11 +94,11 @@ namespace SilverSim.Database.Memory.Experience
         public override List<UEI> GetOwnerExperiences(UGUI creator)
         {
             var res = new List<UEI>();
-            foreach (KeyValuePair<UEI, ExperienceInfo> kvp in m_Experiences)
+            foreach (KeyValuePair<UUID, ExperienceInfo> kvp in m_Experiences)
             {
                 if (kvp.Value.Owner.Equals(creator))
                 {
-                    res.Add(kvp.Key);
+                    res.Add(kvp.Value.ID);
                 }
             }
             return res;
@@ -107,11 +107,11 @@ namespace SilverSim.Database.Memory.Experience
         public override List<UEI> GetGroupExperiences(UGI group)
         {
             var res = new List<UEI>();
-            foreach(KeyValuePair<UEI, ExperienceInfo> kvp in m_Experiences)
+            foreach(KeyValuePair<UUID, ExperienceInfo> kvp in m_Experiences)
             {
                 if(kvp.Value.Group.Equals(group))
                 {
-                    res.Add(kvp.Key);
+                    res.Add(kvp.Value.ID);
                 }
             }
             return res;
@@ -120,7 +120,7 @@ namespace SilverSim.Database.Memory.Experience
         public override bool Remove(UGUI requestingAgent, UEI id)
         {
             ExperienceInfo info;
-            if(!m_Experiences.TryGetValue(id, out info))
+            if(!m_Experiences.TryGetValue(id.ID, out info))
             {
                 return false;
             }
@@ -129,17 +129,29 @@ namespace SilverSim.Database.Memory.Experience
                 return false;
             }
 
-            bool f = m_Experiences.Remove(id);
+            bool f = m_Experiences.Remove(id.ID);
             m_Perms.Remove(id);
             m_KeyValues.Remove(id);
             m_Admins.Remove(id);
             return f;
         }
 
+        public override bool TryGetValue(UUID id, out UEI uei)
+        {
+            ExperienceInfo res;
+            if (m_Experiences.TryGetValue(id, out res))
+            {
+                uei = new UEI(res.ID);
+                return true;
+            }
+            uei = null;
+            return false;
+        }
+
         public override bool TryGetValue(UEI experienceID, out ExperienceInfo experienceInfo)
         {
             ExperienceInfo res;
-            if(m_Experiences.TryGetValue(experienceID, out res))
+            if(m_Experiences.TryGetValue(experienceID.ID, out res))
             {
                 experienceInfo = new ExperienceInfo(res);
                 return true;
@@ -150,7 +162,7 @@ namespace SilverSim.Database.Memory.Experience
 
         public override void Update(UGUI requestingAgent, ExperienceInfo info)
         {
-            if(!m_Experiences.ContainsKey(info.ID))
+            if(!m_Experiences.ContainsKey(info.ID.ID))
             {
                 throw new KeyNotFoundException();
             }
@@ -158,7 +170,7 @@ namespace SilverSim.Database.Memory.Experience
             {
                 throw new InvalidOperationException();
             }
-            m_Experiences[info.ID] = new ExperienceInfo(info);
+            m_Experiences[info.ID.ID] = new ExperienceInfo(info);
         }
     }
 }

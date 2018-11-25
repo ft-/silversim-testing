@@ -149,8 +149,22 @@ namespace SilverSim.Types
             HomeURI = new Uri(parts[1]);
         }
 
+        public static bool TryParse(string uuiString, out UEI uei)
+        {
+            try
+            {
+                uei = new UEI(uuiString);
+                return true;
+            }
+            catch
+            {
+                uei = UEI.Unknown;
+                return false;
+            }
+        }
+
         public override string ToString() => (HomeURI != null) ?
-                String.Format("{0};{1};{2}", ID.ToString(), HomeURI, ExperienceName) :
+                string.Format("{0};{1};{2}", ID.ToString(), HomeURI, ExperienceName) :
                 ID.ToString();
 
         private static readonly char[] Semicolon = new char[1] { ';' };

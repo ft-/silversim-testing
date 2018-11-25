@@ -248,7 +248,7 @@ namespace SilverSim.Database.Memory.SimulationData
                 Name = map["Name"].ToString(),
                 Owner = new UGUI(map["Owner"].ToString()),
                 ParentFolderID = map["ParentFolderID"].AsUUID,
-                ExperienceID = map["ExperienceID"].AsUUID,
+                ExperienceID = new UEI(map["ExperienceID"].ToString()),
                 CollisionFilter = new ObjectPartInventoryItem.CollisionFilterParam
                 {
                     DbSerialization = (BinaryData)map["CollisionFilterData"]
