@@ -754,9 +754,25 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
+            if (GroupsService == null)
+            {
+                return;
+            }
+
+            UGI ugi;
+            if (req.GroupID == UUID.Zero)
+            {
+                ugi = UGI.Unknown;
+            }
+            else if (!GroupsService.Groups.TryGetValue(agent.Owner, req.GroupID, out ugi) ||
+                !GroupsService.TryRequestAuthorization(agent.Owner, ugi))
+            {
+                return;
+            }
+
             using (var propHandler = new ObjectPropertiesSendHandler(agent, ID))
             {
-                foreach (UInt32 d in req.ObjectList)
+                foreach (uint d in req.ObjectList)
                 {
 #if DEBUG
                     m_Log.DebugFormat("ObjectGroup localid={0}", d);
@@ -772,7 +788,8 @@ namespace SilverSim.Scene.Types.Scene
                     {
                         continue;
                     }
-                    prim.ObjectGroup.Group = new UGI(req.GroupID);
+
+                    prim.ObjectGroup.Group = ugi;
                     propHandler.Send(prim);
                 }
             }

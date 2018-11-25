@@ -678,7 +678,6 @@ namespace SilverSim.Viewer.Groups
             if (!ginfo.IsOpenEnrollment)
             {
                 agent.SendMessageAlways(reply, scene.ID);
-                return;
             }
             else if(ginfo.MembershipFee != 0)
             {
