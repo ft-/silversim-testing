@@ -208,6 +208,12 @@ namespace SilverSim.Groups.Common.Broker
             return false;
         }
 
+        public override bool TryRequestAuthorization(UGUI requestingAgent, UGI ugi)
+        {
+            GroupsServiceInterface groupsService;
+            return TryGetGroupsService(ugi, out groupsService) && groupsService.TryRequestAuthorization(requestingAgent, ugi);
+        }
+
         public GroupsBrokerService(IConfig config)
         {
             m_GroupsServiceName = config.GetString("GroupsService", string.Empty);
