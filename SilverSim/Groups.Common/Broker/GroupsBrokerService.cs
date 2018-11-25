@@ -169,6 +169,20 @@ namespace SilverSim.Groups.Common.Broker
                 return false;
             }
 
+            if(ugi.AuthorizationToken == null)
+            {
+                /* if unset, try fetching the authorization token */
+                UGI ugi2;
+                if(m_GroupsNameService.TryGetValue(ugi.ID, out ugi2))
+                {
+                    ugi = ugi2;
+                    if (ugi.HomeURI == null)
+                    {
+                        return false;
+                    }
+                }
+            }
+
             string groupsServerURI = ugi.HomeURI.ToString();
 
             if (m_GroupsService != null && m_GroupsHomeURI == groupsServerURI)
