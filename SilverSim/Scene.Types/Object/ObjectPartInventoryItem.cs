@@ -151,13 +151,13 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region Perms Granting
-        private UUID m_ExperienceID = UUID.Zero;
+        private UEI m_ExperienceID = UEI.Unknown;
 
-        public UUID ExperienceID
+        public UEI ExperienceID
         {
             get
             {
-                UUID id;
+                UEI id;
                 lock(m_PermsGranterLock)
                 {
                     id = m_ExperienceID;
@@ -168,7 +168,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 lock(m_PermsGranterLock)
                 {
-                    m_ExperienceID = value;
+                    m_ExperienceID = new UEI(value);
                 }
             }
         }

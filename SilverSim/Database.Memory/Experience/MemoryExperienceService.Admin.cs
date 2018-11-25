@@ -28,9 +28,9 @@ namespace SilverSim.Database.Memory.Experience
 {
     public sealed partial class MemoryExperienceService : IExperienceAdminInterface
     {
-        private readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UGUI, bool>> m_Admins = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UGUI, bool>>(() => new RwLockedDictionary<UGUI, bool>());
+        private readonly RwLockedDictionaryAutoAdd<UEI, RwLockedDictionary<UGUI, bool>> m_Admins = new RwLockedDictionaryAutoAdd<UEI, RwLockedDictionary<UGUI, bool>>(() => new RwLockedDictionary<UGUI, bool>());
 
-        bool IExperienceAdminInterface.this[UUID experienceID, UGUI agent]
+        bool IExperienceAdminInterface.this[UEI experienceID, UGUI agent]
         {
             get
             {
@@ -50,7 +50,7 @@ namespace SilverSim.Database.Memory.Experience
             }
         }
 
-        bool IExperienceAdminInterface.TryGetValue(UUID experienceID, UGUI agent, out bool allowed)
+        bool IExperienceAdminInterface.TryGetValue(UEI experienceID, UGUI agent, out bool allowed)
         {
             RwLockedDictionary<UGUI, bool> k;
             if (m_Admins.TryGetValue(experienceID, out k))
@@ -62,12 +62,12 @@ namespace SilverSim.Database.Memory.Experience
             return false;
         }
 
-        List<UUID> IExperienceAdminInterface.this[UGUI agent]
+        List<UEI> IExperienceAdminInterface.this[UGUI agent]
         {
             get
             {
-                var res = new List<UUID>();
-                foreach(KeyValuePair<UUID, RwLockedDictionary<UGUI, bool>> kvp in m_Admins)
+                var res = new List<UEI>();
+                foreach(KeyValuePair<UEI, RwLockedDictionary<UGUI, bool>> kvp in m_Admins)
                 {
                     if(kvp.Value[agent])
                     {

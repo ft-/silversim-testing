@@ -46,7 +46,7 @@ namespace SilverSim.Viewer.ExperienceTools
          */
         public static Map ToMap(this ExperienceInfo info) => new Map
         {
-            ["public_id"] = info.ID,
+            ["public_id"] = (AString)info.ID.ToString(),
             ["agent_id"] = info.Owner.ID,
             ["group_id"] = info.Group.ID,
             ["name"] = (AString)info.Name,
@@ -59,7 +59,7 @@ namespace SilverSim.Viewer.ExperienceTools
 
         public static ExperienceInfo ToExperienceInfo(this Map m) => new ExperienceInfo
         {
-            ID = m["public_id"].AsUUID,
+            ID = new UEI(m["public_id"].ToString()),
             Owner = new UGUI(m["agent_id"].AsUUID),
             Group = new UGI(m["group_id"].AsUUID),
             Name = m["name"].ToString(),

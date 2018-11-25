@@ -2089,7 +2089,7 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region Script Events
-        private void PostCollisionEvent(CollisionEvent ev, bool filterExperience, UUID experienceID)
+        private void PostCollisionEvent(CollisionEvent ev, bool filterExperience, UEI experienceID)
         {
             ObjectGroup grp = ObjectGroup;
             SceneInterface scene = grp?.Scene;
@@ -2202,7 +2202,7 @@ namespace SilverSim.Scene.Types.Object
         {
             if (ev.GetType() == typeof(CollisionEvent))
             {
-                PostCollisionEvent((CollisionEvent)ev, false, UUID.Zero);
+                PostCollisionEvent((CollisionEvent)ev, false, UEI.Unknown);
             }
             else
             {
@@ -2213,7 +2213,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        public void PostEvent(IScriptEvent ev, UUID experienceIDfilter)
+        public void PostEvent(IScriptEvent ev, UEI experienceIDfilter)
         {
             if (ev.GetType() == typeof(CollisionEvent))
             {

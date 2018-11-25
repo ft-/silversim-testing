@@ -26,12 +26,12 @@ namespace SilverSim.ServiceInterfaces.Experience
 {
     public interface IExperienceKeyValueInterface
     {
-        bool TryGetValue(UUID experienceID, string key, out string val);
-        bool Remove(UUID experienceID, string key);
-        void Add(UUID experienceID, string key, string value);
-        void Store(UUID experienceID, string key, string value);
-        bool StoreOnlyIfEqualOrig(UUID experienceID, string key, string value, string orig_value);
-        List<string> GetKeys(UUID experienceID);
-        bool GetDatasize(UUID experienceID, out int used, out int quota);
+        bool TryGetValue(UEI experienceID, string key, out string val);
+        bool Remove(UEI experienceID, string key);
+        void Add(UEI experienceID, string key, string value);
+        void Store(UEI experienceID, string key, string value);
+        bool StoreOnlyIfEqualOrig(UEI experienceID, string key, string value, string orig_value);
+        List<string> GetKeys(UEI experienceID);
+        bool GetDatasize(UEI experienceID, out int used, out int quota);
     }
 }

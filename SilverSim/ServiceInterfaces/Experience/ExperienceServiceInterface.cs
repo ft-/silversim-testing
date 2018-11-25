@@ -27,7 +27,7 @@ namespace SilverSim.ServiceInterfaces.Experience
 {
     public abstract class ExperienceServiceInterface
     {
-        public ExperienceInfo this[UUID experienceID]
+        public ExperienceInfo this[UEI experienceID]
         {
             get
             {
@@ -40,15 +40,31 @@ namespace SilverSim.ServiceInterfaces.Experience
             }
         }
 
-        public abstract bool TryGetValue(UUID experienceID, out ExperienceInfo experienceInfo);
+        public ExperienceInfo this[UUID experienceID]
+        {
+            get
+            {
+                ExperienceInfo info;
+                if (!TryGetValue(experienceID, out info))
+                {
+                    throw new KeyNotFoundException();
+                }
+                return info;
+            }
+        }
+
+        public abstract bool TryGetValue(UUID experienceID, out UEI uei);
+        public virtual bool TryGetValue(UUID experienceID, out ExperienceInfo experienceInfo) => TryGetValue(new UEI(experienceID), out experienceInfo);
+        public abstract bool TryGetValue(UEI experienceID, out ExperienceInfo experienceInfo);
+        /** <summary>updates ID field in ExperienceInfo</summary> */
         public abstract void Add(ExperienceInfo info);
         public abstract void Update(UGUI requestingAgent, ExperienceInfo info);
-        public abstract bool Remove(UGUI requestingAgent, UUID id);
+        public abstract bool Remove(UGUI requestingAgent, UEI id);
 
-        public abstract List<UUID> GetGroupExperiences(UGI group);
-        public abstract List<UUID> GetCreatorExperiences(UGUI creator);
-        public abstract List<UUID> GetOwnerExperiences(UGUI owner);
-        public abstract List<UUID> FindExperienceByName(string query);
+        public abstract List<UEI> GetGroupExperiences(UGI group);
+        public abstract List<UEI> GetCreatorExperiences(UGUI creator);
+        public abstract List<UEI> GetOwnerExperiences(UGUI owner);
+        public abstract List<UEI> FindExperienceByName(string query);
         public abstract List<ExperienceInfo> FindExperienceInfoByName(string query);
 
         public abstract IExperiencePermissionsInterface Permissions { get; }

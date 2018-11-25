@@ -40,10 +40,10 @@ namespace SilverSim.Types.Experience
 
     public class ExperienceInfo
     {
-        public UUID ID = UUID.Zero;
+        public UEI ID = UEI.Unknown;
         public string Name = string.Empty;
         public string Description = string.Empty;
-        public ExperiencePropertyFlags Properties = ExperiencePropertyFlags.None;
+        public ExperiencePropertyFlags Properties;
         public UGUI Owner = UGUI.Unknown;
         public UGUI Creator = UGUI.Unknown;
         public UGI Group = UGI.Unknown;

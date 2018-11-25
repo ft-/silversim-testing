@@ -110,7 +110,12 @@ namespace SilverSim.Viewer.Core.Capabilities
                 }
 
                 data.Name = item.Name;
-                item.ExperienceID = kvp.Value.ExperienceID;
+                UEI uei = UEI.Unknown;
+                if (kvp.Value.ExperienceID != UUID.Zero && !m_Scene.ExperienceService.TryGetValue(kvp.Value.ExperienceID, out uei))
+                {
+                    uei = UEI.Unknown;
+                }
+                item.ExperienceID = uei;
                 item.SetNewID(kvp.Value.ItemID);
 
                 try

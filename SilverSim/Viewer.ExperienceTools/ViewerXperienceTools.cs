@@ -101,10 +101,10 @@ namespace SilverSim.Viewer.ExperienceTools
             if (scene.Primitives.TryGetValue(objectid, out part) &&
                 part.Inventory.TryGetValue(itemid, out item))
             {
-                UUID id = item.ExperienceID;
-                if (id != UUID.Zero)
+                UEI id = item.ExperienceID;
+                if (id != UEI.Unknown)
                 {
-                    res.Add("experience", item.ExperienceID);
+                    res.Add("experience", item.ExperienceID.ID);
                 }
             }
 
@@ -116,22 +116,22 @@ namespace SilverSim.Viewer.ExperienceTools
 
         private void GetExperiencesResponse(ViewerAgent agent, AgentCircuit circuit, HttpRequest req)
         {
-            Dictionary<UUID, bool> result = circuit.Scene.ExperienceService.Permissions[agent.Owner];
+            Dictionary<UEI, bool> result = circuit.Scene.ExperienceService.Permissions[agent.Owner];
             var resdata = new Map();
             var allowed = new AnArray();
             var blocked = new AnArray();
             resdata.Add("experiences", allowed);
             resdata.Add("blocked", blocked);
 
-            foreach (KeyValuePair<UUID, bool> kvp in result)
+            foreach (KeyValuePair<UEI, bool> kvp in result)
             {
                 if (kvp.Value)
                 {
-                    allowed.Add(kvp.Key);
+                    allowed.Add(kvp.Key.ID);
                 }
                 else
                 {
-                    blocked.Add(kvp.Key);
+                    blocked.Add(kvp.Key.ID);
                 }
             }
 
@@ -217,7 +217,7 @@ namespace SilverSim.Viewer.ExperienceTools
             {
                 ExperienceInfo info = new ExperienceInfo
                 {
-                    ID = UUID.Random,
+                    /* ID is setup by ExperienceService */
                     Name = "New Experience",
                     Owner = agent.Owner,
                     Creator = agent.Owner,
@@ -225,11 +225,11 @@ namespace SilverSim.Viewer.ExperienceTools
                 experienceService.Add(info);
             }
 
-            List<UUID> experienceids = experienceService.GetOwnerExperiences(agent.Owner);
+            List<UEI> experienceids = experienceService.GetOwnerExperiences(agent.Owner);
             var ids = new AnArray();
-            foreach (UUID id in experienceids)
+            foreach (UEI id in experienceids)
             {
-                ids.Add(id);
+                ids.Add(id.ID);
             }
             var resdata = new Map
             {
@@ -478,11 +478,11 @@ namespace SilverSim.Viewer.ExperienceTools
                 return;
             }
 
-            List<UUID> experienceids = experienceService.Admins[agent.Owner];
+            List<UEI> experienceids = experienceService.Admins[agent.Owner];
             var ids = new AnArray();
-            foreach (UUID id in experienceids)
+            foreach (UEI id in experienceids)
             {
-                ids.Add(id);
+                ids.Add(id.ID);
             }
             var resdata = new Map
             {
@@ -535,11 +535,11 @@ namespace SilverSim.Viewer.ExperienceTools
                 return;
             }
 
-            List<UUID> experienceids = experienceService.GetCreatorExperiences(agent.Owner);
+            List<UEI> experienceids = experienceService.GetCreatorExperiences(agent.Owner);
             var ids = new AnArray();
-            foreach (UUID id in experienceids)
+            foreach (UEI id in experienceids)
             {
-                ids.Add(id);
+                ids.Add(id.ID);
             }
             var resdata = new Map
             {
@@ -665,7 +665,8 @@ namespace SilverSim.Viewer.ExperienceTools
                 Map entry = kvp.Value as Map;
                 IValue iv;
                 UUID experienceid;
-                if(!UUID.TryParse(kvp.Key, out experienceid) || entry == null || !entry.TryGetValue("permission", out iv))
+                UEI uei;
+                if(!UUID.TryParse(kvp.Key, out experienceid) || entry == null || !entry.TryGetValue("permission", out iv) || !experienceService.TryGetValue(experienceid, out uei))
                 {
                     continue;
                 }
@@ -673,11 +674,11 @@ namespace SilverSim.Viewer.ExperienceTools
                 switch(iv.ToString())
                 {
                     case "Allow":
-                        experienceService.Permissions[experienceid, agent.Owner] = true;
+                        experienceService.Permissions[uei, agent.Owner] = true;
                         break;
 
                     case "Block":
-                        experienceService.Permissions[experienceid, agent.Owner] = false;
+                        experienceService.Permissions[uei, agent.Owner] = false;
                         break;
                 }
             }
@@ -707,7 +708,14 @@ namespace SilverSim.Viewer.ExperienceTools
                 return;
             }
 
-            experienceService.Permissions.Remove(id, agent.Owner);
+            UEI uei;
+            if(!experienceService.TryGetValue(id, out uei))
+            {
+                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                return;
+            }
+
+            experienceService.Permissions.Remove(uei, agent.Owner);
         }
 
         /* GroupExperiences 
@@ -748,11 +756,11 @@ namespace SilverSim.Viewer.ExperienceTools
                 return;
             }
 
-            List<UUID> experienceids = experienceService.GetGroupExperiences(agent.Group);
+            List<UEI> experienceids = experienceService.GetGroupExperiences(agent.Group);
             var ids = new AnArray();
-            foreach (UUID id in experienceids)
+            foreach (UEI id in experienceids)
             {
-                ids.Add(id);
+                ids.Add(id.ID);
             }
             var resdata = new Map
             {
@@ -988,11 +996,13 @@ namespace SilverSim.Viewer.ExperienceTools
             bool isadmin = false;
             if(experienceService.TryGetValue(experienceid, out info))
             {
-                isadmin = info.Owner.EqualsGrid(agent.Owner) || experienceService.Admins[experienceid, agent.Owner];
+                isadmin = info.Owner.EqualsGrid(agent.Owner) || experienceService.Admins[info.ID, agent.Owner];
             }
 
-            Map resdata = new Map();
-            resdata.Add("status", isadmin);
+            Map resdata = new Map
+            {
+                { "status", isadmin }
+            };
             using (HttpResponse res = httpreq.BeginResponse("application/llsd+xml"))
             {
                 using (Stream o = res.GetOutputStream())

@@ -200,7 +200,7 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            if(item.ExperienceID != UUID.Zero)
+            if(item.ExperienceID != UEI.Unknown)
             {
                 ExperienceServiceInterface experienceService = ExperienceService;
                 if(req.Questions == ScriptPermissions.ExperienceGrantedPermissions)

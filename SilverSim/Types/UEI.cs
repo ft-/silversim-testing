@@ -23,31 +23,31 @@ using System;
 
 namespace SilverSim.Types
 {
-    /** <summary>Universal Group Identifier</summary> */
-    public sealed class UGI : IEquatable<UGI>
+    /** <summary>Universal Experience Identifier</summary> */
+    public class UEI : IEquatable<UEI>
     {
         public UUID ID = UUID.Zero;
-        public string GroupName = string.Empty;
+        public string ExperienceName = string.Empty;
         public Uri HomeURI;
         public bool IsAuthoritative; /* false means Group Data has been validated through any available resolving service */
         /** <summary>used by GroupsNameStorage. name data without authorization has null here</summary> */
         public byte[] AuthorizationToken;
 
-        public static explicit operator string(UGI v) => string.Format("{0};{1};{2}", v.ID.ToString(), v.HomeURI.ToString(), v.GroupName);
+        public static explicit operator string(UEI v) => string.Format("{0};{1};{2}", v.ID.ToString(), v.HomeURI.ToString(), v.ExperienceName);
 
-        public string GroupData
+        public string ExperienceData
         {
-            get { return string.Format("{0};{1}", HomeURI.ToString(), GroupName); }
+            get { return string.Format("{0};{1}", HomeURI.ToString(), ExperienceName); }
 
             set
             {
                 string[] parts = value.Split(new char[] { ';' }, 2, StringSplitOptions.None);
                 if (parts.Length < 2)
                 {
-                    throw new ArgumentException("\"" + value + "\" is not a GroupData string");
+                    throw new ArgumentException("\"" + value + "\" is not a ExperienceData string");
                 }
                 HomeURI = new Uri(parts[0]);
-                GroupName = parts[1];
+                ExperienceName = parts[1];
             }
         }
 
@@ -56,15 +56,15 @@ namespace SilverSim.Types
             get
             {
                 return (HomeURI == null) ?
-                    string.Format("{0}", GroupName) :
-                    string.Format("{0} @{1}", GroupName.Replace(' ', '.'), HomeURI.ToString());
+                    string.Format("{0}", ExperienceName) :
+                    string.Format("{0} @{1}", ExperienceName.Replace(' ', '.'), HomeURI.ToString());
             }
             set
             {
                 string[] names = value.Split(new char[] { ' ' }, 2, StringSplitOptions.None);
-                if(names.Length < 2)
+                if (names.Length < 2)
                 {
-                    GroupName = names[0];
+                    ExperienceName = names[0];
                     HomeURI = null;
                 }
                 else
@@ -73,67 +73,67 @@ namespace SilverSim.Types
                     {
                         /* HG UUI */
                         HomeURI = new Uri("http://" + names[1]);
-                        GroupName = names[0].Replace('.', ' ');
+                        ExperienceName = names[0].Replace('.', ' ');
                     }
                     else
                     {
-                        GroupName = value;
+                        ExperienceName = value;
                         HomeURI = null;
                     }
                 }
             }
         }
 
-        public UGI()
+        public UEI()
         {
         }
 
-        public UGI(UGI v)
+        public UEI(UEI v)
         {
             ID = v.ID;
-            GroupName = v.GroupName;
+            ExperienceName = v.ExperienceName;
             HomeURI = v.HomeURI;
         }
 
-        public UGI(UUID v)
+        public UEI(UUID v)
         {
             ID = v;
         }
 
         public override bool Equals(object obj)
         {
-            var u = obj as UGI;
+            var u = obj as UEI;
             return (u != null) && Equals(u);
         }
 
-        public bool Equals(UGI ugi)
+        public bool Equals(UEI other)
         {
-            if (ugi.ID == ID && ID == UUID.Zero)
+            if (other.ID == ID && ID == UUID.Zero)
             {
                 return true;
             }
 
-            return ugi.ID == ID &&
-                ((ugi.HomeURI == null && HomeURI == null) ||
-                (ugi.HomeURI != null && HomeURI != null && ugi.HomeURI.Equals(HomeURI)));
+            return other.ID == ID &&
+                ((other.HomeURI == null && HomeURI == null) ||
+                (other.HomeURI != null && HomeURI != null && other.HomeURI.Equals(HomeURI)));
         }
 
         public override int GetHashCode()
         {
             var h = HomeURI;
             return (h != null) ?
-                ID.GetHashCode() ^ GroupName.GetHashCode() ^ h.GetHashCode() :
-                ID.GetHashCode() ^ GroupName.GetHashCode();
+                ID.GetHashCode() ^ ExperienceName.GetHashCode() ^ h.GetHashCode() :
+                ID.GetHashCode() ^ ExperienceName.GetHashCode();
         }
 
-        public UGI(UUID ID, string GroupName, Uri HomeURI)
+        public UEI(UUID ID, string ExperienceName, Uri HomeURI)
         {
             this.ID = ID;
-            this.GroupName = GroupName;
+            this.ExperienceName = ExperienceName;
             this.HomeURI = HomeURI;
         }
 
-        public UGI(string uuiString)
+        public UEI(string uuiString)
         {
             var parts = uuiString.Split(Semicolon, 3);
             if (parts.Length < 2)
@@ -144,20 +144,20 @@ namespace SilverSim.Types
             ID = new UUID(parts[0]);
             if (parts.Length > 2)
             {
-                GroupName = parts[2];
+                ExperienceName = parts[2];
             }
             HomeURI = new Uri(parts[1]);
         }
 
         public override string ToString() => (HomeURI != null) ?
-                String.Format("{0};{1};{2}", ID.ToString(), HomeURI, GroupName) :
+                String.Format("{0};{1};{2}", ID.ToString(), HomeURI, ExperienceName) :
                 ID.ToString();
 
         private static readonly char[] Semicolon = new char[1] { ';' };
 
-        public static UGI Unknown => new UGI();
+        public static UEI Unknown => new UEI();
 
-        public static bool operator ==(UGI l, UGI r)
+        public static bool operator ==(UEI l, UEI r)
         {
             /* get rid of type specifics */
             object lo = l;
@@ -173,7 +173,7 @@ namespace SilverSim.Types
             return l.Equals(r);
         }
 
-        public static bool operator !=(UGI l, UGI r)
+        public static bool operator !=(UEI l, UEI r)
         {
             /* get rid of type specifics */
             object lo = l;

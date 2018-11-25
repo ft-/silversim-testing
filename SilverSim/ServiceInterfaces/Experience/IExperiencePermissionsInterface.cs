@@ -26,9 +26,9 @@ namespace SilverSim.ServiceInterfaces.Experience
 {
     public interface IExperiencePermissionsInterface
     {
-        bool this[UUID experienceID, UGUI agent] { get; set; }
-        bool TryGetValue(UUID experienceID, UGUI agent, out bool allowed);
-        bool Remove(UUID experienceID, UGUI agent);
-        Dictionary<UUID, bool> this[UGUI agent] { get; }
+        bool this[UEI experienceID, UGUI agent] { get; set; }
+        bool TryGetValue(UEI experienceID, UGUI agent, out bool allowed);
+        bool Remove(UEI experienceID, UGUI agent);
+        Dictionary<UEI, bool> this[UGUI agent] { get; }
     }
 }

@@ -543,7 +543,7 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "ExperienceID":
-                                item.ExperienceID = reader.ReadContentAsUUID();
+                                item.ExperienceID = new UEI(reader.ReadContentAsString());
                                 break;
 
                             case "OwnerID": /* Do not trust this ever! */
@@ -698,10 +698,10 @@ namespace SilverSim.Scene.Types.Object
                         writer.WriteNamedValue("PermsMask", (uint)grantinfo.PermsMask);
                         writer.WriteNamedValue("Type", (int)item.AssetType);
                         writer.WriteNamedValue("OwnerChanged", (options & XmlSerializationOptions.AdjustForNextOwner) != XmlSerializationOptions.None);
-                        UUID experienceID = item.ExperienceID;
-                        if(experienceID != UUID.Zero)
+                        UEI experienceID = item.ExperienceID;
+                        if(experienceID != UEI.Unknown)
                         {
-                            writer.WriteNamedValue("ExperienceID", experienceID);
+                            writer.WriteNamedValue("ExperienceID", experienceID.ToString());
                         }
                         {
                             ObjectPartInventoryItem.CollisionFilterParam p = item.CollisionFilter;
