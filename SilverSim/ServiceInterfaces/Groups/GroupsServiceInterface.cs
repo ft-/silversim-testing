@@ -209,6 +209,9 @@ namespace SilverSim.ServiceInterfaces.Groups
             }
         }
 
+        /** <summary>Support authorization data to be granted</summary> */
+        public virtual bool TryRequestAuthorization(UGUI requestingAgent, UGI ugi) => false;
+
         public virtual GroupInfo CreateGroup(UGUI requestingAgent, GroupInfo ginfo, GroupPowers everyonePowers, GroupPowers ownerPowers)
         {
             var role_everyone = new GroupRole
