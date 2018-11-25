@@ -29,6 +29,8 @@ namespace SilverSim.Types
         public string GroupName = string.Empty;
         public Uri HomeURI;
         public bool IsAuthoritative; /* false means Group Data has been validated through any available resolving service */
+        /** <summary>used by GroupsNameStorage. name data without authorization has null here</summary> */
+        public byte[] AuthorizationToken;
 
         public static explicit operator string(UGI v) => string.Format("{0};{1};{2}", v.ID.ToString(), v.HomeURI.ToString(), v.GroupName);
 
