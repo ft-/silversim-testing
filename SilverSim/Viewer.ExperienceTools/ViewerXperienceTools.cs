@@ -1117,8 +1117,8 @@ namespace SilverSim.Viewer.ExperienceTools
 
         private void HandleRegionExperiencesGet(ViewerAgent agent, AgentCircuit circuit, HttpRequest httpreq)
         {
-            List<UUID> allowed = new List<UUID>();
-            List<UUID> blocked = new List<UUID>();
+            var allowed = new List<UEI>();
+            var blocked = new List<UEI>();
 
             SceneInterface scene = circuit.Scene;
             if(scene == null)
@@ -1139,25 +1139,25 @@ namespace SilverSim.Viewer.ExperienceTools
                     blocked.Add(info.ExperienceID);
                 }
             }
-            List<UUID> trusted = estateService.TrustedExperiences[scene.ParentEstateID];
+            List<UEI> trusted = estateService.TrustedExperiences[scene.ParentEstateID];
 
             Map resdata = new Map();
             AnArray array = new AnArray();
-            foreach(UUID id in allowed)
+            foreach(UEI id in allowed)
             {
-                array.Add(id);
+                array.Add(id.ID);
             }
             resdata.Add("allowed", array);
             array = new AnArray();
-            foreach (UUID id in blocked)
+            foreach (UEI id in blocked)
             {
-                array.Add(id);
+                array.Add(id.ID);
             }
             resdata.Add("blocked", array);
             array = new AnArray();
-            foreach (UUID id in trusted)
+            foreach (UEI id in trusted)
             {
-                array.Add(id);
+                array.Add(id.ID);
             }
             resdata.Add("trusted", array);
 

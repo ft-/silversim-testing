@@ -25,7 +25,7 @@ namespace SilverSim.Types.Parcel
     {
         public UUID RegionID;
         public UUID ParcelID;
-        public UUID ExperienceID;
+        public UEI ExperienceID;
         public bool IsAllowed;
 
         public ParcelExperienceEntry()

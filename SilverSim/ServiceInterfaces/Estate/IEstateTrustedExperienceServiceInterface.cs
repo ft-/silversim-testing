@@ -26,9 +26,9 @@ namespace SilverSim.ServiceInterfaces.Estate
 {
     public interface IEstateTrustedExperienceServiceInterface
     {
-        bool this[uint estateID, UUID experienceID] { get; set; }
-        bool TryGetValue(uint estateID, UUID experienceID, out bool trusted);
-        List<UUID> this[uint estateID] { get; }
-        bool Remove(uint estateID, UUID experienceID);
+        bool this[uint estateID, UEI experienceID] { get; set; }
+        bool TryGetValue(uint estateID, UEI experienceID, out bool trusted);
+        List<UEI> this[uint estateID] { get; }
+        bool Remove(uint estateID, UEI experienceID);
     }
 }

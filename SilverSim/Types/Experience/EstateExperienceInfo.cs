@@ -24,7 +24,7 @@ namespace SilverSim.Types.Experience
     public class EstateExperienceInfo
     {
         public uint EstateID;
-        public UUID ExperienceID;
+        public UEI ExperienceID;
         public bool IsAllowed;
 
         public EstateExperienceInfo()

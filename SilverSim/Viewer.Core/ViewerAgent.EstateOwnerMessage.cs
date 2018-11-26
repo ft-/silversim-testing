@@ -558,8 +558,7 @@ namespace SilverSim.Viewer.Core
             var scene = circuit.Scene;
             ExperienceInfo expInfo;
 
-            if ((scene.ExperienceService == null || !scene.ExperienceService.TryGetValue(experienceid, out expInfo)) &&
-                (flags & (EstateExperienceDeltaFlags.AddAllowed | EstateExperienceDeltaFlags.AddBlocked | EstateExperienceDeltaFlags.AddTrusted)) != 0)
+            if ((scene.ExperienceService == null || !scene.ExperienceService.TryGetValue(experienceid, out expInfo)))
             {
                 circuit.Agent.SendAlertMessage(this.GetLanguageString(circuit.Agent.CurrentCulture, "ChangingEstateExperienceNotPossibleSinceExperienceNotKnown", "Changing estate experience not possible since experience not known"), scene.ID);
                 return;
@@ -592,27 +591,27 @@ namespace SilverSim.Viewer.Core
             {
                 if ((flags & EstateExperienceDeltaFlags.AddAllowed) != 0)
                 {
-                    estateService.Experiences.Store(new EstateExperienceInfo { EstateID = selectedEstateId, ExperienceID = experienceid, IsAllowed = true });
+                    estateService.Experiences.Store(new EstateExperienceInfo { EstateID = selectedEstateId, ExperienceID = expInfo.ID, IsAllowed = true });
                 }
                 if ((flags & EstateExperienceDeltaFlags.RemoveAllowed) != 0)
                 {
-                    estateService.Experiences.Remove(selectedEstateId, experienceid);
+                    estateService.Experiences.Remove(selectedEstateId, expInfo.ID);
                 }
                 if ((flags & EstateExperienceDeltaFlags.AddBlocked) != 0)
                 {
-                    estateService.Experiences.Store(new EstateExperienceInfo { EstateID = selectedEstateId, ExperienceID = experienceid, IsAllowed = false });
+                    estateService.Experiences.Store(new EstateExperienceInfo { EstateID = selectedEstateId, ExperienceID = expInfo.ID, IsAllowed = false });
                 }
                 if ((flags & EstateExperienceDeltaFlags.RemoveBlocked) != 0)
                 {
-                    estateService.Experiences.Remove(selectedEstateId, experienceid);
+                    estateService.Experiences.Remove(selectedEstateId, expInfo.ID);
                 }
                 if ((flags & EstateExperienceDeltaFlags.AddTrusted) != 0)
                 {
-                    estateService.TrustedExperiences[selectedEstateId, experienceid] = true;
+                    estateService.TrustedExperiences[selectedEstateId, expInfo.ID] = true;
                 }
                 if ((flags & EstateExperienceDeltaFlags.RemoveTrusted) != 0)
                 {
-                    estateService.TrustedExperiences.Remove(selectedEstateId, experienceid);
+                    estateService.TrustedExperiences.Remove(selectedEstateId, expInfo.ID);
                 }
             }
 
@@ -628,8 +627,8 @@ namespace SilverSim.Viewer.Core
             m.ParamList.Add(StringToBytes(estateID.ToString()));
             m.ParamList.Add(StringToBytes("1"));
 
-            var allowed = new List<UUID>();
-            var blocked = new List<UUID>();
+            var allowed = new List<UEI>();
+            var blocked = new List<UEI>();
             foreach (EstateExperienceInfo info in estateService.Experiences[scene.ParentEstateID])
             {
                 if (info.IsAllowed)
@@ -641,22 +640,22 @@ namespace SilverSim.Viewer.Core
                     blocked.Add(info.ExperienceID);
                 }
             }
-            List<UUID> trusted = estateService.TrustedExperiences[scene.ParentEstateID];
+            List<UEI> trusted = estateService.TrustedExperiences[scene.ParentEstateID];
 
             m.ParamList.Add(StringToBytes(blocked.Count.ToString()));
             m.ParamList.Add(StringToBytes(trusted.Count.ToString()));
             m.ParamList.Add(StringToBytes(allowed.Count.ToString()));
-            foreach(UUID id in blocked)
+            foreach(UEI id in blocked)
             {
-                m.ParamList.Add(id.GetBytes());
+                m.ParamList.Add(id.ID.GetBytes());
             }
-            foreach (UUID id in trusted)
+            foreach (UEI id in trusted)
             {
-                m.ParamList.Add(id.GetBytes());
+                m.ParamList.Add(id.ID.GetBytes());
             }
-            foreach (UUID id in allowed)
+            foreach (UEI id in allowed)
             {
-                m.ParamList.Add(id.GetBytes());
+                m.ParamList.Add(id.ID.GetBytes());
             }
             SendMessageAlways(m, req.CircuitSceneID);
         }

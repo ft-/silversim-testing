@@ -182,11 +182,11 @@ namespace SilverSim.Viewer.Core
                 {
                     if(entry.IsAllowed)
                     {
-                        allowedexp.Add(entry.ExperienceID);
+                        allowedexp.Add(entry.ExperienceID.ID);
                     }
                     else
                     {
-                        blockedexp.Add(entry.ExperienceID);
+                        blockedexp.Add(entry.ExperienceID.ID);
                     }
                 }
                 if ((req.Flags & ParcelAccessList.AllowExperience) != 0)
@@ -246,7 +246,7 @@ namespace SilverSim.Viewer.Core
             IEnumerable<ParcelExperienceEntry> reslist = from entry in list[Scene.ID, parcelID] where (entry.IsAllowed && setallow) || (!entry.IsAllowed && !setallow) select entry;
             foreach (var listed in reslist)
             {
-                if (!entries.ContainsKey(listed.ExperienceID))
+                if (!entries.ContainsKey(listed.ExperienceID.ID))
                 {
                     list.Remove(Scene.ID, parcelID, listed.ExperienceID);
                 }
@@ -259,7 +259,7 @@ namespace SilverSim.Viewer.Core
                     var pae = new ParcelExperienceEntry
                     {
                         RegionID = Scene.ID,
-                        ExperienceID = upd.ID,
+                        ExperienceID = expInfo.ID,
                         IsAllowed = setallow,
                         ParcelID = parcelID
                     };

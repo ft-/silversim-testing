@@ -47,21 +47,21 @@ namespace SilverSim.Database.Memory.Estate
             }
         }
 
-        bool IEstateExperienceServiceInterface.Remove(uint estateID, UUID experienceID)
+        bool IEstateExperienceServiceInterface.Remove(uint estateID, UEI experienceID)
         {
             RwLockedDictionary<UUID, EstateExperienceInfo> experiences;
-            return m_Experiences.TryGetValue(estateID, out experiences) && experiences.Remove(experienceID);
+            return m_Experiences.TryGetValue(estateID, out experiences) && experiences.Remove(experienceID.ID);
         }
 
         void IEstateExperienceServiceInterface.Store(EstateExperienceInfo info)
         {
-            m_Experiences[info.EstateID][info.ExperienceID] = new EstateExperienceInfo(info);
+            m_Experiences[info.EstateID][info.ExperienceID.ID] = new EstateExperienceInfo(info);
         }
 
-        bool IEstateExperienceServiceInterface.TryGetValue(uint estateID, UUID experienceID, out EstateExperienceInfo info)
+        bool IEstateExperienceServiceInterface.TryGetValue(uint estateID, UEI experienceID, out EstateExperienceInfo info)
         {
             RwLockedDictionary<UUID, EstateExperienceInfo> experiences;
-            if(m_Experiences.TryGetValue(estateID, out experiences) && experiences.TryGetValue(experienceID, out info))
+            if(m_Experiences.TryGetValue(estateID, out experiences) && experiences.TryGetValue(experienceID.ID, out info))
             {
                 info = new EstateExperienceInfo(info);
                 return true;

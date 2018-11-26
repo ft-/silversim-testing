@@ -64,7 +64,7 @@ namespace SilverSim.ServiceInterfaces.Estate
         public abstract IEstateExperienceServiceInterface Experiences { get; }
         public abstract IEstateTrustedExperienceServiceInterface TrustedExperiences { get; }
 
-        EstateExperienceInfo IEstateExperienceServiceThisInterface.this[uint estateID, UUID experienceID]
+        EstateExperienceInfo IEstateExperienceServiceThisInterface.this[uint estateID, UEI experienceID]
         {
             get
             {

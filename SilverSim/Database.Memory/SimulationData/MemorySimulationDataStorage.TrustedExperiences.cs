@@ -24,6 +24,7 @@ using SilverSim.Scene.Types.Scene;
 using SilverSim.Threading;
 using SilverSim.Types;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SilverSim.Database.Memory.SimulationData
 {
@@ -31,39 +32,39 @@ namespace SilverSim.Database.Memory.SimulationData
     {
         private readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, bool>> m_TrustedExperiences = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<UUID, bool>>(() => new RwLockedDictionary<UUID, bool>());
 
-        List<UUID> IRegionTrustedExperienceList.this[UUID regionID]
+        List<UEI> IRegionTrustedExperienceList.this[UUID regionID]
         {
             get
             {
                 RwLockedDictionary<UUID, bool> exp;
-                return m_TrustedExperiences.TryGetValue(regionID, out exp) ? new List<UUID>(exp.Keys) : new List<UUID>();
+                return m_TrustedExperiences.TryGetValue(regionID, out exp) ? new List<UEI>(from k in exp.Keys select new UEI(k)) : new List<UEI>();
             }
         }
 
-        bool IRegionTrustedExperienceList.this[UUID regionID, UUID experienceID]
+        bool IRegionTrustedExperienceList.this[UUID regionID, UEI experienceID]
         {
             get
             {
                 RwLockedDictionary<UUID, bool> exp;
-                return m_TrustedExperiences.TryGetValue(regionID, out exp) && exp.ContainsKey(experienceID);
+                return m_TrustedExperiences.TryGetValue(regionID, out exp) && exp.ContainsKey(experienceID.ID);
             }
             set
             {
                 if (value)
                 {
-                    m_TrustedExperiences[regionID][experienceID] = true;
+                    m_TrustedExperiences[regionID][experienceID.ID] = true;
                 }
                 else
                 {
-                    m_TrustedExperiences[regionID].Remove(experienceID);
+                    m_TrustedExperiences[regionID].Remove(experienceID.ID);
                 }
             }
         }
 
-        bool IRegionTrustedExperienceList.Remove(UUID regionID, UUID experienceID)
+        bool IRegionTrustedExperienceList.Remove(UUID regionID, UEI experienceID)
         {
             RwLockedDictionary<UUID, bool> exp;
-            return m_TrustedExperiences.TryGetValue(regionID, out exp) && exp.Remove(experienceID);
+            return m_TrustedExperiences.TryGetValue(regionID, out exp) && exp.Remove(experienceID.ID);
         }
 
         void ISimulationDataRegionTrustedExperiencesStorageInterface.RemoveRegion(UUID regionID)
@@ -71,13 +72,13 @@ namespace SilverSim.Database.Memory.SimulationData
             m_TrustedExperiences.Remove(regionID);
         }
 
-        bool IRegionTrustedExperienceList.TryGetValue(UUID regionID, UUID experienceID, out bool trusted)
+        bool IRegionTrustedExperienceList.TryGetValue(UUID regionID, UEI experienceID, out bool trusted)
         {
             trusted = false;
             RwLockedDictionary<UUID, bool> exp;
             if (m_TrustedExperiences.TryGetValue(regionID, out exp))
             {
-                exp.TryGetValue(experienceID, out trusted);
+                exp.TryGetValue(experienceID.ID, out trusted);
             }
             return true;
         }

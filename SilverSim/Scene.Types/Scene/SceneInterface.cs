@@ -118,29 +118,29 @@ namespace SilverSim.Scene.Types.Scene
 
     public interface IParcelExperienceList
     {
-        ParcelExperienceEntry this[UUID regionID, UUID parcelID, UUID experienceID] { get; }
-        bool TryGetValue(UUID regionID, UUID parcelID, UUID experienceID, out ParcelExperienceEntry entry);
+        ParcelExperienceEntry this[UUID regionID, UUID parcelID, UEI experienceID] { get; }
+        bool TryGetValue(UUID regionID, UUID parcelID, UEI experienceID, out ParcelExperienceEntry entry);
         List<ParcelExperienceEntry> this[UUID regionID, UUID parcelID] { get; }
         void Store(ParcelExperienceEntry entry);
         bool Remove(UUID regionID, UUID parcelID);
-        bool Remove(UUID regionID, UUID parcelID, UUID experienceID);
+        bool Remove(UUID regionID, UUID parcelID, UEI experienceID);
     }
 
     public interface IRegionExperienceList
     {
-        RegionExperienceInfo this[UUID regionID, UUID experienceID] { get; }
-        bool TryGetValue(UUID regionID, UUID experienceID, out RegionExperienceInfo info);
+        RegionExperienceInfo this[UUID regionID, UEI experienceID] { get; }
+        bool TryGetValue(UUID regionID, UEI experienceID, out RegionExperienceInfo info);
         List<RegionExperienceInfo> this[UUID regionID] { get; }
         void Store(RegionExperienceInfo info);
-        bool Remove(UUID regionID, UUID experienceID);
+        bool Remove(UUID regionID, UEI experienceID);
     }
 
     public interface IRegionTrustedExperienceList
     {
-        bool this[UUID regionID, UUID experienceID] { get; set; }
-        bool TryGetValue(UUID regionID, UUID experienceID, out bool trusted);
-        List<UUID> this[UUID regionID] { get; }
-        bool Remove(UUID regionID, UUID experienceID);
+        bool this[UUID regionID, UEI experienceID] { get; set; }
+        bool TryGetValue(UUID regionID, UEI experienceID, out bool trusted);
+        List<UEI> this[UUID regionID] { get; }
+        bool Remove(UUID regionID, UEI experienceID);
     }
 
     public interface ISceneParcels : IEnumerable<ParcelInfo>
@@ -521,7 +521,7 @@ namespace SilverSim.Scene.Types.Scene
         public abstract void RelocateRegion(GridVector location);
         public GridServiceInterface RegionStorage { get; set; }
 
-        protected SceneInterface(UInt32 sizeX, UInt32 sizeY)
+        protected SceneInterface(uint sizeX, uint sizeY)
         {
             LoginControl = new LoginController(this);
             RegionMapTexture = TextureConstant.DefaultTerrainTexture2; /* set Default terrain Texture 2 as initial RegionMapTexture */

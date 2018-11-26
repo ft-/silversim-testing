@@ -49,7 +49,7 @@ namespace SilverSim.Database.Memory.SimulationData
             }
         }
 
-        RegionExperienceInfo IRegionExperienceList.this[UUID regionID, UUID experienceID]
+        RegionExperienceInfo IRegionExperienceList.this[UUID regionID, UEI experienceID]
         {
             get
             {
@@ -62,11 +62,11 @@ namespace SilverSim.Database.Memory.SimulationData
             }
         }
 
-        bool IRegionExperienceList.TryGetValue(UUID regionID, UUID experienceID, out RegionExperienceInfo info)
+        bool IRegionExperienceList.TryGetValue(UUID regionID, UEI experienceID, out RegionExperienceInfo info)
         {
             RwLockedDictionary<UUID, RegionExperienceInfo> exp;
             RegionExperienceInfo i_info;
-            if(m_Experiences.TryGetValue(regionID, out exp) && exp.TryGetValue(experienceID, out i_info))
+            if(m_Experiences.TryGetValue(regionID, out exp) && exp.TryGetValue(experienceID.ID, out i_info))
             {
                 info = new RegionExperienceInfo(i_info);
                 return true;
@@ -80,10 +80,10 @@ namespace SilverSim.Database.Memory.SimulationData
             m_Experiences[info.RegionID][info.ExperienceID] = new RegionExperienceInfo(info);
         }
 
-        bool IRegionExperienceList.Remove(UUID regionID, UUID experienceID)
+        bool IRegionExperienceList.Remove(UUID regionID, UEI experienceID)
         {
             RwLockedDictionary<UUID, RegionExperienceInfo> exp;
-            return m_Experiences.TryGetValue(regionID, out exp) && exp.Remove(experienceID);
+            return m_Experiences.TryGetValue(regionID, out exp) && exp.Remove(experienceID.ID);
         }
 
         void ISimulationDataRegionExperiencesStorageInterface.RemoveRegion(UUID regionID)

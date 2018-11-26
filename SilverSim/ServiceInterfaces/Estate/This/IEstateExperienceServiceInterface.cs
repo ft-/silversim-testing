@@ -26,6 +26,6 @@ namespace SilverSim.ServiceInterfaces.Estate.This
 {
     public interface IEstateExperienceServiceThisInterface
     {
-        EstateExperienceInfo this[uint estateID, UUID experienceID] { get; }
+        EstateExperienceInfo this[uint estateID, UEI experienceID] { get; }
     }
 }
