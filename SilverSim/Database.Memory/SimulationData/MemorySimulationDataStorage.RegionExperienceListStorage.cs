@@ -77,7 +77,7 @@ namespace SilverSim.Database.Memory.SimulationData
 
         void IRegionExperienceList.Store(RegionExperienceInfo info)
         {
-            m_Experiences[info.RegionID][info.ExperienceID] = new RegionExperienceInfo(info);
+            m_Experiences[info.RegionID][info.ExperienceID.ID] = new RegionExperienceInfo(info);
         }
 
         bool IRegionExperienceList.Remove(UUID regionID, UEI experienceID)

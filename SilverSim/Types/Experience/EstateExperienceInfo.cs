@@ -34,7 +34,7 @@ namespace SilverSim.Types.Experience
         public EstateExperienceInfo(EstateExperienceInfo info)
         {
             EstateID = info.EstateID;
-            ExperienceID = info.ExperienceID;
+            ExperienceID = new UEI(info.ExperienceID);
             IsAllowed = info.IsAllowed;
         }
     }

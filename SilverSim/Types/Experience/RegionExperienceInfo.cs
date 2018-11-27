@@ -24,7 +24,7 @@ namespace SilverSim.Types.Experience
     public class RegionExperienceInfo
     {
         public UUID RegionID;
-        public UUID ExperienceID;
+        public UEI ExperienceID;
         public bool IsAllowed;
 
         public RegionExperienceInfo()
@@ -34,7 +34,7 @@ namespace SilverSim.Types.Experience
         public RegionExperienceInfo(RegionExperienceInfo info)
         {
             RegionID = info.RegionID;
-            ExperienceID = info.ExperienceID;
+            ExperienceID = new UEI(info.ExperienceID);
             IsAllowed = info.IsAllowed;
         }
     }
