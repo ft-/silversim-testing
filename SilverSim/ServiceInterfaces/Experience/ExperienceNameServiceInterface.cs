@@ -40,7 +40,7 @@ namespace SilverSim.ServiceInterfaces.Experience
             }
         }
 
-        public abstract bool TryGetValue(UUID groupID, out UEI uei);
+        public abstract bool TryGetValue(UUID experienceID, out UEI uei);
 
         public abstract List<UEI> GetExperiencesByName(string experienceName, int limit);
 
