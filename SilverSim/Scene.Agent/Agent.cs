@@ -29,6 +29,7 @@ using SilverSim.Scene.Types.Script;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Economy;
+using SilverSim.ServiceInterfaces.Experience;
 using SilverSim.ServiceInterfaces.Friends;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.Groups;
@@ -968,6 +969,7 @@ namespace SilverSim.Scene.Agent
         public abstract AssetServiceInterface AssetService { get; }
         public abstract InventoryServiceInterface InventoryService { get; }
         public abstract GroupsServiceInterface GroupsService { get; }
+        public abstract ExperienceServiceInterface ExperienceService { get; }
         public abstract ProfileServiceInterface ProfileService { get; }
         public abstract FriendsServiceInterface FriendsService { get; }
         public abstract UserAgentServiceInterface UserAgentService { get; }

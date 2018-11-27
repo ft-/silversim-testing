@@ -30,6 +30,7 @@ using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Economy;
+using SilverSim.ServiceInterfaces.Experience;
 using SilverSim.ServiceInterfaces.Friends;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.Groups;
@@ -217,10 +218,9 @@ namespace SilverSim.Scene.Npc
 
         public NpcPresenceServiceInterface NpcPresenceService { get; }
 
-        public override GroupsServiceInterface GroupsService
-        {
-            get { return CurrentScene.GroupsService; }
-        }
+        public override GroupsServiceInterface GroupsService => CurrentScene.GroupsService;
+
+        public override ExperienceServiceInterface ExperienceService => CurrentScene.ExperienceService;
 
         public override InventoryServiceInterface InventoryService
         {

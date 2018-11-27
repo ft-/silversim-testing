@@ -25,6 +25,7 @@ using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Economy;
+using SilverSim.ServiceInterfaces.Experience;
 using SilverSim.ServiceInterfaces.Friends;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.Groups;
@@ -183,6 +184,8 @@ namespace SilverSim.Scene.Types.Agent
         InventoryServiceInterface InventoryService { get; }
 
         GroupsServiceInterface GroupsService { get; }
+
+        ExperienceServiceInterface ExperienceService { get; }
 
         ProfileServiceInterface ProfileService { get; }
 

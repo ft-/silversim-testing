@@ -32,6 +32,7 @@ using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Economy;
+using SilverSim.ServiceInterfaces.Experience;
 using SilverSim.ServiceInterfaces.Friends;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.Groups;
@@ -406,6 +407,8 @@ namespace SilverSim.Viewer.Core
 
         public override GroupsServiceInterface GroupsService => m_GroupsService;
 
+        public override ExperienceServiceInterface ExperienceService => m_ExperienceService;
+
         public override ProfileServiceInterface ProfileService => m_ProfileService;
 
         public override FriendsServiceInterface FriendsService => m_FriendsService;
@@ -504,6 +507,7 @@ namespace SilverSim.Viewer.Core
         private AssetServiceInterface m_AssetService;
         private InventoryServiceInterface m_InventoryService;
         private GroupsServiceInterface m_GroupsService;
+        private ExperienceServiceInterface m_ExperienceService;
         private ProfileServiceInterface m_ProfileService;
         private FriendsServiceInterface m_FriendsService;
         private UserAgentServiceInterface m_UserAgentService;
@@ -702,6 +706,7 @@ namespace SilverSim.Viewer.Core
             m_AssetService = serviceList.Get<AssetServiceInterface>();
             m_InventoryService = serviceList.Get<InventoryServiceInterface>();
             m_GroupsService = serviceList.Get<GroupsServiceInterface>();
+            m_ExperienceService = serviceList.Get<ExperienceServiceInterface>();
             m_ProfileService = serviceList.Get<ProfileServiceInterface>();
             m_FriendsService = serviceList.Get<FriendsServiceInterface>();
             m_UserAgentService = serviceList.Get<UserAgentServiceInterface>();
@@ -723,6 +728,7 @@ namespace SilverSim.Viewer.Core
                 m_TeleportServices.Clear();
                 m_AssetService = null;
                 m_InventoryService = null;
+                m_ExperienceService = null;
                 m_GroupsService = null;
                 m_ProfileService = null;
                 m_FriendsService = null;
