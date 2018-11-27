@@ -72,5 +72,10 @@ namespace SilverSim.ServiceInterfaces.Experience
         public abstract IExperienceAdminInterface Admins { get; }
 
         public abstract IExperienceKeyValueInterface KeyValueStore { get; }
+
+        /** <summary>Support authorization data to be granted.</summary>
+         * When granted, it adds AuthorizationToken data to UEI which needs to be stored on ExperienceNameStorage.
+         */
+        public virtual bool TryRequestAuthorization(UGUI requestingAgent, UEI experienceId) => false;
     }
 }
