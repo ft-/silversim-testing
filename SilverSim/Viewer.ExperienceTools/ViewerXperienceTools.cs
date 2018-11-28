@@ -1186,6 +1186,7 @@ namespace SilverSim.Viewer.ExperienceTools
             }
 
             /* process map */
+            /* process experience addition and authorization */
 
             HandleRegionExperiencesGet(agent, circuit, httpreq);
         }

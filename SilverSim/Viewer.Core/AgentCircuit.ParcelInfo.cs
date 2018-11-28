@@ -253,13 +253,26 @@ namespace SilverSim.Viewer.Core
             }
             foreach (var upd in entries.Values)
             {
-                ExperienceInfo expInfo;
+                UEI expInfo;
                 if (Scene.ExperienceService.TryGetValue(upd.ID, out expInfo))
                 {
                     var pae = new ParcelExperienceEntry
                     {
                         RegionID = Scene.ID,
-                        ExperienceID = expInfo.ID,
+                        ExperienceID = expInfo,
+                        IsAllowed = setallow,
+                        ParcelID = parcelID
+                    };
+                    list.Store(pae);
+                }
+                else if (Agent.ExperienceService != null && Agent.ExperienceService.TryGetValue(upd.ID, out expInfo) &&
+                    Agent.ExperienceService.TryRequestAuthorization(Agent.Owner, expInfo))
+                {
+                    Scene.ExperienceNameService?.Store(expInfo);
+                    var pae = new ParcelExperienceEntry
+                    {
+                        RegionID = Scene.ID,
+                        ExperienceID = expInfo,
                         IsAllowed = setallow,
                         ParcelID = parcelID
                     };

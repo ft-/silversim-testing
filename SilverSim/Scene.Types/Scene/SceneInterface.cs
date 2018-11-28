@@ -212,6 +212,7 @@ namespace SilverSim.Scene.Types.Scene
         public GridServiceInterface GridService { get; protected set; }
         public EstateServiceInterface EstateService { get; protected set; }
         public ExperienceServiceInterface ExperienceService { get; protected set; }
+        public ExperienceNameServiceInterface ExperienceNameService { get; protected set; }
         public EconomyInfo EconomyData { get; protected set; }
         private readonly NotecardCache m_NotecardCache;
         public Dictionary<string, string> CapabilitiesConfig { get; protected set; }

@@ -555,11 +555,24 @@ namespace SilverSim.Viewer.Core
             var flags = (EstateExperienceDeltaFlags)int.Parse(req.ParamList[1].FromUTF8Bytes());
             UUID experienceid = UUID.Parse(req.ParamList[2].FromUTF8Bytes());
 
-            var scene = circuit.Scene;
-            ExperienceInfo expInfo;
+            SceneInterface scene = circuit.Scene;
+            UEI experienceID;
+            bool isExpfromAgent = false;
 
-            if ((scene.ExperienceService == null || !scene.ExperienceService.TryGetValue(experienceid, out expInfo)))
+            if(scene.ExperienceNameService != null && scene.ExperienceNameService.TryGetValue(experienceid, out experienceID))
             {
+
+            }
+            else if (ExperienceService != null && ExperienceService.TryGetValue(experienceid, out experienceID))
+            {
+                isExpfromAgent = true;
+                scene.ExperienceNameService?.Store(experienceID);
+            }
+            else if (scene.ExperienceService != null && scene.ExperienceService.TryGetValue(experienceid, out experienceID))
+            {
+            }
+            else
+            { 
                 circuit.Agent.SendAlertMessage(this.GetLanguageString(circuit.Agent.CurrentCulture, "ChangingEstateExperienceNotPossibleSinceExperienceNotKnown", "Changing estate experience not possible since experience not known"), scene.ID);
                 return;
             }
@@ -591,27 +604,27 @@ namespace SilverSim.Viewer.Core
             {
                 if ((flags & EstateExperienceDeltaFlags.AddAllowed) != 0)
                 {
-                    estateService.Experiences.Store(new EstateExperienceInfo { EstateID = selectedEstateId, ExperienceID = expInfo.ID, IsAllowed = true });
+                    estateService.Experiences.Store(new EstateExperienceInfo { EstateID = selectedEstateId, ExperienceID = experienceID, IsAllowed = true });
                 }
                 if ((flags & EstateExperienceDeltaFlags.RemoveAllowed) != 0)
                 {
-                    estateService.Experiences.Remove(selectedEstateId, expInfo.ID);
+                    estateService.Experiences.Remove(selectedEstateId, experienceID);
                 }
                 if ((flags & EstateExperienceDeltaFlags.AddBlocked) != 0)
                 {
-                    estateService.Experiences.Store(new EstateExperienceInfo { EstateID = selectedEstateId, ExperienceID = expInfo.ID, IsAllowed = false });
+                    estateService.Experiences.Store(new EstateExperienceInfo { EstateID = selectedEstateId, ExperienceID = experienceID, IsAllowed = false });
                 }
                 if ((flags & EstateExperienceDeltaFlags.RemoveBlocked) != 0)
                 {
-                    estateService.Experiences.Remove(selectedEstateId, expInfo.ID);
+                    estateService.Experiences.Remove(selectedEstateId, experienceID);
                 }
                 if ((flags & EstateExperienceDeltaFlags.AddTrusted) != 0)
                 {
-                    estateService.TrustedExperiences[selectedEstateId, expInfo.ID] = true;
+                    estateService.TrustedExperiences[selectedEstateId, experienceID] = true;
                 }
                 if ((flags & EstateExperienceDeltaFlags.RemoveTrusted) != 0)
                 {
-                    estateService.TrustedExperiences.Remove(selectedEstateId, expInfo.ID);
+                    estateService.TrustedExperiences.Remove(selectedEstateId, experienceID);
                 }
             }
 
