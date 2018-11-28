@@ -33,6 +33,7 @@ using SilverSim.ServiceInterfaces.Account;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Authorization;
 using SilverSim.ServiceInterfaces.Economy;
+using SilverSim.ServiceInterfaces.Experience;
 using SilverSim.ServiceInterfaces.Friends;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.Groups;
@@ -80,6 +81,8 @@ namespace SilverSim.Grid.Standalone
         private OfflineIMServiceInterface m_LocalOfflineIMService;
         private readonly string m_LocalGroupsServiceName;
         private GroupsServiceInterface m_LocalGroupsService;
+        private readonly string m_LocalExperienceServiceName;
+        private ExperienceServiceInterface m_LocalExperienceService;
         private readonly string m_LocalEconomyServiceName;
         private EconomyServiceInterface m_LocalEconomyService;
         private List<ITeleportHandlerFactoryServiceInterface> m_TeleportProtocols = new List<ITeleportHandlerFactoryServiceInterface>();
@@ -130,6 +133,7 @@ namespace SilverSim.Grid.Standalone
             m_LocalUserSessionServiceName = ownConfig.GetString("LocalUserSessionService", "UserSessionService");
             m_LocalOfflineIMServiceName = ownConfig.GetString("LocalOfflineIMService", "OfflineIMService");
             m_LocalGroupsServiceName = ownConfig.GetString("LocalGroupsService", string.Empty);
+            m_LocalExperienceServiceName = ownConfig.GetString("LocalExperienceService", "ExperienceService");
             m_LocalEconomyServiceName = ownConfig.GetString("LocalEconomyService", "EconomyService");
         }
 
@@ -160,6 +164,10 @@ namespace SilverSim.Grid.Standalone
             if (!string.IsNullOrEmpty(m_LocalGroupsServiceName))
             {
                 loader.GetService(m_LocalGroupsServiceName, out m_LocalGroupsService);
+            }
+            if(!string.IsNullOrEmpty(m_LocalExperienceServiceName))
+            {
+                loader.GetService(m_LocalExperienceServiceName, out m_LocalExperienceService);
             }
             if (!loader.TryGetService(m_LocalEconomyServiceName, out m_LocalEconomyService))
             {
@@ -292,6 +300,10 @@ namespace SilverSim.Grid.Standalone
             if (m_LocalGroupsService != null)
             {
                 serviceList.Add(m_LocalGroupsService);
+            }
+            if(m_LocalExperienceService != null)
+            {
+                serviceList.Add(m_LocalExperienceService);
             }
             if (m_LocalProfileService != null)
             {
