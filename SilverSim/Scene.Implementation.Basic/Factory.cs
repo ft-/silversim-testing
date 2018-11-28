@@ -65,6 +65,7 @@ namespace SilverSim.Scene.Implementation.Basic
         private readonly string m_WindModelFactoryName;
         private readonly string m_PathfindingServiceFactoryName;
         private readonly string m_ExperienceServiceName;
+        private readonly string m_ExperienceNameServiceName;
         private readonly string m_ScriptWorkerThreadPoolName;
         private readonly List<string> m_AvatarNameServiceNames = new List<string>();
 
@@ -85,6 +86,7 @@ namespace SilverSim.Scene.Implementation.Basic
             m_WindModelFactoryName = ownConfig.GetString("WindPlugin", string.Empty);
             m_PathfindingServiceFactoryName = ownConfig.GetString("PathfindingPlugin", string.Empty);
             m_ExperienceServiceName = ownConfig.GetString("ExperienceService", string.Empty);
+            m_ExperienceNameServiceName = ownConfig.GetString("ExperienceNameService", string.Empty);
             m_ScriptWorkerThreadPoolName = ownConfig.GetString("ScriptWorkerThreadPool", string.Empty);
             string avatarNameServices = ownConfig.GetString("AvatarNameServices", string.Empty);
             if (!string.IsNullOrEmpty(avatarNameServices))
@@ -140,6 +142,10 @@ namespace SilverSim.Scene.Implementation.Basic
             if(m_ExperienceServiceName.Length != 0)
             {
                 ExperienceService = loader.GetService<ExperienceServiceInterface>(m_ExperienceServiceName);
+            }
+            if(m_ExperienceNameServiceName.Length != 0)
+            {
+                ExperienceNameService = loader.GetService<ExperienceNameServiceInterface>(m_ExperienceNameServiceName);
             }
             AssetService = loader.GetService<AssetServiceInterface>(m_AssetServiceName);
             AssetCacheService = loader.GetService<AssetServiceInterface>(m_AssetCacheServiceName);

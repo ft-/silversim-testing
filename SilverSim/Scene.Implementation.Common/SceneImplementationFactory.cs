@@ -71,6 +71,7 @@ namespace SilverSim.Scene.Implementation.Common
         public IWindModelFactory WindModelFactory { get; protected set; }
         public IPathfindingServiceFactory PathfindingServiceFactory { get; protected set; }
         public ExperienceServiceInterface ExperienceService { get; protected set; }
+        public ExperienceNameServiceInterface ExperienceNameService { get; protected set; }
 
         public List<IUserAgentServicePlugin> UserAgentServicePlugins { get; protected set; }
         public List<IAssetServicePlugin> AssetServicePlugins { get; protected set; }
