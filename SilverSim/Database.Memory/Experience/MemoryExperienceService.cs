@@ -89,12 +89,12 @@ namespace SilverSim.Database.Memory.Experience
             return res;
         }
 
-        public override List<UEI> GetOwnerExperiences(UGUI creator)
+        public override List<UEI> GetOwnerExperiences(UGUI owner)
         {
             var res = new List<UEI>();
             foreach (KeyValuePair<UUID, ExperienceInfo> kvp in m_Experiences)
             {
-                if (kvp.Value.Owner.Equals(creator))
+                if (kvp.Value.Owner.Equals(owner))
                 {
                     res.Add(kvp.Value.ID);
                 }
