@@ -39,16 +39,14 @@ namespace SilverSim.Database.Memory.Experience
         public override IExperiencePermissionsInterface Permissions => this;
         public override IExperienceAdminInterface Admins => this;
         public override IExperienceKeyValueInterface KeyValueStore => this;
-        private string m_HomeURI;
 
         public void Startup(ConfigurationLoader loader)
         {
-            m_HomeURI = loader.HomeURI;
+            /* intentionally left empty */
         }
 
         public override void Add(ExperienceInfo info)
         {
-            info.ID.HomeURI = !string.IsNullOrEmpty(m_HomeURI) ? new Uri(m_HomeURI) : null;
             m_Experiences.Add(info.ID.ID, info);
         }
 
