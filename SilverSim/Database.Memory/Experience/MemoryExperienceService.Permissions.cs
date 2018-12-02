@@ -71,7 +71,12 @@ namespace SilverSim.Database.Memory.Experience
                     bool allowed;
                     if(kvp.Value.TryGetValue(agent ,out allowed))
                     {
-                        res.Add(kvp.Key, allowed);
+                        UEI uei;
+                        if (!TryGetValue(kvp.Key.ID, out uei))
+                        {
+                            uei = kvp.Key;
+                        }
+                        res.Add(uei, allowed);
                     }
                 }
                 return res;

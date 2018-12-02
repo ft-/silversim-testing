@@ -124,5 +124,7 @@ namespace SilverSim.Threading
         public List<T> FindAll(Predicate<T> match) => m_RwLock.AcquireReaderLock(() => m_List.FindAll(match));
 
         public T Find(Predicate<T> match) => m_RwLock.AcquireReaderLock(() => m_List.Find(match));
+
+        public void ForEach(Action<T> action) => m_RwLock.AcquireReaderLock(() => m_List.ForEach(action));
     }
 }

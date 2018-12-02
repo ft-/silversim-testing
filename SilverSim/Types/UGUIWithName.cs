@@ -39,10 +39,10 @@ namespace SilverSim.Types
         public override bool Equals(object obj)
         {
             var u = obj as UGUIWithName;
-            return u != null && EqualsGrid(u);
+            return u != null && Equals(u);
         }
 
-        public bool Equals(UGUIWithName uui) => EqualsGrid(uui);
+        public bool Equals(UGUIWithName other) => ID == other.ID;
 
         public bool EqualsGrid(UGUIWithName uui)
         {
@@ -61,13 +61,7 @@ namespace SilverSim.Types
             }
         }
 
-        public override int GetHashCode()
-        {
-            var h = HomeURI;
-            return (h != null) ?
-                ID.GetHashCode() ^ h.GetHashCode() :
-                ID.GetHashCode();
-        }
+        public override int GetHashCode() => ID.GetHashCode();
 
         public string CreatorData
         {

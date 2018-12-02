@@ -223,7 +223,7 @@ namespace SilverSim.Scene.Types.Scene
         private bool IsInGodAgents(UGUI agent)
         {
             RwLockedList<UGUI> activeList = m_GodAgentsSetToLocal ? m_GodAgentsLocal : m_GodAgentsGlobal;
-            return activeList.Contains(agent);
+            return activeList.Find((e) => agent.EqualsGrid(e)) != null;
         }
 
         public bool IsPossibleGod(UGUI agent) => agent.EqualsGrid(Owner) ||
@@ -345,7 +345,7 @@ namespace SilverSim.Scene.Types.Scene
                 return true;
             }
             else if ((pinfo.Flags & ParcelFlags.CreateGroupObjects) != 0 &&
-                pinfo.Group.ID != UUID.Zero &&
+                pinfo.Group.IsSet &&
                 HasGroupPower(agent, pinfo.Group, GroupPowers.AllowRez))
             {
                 return true;
@@ -374,7 +374,7 @@ namespace SilverSim.Scene.Types.Scene
                 return true;
             }
             else if ((pinfo.Flags & ParcelFlags.AllowGroupScripts) != 0 &&
-                pinfo.Group.ID != UUID.Zero &&
+                pinfo.Group.IsSet &&
                 IsGroupMember(agent, pinfo.Group))
             {
                 return true;

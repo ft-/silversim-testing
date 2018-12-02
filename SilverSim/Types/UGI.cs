@@ -35,6 +35,8 @@ namespace SilverSim.Types
 
         public static explicit operator string(UGI v) => string.Format("{0};{1};{2}", v.ID.ToString(), v.HomeURI.ToString(), v.GroupName);
 
+        public bool IsSet => ID != UUID.Zero;
+
         public string GroupData
         {
             get { return string.Format("{0};{1}", HomeURI.ToString(), GroupName); }
@@ -106,25 +108,21 @@ namespace SilverSim.Types
             return (u != null) && Equals(u);
         }
 
-        public bool Equals(UGI ugi)
+        public bool Equals(UGI other) => other.ID == ID;
+
+        public bool EqualsGrid(UGI other)
         {
-            if (ugi.ID == ID && ID == UUID.Zero)
+            if (other.ID == ID && ID == UUID.Zero)
             {
                 return true;
             }
 
-            return ugi.ID == ID &&
-                ((ugi.HomeURI == null && HomeURI == null) ||
-                (ugi.HomeURI != null && HomeURI != null && ugi.HomeURI.Equals(HomeURI)));
+            return other.ID == ID &&
+                ((other.HomeURI == null && HomeURI == null) ||
+                (other.HomeURI != null && HomeURI != null && other.HomeURI.Equals(HomeURI)));
         }
 
-        public override int GetHashCode()
-        {
-            var h = HomeURI;
-            return (h != null) ?
-                ID.GetHashCode() ^ GroupName.GetHashCode() ^ h.GetHashCode() :
-                ID.GetHashCode() ^ GroupName.GetHashCode();
-        }
+        public override int GetHashCode() => ID.GetHashCode();
 
         public UGI(UUID ID, string GroupName, Uri HomeURI)
         {

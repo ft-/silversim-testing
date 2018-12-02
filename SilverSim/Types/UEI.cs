@@ -29,11 +29,13 @@ namespace SilverSim.Types
         public UUID ID = UUID.Zero;
         public string ExperienceName = string.Empty;
         public Uri HomeURI;
-        public bool IsAuthoritative; /* false means Group Data has been validated through any available resolving service */
-        /** <summary>used by GroupsNameStorage. name data without authorization has null here</summary> */
+        public bool IsAuthoritative; /* false means Experience Data has been validated through any available resolving service */
+        /** <summary>used by ExperienceNameStorage. name data without authorization has null here</summary> */
         public byte[] AuthorizationToken;
 
         public static explicit operator string(UEI v) => string.Format("{0};{1};{2}", v.ID.ToString(), v.HomeURI.ToString(), v.ExperienceName);
+
+        public bool IsSet => ID != UUID.Zero;
 
         public string ExperienceData
         {
@@ -106,7 +108,9 @@ namespace SilverSim.Types
             return (u != null) && Equals(u);
         }
 
-        public bool Equals(UEI other)
+        public bool Equals(UEI other) => other.ID == ID;
+
+        public bool EqualsGrid(UEI other)
         {
             if (other.ID == ID && ID == UUID.Zero)
             {
@@ -118,13 +122,7 @@ namespace SilverSim.Types
                 (other.HomeURI != null && HomeURI != null && other.HomeURI.Equals(HomeURI)));
         }
 
-        public override int GetHashCode()
-        {
-            var h = HomeURI;
-            return (h != null) ?
-                ID.GetHashCode() ^ ExperienceName.GetHashCode() ^ h.GetHashCode() :
-                ID.GetHashCode() ^ ExperienceName.GetHashCode();
-        }
+        public override int GetHashCode() => ID.GetHashCode();
 
         public UEI(UUID ID, string ExperienceName, Uri HomeURI)
         {
