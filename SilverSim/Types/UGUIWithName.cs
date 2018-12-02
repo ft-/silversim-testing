@@ -42,6 +42,8 @@ namespace SilverSim.Types
             return u != null && Equals(u);
         }
 
+        public bool IsSet => ID != UUID.Zero;
+
         public bool Equals(UGUIWithName other) => ID == other.ID;
 
         public bool EqualsGrid(UGUIWithName uui)

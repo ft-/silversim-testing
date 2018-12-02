@@ -39,6 +39,8 @@ namespace SilverSim.Types
 
         public static implicit operator UGUI(UGUIWithName v) => new UGUI(v.ID, v.HomeURI) { IsAuthoritative = v.IsAuthoritative };
 
+        public bool IsSet => ID != UUID.Zero;
+
         public override bool Equals(object obj)
         {
             var u = obj as UGUI;
