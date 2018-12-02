@@ -30,6 +30,7 @@ namespace SilverSim.Scene.Types.Object.Localization
     {
         private TextureEntry m_TextureEntry;
         private byte[] m_TextureEntryBytes;
+        private byte[] m_TextureEntryBytes_LimitsEnabled;
         private readonly ReaderWriterLock m_TextureEntryLock = new ReaderWriterLock();
 
         private byte[] m_TextureAnimationBytes;
@@ -120,10 +121,21 @@ namespace SilverSim.Scene.Types.Object.Localization
                     flags = ChangedTexParams(m_TextureEntry, copy);
                     m_TextureEntry = copy;
                     m_TextureEntryBytes = value.GetBytes();
+                    ObjectPart part = m_Part;
+                    if (part != null)
+                    {
+                        m_TextureEntryBytes_LimitsEnabled = value.GetBytes(part.IsFullbrightDisabled, (float)part.GlowLimitIntensity);
+                    }
+                    else
+                    {
+                        m_TextureEntryBytes_LimitsEnabled = value.GetBytes();
+                    }
                 });
                 m_Part.TriggerOnUpdate(flags);
             }
         }
+
+        public byte[] TextureEntryBytes_Limited => m_TextureEntryBytes_LimitsEnabled;
 
         public byte[] TextureEntryBytes
         {
@@ -160,6 +172,15 @@ namespace SilverSim.Scene.Types.Object.Localization
                         newTex = new TextureEntry(value);
                         UpdateChangedFlags flag = ChangedTexParams(m_TextureEntry, newTex);
                         m_TextureEntry = newTex;
+                        ObjectPart part = m_Part;
+                        if (part != null)
+                        {
+                            m_TextureEntryBytes_LimitsEnabled = newTex.GetBytes(part.IsFullbrightDisabled, (float)part.GlowLimitIntensity);
+                        }
+                        else
+                        {
+                            m_TextureEntryBytes_LimitsEnabled = newTex.GetBytes();
+                        }
                         return flag;
                     });
                     m_Part.TriggerOnUpdate(flags);
