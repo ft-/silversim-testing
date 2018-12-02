@@ -29,7 +29,7 @@ namespace SilverSim.Viewer.Core
 {
     public partial class AgentCircuit
     {
-        private void Cap_ViewerAsset(HttpRequest httpreq)
+        private void Cap_GetAsset(HttpRequest httpreq)
         {
             if (httpreq.CallerIP != RemoteIP)
             {
@@ -76,7 +76,7 @@ namespace SilverSim.Viewer.Core
                     break;
 
                 default:
-                    m_Log.InfoFormat("ViewerAsset not enabled for {0}", assetType.ToString());
+                    m_Log.InfoFormat("GetAsset not enabled for {0}", assetType.ToString());
                     httpreq.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
                     return;
             }
@@ -100,14 +100,14 @@ namespace SilverSim.Viewer.Core
                     }
                     catch (Exception e3)
                     {
-                        m_Log.DebugFormat("Failed to store asset {0} locally (Cap_ViewerAsset): {1}", assetId, e3.Message);
+                        m_Log.DebugFormat("Failed to store asset {0} locally (Cap_GetAsset): {1}", assetId, e3.Message);
                     }
                 }
                 catch (Exception e2)
                 {
                     if (Server.LogAssetFailures)
                     {
-                        m_Log.DebugFormat("Failed to download asset {0} (Cap_ViewerAsset): {1} or {2}\nA: {3}\nB: {4}", assetId, e1.Message, e2.Message, e1.StackTrace, e2.StackTrace);
+                        m_Log.DebugFormat("Failed to download asset {0} (Cap_GetAsset): {1} or {2}\nA: {3}\nB: {4}", assetId, e1.Message, e2.Message, e1.StackTrace, e2.StackTrace);
                     }
                     httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
                     return;
@@ -120,7 +120,7 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            httpreq.RangeResponse(asset.Data, asset.ContentType, "ViewerAsset");
+            httpreq.RangeResponse(asset.Data, asset.ContentType, "GetAsset");
         }
     }
 }

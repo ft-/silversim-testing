@@ -357,10 +357,10 @@ namespace SilverSim.Viewer.Core
             AddDefCapability("EnvironmentSettings", regionSeedID, Cap_EnvironmentSettings, capConfig);
             AddDefCapability("RenderMaterials", regionSeedID, Cap_RenderMaterials, capConfig);
             AddDefCapability("SimConsoleAsync", regionSeedID, Cap_SimConsoleAsyncCap, capConfig);
-            AddDefCapability("ViewerAsset", regionSeedID, Cap_ViewerAsset, capConfig);
-            AddDefCapability("GetTexture", regionSeedID, Cap_GetTexture, capConfig);
-            AddDefCapability("GetMesh", regionSeedID, Cap_GetMesh, capConfig);
-            AddDefCapability("GetMesh2", regionSeedID, Cap_GetMesh, capConfig);
+            AddDefCapability("ViewerAsset", regionSeedID, Cap_GetAsset, capConfig);
+            AddDefCapability("GetTexture", regionSeedID, Cap_GetAsset, capConfig);
+            AddDefCapability("GetMesh", regionSeedID, Cap_GetAsset, capConfig);
+            AddDefCapability("GetMesh2", regionSeedID, Cap_GetAsset, capConfig);
             AddDefCapability("GetDisplayNames", regionSeedID, Cap_GetDisplayNames, capConfig);
             AddDefCapability("MeshUploadFlag", regionSeedID, Cap_MeshUploadFlag, capConfig);
             AddDefCapability("GetPhysicsObjectData", regionSeedID, Cap_GetObjectsPhysicsData, capConfig);
