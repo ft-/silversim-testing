@@ -56,7 +56,8 @@ namespace SilverSim.Types.StructuredData.TLV
             Color = 25,
             ColorAlpha = 26,
             Null = 27,
-            UEI = 28
+            UEI = 28,
+            Char = 29
         }
 
         public struct Header
@@ -181,6 +182,9 @@ namespace SilverSim.Types.StructuredData.TLV
 
         public void Write(ushort tlvId, string value) =>
             Write_Blob(tlvId, EntryType.String, value.ToUTF8Bytes());
+
+        public void Write(ushort tlvId, char value) =>
+            Write_HtoL(tlvId, EntryType.Char, BitConverter.GetBytes(value));
 
         public void Write(ushort tlvId, UEI value) =>
             Write_Blob(tlvId, EntryType.UEI, value.ToString().ToUTF8Bytes());
@@ -456,6 +460,18 @@ namespace SilverSim.Types.StructuredData.TLV
                         data = readdata.FromUTF8Bytes();
                         return true;
                     }
+
+                case EntryType.Char:
+                    if (!TryReadData(header.Length, out readdata))
+                    {
+                        return false;
+                    }
+                    if (header.Length != 2)
+                    {
+                        return false;
+                    }
+                    data = BitConverter.ToChar(readdata, 0);
+                    return true;
 
                 case EntryType.Binary:
                     if (!TryReadData(header.Length, out readdata))
