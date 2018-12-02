@@ -36,8 +36,49 @@ namespace SilverSim.Scene.Types.Object
 
         private bool m_IsFacelightDisabled;
         private bool m_IsAttachmentLightsDisabled;
+        private bool m_IsFullbrightDisabled;
+        private double m_GlowLimitIntensity = 1;
         private double m_FacelightLimitIntensity = 1;
         private double m_AttachmentLightLimitIntensity = 1;
+
+        public bool IsFullbrightDisabled
+        {
+            get { return m_IsFullbrightDisabled; }
+
+            set
+            {
+                bool changed;
+                lock (m_DataLock)
+                {
+                    changed = m_IsFullbrightDisabled != value;
+                    m_IsFullbrightDisabled = value;
+                }
+                if (changed)
+                {
+                    TriggerOnUpdate(0);
+                }
+            }
+        }
+
+        public double GlowLimitIntensity
+        {
+            get { return m_GlowLimitIntensity; }
+
+            set
+            {
+                bool changed;
+                double v = value.Clamp(0, 1);
+                lock (m_DataLock)
+                {
+                    changed = m_GlowLimitIntensity != v;
+                    m_GlowLimitIntensity = v;
+                }
+                if (changed)
+                {
+                    TriggerOnUpdate(0);
+                }
+            }
+        }
 
         public double FacelightLimitIntensity
         {
