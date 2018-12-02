@@ -67,10 +67,10 @@ namespace SilverSim.Types.StructuredData.TLV
         }
 
         private Stream m_Stream;
-        private readonly bool m_ReadOuter = false;
+        private readonly bool m_ReadOuter;
         private TLV m_Outer;
         private ushort m_OuterId;
-        private int m_MaxLength = 0;
+        private int m_MaxLength;
 
         public TLV(Stream s)
         {

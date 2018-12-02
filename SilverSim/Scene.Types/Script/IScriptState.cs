@@ -51,7 +51,7 @@ namespace SilverSim.Scene.Types.Script
 
     public interface IScriptState
     {
-        void ToXml(XmlTextWriter writer);
+        void ToXml(XmlTextWriter writer, bool primaryFormatOnly = false);
         byte[] ToDbSerializedState();
     }
 }
