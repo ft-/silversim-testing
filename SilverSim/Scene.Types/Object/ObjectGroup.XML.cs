@@ -724,9 +724,11 @@ namespace SilverSim.Scene.Types.Object
             else
             {
                 IScriptCompiler compiler;
+                string engineName;
                 try
                 {
-                    compiler = CompilerRegistry[attrs["Engine"]];
+                    engineName = attrs["Engine"];
+                    compiler = CompilerRegistry[engineName];
                 }
                 catch
                 {
@@ -739,7 +741,7 @@ namespace SilverSim.Scene.Types.Object
 
                 try
                 {
-                    item.ScriptState = compiler.StateFromXml(reader, attrs, item);
+                    item.SetLoadedScriptState(engineName, compiler.StateFromXml(reader, attrs, item));
                 }
                 catch (ScriptStateLoaderNotImplementedException)
                 {

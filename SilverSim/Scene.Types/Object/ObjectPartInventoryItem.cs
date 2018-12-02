@@ -25,6 +25,8 @@ using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using SilverSim.Types.Script;
 using System;
+using System.Collections.Generic;
+using System.Threading;
 
 namespace SilverSim.Scene.Types.Object
 {
@@ -294,6 +296,35 @@ namespace SilverSim.Scene.Types.Object
                     m_CollisionFilterType = value.Type;
                 }
             }
+        }
+        #endregion
+
+        #region Loaded script state
+        private Dictionary<string, IScriptState> m_ScriptStates;
+
+        public void SetLoadedScriptState(string engineName, IScriptState state)
+        {
+            if(m_ScriptStates == null)
+            {
+                Interlocked.CompareExchange(ref m_ScriptStates, new Dictionary<string, IScriptState>(), null);
+            }
+            m_ScriptStates[engineName] = state;
+        }
+
+        public bool TryGetScriptState(string enginename, out IScriptState state)
+        {
+            state = ScriptState;
+            if(state != null)
+            {
+                /* if set, ScriptState variable takes precedence */
+                return true;
+            }
+            state = default(IScriptState);
+            if(m_ScriptStates?.TryGetValue(enginename, out state) ?? false)
+            {
+                m_ScriptStates = null;
+            }
+            return false;
         }
         #endregion
 
