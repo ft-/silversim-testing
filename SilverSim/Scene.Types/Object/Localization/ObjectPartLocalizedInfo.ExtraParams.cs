@@ -289,6 +289,19 @@ namespace SilverSim.Scene.Types.Object.Localization
 
                 if (emeshFlags != ExtendedMeshParams.MeshFlags.None)
                 {
+                    /* full block */
+                    updatebytes[i++] = (ExtendedMeshEP % 256);
+                    updatebytes[i++] = (ExtendedMeshEP / 256);
+                    updatebytes[i++] = 4;
+                    updatebytes[i++] = 0;
+                    updatebytes[i++] = 0;
+                    updatebytes[i++] = 0;
+                    updatebytes[i++] = (byte)(((uint)emeshFlags) & 0xFF);
+                    updatebytes[i++] = (byte)((((uint)emeshFlags) >> 8) & 0xFF);
+                    updatebytes[i++] = (byte)((((uint)emeshFlags) >> 16) & 0xFF);
+                    updatebytes[i++] = (byte)((((uint)emeshFlags) >> 24) & 0xFF);
+
+                    /* limited block */
                     updatebyteslimited[limitedi++] = (ExtendedMeshEP % 256);
                     updatebyteslimited[limitedi++] = (ExtendedMeshEP / 256);
                     updatebyteslimited[limitedi++] = 4;
