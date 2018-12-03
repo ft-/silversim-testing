@@ -36,6 +36,7 @@ namespace SilverSim.Scene.Types.Object
 
         private bool m_IsFacelightDisabled;
         private bool m_IsAttachmentLightsDisabled;
+        private bool m_IsUnattachedLightsDisabled;
         private bool m_IsFullbrightDisabled;
         private double m_GlowLimitIntensity = 1;
         private double m_FacelightLimitIntensity = 1;
@@ -235,6 +236,26 @@ namespace SilverSim.Scene.Types.Object
                 {
                     value = Math.Max(0, value);
                     changed = Interlocked.Exchange(ref m_UnattachedLightLimitRadius, value) != value;
+                }
+                if (PointLight.IsLight && changed)
+                {
+                    UpdateExtraParams();
+                    TriggerOnUpdateNoChange(0);
+                }
+            }
+        }
+
+        public bool IsUnattachedLightsDisabled
+        {
+            get { return m_IsUnattachedLightsDisabled; }
+
+            set
+            {
+                bool changed;
+                lock (m_DataLock)
+                {
+                    changed = m_IsUnattachedLightsDisabled != value;
+                    m_IsUnattachedLightsDisabled = value;
                 }
                 if (PointLight.IsLight && changed)
                 {

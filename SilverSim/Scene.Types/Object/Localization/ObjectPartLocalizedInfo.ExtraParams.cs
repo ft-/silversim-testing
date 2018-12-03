@@ -100,9 +100,11 @@ namespace SilverSim.Scene.Types.Object.Localization
                 bool isSculpt = shape.Type == PrimitiveShapeType.Sculpt;
                 ObjectGroup objectGroup = m_Part.ObjectGroup;
                 bool isFullLight = light.IsLight;
+                AttachmentPoint attachPoint = objectGroup.AttachPoint;
                 bool isLimitedLight = isFullLight &&
-                    (!m_Part.IsAttachmentLightsDisabled || !IsPrivateAttachmentOrNone(objectGroup.AttachPoint)) &&
-                    (!m_Part.IsFacelightDisabled || (objectGroup.AttachPoint != AttachmentPoint.LeftHand && objectGroup.AttachPoint != AttachmentPoint.RightHand));
+                    (!m_Part.IsAttachmentLightsDisabled || !IsPrivateAttachmentOrNone(attachPoint)) &&
+                    (!m_Part.IsFacelightDisabled || (attachPoint != AttachmentPoint.LeftHand && attachPoint != AttachmentPoint.RightHand)) &&
+                    (!m_Part.IsUnattachedLightsDisabled || attachPoint != AttachmentPoint.NotAttached);
                 bool isProjecting = proj.IsProjecting;
                 ExtendedMeshParams.MeshFlags emeshFlags = emesh.Flags;
                 if (isFlexible)
