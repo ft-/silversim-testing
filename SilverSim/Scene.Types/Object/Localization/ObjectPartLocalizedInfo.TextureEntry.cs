@@ -128,7 +128,7 @@ namespace SilverSim.Scene.Types.Object.Localization
                     }
                     else
                     {
-                        m_TextureEntryBytes_LimitsEnabled = value.GetBytes();
+                        m_TextureEntryBytes_LimitsEnabled = m_TextureEntryBytes;
                     }
                 });
                 m_Part.TriggerOnUpdate(flags);
@@ -159,6 +159,7 @@ namespace SilverSim.Scene.Types.Object.Localization
                     m_TextureEntryLock.AcquireWriterLock(() =>
                     {
                         m_TextureEntryBytes = null;
+                        m_TextureEntryBytes_LimitsEnabled = null;
                         m_TextureEntry = null;
                     });
                     m_Part.TriggerOnUpdate(UpdateChangedFlags.Texture | UpdateChangedFlags.Color);

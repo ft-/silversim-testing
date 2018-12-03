@@ -250,6 +250,7 @@ namespace SilverSim.Scene.Types.Object.Localization
             m_TextureAnimationBytes = new byte[0];
             m_TextureEntry = new TextureEntry();
             m_TextureEntryBytes = new byte[0];
+            m_TextureEntryBytes_LimitsEnabled = new byte[0];
             m_CollisionSound = new CollisionSoundParam();
             m_TouchText = string.Empty;
             m_SitText = string.Empty;
@@ -268,6 +269,7 @@ namespace SilverSim.Scene.Types.Object.Localization
             m_Part = part;
             m_TextureEntry = src.TextureEntry;
             m_TextureEntryBytes = m_TextureEntry?.GetBytes();
+            m_TextureEntryBytes_LimitsEnabled = m_TextureEntry?.GetBytes(part.IsFullbrightDisabled, (float)part.GlowLimitIntensity);
             m_CollisionSound = src.CollisionSound;
             m_Name = src.Name;
             m_Description = src.Description;
