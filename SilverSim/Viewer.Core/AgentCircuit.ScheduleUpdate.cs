@@ -478,6 +478,8 @@ namespace SilverSim.Viewer.Core
             }
         }
 
+        private bool IsLightLimited(IObjUpdateInfo ui) => false;
+
         private void HandleObjectUpdates()
         {
             Thread.CurrentThread.Name = $"Agent:ObjectUpdateHandler:Agent={AgentID}:Scene={m_Scene.ID}";
@@ -700,7 +702,7 @@ namespace SilverSim.Viewer.Core
 
                             if (dofull)
                             {
-                                byte[] fullUpdate = ui.GetFullUpdate(Agent.CurrentCulture);
+                                byte[] fullUpdate = IsLightLimited(ui) ? ui.GetFullUpdateLimited(Agent.CurrentCulture) : ui.GetFullUpdate(Agent.CurrentCulture);
 
                                 if (fullUpdate != null)
                                 {
@@ -821,7 +823,7 @@ send_nonphys_packet:
                             }
                             else
                             {
-                                byte[] terseUpdate = ui.GetTerseUpdate(Agent.CurrentCulture);
+                                byte[] terseUpdate = IsLightLimited(ui) ? ui.GetTerseUpdateLimited(Agent.CurrentCulture) : ui.GetTerseUpdate(Agent.CurrentCulture);
 
                                 if (terseUpdate != null)
                                 {

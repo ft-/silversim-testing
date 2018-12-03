@@ -115,6 +115,24 @@ namespace SilverSim.Scene.Types.Object
             return null;
         }
 
+        public byte[] GetFullUpdateLimited(CultureInfo cultureInfo)
+        {
+            if (Part != null && !m_Killed)
+            {
+                return Part.GetFullUpdateDataLimited(cultureInfo);
+            }
+            return null;
+        }
+
+        public byte[] GetTerseUpdateLimited(CultureInfo cultureInfo)
+        {
+            if (Part != null && !m_Killed)
+            {
+                return Part.GetTerseUpdateDataLimited(cultureInfo);
+            }
+            return null;
+        }
+
         public byte[] GetPropertiesUpdate(CultureInfo cultureInfo)
         {
             if (Part != null && !m_Killed)

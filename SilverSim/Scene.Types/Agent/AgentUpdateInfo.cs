@@ -216,7 +216,11 @@ namespace SilverSim.Scene.Types.Agent
 
         public byte[] GetTerseUpdate(CultureInfo cultureInfo) => null;
 
+        public byte[] GetTerseUpdateLimited(CultureInfo cultureInfo) => null;
+
         public byte[] GetPropertiesUpdate(CultureInfo cultureInfo) => null;
+
+        public byte[] GetFullUpdateLimited(CultureInfo cultureInfo) => GetFullUpdate(cultureInfo);
 
         public byte[] GetFullUpdate(CultureInfo cultureInfo)
         {

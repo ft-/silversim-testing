@@ -52,6 +52,10 @@ namespace SilverSim.Scene.Types.Object
 
         byte[] GetTerseUpdate(CultureInfo cultureInfo);
 
+        byte[] GetFullUpdateLimited(CultureInfo cultureInfo);
+
+        byte[] GetTerseUpdateLimited(CultureInfo cultureInfo);
+
         byte[] GetPropertiesUpdate(CultureInfo cultureInfo);
 
         int SerialNumber { get; }

@@ -135,7 +135,7 @@ namespace SilverSim.Scene.Types.Object.Localization
             }
         }
 
-        public byte[] TextureEntryBytes_Limited => m_TextureEntryBytes_LimitsEnabled;
+        public byte[] TextureEntryBytesLimitedLight => m_TextureEntryBytes_LimitsEnabled;
 
         public byte[] TextureEntryBytes
         {

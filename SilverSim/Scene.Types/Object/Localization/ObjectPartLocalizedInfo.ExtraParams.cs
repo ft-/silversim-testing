@@ -31,7 +31,8 @@ namespace SilverSim.Scene.Types.Object.Localization
     public sealed partial class ObjectPartLocalizedInfo
     {
         private byte[] m_ExtraParamsBytes = new byte[0];
-        readonly ReaderWriterLock m_ExtraParamsLock = new ReaderWriterLock();
+        private byte[] m_ExtraParamsBytesLimitedLight = new byte[0];
+        private readonly object m_ExtraParamsLock = new object();
 
         private ProjectionParam m_Projection;
 
@@ -46,12 +47,15 @@ namespace SilverSim.Scene.Types.Object.Localization
         {
             get
             {
-                return m_ExtraParamsLock.AcquireReaderLock(() =>
-                {
-                    var b = new byte[m_ExtraParamsBytes.Length];
-                    Buffer.BlockCopy(m_ExtraParamsBytes, 0, b, 0, m_ExtraParamsBytes.Length);
-                    return b;
-                });
+                return m_ExtraParamsBytes;
+            }
+        }
+
+        public byte[] ExtraParamsBytesLimitedLight
+        {
+            get
+            {
+                return m_ExtraParamsBytesLimitedLight;
             }
         }
 
@@ -75,160 +79,220 @@ namespace SilverSim.Scene.Types.Object.Localization
             }
         }
 
-        internal void UpdateExtraParams() => m_ExtraParamsLock.AcquireWriterLock(() =>
+        internal void UpdateExtraParams()
         {
-            int i = 0;
-            uint totalBytesLength = 1;
-            uint extraParamsNum = 0;
-
-            var flexi = m_Part.Flexible;
-            var light = m_Part.PointLight;
-            var proj = Projection;
-            var shape = m_Part.Shape;
-            var emesh = m_Part.ExtendedMesh;
-            bool isFlexible = flexi.IsFlexible;
-            bool isSculpt = shape.Type == PrimitiveShapeType.Sculpt;
-            ObjectGroup objectGroup = m_Part.ObjectGroup;
-            bool isLight = light.IsLight &&
-                (!m_Part.IsAttachmentLightsDisabled || !IsPrivateAttachmentOrNone(objectGroup.AttachPoint)) &&
-                (!m_Part.IsFacelightDisabled || (objectGroup.AttachPoint != AttachmentPoint.LeftHand && objectGroup.AttachPoint != AttachmentPoint.RightHand));
-            bool isProjecting = proj.IsProjecting;
-            ExtendedMeshParams.MeshFlags emeshFlags = emesh.Flags;
-            if (isFlexible)
+            lock (m_ExtraParamsLock)
             {
-                ++extraParamsNum;
-                totalBytesLength += 16;
-                totalBytesLength += 2 + 4;
-            }
+                int i = 0;
+                int limitedi = 0;
+                uint totalBytesLength = 1;
+                uint extraParamsNum = 0;
 
-            if (isSculpt)
-            {
-                ++extraParamsNum;
-                totalBytesLength += 17;
-                totalBytesLength += 2 + 4;
-            }
+                uint limitedTotalBytesLength = 1;
+                uint limitedExtraParamsNum = 0;
 
-            if (isLight)
-            {
-                ++extraParamsNum;
-                totalBytesLength += 16;
-                totalBytesLength += 2 + 4;
-            }
-
-            if (isProjecting)
-            {
-                ++extraParamsNum;
-                totalBytesLength += 28;
-                totalBytesLength += 2 + 4;
-            }
-
-            if (emeshFlags != ExtendedMeshParams.MeshFlags.None)
-            {
-                ++extraParamsNum;
-                totalBytesLength += 4;
-                totalBytesLength += 2 + 4;
-            }
-
-            var updatebytes = new byte[totalBytesLength];
-            updatebytes[i++] = (byte)extraParamsNum;
-
-            if (isFlexible)
-            {
-                updatebytes[i++] = FlexiEP % 256;
-                updatebytes[i++] = FlexiEP / 256;
-
-                updatebytes[i++] = 16;
-                updatebytes[i++] = 0;
-                updatebytes[i++] = 0;
-                updatebytes[i++] = 0;
-
-                updatebytes[i++] = (byte)((byte)((byte)(flexi.Tension * 10.01f) & 0x7F) | (byte)((flexi.Softness & 2) << 6));
-                updatebytes[i++] = (byte)((byte)((byte)(flexi.Friction * 10.01f) & 0x7F) | (byte)((flexi.Softness & 1) << 7));
-                updatebytes[i++] = (byte)((flexi.Gravity + 10.0f) * 10.01f);
-                updatebytes[i++] = (byte)(flexi.Wind * 10.01f);
-                flexi.Force.ToBytes(updatebytes, i);
-                i += 12;
-            }
-
-            if (isSculpt)
-            {
-                updatebytes[i++] = SculptEP % 256;
-                updatebytes[i++] = SculptEP / 256;
-                updatebytes[i++] = 17;
-                updatebytes[i++] = 0;
-                updatebytes[i++] = 0;
-                updatebytes[i++] = 0;
-                shape.SculptMap.ToBytes(updatebytes, i);
-                i += 16;
-                updatebytes[i++] = (byte)shape.SculptType;
-            }
-
-            if (isLight)
-            {
-                updatebytes[i++] = LightEP % 256;
-                updatebytes[i++] = LightEP / 256;
-                updatebytes[i++] = 16;
-                updatebytes[i++] = 0;
-                updatebytes[i++] = 0;
-                updatebytes[i++] = 0;
-                Buffer.BlockCopy(light.LightColor.AsByte, 0, updatebytes, i, 3);
-
-                double intensity = light.Intensity;
-                if (intensity > m_Part.FacelightLimitIntensity &&
-                    (m_Part.ObjectGroup.AttachPoint == AttachmentPoint.LeftHand ||
-                    m_Part.ObjectGroup.AttachPoint == AttachmentPoint.RightHand))
+                var flexi = m_Part.Flexible;
+                var light = m_Part.PointLight;
+                var proj = Projection;
+                var shape = m_Part.Shape;
+                var emesh = m_Part.ExtendedMesh;
+                bool isFlexible = flexi.IsFlexible;
+                bool isSculpt = shape.Type == PrimitiveShapeType.Sculpt;
+                ObjectGroup objectGroup = m_Part.ObjectGroup;
+                bool isFullLight = light.IsLight;
+                bool isLimitedLight = isFullLight &&
+                    (!m_Part.IsAttachmentLightsDisabled || !IsPrivateAttachmentOrNone(objectGroup.AttachPoint)) &&
+                    (!m_Part.IsFacelightDisabled || (objectGroup.AttachPoint != AttachmentPoint.LeftHand && objectGroup.AttachPoint != AttachmentPoint.RightHand));
+                bool isProjecting = proj.IsProjecting;
+                ExtendedMeshParams.MeshFlags emeshFlags = emesh.Flags;
+                if (isFlexible)
                 {
-                    intensity = m_Part.FacelightLimitIntensity;
-                }
-                else if (intensity > m_Part.AttachmentLightLimitIntensity &&
-                    !IsPrivateAttachmentOrNone(m_Part.ObjectGroup.AttachPoint))
-                {
-                    intensity = m_Part.AttachmentLightLimitIntensity;
+                    ++extraParamsNum;
+                    totalBytesLength += 16;
+                    totalBytesLength += 2 + 4;
                 }
 
-                updatebytes[i + 3] = (byte)(intensity * 255f);
-                i += 4;
-                ConversionMethods.Float2LEBytes((float)light.Radius, updatebytes, i);
-                i += 4;
-                ConversionMethods.Float2LEBytes((float)light.Cutoff, updatebytes, i);
-                i += 4;
-                ConversionMethods.Float2LEBytes((float)light.Falloff, updatebytes, i);
-                i += 4;
-            }
+                if (isSculpt)
+                {
+                    ++extraParamsNum;
+                    totalBytesLength += 17;
+                    totalBytesLength += 2 + 4;
+                }
 
-            if (isProjecting)
-            {
-                updatebytes[i++] = (ProjectionEP % 256);
-                updatebytes[i++] = (ProjectionEP / 256);
-                updatebytes[i++] = 28;
-                updatebytes[i++] = 0;
-                updatebytes[i++] = 0;
-                updatebytes[i++] = 0;
-                proj.ProjectionTextureID.ToBytes(updatebytes, i);
-                i += 16;
-                ConversionMethods.Float2LEBytes((float)proj.ProjectionFOV, updatebytes, i);
-                i += 4;
-                ConversionMethods.Float2LEBytes((float)proj.ProjectionFocus, updatebytes, i);
-                i += 4;
-                ConversionMethods.Float2LEBytes((float)proj.ProjectionAmbience, updatebytes, i);
-            }
+                if (isProjecting)
+                {
+                    ++extraParamsNum;
+                    totalBytesLength += 28;
+                    totalBytesLength += 2 + 4;
+                }
 
-            if (emeshFlags != ExtendedMeshParams.MeshFlags.None)
-            {
-                updatebytes[i++] = (ExtendedMeshEP % 256);
-                updatebytes[i++] = (ExtendedMeshEP / 256);
-                updatebytes[i++] = 4;
-                updatebytes[i++] = 0;
-                updatebytes[i++] = 0;
-                updatebytes[i++] = 0;
-                updatebytes[i++] = (byte)(((uint)emeshFlags) & 0xFF);
-                updatebytes[i++] = (byte)((((uint)emeshFlags) >> 8) & 0xFF);
-                updatebytes[i++] = (byte)((((uint)emeshFlags) >> 16) & 0xFF);
-                updatebytes[i++] = (byte)((((uint)emeshFlags) >> 24) & 0xFF);
-            }
+                if (emeshFlags != ExtendedMeshParams.MeshFlags.None)
+                {
+                    ++extraParamsNum;
+                    totalBytesLength += 4;
+                    totalBytesLength += 2 + 4;
+                }
 
-            m_ExtraParamsBytes = updatebytes;
-        });
+                limitedExtraParamsNum = extraParamsNum;
+                limitedTotalBytesLength = totalBytesLength;
+
+                if (isLimitedLight)
+                {
+                    ++limitedExtraParamsNum;
+                    limitedTotalBytesLength += 16;
+                    limitedTotalBytesLength += 2 + 4;
+                }
+
+                if (isFullLight)
+                {
+                    ++extraParamsNum;
+                    totalBytesLength += 16;
+                    totalBytesLength += 2 + 4;
+                }
+
+                var updatebytes = new byte[totalBytesLength];
+                var updatebyteslimited = new byte[limitedTotalBytesLength];
+                updatebyteslimited[limitedi++] = (byte)limitedExtraParamsNum;
+                updatebytes[i++] = (byte)extraParamsNum;
+
+                if (isFlexible)
+                {
+                    updatebytes[i++] = FlexiEP % 256;
+                    updatebytes[i++] = FlexiEP / 256;
+
+                    updatebytes[i++] = 16;
+                    updatebytes[i++] = 0;
+                    updatebytes[i++] = 0;
+                    updatebytes[i++] = 0;
+
+                    updatebytes[i++] = (byte)((byte)((byte)(flexi.Tension * 10.01f) & 0x7F) | (byte)((flexi.Softness & 2) << 6));
+                    updatebytes[i++] = (byte)((byte)((byte)(flexi.Friction * 10.01f) & 0x7F) | (byte)((flexi.Softness & 1) << 7));
+                    updatebytes[i++] = (byte)((flexi.Gravity + 10.0f) * 10.01f);
+                    updatebytes[i++] = (byte)(flexi.Wind * 10.01f);
+                    flexi.Force.ToBytes(updatebytes, i);
+                    i += 12;
+                }
+
+                if (isSculpt)
+                {
+                    updatebytes[i++] = SculptEP % 256;
+                    updatebytes[i++] = SculptEP / 256;
+                    updatebytes[i++] = 17;
+                    updatebytes[i++] = 0;
+                    updatebytes[i++] = 0;
+                    updatebytes[i++] = 0;
+                    shape.SculptMap.ToBytes(updatebytes, i);
+                    i += 16;
+                    updatebytes[i++] = (byte)shape.SculptType;
+                }
+
+                Buffer.BlockCopy(updatebytes, 1, updatebyteslimited, 1, i - 1);
+                limitedi = i;
+
+                if (isFullLight)
+                {
+                    updatebytes[i++] = LightEP % 256;
+                    updatebytes[i++] = LightEP / 256;
+                    updatebytes[i++] = 16;
+                    updatebytes[i++] = 0;
+                    updatebytes[i++] = 0;
+                    updatebytes[i++] = 0;
+                    Buffer.BlockCopy(light.LightColor.AsByte, 0, updatebytes, i, 3);
+
+                    updatebytes[i + 3] = (byte)(light.Intensity * 255f);
+                    i += 4;
+                    ConversionMethods.Float2LEBytes((float)light.Radius, updatebytes, i);
+                    i += 4;
+                    ConversionMethods.Float2LEBytes((float)light.Cutoff, updatebytes, i);
+                    i += 4;
+                    ConversionMethods.Float2LEBytes((float)light.Falloff, updatebytes, i);
+                    i += 4;
+                }
+
+                if (isLimitedLight)
+                {
+                    updatebyteslimited[limitedi++] = LightEP % 256;
+                    updatebyteslimited[limitedi++] = LightEP / 256;
+                    updatebyteslimited[limitedi++] = 16;
+                    updatebyteslimited[limitedi++] = 0;
+                    updatebyteslimited[limitedi++] = 0;
+                    updatebyteslimited[limitedi++] = 0;
+                    Buffer.BlockCopy(light.LightColor.AsByte, 0, updatebyteslimited, i, 3);
+
+                    double intensity = light.Intensity;
+                    if (intensity > m_Part.FacelightLimitIntensity &&
+                        (m_Part.ObjectGroup.AttachPoint == AttachmentPoint.LeftHand ||
+                        m_Part.ObjectGroup.AttachPoint == AttachmentPoint.RightHand))
+                    {
+                        intensity = m_Part.FacelightLimitIntensity;
+                    }
+                    else if (intensity > m_Part.AttachmentLightLimitIntensity &&
+                        !IsPrivateAttachmentOrNone(m_Part.ObjectGroup.AttachPoint))
+                    {
+                        intensity = m_Part.AttachmentLightLimitIntensity;
+                    }
+
+                    updatebyteslimited[limitedi + 3] = (byte)(intensity * 255f);
+                    limitedi += 4;
+                    ConversionMethods.Float2LEBytes((float)light.Radius, updatebyteslimited, limitedi);
+                    limitedi += 4;
+                    ConversionMethods.Float2LEBytes((float)light.Cutoff, updatebyteslimited, limitedi);
+                    limitedi += 4;
+                    ConversionMethods.Float2LEBytes((float)light.Falloff, updatebyteslimited, limitedi);
+                    limitedi += 4;
+                }
+
+                if (isProjecting)
+                {
+                    /* full block */
+                    updatebytes[i++] = (ProjectionEP % 256);
+                    updatebytes[i++] = (ProjectionEP / 256);
+                    updatebytes[i++] = 28;
+                    updatebytes[i++] = 0;
+                    updatebytes[i++] = 0;
+                    updatebytes[i++] = 0;
+                    proj.ProjectionTextureID.ToBytes(updatebytes, i);
+                    i += 16;
+                    ConversionMethods.Float2LEBytes((float)proj.ProjectionFOV, updatebytes, i);
+                    i += 4;
+                    ConversionMethods.Float2LEBytes((float)proj.ProjectionFocus, updatebytes, i);
+                    i += 4;
+                    ConversionMethods.Float2LEBytes((float)proj.ProjectionAmbience, updatebytes, i);
+
+                    /* limited block */
+                    updatebyteslimited[limitedi++] = (ProjectionEP % 256);
+                    updatebyteslimited[limitedi++] = (ProjectionEP / 256);
+                    updatebyteslimited[limitedi++] = 28;
+                    updatebyteslimited[limitedi++] = 0;
+                    updatebyteslimited[limitedi++] = 0;
+                    updatebyteslimited[limitedi++] = 0;
+                    proj.ProjectionTextureID.ToBytes(updatebyteslimited, limitedi);
+                    limitedi += 16;
+                    ConversionMethods.Float2LEBytes((float)proj.ProjectionFOV, updatebytes, limitedi);
+                    limitedi += 4;
+                    ConversionMethods.Float2LEBytes((float)proj.ProjectionFocus, updatebytes, limitedi);
+                    limitedi += 4;
+                    ConversionMethods.Float2LEBytes((float)proj.ProjectionAmbience, updatebytes, limitedi);
+                }
+
+                if (emeshFlags != ExtendedMeshParams.MeshFlags.None)
+                {
+                    updatebyteslimited[limitedi++] = (ExtendedMeshEP % 256);
+                    updatebyteslimited[limitedi++] = (ExtendedMeshEP / 256);
+                    updatebyteslimited[limitedi++] = 4;
+                    updatebyteslimited[limitedi++] = 0;
+                    updatebyteslimited[limitedi++] = 0;
+                    updatebyteslimited[limitedi++] = 0;
+                    updatebyteslimited[limitedi++] = (byte)(((uint)emeshFlags) & 0xFF);
+                    updatebyteslimited[limitedi++] = (byte)((((uint)emeshFlags) >> 8) & 0xFF);
+                    updatebyteslimited[limitedi++] = (byte)((((uint)emeshFlags) >> 16) & 0xFF);
+                    updatebyteslimited[limitedi++] = (byte)((((uint)emeshFlags) >> 24) & 0xFF);
+                }
+
+                m_ExtraParamsBytes = updatebytes;
+                m_ExtraParamsBytesLimitedLight = updatebyteslimited;
+            }
+        }
 
         public ProjectionParam Projection
         {
@@ -257,8 +321,7 @@ namespace SilverSim.Scene.Types.Object.Localization
                 }
                 else
                 {
-                    ProjectionParam oldParam;
-                    oldParam = Interlocked.Exchange(ref m_Projection, new ProjectionParam(value));
+                    ProjectionParam oldParam = Interlocked.Exchange(ref m_Projection, new ProjectionParam(value));
                     changed = oldParam?.IsDifferent(value) ?? true;
                 }
                 if (changed)

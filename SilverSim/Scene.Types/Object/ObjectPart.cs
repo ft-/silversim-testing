@@ -639,6 +639,25 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+
+        private void TriggerOnUpdateNoChange(UpdateChangedFlags flags)
+        {
+            /* we have to check the ObjectGroup during setup process before using it here */
+            if (ObjectGroup == null)
+            {
+                return;
+            }
+
+            /* trigger cache rebuild */
+            if ((flags & (UpdateChangedFlags.Texture | UpdateChangedFlags.Shape)) != 0)
+            {
+                Interlocked.Increment(ref m_StaleCount);
+            }
+
+            UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.All);
+            ObjectGroup.Scene?.ScheduleUpdate(UpdateInfo);
+        }
+
         internal void TriggerOnUpdate(UpdateChangedFlags flags)
         {
             /* we have to check the ObjectGroup during setup process before using it here */

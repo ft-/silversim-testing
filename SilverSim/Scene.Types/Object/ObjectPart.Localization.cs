@@ -137,6 +137,12 @@ namespace SilverSim.Scene.Types.Object
 
         public byte[] GetCompressedUpdateData(CultureInfo culture) => GetLocalization(culture).CompressedUpdateData;
 
+        public byte[] GetFullUpdateDataLimited(CultureInfo culture) => GetLocalization(culture).FullUpdateDataLimited;
+
+        public byte[] GetTerseUpdateDataLimited(CultureInfo culture) => GetLocalization(culture).TerseUpdateDataLimited;
+
+        public byte[] GetCompressedUpdateDataLimited(CultureInfo culture) => GetLocalization(culture).CompressedUpdateDataLimited;
+
         public byte[] GetPropertiesUpdateData(CultureInfo culture) => GetLocalization(culture).PropertiesUpdateData;
 
         internal ObjectPartLocalizedInfo[] Localizations

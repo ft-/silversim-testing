@@ -623,9 +623,12 @@ namespace SilverSim.Scene.Types.Object.Localization
         private readonly byte[] m_CompressedUpdateFixedBlock = new byte[(int)CompressedUpdateOffset.BlockLength];
 
         private byte[] m_FullUpdateData;
+        private byte[] m_FullUpdateDataLimited;
         private byte[] m_TerseUpdateData;
+        private byte[] m_TerseUpdateDataLimited;
         private byte[] m_PropUpdateData;
         private byte[] m_CompressedUpdateData;
+        private byte[] m_CompressedUpdateDataLimited;
         private readonly object m_UpdateDataLock = new object();
 
         public int SerialNumber => m_Part.SerialNumber;
@@ -663,6 +666,42 @@ namespace SilverSim.Scene.Types.Object.Localization
                     UpdateData(UpdateDataFlags.Compressed);
                 }
                 return m_CompressedUpdateData;
+            }
+        }
+
+        public byte[] FullUpdateDataLimited
+        {
+            get
+            {
+                if (m_FullUpdateDataLimited == null)
+                {
+                    UpdateData(UpdateDataFlags.Full);
+                }
+                return m_FullUpdateDataLimited;
+            }
+        }
+
+        public byte[] TerseUpdateDataLimited
+        {
+            get
+            {
+                if (m_TerseUpdateDataLimited == null)
+                {
+                    UpdateData(UpdateDataFlags.Terse);
+                }
+                return m_TerseUpdateDataLimited;
+            }
+        }
+
+        public byte[] CompressedUpdateDataLimited
+        {
+            get
+            {
+                if (m_CompressedUpdateDataLimited == null)
+                {
+                    UpdateData(UpdateDataFlags.Compressed);
+                }
+                return m_CompressedUpdateDataLimited;
             }
         }
 
@@ -818,11 +857,11 @@ namespace SilverSim.Scene.Types.Object.Localization
                     m_Part.IncSerialNumber();
                 }
 
-                if (m_FullUpdateData == null)
+                if (m_FullUpdateData == null || m_FullUpdateDataLimited == null)
                 {
                     flags |= UpdateDataFlags.Full;
                 }
-                if (m_TerseUpdateData == null)
+                if (m_TerseUpdateData == null || m_TerseUpdateDataLimited == null)
                 {
                     flags |= UpdateDataFlags.Terse;
                 }
@@ -830,7 +869,7 @@ namespace SilverSim.Scene.Types.Object.Localization
                 {
                     flags |= UpdateDataFlags.Properties;
                 }
-                if (m_CompressedUpdateData == null)
+                if (m_CompressedUpdateData == null || m_CompressedUpdateDataLimited == null)
                 {
                     flags |= UpdateDataFlags.Compressed;
                 }
@@ -901,39 +940,13 @@ namespace SilverSim.Scene.Types.Object.Localization
                 #region ObjectUpdate
                 if ((flags & UpdateDataFlags.Full) != 0)
                 {
-                    var textureEntry = TextureEntryBytes;
-                    var textureAnimEntry = TextureAnimationBytes;
-                    var text = Text;
-                    var textBytes = text.Text.ToUTF8Bytes();
-                    var psBlock = ParticleSystemBytes;
-                    var extraParams = ExtraParamsBytes;
-                    var mediaUrlBytes = MediaURL.ToUTF8Bytes();
-
-                    byte[] data;
-                    switch (m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PCode])
-                    {
-                        case (byte)PrimitiveCode.Grass:
-                        case (byte)PrimitiveCode.Tree:
-                        case (byte)PrimitiveCode.NewTree:
-                            data = new byte[] { m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.State] };
-                            break;
-                        default:
-                            data = new byte[0];
-                            break;
-                    }
-
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.UpdateFlags] = (byte)(primUpdateFlags & 0xFF);
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.UpdateFlags + 1] = (byte)((primUpdateFlags >> 8) & 0xFF);
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.UpdateFlags + 2] = (byte)((primUpdateFlags >> 16) & 0xFF);
-                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.UpdateFlags + 3] = (byte)((primUpdateFlags >> 24) & 0xFF);
-
                     if (objectGroup == null)
                     {
                         name = string.Empty;
                     }
                     else if (objectGroup.IsAttached)
                     {
-                        m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.State] = (byte)(((byte)objectGroup.AttachPoint % 16) * 16 + (((byte)objectGroup.AttachPoint / 16)));
+                        m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.State] = (byte)((byte)objectGroup.AttachPoint % 16 * 16 + ((byte)objectGroup.AttachPoint / 16));
                     }
                     else
                     {
@@ -942,274 +955,34 @@ namespace SilverSim.Scene.Types.Object.Localization
 
                     var nameBytes = name.ToUTF8Bytes();
 
-                    int blockSize = m_FullUpdateFixedBlock1.Length + m_FullUpdateFixedBlock2.Length;
-                    blockSize += textureEntry.Length + 2;
-                    blockSize += textureAnimEntry.Length + 1;
-                    blockSize += textBytes.Length + 2;
-                    blockSize += nameBytes.Length + 3;
-                    blockSize += psBlock.Length + 1;
-                    blockSize += extraParams.Length + 1;
-                    blockSize += data.Length + 2;
-                    blockSize += mediaUrlBytes.Length + 2;
-                    blockSize += 4;
-
-                    var newFullData = new byte[blockSize];
-                    int offset = 0;
-
-                    Buffer.BlockCopy(m_FullUpdateFixedBlock1, 0, newFullData, 0, m_FullUpdateFixedBlock1.Length);
-                    offset += m_FullUpdateFixedBlock1.Length;
-
-                    newFullData[offset++] = (byte)(textureEntry.Length % 256);
-                    newFullData[offset++] = (byte)(textureEntry.Length / 256);
-                    Buffer.BlockCopy(textureEntry, 0, newFullData, offset, textureEntry.Length);
-                    offset += textureEntry.Length;
-
-                    newFullData[offset++] = (byte)textureAnimEntry.Length;
-                    Buffer.BlockCopy(textureAnimEntry, 0, newFullData, offset, textureAnimEntry.Length);
-                    offset += textureAnimEntry.Length;
-
-                    newFullData[offset++] = (byte)((nameBytes.Length + 1) % 256);
-                    newFullData[offset++] = (byte)((nameBytes.Length + 1) / 256);
-                    Buffer.BlockCopy(nameBytes, 0, newFullData, offset, nameBytes.Length);
-                    offset += nameBytes.Length;
-                    newFullData[offset++] = 0;
-
-                    newFullData[offset++] = (byte)(data.Length % 256);
-                    newFullData[offset++] = (byte)(data.Length / 256);
-                    Buffer.BlockCopy(data, 0, newFullData, offset, data.Length);
-                    offset += data.Length;
-
-                    newFullData[offset++] = (byte)(textBytes.Length + 1);
-                    Buffer.BlockCopy(textBytes, 0, newFullData, offset, textBytes.Length);
-                    offset += textBytes.Length;
-                    newFullData[offset++] = 0;
-
-                    newFullData[offset++] = text.TextColor.R_AsByte;
-                    newFullData[offset++] = text.TextColor.G_AsByte;
-                    newFullData[offset++] = text.TextColor.B_AsByte;
-                    newFullData[offset++] = (byte)(255 - text.TextColor.A_AsByte);
-
-                    newFullData[offset++] = (byte)(mediaUrlBytes.Length + 1);
-                    Buffer.BlockCopy(mediaUrlBytes, 0, newFullData, offset, mediaUrlBytes.Length);
-                    offset += mediaUrlBytes.Length;
-                    newFullData[offset++] = 0;
-
-                    newFullData[offset++] = (byte)psBlock.Length;
-                    Buffer.BlockCopy(psBlock, 0, newFullData, offset, psBlock.Length);
-                    offset += psBlock.Length;
-
-                    newFullData[offset++] = (byte)extraParams.Length;
-                    Buffer.BlockCopy(extraParams, 0, newFullData, offset, extraParams.Length);
-                    offset += extraParams.Length;
-
-                    Buffer.BlockCopy(m_FullUpdateFixedBlock2, 0, newFullData, offset, m_FullUpdateFixedBlock2.Length);
-
-                    m_FullUpdateData = newFullData;
+                    m_FullUpdateData = GenerateFullUpdate(primUpdateFlags, nameBytes, false);
+                    m_FullUpdateDataLimited = GenerateFullUpdate(primUpdateFlags, nameBytes, true);
                 }
                 #endregion
 
                 #region Terse Update
                 if ((flags & UpdateDataFlags.Terse) != 0)
                 {
-                    byte[] terseData = m_Part.TerseData;
-                    byte[] textureEntry = TextureEntryBytes;
-
-                    var newTerseData = new byte[3 + terseData.Length + textureEntry.Length];
-
-                    int offset = 0;
-                    newTerseData[offset++] = (byte)terseData.Length;
-                    Buffer.BlockCopy(terseData, 0, newTerseData, offset, terseData.Length);
-                    offset += terseData.Length;
-
-                    newTerseData[offset++] = (byte)(textureEntry.Length % 256);
-                    newTerseData[offset++] = (byte)(textureEntry.Length / 256);
-                    Buffer.BlockCopy(textureEntry, 0, newTerseData, offset, textureEntry.Length);
-                    m_TerseUpdateData = newTerseData;
+                    m_TerseUpdateData = GenerateTerseUpdate(false);
+                    m_TerseUpdateDataLimited = GenerateTerseUpdate(true);
                 }
                 #endregion
 
                 #region CompressedUpdate
                 if ((flags & UpdateDataFlags.Compressed) != 0)
                 {
-                    var partsystem = ParticleSystemBytes;
-                    if ((partsystem.Length != 0 && partsystem.Length != 86) || m_Part.Velocity.Length > double.Epsilon)
-                    {
-                        m_CompressedUpdateData = null;
-                    }
-                    else
-                    {
-                        var compressedflags = ObjectUpdateCompressed.CompressedFlags.None;
-                        TextParam textparam = Text;
-                        int compressedSize = 80;
-                        byte[] textbytes = null;
-                        byte[] mediaurlbytes = null;
-                        byte[] namebytes = null;
-                        var textureanimbytes = TextureAnimationBytes;
-                        var textureentry = TextureEntryBytes;
-                        var extrabytes = ExtraParamsBytes;
-
-                        if (extrabytes == null || extrabytes.Length == 0)
-                        {
-                            extrabytes = new byte[1] { 0 };
-                        }
-
-                        compressedSize += (4 + textureentry.Length) + extrabytes.Length + m_CompressedUpdateFixedBlock.Length;
-
-                        if (m_Part.AngularVelocity.Length > double.Epsilon)
-                        {
-                            compressedflags |= ObjectUpdateCompressed.CompressedFlags.HasAngularVelocity;
-                            compressedSize += 12;
-                        }
-
-                        if (textureanimbytes != null && textureanimbytes.Length != 0)
-                        {
-                            compressedflags |= ObjectUpdateCompressed.CompressedFlags.TextureAnimation;
-                            compressedSize += textureanimbytes.Length + 4;
-                        }
-
-                        compressedflags |= ObjectUpdateCompressed.CompressedFlags.HasParent;
-                        compressedSize += 4;
-
-                        if (!string.IsNullOrEmpty(name))
-                        {
-                            namebytes = (name + "\0").ToUTF8Bytes();
-                            compressedflags |= ObjectUpdateCompressed.CompressedFlags.HasNameValues;
-                            compressedSize += namebytes.Length;
-                        }
-
-                        if (textparam.Text.Length != 0)
-                        {
-                            compressedflags |= ObjectUpdateCompressed.CompressedFlags.HasText;
-                            textbytes = (textparam.Text + "\0").ToUTF8Bytes();
-                            compressedSize += (textbytes.Length + 4);
-                        }
-
-                        string mediaUrl = MediaURL;
-                        if (!string.IsNullOrEmpty(mediaUrl))
-                        {
-                            mediaurlbytes = (MediaURL + "\0").ToUTF8Bytes();
-                            compressedSize += mediaurlbytes.Length;
-                        }
-
-                        if (partsystem.Length != 0)
-                        {
-                            compressedflags |= ObjectUpdateCompressed.CompressedFlags.HasParticles;
-                            compressedSize += partsystem.Length;
-                        }
-
-                        var compressedData = new byte[compressedSize];
-                        m_Part.ID.ToBytes(compressedData, 0);
-                        //LocalID integrated later in sender
-                        compressedData[16] = 0;//(byte)(LocalID & 0xFF);
-                        compressedData[17] = 0;//(byte)((LocalID >> 8) & 0xFF);
-                        compressedData[18] = 0;//(byte)((LocalID >> 16) & 0xFF);
-                        compressedData[19] = 0;// (byte)((LocalID >> 24) & 0xFF);
-                        var shape = m_Part.Shape;
-                        compressedData[20] = (byte)shape.PCode;
-                        compressedData[21] = shape.State;
-                        //CRC
-                        compressedData[22] = 0;
-                        compressedData[23] = 0;
-                        compressedData[24] = 0;
-                        compressedData[25] = 0;
-                        compressedData[26] = (byte)m_Part.Material;
-                        compressedData[27] = (byte)m_Part.ClickAction;
-                        m_Part.Size.ToBytes(compressedData, 28);
-                        m_Part.Position.ToBytes(compressedData, 40);
-                        m_Part.Rotation.ToBytes(compressedData, 52);
-                        compressedData[64] = (byte)((uint)compressedflags & 0xFF);
-                        compressedData[65] = (byte)(((uint)compressedflags >> 8) & 0xFF);
-                        compressedData[66] = (byte)(((uint)compressedflags >> 16) & 0xFF);
-                        compressedData[67] = (byte)(((uint)compressedflags >> 24) & 0xFF);
-                        m_Part.Owner.ID.ToBytes(compressedData, 68);
-
-                        int offset = 80;
-
-                        //Angular velocity
-                        if ((compressedflags & ObjectUpdateCompressed.CompressedFlags.HasAngularVelocity) != 0)
-                        {
-                            m_Part.AngularVelocity.ToBytes(compressedData, offset);
-                            offset += 12;
-                        }
-
-                        //ParentID integrated later in sender
-                        compressedData[offset] = 0;
-                        compressedData[offset + 1] = 0;
-                        compressedData[offset + 2] = 0;
-                        compressedData[offset + 3] = 0;
-                        offset += 4;
-
-                        //Hover text
-                        if (textbytes != null)
-                        {
-                            Buffer.BlockCopy(textbytes, 0, compressedData, offset, textbytes.Length);
-                            offset += textbytes.Length;
-                            compressedData[offset++] = textparam.TextColor.R_AsByte;
-                            compressedData[offset++] = textparam.TextColor.G_AsByte;
-                            compressedData[offset++] = textparam.TextColor.B_AsByte;
-                            compressedData[offset++] = (byte)(255 - textparam.TextColor.A_AsByte);
-                        }
-
-                        //Media url
-                        if (mediaurlbytes != null)
-                        {
-                            Buffer.BlockCopy(mediaurlbytes, 0, compressedData, offset, mediaurlbytes.Length);
-                            offset += mediaurlbytes.Length;
-                        }
-
-                        //Particle system
-                        if (partsystem.Length != 0)
-                        {
-                            Buffer.BlockCopy(partsystem, 0, compressedData, offset, partsystem.Length);
-                            offset += partsystem.Length;
-                        }
-
-                        //ExtraParams
-                        Buffer.BlockCopy(extrabytes, 0, compressedData, offset, extrabytes.Length);
-                        offset += extrabytes.Length;
-
-                        if ((compressedflags & ObjectUpdateCompressed.CompressedFlags.HasNameValues) != 0)
-                        {
-                            Buffer.BlockCopy(namebytes, 0, compressedData, offset, namebytes.Length);
-                            offset += namebytes.Length;
-                        }
-
-                        //PShape
-                        Buffer.BlockCopy(m_CompressedUpdateFixedBlock, 0, compressedData, offset, m_CompressedUpdateFixedBlock.Length);
-                        offset += m_CompressedUpdateFixedBlock.Length;
-
-                        //TextureEntry
-                        compressedData[offset++] = (byte)(textureentry.Length & 0xFF);
-                        compressedData[offset++] = (byte)((textureentry.Length >> 8) & 0xFF);
-                        compressedData[offset++] = (byte)((textureentry.Length >> 16) & 0xFF);
-                        compressedData[offset++] = (byte)((textureentry.Length >> 24) & 0xFF);
-
-                        //TextureEntry
-                        Buffer.BlockCopy(textureentry, 0, compressedData, offset, textureentry.Length);
-                        offset += textureentry.Length;
-
-                        //TextureAnim
-                        if ((compressedflags & ObjectUpdateCompressed.CompressedFlags.TextureAnimation) != 0)
-                        {
-                            compressedData[offset++] = (byte)(textureanimbytes.Length & 0xFF);
-                            compressedData[offset++] = (byte)((textureanimbytes.Length >> 8) & 0xFF);
-                            compressedData[offset++] = (byte)((textureanimbytes.Length >> 16) & 0xFF);
-                            compressedData[offset++] = (byte)((textureanimbytes.Length >> 24) & 0xFF);
-
-                            Buffer.BlockCopy(textureanimbytes, 0, compressedData, offset, textureanimbytes.Length);
-                        }
-                        m_CompressedUpdateData = compressedData;
-                    }
+                    m_CompressedUpdateData = GenerateCompressedUpdate(name, false);
+                    m_CompressedUpdateDataLimited = GenerateCompressedUpdate(name, true);
                 }
                 #endregion
 
                 #region ObjectProperties
                 if ((flags & UpdateDataFlags.Properties) != 0)
                 {
-                    var nameBytes = Name.ToUTF8Bytes();
-                    var descriptionBytes = Description.ToUTF8Bytes();
-                    var touchNameBytes = TouchText.ToUTF8Bytes();
-                    var sitNameBytes = SitText.ToUTF8Bytes();
+                    byte[] nameBytes = Name.ToUTF8Bytes();
+                    byte[] descriptionBytes = Description.ToUTF8Bytes();
+                    byte[] touchNameBytes = TouchText.ToUTF8Bytes();
+                    byte[] sitNameBytes = SitText.ToUTF8Bytes();
 
                     int propDataLength = m_PropUpdateFixedBlock.Length + 9 +
                         nameBytes.Length +
@@ -1266,6 +1039,290 @@ namespace SilverSim.Scene.Types.Object.Localization
                     m_PropUpdateData = newPropData;
                 }
                 #endregion
+            }
+        }
+
+        private byte[] GenerateFullUpdate(uint primUpdateFlags, byte[] nameBytes, bool useLimiters)
+        {
+            byte[] textureEntry = useLimiters ? TextureEntryBytesLimitedLight : TextureEntryBytes;
+            byte[] textureAnimEntry = TextureAnimationBytes;
+            TextParam text = Text;
+            byte[] textBytes = text.Text.ToUTF8Bytes();
+            byte[] psBlock = ParticleSystemBytes;
+            byte[] extraParams = useLimiters ? ExtraParamsBytesLimitedLight : ExtraParamsBytes;
+            byte[] mediaUrlBytes = MediaURL.ToUTF8Bytes();
+
+            byte[] data;
+            switch (m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PCode])
+            {
+                case (byte)PrimitiveCode.Grass:
+                case (byte)PrimitiveCode.Tree:
+                case (byte)PrimitiveCode.NewTree:
+                    data = new byte[] { m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.State] };
+                    break;
+                default:
+                    data = new byte[0];
+                    break;
+            }
+
+            m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.UpdateFlags] = (byte)(primUpdateFlags & 0xFF);
+            m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.UpdateFlags + 1] = (byte)((primUpdateFlags >> 8) & 0xFF);
+            m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.UpdateFlags + 2] = (byte)((primUpdateFlags >> 16) & 0xFF);
+            m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.UpdateFlags + 3] = (byte)((primUpdateFlags >> 24) & 0xFF);
+
+            int blockSize = m_FullUpdateFixedBlock1.Length + m_FullUpdateFixedBlock2.Length;
+            blockSize += textureEntry.Length + 2;
+            blockSize += textureAnimEntry.Length + 1;
+            blockSize += textBytes.Length + 2;
+            blockSize += nameBytes.Length + 3;
+            blockSize += psBlock.Length + 1;
+            blockSize += extraParams.Length + 1;
+            blockSize += data.Length + 2;
+            blockSize += mediaUrlBytes.Length + 2;
+            blockSize += 4;
+
+            var newFullData = new byte[blockSize];
+            int offset = 0;
+
+            Buffer.BlockCopy(m_FullUpdateFixedBlock1, 0, newFullData, 0, m_FullUpdateFixedBlock1.Length);
+            offset += m_FullUpdateFixedBlock1.Length;
+
+            newFullData[offset++] = (byte)(textureEntry.Length % 256);
+            newFullData[offset++] = (byte)(textureEntry.Length / 256);
+            Buffer.BlockCopy(textureEntry, 0, newFullData, offset, textureEntry.Length);
+            offset += textureEntry.Length;
+
+            newFullData[offset++] = (byte)textureAnimEntry.Length;
+            Buffer.BlockCopy(textureAnimEntry, 0, newFullData, offset, textureAnimEntry.Length);
+            offset += textureAnimEntry.Length;
+
+            newFullData[offset++] = (byte)((nameBytes.Length + 1) % 256);
+            newFullData[offset++] = (byte)((nameBytes.Length + 1) / 256);
+            Buffer.BlockCopy(nameBytes, 0, newFullData, offset, nameBytes.Length);
+            offset += nameBytes.Length;
+            newFullData[offset++] = 0;
+
+            newFullData[offset++] = (byte)(data.Length % 256);
+            newFullData[offset++] = (byte)(data.Length / 256);
+            Buffer.BlockCopy(data, 0, newFullData, offset, data.Length);
+            offset += data.Length;
+
+            newFullData[offset++] = (byte)(textBytes.Length + 1);
+            Buffer.BlockCopy(textBytes, 0, newFullData, offset, textBytes.Length);
+            offset += textBytes.Length;
+            newFullData[offset++] = 0;
+
+            newFullData[offset++] = text.TextColor.R_AsByte;
+            newFullData[offset++] = text.TextColor.G_AsByte;
+            newFullData[offset++] = text.TextColor.B_AsByte;
+            newFullData[offset++] = (byte)(255 - text.TextColor.A_AsByte);
+
+            newFullData[offset++] = (byte)(mediaUrlBytes.Length + 1);
+            Buffer.BlockCopy(mediaUrlBytes, 0, newFullData, offset, mediaUrlBytes.Length);
+            offset += mediaUrlBytes.Length;
+            newFullData[offset++] = 0;
+
+            newFullData[offset++] = (byte)psBlock.Length;
+            Buffer.BlockCopy(psBlock, 0, newFullData, offset, psBlock.Length);
+            offset += psBlock.Length;
+
+            newFullData[offset++] = (byte)extraParams.Length;
+            Buffer.BlockCopy(extraParams, 0, newFullData, offset, extraParams.Length);
+            offset += extraParams.Length;
+
+            Buffer.BlockCopy(m_FullUpdateFixedBlock2, 0, newFullData, offset, m_FullUpdateFixedBlock2.Length);
+
+            return newFullData;
+        }
+
+        private byte[] GenerateTerseUpdate(bool uselimiters)
+        {
+            byte[] terseData = m_Part.TerseData;
+            byte[] textureEntry = uselimiters ? TextureEntryBytesLimitedLight : TextureEntryBytes;
+
+            var newTerseData = new byte[3 + terseData.Length + textureEntry.Length];
+
+            int offset = 0;
+            newTerseData[offset++] = (byte)terseData.Length;
+            Buffer.BlockCopy(terseData, 0, newTerseData, offset, terseData.Length);
+            offset += terseData.Length;
+
+            newTerseData[offset++] = (byte)(textureEntry.Length % 256);
+            newTerseData[offset++] = (byte)(textureEntry.Length / 256);
+            Buffer.BlockCopy(textureEntry, 0, newTerseData, offset, textureEntry.Length);
+            return newTerseData;
+        }
+
+        private byte[] GenerateCompressedUpdate(string name, bool uselimiters)
+        {
+            byte[] partsystem = ParticleSystemBytes;
+            if ((partsystem.Length != 0 && partsystem.Length != 86) || m_Part.Velocity.Length > double.Epsilon)
+            {
+                return null;
+            }
+            else
+            {
+                var compressedflags = ObjectUpdateCompressed.CompressedFlags.None;
+                TextParam textparam = Text;
+                int compressedSize = 80;
+                byte[] textbytes = null;
+                byte[] mediaurlbytes = null;
+                byte[] namebytes = null;
+                byte[] textureanimbytes = TextureAnimationBytes;
+                byte[] textureentry = uselimiters ? TextureEntryBytesLimitedLight : TextureEntryBytes;
+                byte[] extrabytes = ExtraParamsBytes;
+
+                if (extrabytes == null || extrabytes.Length == 0)
+                {
+                    extrabytes = new byte[1] { 0 };
+                }
+
+                compressedSize += 4 + textureentry.Length + extrabytes.Length + m_CompressedUpdateFixedBlock.Length;
+
+                if (m_Part.AngularVelocity.Length > double.Epsilon)
+                {
+                    compressedflags |= ObjectUpdateCompressed.CompressedFlags.HasAngularVelocity;
+                    compressedSize += 12;
+                }
+
+                if (textureanimbytes != null && textureanimbytes.Length != 0)
+                {
+                    compressedflags |= ObjectUpdateCompressed.CompressedFlags.TextureAnimation;
+                    compressedSize += textureanimbytes.Length + 4;
+                }
+
+                compressedflags |= ObjectUpdateCompressed.CompressedFlags.HasParent;
+                compressedSize += 4;
+
+                if (!string.IsNullOrEmpty(name))
+                {
+                    namebytes = (name + "\0").ToUTF8Bytes();
+                    compressedflags |= ObjectUpdateCompressed.CompressedFlags.HasNameValues;
+                    compressedSize += namebytes.Length;
+                }
+
+                if (textparam.Text.Length != 0)
+                {
+                    compressedflags |= ObjectUpdateCompressed.CompressedFlags.HasText;
+                    textbytes = (textparam.Text + "\0").ToUTF8Bytes();
+                    compressedSize += (textbytes.Length + 4);
+                }
+
+                string mediaUrl = MediaURL;
+                if (!string.IsNullOrEmpty(mediaUrl))
+                {
+                    mediaurlbytes = (MediaURL + "\0").ToUTF8Bytes();
+                    compressedSize += mediaurlbytes.Length;
+                }
+
+                if (partsystem.Length != 0)
+                {
+                    compressedflags |= ObjectUpdateCompressed.CompressedFlags.HasParticles;
+                    compressedSize += partsystem.Length;
+                }
+
+                var compressedData = new byte[compressedSize];
+                m_Part.ID.ToBytes(compressedData, 0);
+                //LocalID integrated later in sender
+                compressedData[16] = 0;//(byte)(LocalID & 0xFF);
+                compressedData[17] = 0;//(byte)((LocalID >> 8) & 0xFF);
+                compressedData[18] = 0;//(byte)((LocalID >> 16) & 0xFF);
+                compressedData[19] = 0;// (byte)((LocalID >> 24) & 0xFF);
+                ObjectPart.PrimitiveShape shape = m_Part.Shape;
+                compressedData[20] = (byte)shape.PCode;
+                compressedData[21] = shape.State;
+                //CRC
+                compressedData[22] = 0;
+                compressedData[23] = 0;
+                compressedData[24] = 0;
+                compressedData[25] = 0;
+                compressedData[26] = (byte)m_Part.Material;
+                compressedData[27] = (byte)m_Part.ClickAction;
+                m_Part.Size.ToBytes(compressedData, 28);
+                m_Part.Position.ToBytes(compressedData, 40);
+                m_Part.Rotation.ToBytes(compressedData, 52);
+                compressedData[64] = (byte)((uint)compressedflags & 0xFF);
+                compressedData[65] = (byte)(((uint)compressedflags >> 8) & 0xFF);
+                compressedData[66] = (byte)(((uint)compressedflags >> 16) & 0xFF);
+                compressedData[67] = (byte)(((uint)compressedflags >> 24) & 0xFF);
+                m_Part.Owner.ID.ToBytes(compressedData, 68);
+
+                int offset = 80;
+
+                //Angular velocity
+                if ((compressedflags & ObjectUpdateCompressed.CompressedFlags.HasAngularVelocity) != 0)
+                {
+                    m_Part.AngularVelocity.ToBytes(compressedData, offset);
+                    offset += 12;
+                }
+
+                //ParentID integrated later in sender
+                compressedData[offset] = 0;
+                compressedData[offset + 1] = 0;
+                compressedData[offset + 2] = 0;
+                compressedData[offset + 3] = 0;
+                offset += 4;
+
+                //Hover text
+                if (textbytes != null)
+                {
+                    Buffer.BlockCopy(textbytes, 0, compressedData, offset, textbytes.Length);
+                    offset += textbytes.Length;
+                    compressedData[offset++] = textparam.TextColor.R_AsByte;
+                    compressedData[offset++] = textparam.TextColor.G_AsByte;
+                    compressedData[offset++] = textparam.TextColor.B_AsByte;
+                    compressedData[offset++] = (byte)(255 - textparam.TextColor.A_AsByte);
+                }
+
+                //Media url
+                if (mediaurlbytes != null)
+                {
+                    Buffer.BlockCopy(mediaurlbytes, 0, compressedData, offset, mediaurlbytes.Length);
+                    offset += mediaurlbytes.Length;
+                }
+
+                //Particle system
+                if (partsystem.Length != 0)
+                {
+                    Buffer.BlockCopy(partsystem, 0, compressedData, offset, partsystem.Length);
+                    offset += partsystem.Length;
+                }
+
+                //ExtraParams
+                Buffer.BlockCopy(extrabytes, 0, compressedData, offset, extrabytes.Length);
+                offset += extrabytes.Length;
+
+                if ((compressedflags & ObjectUpdateCompressed.CompressedFlags.HasNameValues) != 0)
+                {
+                    Buffer.BlockCopy(namebytes, 0, compressedData, offset, namebytes.Length);
+                    offset += namebytes.Length;
+                }
+
+                //PShape
+                Buffer.BlockCopy(m_CompressedUpdateFixedBlock, 0, compressedData, offset, m_CompressedUpdateFixedBlock.Length);
+                offset += m_CompressedUpdateFixedBlock.Length;
+
+                //TextureEntry
+                compressedData[offset++] = (byte)(textureentry.Length & 0xFF);
+                compressedData[offset++] = (byte)((textureentry.Length >> 8) & 0xFF);
+                compressedData[offset++] = (byte)((textureentry.Length >> 16) & 0xFF);
+                compressedData[offset++] = (byte)((textureentry.Length >> 24) & 0xFF);
+
+                //TextureEntry
+                Buffer.BlockCopy(textureentry, 0, compressedData, offset, textureentry.Length);
+                offset += textureentry.Length;
+
+                //TextureAnim
+                if ((compressedflags & ObjectUpdateCompressed.CompressedFlags.TextureAnimation) != 0)
+                {
+                    compressedData[offset++] = (byte)(textureanimbytes.Length & 0xFF);
+                    compressedData[offset++] = (byte)((textureanimbytes.Length >> 8) & 0xFF);
+                    compressedData[offset++] = (byte)((textureanimbytes.Length >> 16) & 0xFF);
+                    compressedData[offset++] = (byte)((textureanimbytes.Length >> 24) & 0xFF);
+
+                    Buffer.BlockCopy(textureanimbytes, 0, compressedData, offset, textureanimbytes.Length);
+                }
+                return compressedData;
             }
         }
     }

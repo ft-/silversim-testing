@@ -55,7 +55,7 @@ namespace SilverSim.Scene.Types.Object
                 }
                 if (changed)
                 {
-                    TriggerOnUpdate(0);
+                    TriggerOnUpdateNoChange(UpdateChangedFlags.Texture);
                 }
             }
         }
@@ -75,7 +75,7 @@ namespace SilverSim.Scene.Types.Object
                 }
                 if (changed)
                 {
-                    TriggerOnUpdate(0);
+                    TriggerOnUpdateNoChange(UpdateChangedFlags.Texture);
                 }
             }
         }
@@ -95,7 +95,7 @@ namespace SilverSim.Scene.Types.Object
                 if (PointLight.IsLight && changed)
                 {
                     UpdateExtraParams();
-                    TriggerOnUpdate(0);
+                    TriggerOnUpdateNoChange(0);
                 }
             }
         }
@@ -115,7 +115,7 @@ namespace SilverSim.Scene.Types.Object
                 if (PointLight.IsLight && changed)
                 {
                     UpdateExtraParams();
-                    TriggerOnUpdate(0);
+                    TriggerOnUpdateNoChange(0);
                 }
             }
         }
@@ -135,7 +135,7 @@ namespace SilverSim.Scene.Types.Object
                 if (PointLight.IsLight && changed)
                 {
                     UpdateExtraParams();
-                    TriggerOnUpdate(0);
+                    TriggerOnUpdateNoChange(0);
                 }
             }
         }
@@ -155,7 +155,7 @@ namespace SilverSim.Scene.Types.Object
                 if (PointLight.IsLight && changed)
                 {
                     UpdateExtraParams();
-                    TriggerOnUpdate(0);
+                    TriggerOnUpdateNoChange(0);
                 }
             }
         }
