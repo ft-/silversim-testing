@@ -20,7 +20,6 @@
 // exception statement from your version.
 
 using SilverSim.Scene.Types.Object.Parameters;
-using SilverSim.Threading;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Primitive;
 using System;
