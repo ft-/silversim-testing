@@ -365,6 +365,7 @@ namespace SilverSim.Viewer.Core
             AddDefCapability("MeshUploadFlag", regionSeedID, Cap_MeshUploadFlag, capConfig);
             AddDefCapability("GetPhysicsObjectData", regionSeedID, Cap_GetObjectsPhysicsData, capConfig);
             AddDefCapability("ChatSessionRequest", regionSeedID, ChatSessionRequestCapability.HttpRequestHandler, capConfig);
+            AddDefCapability("CreateInventoryCategory", regionSeedID, Cap_CreateInventoryCategory, capConfig);
             string localHostName = string.Format("{0}://{1}:{2}", m_CapsRedirector.Scheme, m_CapsRedirector.ExternalHostName, m_CapsRedirector.Port);
             AddDefCapabilityFactory("DispatchRegionInfo", regionSeedID, (agent) => new DispatchRegionInfo(agent, Server.Scene, RemoteIP), capConfig);
             AddDefCapabilityFactory("CopyInventoryFromNotecard", regionSeedID, (agent) => new CopyInventoryFromNotecard(agent, Server.Scene, RemoteIP), capConfig);
