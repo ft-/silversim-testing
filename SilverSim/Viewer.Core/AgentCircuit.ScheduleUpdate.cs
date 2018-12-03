@@ -478,12 +478,12 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        private bool IsLightLimited(IObjUpdateInfo ui) => false;
+        private bool IsLightLimited(IObjUpdateInfo ui) => ui.Owner != Agent?.Owner;
 
         private void HandleObjectUpdates()
         {
             Thread.CurrentThread.Name = $"Agent:ObjectUpdateHandler:Agent={AgentID}:Scene={m_Scene.ID}";
-            UInt64 regionHandle;
+            ulong regionHandle;
             var LastObjSerialNo = new C5.TreeDictionary<uint, int>();
             var SendSelectedObjects = new C5.TreeSet<UUID>();
             var queues = new Queue<IObjUpdateInfo>[2];
