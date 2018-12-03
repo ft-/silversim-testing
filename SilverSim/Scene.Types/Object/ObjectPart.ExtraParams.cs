@@ -39,7 +39,11 @@ namespace SilverSim.Scene.Types.Object
         private bool m_IsFullbrightDisabled;
         private double m_GlowLimitIntensity = 1;
         private double m_FacelightLimitIntensity = 1;
+        private double m_FacelightLimitRadius = double.MaxValue;
         private double m_AttachmentLightLimitIntensity = 1;
+        private double m_AttachmentLightLimitRadius = double.MaxValue;
+        private double m_UnattachedLightLimitIntensity = 1;
+        private double m_UnattachedLightLimitRadius = double.MaxValue;
 
         public bool IsFullbrightDisabled
         {
@@ -100,6 +104,26 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        public double FacelightLimitRadius
+        {
+            get { return Interlocked.CompareExchange(ref m_FacelightLimitRadius, 0, 0); }
+
+            set
+            {
+                bool changed;
+                lock (m_DataLock)
+                {
+                    value = Math.Max(0, value);
+                    changed = Interlocked.Exchange(ref m_FacelightLimitRadius, value) != value;
+                }
+                if (PointLight.IsLight && changed)
+                {
+                    UpdateExtraParams();
+                    TriggerOnUpdateNoChange(0);
+                }
+            }
+        }
+
         public double AttachmentLightLimitIntensity
         {
             get { return m_AttachmentLightLimitIntensity; }
@@ -111,6 +135,26 @@ namespace SilverSim.Scene.Types.Object
                 {
                     value = value.Clamp(0, 1);
                     changed = Interlocked.Exchange(ref m_AttachmentLightLimitIntensity, value) != value;
+                }
+                if (PointLight.IsLight && changed)
+                {
+                    UpdateExtraParams();
+                    TriggerOnUpdateNoChange(0);
+                }
+            }
+        }
+
+        public double AttachmentLightLimitRadius
+        {
+            get { return m_AttachmentLightLimitRadius; }
+
+            set
+            {
+                bool changed;
+                lock (m_DataLock)
+                {
+                    value = Math.Max(0, value);
+                    changed = Interlocked.Exchange(ref m_AttachmentLightLimitRadius, value) != value;
                 }
                 if (PointLight.IsLight && changed)
                 {
@@ -151,6 +195,46 @@ namespace SilverSim.Scene.Types.Object
                 {
                     changed = m_IsAttachmentLightsDisabled != value;
                     m_IsAttachmentLightsDisabled = value;
+                }
+                if (PointLight.IsLight && changed)
+                {
+                    UpdateExtraParams();
+                    TriggerOnUpdateNoChange(0);
+                }
+            }
+        }
+
+        public double UnattachedLightLimitIntensity
+        {
+            get { return m_UnattachedLightLimitIntensity; }
+
+            set
+            {
+                bool changed;
+                lock (m_DataLock)
+                {
+                    value = value.Clamp(0, 1);
+                    changed = Interlocked.Exchange(ref m_UnattachedLightLimitIntensity, value) != value;
+                }
+                if (PointLight.IsLight && changed)
+                {
+                    UpdateExtraParams();
+                    TriggerOnUpdateNoChange(0);
+                }
+            }
+        }
+
+        public double UnattachedLightLimitRadius
+        {
+            get { return m_UnattachedLightLimitRadius; }
+
+            set
+            {
+                bool changed;
+                lock (m_DataLock)
+                {
+                    value = Math.Max(0, value);
+                    changed = Interlocked.Exchange(ref m_UnattachedLightLimitRadius, value) != value;
                 }
                 if (PointLight.IsLight && changed)
                 {
@@ -220,7 +304,7 @@ namespace SilverSim.Scene.Types.Object
                                 break;
                             }
                             var type = (ushort)(value[pos] | (value[pos + 1] << 8));
-                            var len = (UInt32)(value[pos + 2] | (value[pos + 3] << 8) | (value[pos + 4] << 16) | (value[pos + 5] << 24));
+                            var len = (uint)(value[pos + 2] | (value[pos + 3] << 8) | (value[pos + 4] << 16) | (value[pos + 5] << 24));
                             pos += 6;
 
                             if (pos + len > value.Length)

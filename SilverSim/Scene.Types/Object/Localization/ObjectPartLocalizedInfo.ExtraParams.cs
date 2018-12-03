@@ -220,16 +220,27 @@ namespace SilverSim.Scene.Types.Object.Localization
                     Buffer.BlockCopy(light.LightColor.AsByte, 0, updatebyteslimited, i, 3);
 
                     double intensity = light.Intensity;
-                    if (intensity > m_Part.FacelightLimitIntensity &&
-                        (m_Part.ObjectGroup.AttachPoint == AttachmentPoint.LeftHand ||
-                        m_Part.ObjectGroup.AttachPoint == AttachmentPoint.RightHand))
+                    double radius = light.Radius;
+
+                    if(m_Part.ObjectGroup.AttachPoint == AttachmentPoint.NotAttached)
                     {
-                        intensity = m_Part.FacelightLimitIntensity;
+                        intensity = Math.Min(m_Part.UnattachedLightLimitIntensity, intensity);
+                        radius = Math.Min(m_Part.UnattachedLightLimitRadius, radius);
                     }
-                    else if (intensity > m_Part.AttachmentLightLimitIntensity &&
-                        !IsPrivateAttachmentOrNone(m_Part.ObjectGroup.AttachPoint))
+                    else if (IsPrivateAttachmentOrNone(m_Part.ObjectGroup.AttachPoint))
                     {
-                        intensity = m_Part.AttachmentLightLimitIntensity;
+                        /* skip these as they are anyways hidden from anyone else */
+                    }
+                    else
+                    { 
+                        if (m_Part.ObjectGroup.AttachPoint != AttachmentPoint.LeftHand &&
+                            m_Part.ObjectGroup.AttachPoint != AttachmentPoint.RightHand)
+                        {
+                            intensity = Math.Min(m_Part.FacelightLimitIntensity, intensity);
+                            radius = Math.Min(m_Part.FacelightLimitRadius, radius);
+                        }
+                        intensity = Math.Min(m_Part.AttachmentLightLimitIntensity, intensity);
+                        radius = Math.Min(m_Part.AttachmentLightLimitRadius, radius);
                     }
 
                     updatebyteslimited[limitedi + 3] = (byte)(intensity * 255f);
