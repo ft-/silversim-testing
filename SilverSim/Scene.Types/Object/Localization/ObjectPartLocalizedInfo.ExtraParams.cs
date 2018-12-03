@@ -218,7 +218,7 @@ namespace SilverSim.Scene.Types.Object.Localization
                     updatebyteslimited[limitedi++] = 0;
                     updatebyteslimited[limitedi++] = 0;
                     updatebyteslimited[limitedi++] = 0;
-                    Buffer.BlockCopy(light.LightColor.AsByte, 0, updatebyteslimited, i, 3);
+                    Buffer.BlockCopy(light.LightColor.AsByte, 0, updatebyteslimited, limitedi, 3);
 
                     double intensity = light.Intensity;
                     double radius = light.Radius;
