@@ -99,7 +99,7 @@ namespace SilverSim.Scene.Types.Object.Localization
                 bool isSculpt = shape.Type == PrimitiveShapeType.Sculpt;
                 ObjectGroup objectGroup = m_Part.ObjectGroup;
                 bool isFullLight = light.IsLight;
-                AttachmentPoint attachPoint = objectGroup.AttachPoint;
+                AttachmentPoint attachPoint = objectGroup?.AttachPoint ?? AttachmentPoint.NotAttached;
                 bool isLimitedLight = isFullLight &&
                     (!m_Part.IsAttachmentLightsDisabled || !IsPrivateAttachmentOrNone(attachPoint)) &&
                     (!m_Part.IsFacelightDisabled || (attachPoint != AttachmentPoint.LeftHand && attachPoint != AttachmentPoint.RightHand)) &&
@@ -223,19 +223,19 @@ namespace SilverSim.Scene.Types.Object.Localization
                     double intensity = light.Intensity;
                     double radius = light.Radius;
 
-                    if(m_Part.ObjectGroup.AttachPoint == AttachmentPoint.NotAttached)
+                    if(attachPoint == AttachmentPoint.NotAttached)
                     {
                         intensity = Math.Min(m_Part.UnattachedLightLimitIntensity, intensity);
                         radius = Math.Min(m_Part.UnattachedLightLimitRadius, radius);
                     }
-                    else if (IsPrivateAttachmentOrNone(m_Part.ObjectGroup.AttachPoint))
+                    else if (IsPrivateAttachmentOrNone(attachPoint))
                     {
                         /* skip these as they are anyways hidden from anyone else */
                     }
                     else
                     { 
-                        if (m_Part.ObjectGroup.AttachPoint != AttachmentPoint.LeftHand &&
-                            m_Part.ObjectGroup.AttachPoint != AttachmentPoint.RightHand)
+                        if (attachPoint != AttachmentPoint.LeftHand &&
+                            attachPoint != AttachmentPoint.RightHand)
                         {
                             intensity = Math.Min(m_Part.FacelightLimitIntensity, intensity);
                             radius = Math.Min(m_Part.FacelightLimitRadius, radius);
