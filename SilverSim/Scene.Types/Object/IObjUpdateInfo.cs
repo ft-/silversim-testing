@@ -52,9 +52,13 @@ namespace SilverSim.Scene.Types.Object
 
         byte[] GetTerseUpdate(CultureInfo cultureInfo);
 
+        byte[] GetCompressedUpdate(CultureInfo cultureInfo);
+
         byte[] GetFullUpdateLimited(CultureInfo cultureInfo);
 
         byte[] GetTerseUpdateLimited(CultureInfo cultureInfo);
+
+        byte[] GetCompressedUpdateLimited(CultureInfo cultureInfo);
 
         byte[] GetPropertiesUpdate(CultureInfo cultureInfo);
 

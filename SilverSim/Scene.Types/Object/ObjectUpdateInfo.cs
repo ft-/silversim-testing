@@ -115,6 +115,15 @@ namespace SilverSim.Scene.Types.Object
             return null;
         }
 
+        public byte[] GetCompressedUpdate(CultureInfo cultureInfo)
+        {
+            if(Part != null && !m_Killed)
+            {
+                return Part.GetCompressedUpdateData(cultureInfo);
+            }
+            return null;
+        }
+
         public byte[] GetFullUpdateLimited(CultureInfo cultureInfo)
         {
             if (Part != null && !m_Killed)
@@ -129,6 +138,15 @@ namespace SilverSim.Scene.Types.Object
             if (Part != null && !m_Killed)
             {
                 return Part.GetTerseUpdateDataLimited(cultureInfo);
+            }
+            return null;
+        }
+
+        public byte[] GetCompressedUpdateLimited(CultureInfo cultureInfo)
+        {
+            if(Part != null && !m_Killed)
+            {
+                return Part.GetCompressedUpdateDataLimited(cultureInfo);
             }
             return null;
         }

@@ -214,6 +214,10 @@ namespace SilverSim.Scene.Types.Agent
             }
         }
 
+        public byte[] GetCompressedUpdate(CultureInfo cultureInfo) => null;
+
+        public byte[] GetCompressedUpdateLimited(CultureInfo cultureInfo) => null;
+
         public byte[] GetTerseUpdate(CultureInfo cultureInfo) => null;
 
         public byte[] GetTerseUpdateLimited(CultureInfo cultureInfo) => null;
