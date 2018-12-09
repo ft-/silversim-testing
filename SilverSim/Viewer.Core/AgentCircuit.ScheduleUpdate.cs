@@ -218,9 +218,11 @@ namespace SilverSim.Viewer.Core
             return null;
         }
 
+        private ushort GetPhysicsDilation() => 65535;
+
         private void SendFullUpdateMsg(UDPPacket full_packet, List<KeyValuePair<IObjUpdateInfo, byte[]>> full_packet_data)
         {
-            UInt64 regionHandle;
+            ulong regionHandle;
             try
             {
                 regionHandle = Scene.GridPosition.RegionHandle;
@@ -231,7 +233,7 @@ namespace SilverSim.Viewer.Core
             }
             full_packet.WriteMessageNumber(MessageType.ObjectUpdate);
             full_packet.WriteUInt64(regionHandle);
-            full_packet.WriteUInt16(65535); /* dilation */
+            full_packet.WriteUInt16(GetPhysicsDilation()); /* dilation */
             full_packet.WriteUInt8((byte)full_packet_data.Count);
 
             foreach (var kvp in full_packet_data)
@@ -366,6 +368,146 @@ namespace SilverSim.Viewer.Core
             }
 
             SendObjectUpdateMsg(full_packet);
+        }
+
+        private void SendCompressedUpdateMsg(UDPPacket compressed_packet, List<KeyValuePair<IObjUpdateInfo, byte[]>> compressed_packet_data)
+        {
+            ulong regionHandle;
+            try
+            {
+                regionHandle = Scene.GridPosition.RegionHandle;
+            }
+            catch
+            {
+                return;
+            }
+            compressed_packet.WriteMessageNumber(MessageType.ObjectUpdateCompressed);
+            compressed_packet.WriteUInt64(regionHandle);
+            compressed_packet.WriteUInt16(GetPhysicsDilation()); /* dilation */
+            compressed_packet.WriteUInt8((byte)compressed_packet_data.Count);
+
+            foreach (var kvp in compressed_packet_data)
+            {
+                int offset = compressed_packet.DataPos;
+                compressed_packet.WriteBytes(kvp.Value);
+
+                if (kvp.Key.GetType() == typeof(ObjectUpdateInfo))
+                {
+                    var oui = kvp.Key as ObjectUpdateInfo;
+                    ObjectPart part = oui.Part;
+
+                    uint parentID = oui.ParentID;
+                    uint localID = oui.LocalID;
+
+                    compressed_packet.Data[offset + (int)ObjectPartLocalizedInfo.CompressedUpdateFixedOffset.LocalID] = (byte)(localID & 0xFF);
+                    compressed_packet.Data[offset + (int)ObjectPartLocalizedInfo.CompressedUpdateFixedOffset.LocalID + 1] = (byte)((localID >> 8) & 0xFF);
+                    compressed_packet.Data[offset + (int)ObjectPartLocalizedInfo.CompressedUpdateFixedOffset.LocalID + 2] = (byte)((localID >> 16) & 0xFF);
+                    compressed_packet.Data[offset + (int)ObjectPartLocalizedInfo.CompressedUpdateFixedOffset.LocalID + 3] = (byte)((localID >> 24) & 0xFF);
+
+                    byte dynflags = kvp.Value[(int)ObjectPartLocalizedInfo.CompressedUpdateFixedOffset.CompressedFlags];
+                    if ((dynflags & 0x20) != 0)
+                    {
+                        int parentidoffset = (dynflags & 0x80) != 0 ? (int)ObjectPartLocalizedInfo.CompressedUpdateFixedOffset.ParentID_WithAngularVelocity : (int)ObjectPartLocalizedInfo.CompressedUpdateFixedOffset.ParentID_NoAngularVelocity;
+                        parentidoffset += offset;
+                        compressed_packet.Data[parentidoffset] = (byte)(parentID & 0xFF);
+                        compressed_packet.Data[parentidoffset + 1] = (byte)((parentID >> 8) & 0xFF);
+                        compressed_packet.Data[parentidoffset + 2] = (byte)((parentID >> 16) & 0xFF);
+                        compressed_packet.Data[parentidoffset + 3] = (byte)((parentID >> 24) & 0xFF);
+                    }
+
+                    var b = new byte[4];
+                    Buffer.BlockCopy(compressed_packet.Data, offset + (int)ObjectPartLocalizedInfo.CompressedUpdateFixedOffset.UpdateFlags, b, 0, 4);
+                    if (!BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(b);
+                    }
+                    var flags = (PrimitiveFlags)BitConverter.ToUInt32(b, 0);
+
+                    if (SelectedObjects.Contains(kvp.Key.ID))
+                    {
+                        flags |= PrimitiveFlags.CreateSelected;
+                    }
+                    if (part.ObjectGroup.IsGroupOwned)
+                    {
+                        flags |= PrimitiveFlags.ObjectGroupOwned;
+                    }
+                    if (0 != (part.ObjectGroup.VehicleFlags & SilverSim.Scene.Types.Physics.Vehicle.VehicleFlags.CameraDecoupled))
+                    {
+                        flags |= PrimitiveFlags.CameraDecoupled;
+                    }
+                    if (part.Owner.EqualsGrid(Agent.Owner) && !part.ObjectGroup.IsGroupOwned)
+                    {
+                        flags |= PrimitiveFlags.ObjectYouOwner;
+                        if ((part.OwnerMask & InventoryPermissionsMask.Move) != 0)
+                        {
+                            flags |= PrimitiveFlags.ObjectMove;
+                        }
+                        if ((part.OwnerMask & InventoryPermissionsMask.Transfer) != 0)
+                        {
+                            flags |= PrimitiveFlags.ObjectTransfer;
+                        }
+                        if ((part.OwnerMask & InventoryPermissionsMask.Modify) != 0)
+                        {
+                            flags |= PrimitiveFlags.ObjectModify | PrimitiveFlags.ObjectOwnerModify;
+                        }
+                        if ((part.OwnerMask & InventoryPermissionsMask.Copy) != 0)
+                        {
+                            flags |= PrimitiveFlags.ObjectCopy;
+                        }
+                    }
+                    else
+                    {
+                        flags &= ~PrimitiveFlags.ObjectYouOwner;
+                        if ((part.EveryoneMask & InventoryPermissionsMask.Move) != 0)
+                        {
+                            flags |= PrimitiveFlags.ObjectMove;
+                        }
+                        if ((part.EveryoneMask & InventoryPermissionsMask.Transfer) != 0)
+                        {
+                            flags |= PrimitiveFlags.ObjectTransfer;
+                        }
+                        if ((part.EveryoneMask & InventoryPermissionsMask.Modify) != 0)
+                        {
+                            flags |= PrimitiveFlags.ObjectModify;
+                        }
+                        if ((part.EveryoneMask & InventoryPermissionsMask.Copy) != 0)
+                        {
+                            flags |= PrimitiveFlags.ObjectCopy;
+                        }
+
+                        if (Agent.Group.Equals(part.Group))
+                        {
+                            if ((part.GroupMask & InventoryPermissionsMask.Move) != 0)
+                            {
+                                flags |= PrimitiveFlags.ObjectMove;
+                            }
+                            if ((part.GroupMask & InventoryPermissionsMask.Transfer) != 0)
+                            {
+                                flags |= PrimitiveFlags.ObjectTransfer;
+                            }
+                            if ((part.GroupMask & InventoryPermissionsMask.Modify) != 0)
+                            {
+                                flags |= PrimitiveFlags.ObjectModify;
+                            }
+                            if ((part.GroupMask & InventoryPermissionsMask.Copy) != 0)
+                            {
+                                flags |= PrimitiveFlags.ObjectCopy;
+                            }
+                        }
+                    }
+                    flags |= PrimitiveFlags.ObjectAnyOwner;
+
+                    b = BitConverter.GetBytes((UInt32)flags);
+                    if (!BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(b);
+                    }
+
+                    Buffer.BlockCopy(b, 0, compressed_packet.Data, offset + (int)ObjectPartLocalizedInfo.CompressedUpdateFixedOffset.UpdateFlags, 4);
+                }
+            }
+
+            SendObjectUpdateMsg(compressed_packet);
         }
 
         private readonly object m_PhysQueueThrottleLock = new object();
