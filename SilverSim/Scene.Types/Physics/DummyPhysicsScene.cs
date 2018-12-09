@@ -89,6 +89,8 @@ namespace SilverSim.Scene.Types.Physics
 
         public double PhysicsFPS => 0;
 
+        public double PhysicsFPSNormalized => 1;
+
         public uint PhysicsFrameNumber => 0;
 
         public RayResult[] ClosestRayTest(Vector3 rayFromWorld, Vector3 rayToWorld) =>
