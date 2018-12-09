@@ -212,13 +212,17 @@ namespace SilverSim.Viewer.Core
                 }
                 catch
                 {
-                    continue;
+                    /* intentionally ignoring exceptions */
                 }
             }
             return null;
         }
 
-        private ushort GetPhysicsDilation() => 65535;
+        private ushort GetPhysicsDilation()
+        {
+            double normfps = Scene.PhysicsScene?.PhysicsFPSNormalized ?? 0.0;
+            return normfps > 1.0 ? (ushort)65535 : (ushort)(normfps * 65535);
+        }
 
         private void SendFullUpdateMsg(UDPPacket full_packet, List<KeyValuePair<IObjUpdateInfo, byte[]>> full_packet_data)
         {
@@ -999,7 +1003,7 @@ send_nonphys_packet:
                                                 phys_terse_packet.AckMessage = phys_terse_object_release;
                                                 phys_terse_packet.WriteMessageNumber(MessageType.ImprovedTerseObjectUpdate);
                                                 phys_terse_packet.WriteUInt64(regionHandle);
-                                                phys_terse_packet.WriteUInt16(65535); /* dilation */
+                                                phys_terse_packet.WriteUInt16(GetPhysicsDilation()); /* dilation */
                                                 phys_terse_packet.WriteUInt8(0);
                                             }
 
@@ -1028,7 +1032,7 @@ send_nonphys_packet:
                                             nonphys_terse_packet.IsReliable = true;
                                             nonphys_terse_packet.WriteMessageNumber(MessageType.ImprovedTerseObjectUpdate);
                                             nonphys_terse_packet.WriteUInt64(regionHandle);
-                                            nonphys_terse_packet.WriteUInt16(65535); /* dilation */
+                                            nonphys_terse_packet.WriteUInt16(GetPhysicsDilation()); /* dilation */
                                             nonphys_terse_packet.WriteUInt8(0);
                                         }
                                         nonphys_terse_packet.WriteBytes(terseUpdate);
