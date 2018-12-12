@@ -35,7 +35,7 @@ namespace SilverSim.Scene.Npc
 {
     public partial class NpcAgent
     {
-        public void DoSay(int channel, string text)
+        public void DoSayTo(UUID target, int channel, string text)
         {
             ChatServiceInterface chatService = CurrentScene.GetService<ChatServiceInterface>();
             chatService.Send(new ListenEvent
@@ -46,16 +46,15 @@ namespace SilverSim.Scene.Npc
                 GlobalPosition = GlobalPosition,
                 Name = Name,
                 Message = text,
-                TargetID = UUID.Zero,
+                TargetID = target,
                 SourceType = ListenEvent.ChatSourceType.Agent,
                 OwnerID = ID
             });
         }
 
-        public void DoSay(string text)
-        {
-            DoSay(0, text);
-        }
+        public void DoSay(int channel, string text) => DoSayTo(UUID.Zero, channel, text);
+
+        public void DoSay(string text) => DoSay(0, text);
 
         public new void SendAnimations()
         {
@@ -96,7 +95,7 @@ namespace SilverSim.Scene.Npc
             });
         }
 
-        public void DoShout(int channel, string text)
+        public void DoShoutTo(UUID target, int channel, string text)
         {
             var chatService = CurrentScene.GetService<ChatServiceInterface>();
             chatService.Send(new ListenEvent
@@ -107,18 +106,17 @@ namespace SilverSim.Scene.Npc
                 GlobalPosition = GlobalPosition,
                 Name = Name,
                 Message = text,
-                TargetID = UUID.Zero,
+                TargetID = target,
                 SourceType = ListenEvent.ChatSourceType.Agent,
                 OwnerID = ID
             });
         }
 
-        public void DoShout(string text)
-        {
-            DoShout(0, text);
-        }
+        public void DoShout(int channel, string text) => DoShoutTo(UUID.Zero, channel, text);
 
-        public void DoWhisper(int channel, string text)
+        public void DoShout(string text) => DoShout(0, text);
+
+        public void DoWhisperTo(UUID target, int channel, string text)
         {
             ChatServiceInterface chatService = CurrentScene.GetService<ChatServiceInterface>();
             chatService.Send(new ListenEvent
@@ -129,16 +127,15 @@ namespace SilverSim.Scene.Npc
                 GlobalPosition = GlobalPosition,
                 Name = Name,
                 Message = text,
-                TargetID = UUID.Zero,
+                TargetID = target,
                 SourceType = ListenEvent.ChatSourceType.Agent,
                 OwnerID = ID
             });
         }
 
-        public void DoWhisper(string text)
-        {
-            DoWhisper(0, text);
-        }
+        public void DoWhisper(int channel, string text) => DoWhisperTo(UUID.Zero, channel, text);
+
+        public void DoWhisper(string text) => DoWhisper(0, text);
 
         public void DoTouch(UUID objectKey, int linkNum)
         {
