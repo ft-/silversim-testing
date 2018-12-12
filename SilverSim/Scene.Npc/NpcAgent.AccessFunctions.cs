@@ -52,6 +52,8 @@ namespace SilverSim.Scene.Npc
             });
         }
 
+        public void DoSayTo(UUID target, string text) => DoSayTo(target, 0, text);
+
         public void DoSay(int channel, string text) => DoSayTo(UUID.Zero, channel, text);
 
         public void DoSay(string text) => DoSay(0, text);
@@ -112,6 +114,8 @@ namespace SilverSim.Scene.Npc
             });
         }
 
+        public void DoShoutTo(UUID target, string text) => DoShoutTo(target, 0, text);
+
         public void DoShout(int channel, string text) => DoShoutTo(UUID.Zero, channel, text);
 
         public void DoShout(string text) => DoShout(0, text);
@@ -132,6 +136,8 @@ namespace SilverSim.Scene.Npc
                 OwnerID = ID
             });
         }
+
+        public void DoWhisperTo(UUID target, string text) => DoWhisperTo(target, 0, text);
 
         public void DoWhisper(int channel, string text) => DoWhisperTo(UUID.Zero, channel, text);
 
