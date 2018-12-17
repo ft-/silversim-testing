@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using log4net;
 using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Scene.Implementation.Common;
@@ -68,6 +69,7 @@ namespace SilverSim.Scene.Implementation.Basic
         private readonly string m_ExperienceNameServiceName;
         private readonly string m_ScriptWorkerThreadPoolName;
         private readonly List<string> m_AvatarNameServiceNames = new List<string>();
+        private static readonly ILog m_Log = LogManager.GetLogger("SCENE FACTORY");
 
         public SceneFactory(IConfig ownConfig)
         {
@@ -161,7 +163,19 @@ namespace SilverSim.Scene.Implementation.Basic
             AssetServicePlugins = loader.GetServicesByValue<IAssetServicePlugin>();
             InventoryServicePlugins = loader.GetServicesByValue<IInventoryServicePlugin>();
             IScriptWorkerThreadPoolFactory scriptWorkerFactory;
-            ScriptWorkerThreadPoolFactory = m_ScriptWorkerThreadPoolName?.Length != 0 && loader.TryGetService(m_ScriptWorkerThreadPoolName, out scriptWorkerFactory) ? scriptWorkerFactory : ScriptWorkerThreadPool.Factory;
+            ScriptWorkerThreadPoolFactory = ScriptWorkerThreadPool.Factory;
+            if (m_ScriptWorkerThreadPoolName?.Length != 0)
+            {
+                if(!loader.TryGetService(m_ScriptWorkerThreadPoolName, out scriptWorkerFactory))
+                {
+                    m_Log.WarnFormat("Script worker thread pool \"{0\" not found. Using default implementation.", m_ScriptWorkerThreadPoolName);
+                    ScriptWorkerThreadPoolFactory = ScriptWorkerThreadPool.Factory;
+                }
+                else
+                {
+                    ScriptWorkerThreadPoolFactory = scriptWorkerFactory;
+                }
+            }
         }
 
         public override SceneInterface Instantiate(RegionInfo ri) => new BasicScene(
