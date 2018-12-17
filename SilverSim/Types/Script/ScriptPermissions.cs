@@ -46,11 +46,11 @@ namespace SilverSim.Types.Script
         All = 0xFFFFFFFF,
 
         ExperienceGrantedPermissions = 
-            Teleport | 
-            ControlCamera | 
-            TrackCamera | 
-            TriggerAnimation | 
-            TakeControls | 
+            Teleport |
+            ControlCamera |
+            TrackCamera |
+            TriggerAnimation |
+            TakeControls |
             Attach
     }
 }
