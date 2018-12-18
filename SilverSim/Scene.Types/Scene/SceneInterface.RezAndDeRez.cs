@@ -104,7 +104,7 @@ namespace SilverSim.Scene.Types.Scene
             {
                 pos = target.GlobalPosition;
             }
-            RayResult[] results = PhysicsScene.ClosestRayTest(rezparams.RayStart, pos);
+            RayResult[] results = PhysicsScene.RayTest(rezparams.RayStart, pos);
 
             if (rezparams.RayTargetID != UUID.Zero)
             {

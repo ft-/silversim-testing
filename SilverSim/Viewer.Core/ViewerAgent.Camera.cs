@@ -149,7 +149,7 @@ namespace SilverSim.Viewer.Core
                 return false;
             }
 
-            RayResult[] results = physicsScene.ClosestRayTest(GlobalPosition, wantedCamPosition);
+            RayResult[] results = physicsScene.RayTest(GlobalPosition, wantedCamPosition, RayTestHitFlags.All, 1);
             if(results.Length == 0)
             {
                 return false;

@@ -93,19 +93,13 @@ namespace SilverSim.Scene.Types.Physics
 
         public uint PhysicsFrameNumber => 0;
 
-        public RayResult[] ClosestRayTest(Vector3 rayFromWorld, Vector3 rayToWorld) =>
-            ClosestRayTest(rayFromWorld, rayToWorld, RayTestHitFlags.All);
+        public RayResult[] RayTest(Vector3 rayFromWorld, Vector3 rayToWorld) =>
+            RayTest(rayFromWorld, rayToWorld, RayTestHitFlags.All);
 
-        public RayResult[] AllHitsRayTest(Vector3 rayFromWorld, Vector3 rayToWorld) =>
-            AllHitsRayTest(rayFromWorld, rayToWorld, RayTestHitFlags.All);
+        public RayResult[] RayTest(Vector3 rayFromWorld, Vector3 rayToWorld, RayTestHitFlags flags) =>
+            RayTest(rayFromWorld, rayToWorld, flags, uint.MaxValue);
 
-        public RayResult[] ClosestRayTest(Vector3 rayFromWorld, Vector3 rayToWorld, RayTestHitFlags flags) =>
-            AllHitsRayTest(rayFromWorld, rayToWorld, flags, 1);
-
-        public RayResult[] AllHitsRayTest(Vector3 rayFromWorld, Vector3 rayToWorld, RayTestHitFlags flags) =>
-            AllHitsRayTest(rayFromWorld, rayToWorld, flags, UInt32.MaxValue);
-
-        public RayResult[] AllHitsRayTest(Vector3 rayFromWorld, Vector3 rayToWorld, RayTestHitFlags flags, uint maxHits)
+        public RayResult[] RayTest(Vector3 rayFromWorld, Vector3 rayToWorld, RayTestHitFlags flags, uint maxHits)
         {
             var results = new List<RayResult>();
             RayData ray = new RayData(rayFromWorld, rayToWorld);

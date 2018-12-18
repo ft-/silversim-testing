@@ -69,13 +69,10 @@ namespace SilverSim.Scene.Types.Physics
         string PhysicsEngineName { get; }
 
         /* following two hit everything */
-        RayResult[] ClosestRayTest(Vector3 rayFromWorld, Vector3 rayToWorld);
-        RayResult[] AllHitsRayTest(Vector3 rayFromWorld, Vector3 rayToWorld);
-
+        RayResult[] RayTest(Vector3 rayFromWorld, Vector3 rayToWorld);
         /* next two hit specific based on flags */
-        RayResult[] ClosestRayTest(Vector3 rayFromWorld, Vector3 rayToWorld, RayTestHitFlags flags);
-        RayResult[] AllHitsRayTest(Vector3 rayFromWorld, Vector3 rayToWorld, RayTestHitFlags flags);
-        RayResult[] AllHitsRayTest(Vector3 rayFromWorld, Vector3 rayToWorld, RayTestHitFlags flags, uint maxHits);
+        RayResult[] RayTest(Vector3 rayFromWorld, Vector3 rayToWorld, RayTestHitFlags flags);
+        RayResult[] RayTest(Vector3 rayFromWorld, Vector3 rayToWorld, RayTestHitFlags flags, uint maxHits);
 
         Dictionary<uint, double> GetTopColliders();
     }
