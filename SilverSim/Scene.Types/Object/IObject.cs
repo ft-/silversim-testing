@@ -96,6 +96,14 @@ namespace SilverSim.Scene.Types.Object
     {
         public Vector3 CenterOffset;
         public Vector3 Size;
+
+        public bool IsInside(Vector3 pos)
+        {
+            Vector3 relpos = pos - CenterOffset;
+            return Math.Abs(relpos.X) < Size.X / 2 &&
+                Math.Abs(relpos.Y) < Size.Y / 2 &&
+                Math.Abs(relpos.Z) < Size.Z / 2;
+        }
     }
 
     public interface ILocalIDAccessor
