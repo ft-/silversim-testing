@@ -114,7 +114,7 @@ namespace SilverSim.Scene.Types.Physics
                 GetObjectMatches(ray, flags, results);
             }
 
-            results.Sort((r1, r2) => (r1.HitPointWorld - rayFromWorld).Length.CompareTo(r2.HitPointWorld - rayFromWorld));
+            results.Sort((r1, r2) => (r1.HitPointWorld - rayFromWorld).LengthSquared.CompareTo((r2.HitPointWorld - rayFromWorld).LengthSquared));
 
             if(results.Count > maxHits)
             {
