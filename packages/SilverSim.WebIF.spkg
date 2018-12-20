@@ -3,10 +3,6 @@
 	<name>SilverSim.WebIF</name>
 	<default-configuration>
 		<source>SilverSim.WebIF:PackageConfig.ini</source>
-		<use-if-started-as>bare</use-if-started-as>
-		<use-if-started-as>grid</use-if-started-as>
-		<use-if-started-as>simulator</use-if-started-as>
-		<use-if-started-as>standalone</use-if-started-as>
 	</default-configuration>
 	<default-configuration>
 		<source>SilverSim.WebIF:PackageConfig.Bare.ini</source>
@@ -15,6 +11,14 @@
 	<default-configuration>
 		<source>SilverSim.WebIF:PackageConfig.Grid.ini</source>
 		<use-if-started-as>grid</use-if-started-as>
+	</default-configuration>
+	<default-configuration>
+		<source>SilverSim.WebIF:PackageConfig.MapServer.ini</source>
+		<use-if-started-as>mapserver</use-if-started-as>
+	</default-configuration>
+	<default-configuration>
+		<source>SilverSim.WebIF:PackageConfig.UserServer.ini</source>
+		<use-if-started-as>userserver</use-if-started-as>
 	</default-configuration>
 	<default-configuration>
 		<source>SilverSim.WebIF:PackageConfig.Simulator.ini</source>
