@@ -5,6 +5,7 @@
 		<source>SilverSim.Main.Cmd.UserServer:PackageConfig.ini</source>
 		<use-if-started-as>grid</use-if-started-as>
 		<use-if-started-as>standalone</use-if-started-as>
+		<use-if-started-as>userserver</use-if-started-as>
 	</default-configuration>
 	<files>
 		<file name="bin/plugins/SilverSim.Main.Cmd.UserServer.dll" is-version-src="true"/>
