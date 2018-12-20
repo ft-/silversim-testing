@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using log4net;
 using System;
 using System.Collections.Generic;
 
@@ -26,6 +27,9 @@ namespace SilverSim.Http.Client.Authorization
 {
     public sealed class BearerAuthorization : IHttpAuthorization
     {
+#if DEBUG
+        private static readonly ILog m_Log = LogManager.GetLogger("BEARER AUTH");
+#endif
         private readonly byte[] m_BearerToken;
 
         public BearerAuthorization(byte[] bearertoken)
@@ -38,7 +42,17 @@ namespace SilverSim.Http.Client.Authorization
 
         public bool CanHandleUnauthorized(IDictionary<string, string> headers) => false;
 
-        public bool IsSchemeAllowed(string scheme) => scheme == Uri.UriSchemeHttps;
+        public bool IsSchemeAllowed(string scheme)
+        {
+#if DEBUG
+            if(scheme == Uri.UriSchemeHttp)
+            {
+                m_Log.WarnFormat("http scheme on bearer authentication is for debugging only");
+                return true;
+            }
+#endif
+            return scheme == Uri.UriSchemeHttps;
+        }
 
         public void ProcessResponseHeaders(IDictionary<string, string> headers)
         {
