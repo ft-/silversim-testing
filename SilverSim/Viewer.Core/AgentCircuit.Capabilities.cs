@@ -357,7 +357,7 @@ namespace SilverSim.Viewer.Core
             AddDefCapability("EnvironmentSettings", regionSeedID, Cap_EnvironmentSettings, capConfig);
             AddDefCapability("RenderMaterials", regionSeedID, Cap_RenderMaterials, capConfig);
             AddDefCapability("SimConsoleAsync", regionSeedID, Cap_SimConsoleAsyncCap, capConfig);
-            AddDefCapability("ViewerAsset", regionSeedID, Cap_GetAsset, capConfig);
+            /* AddDefCapability("ViewerAsset", regionSeedID, Cap_GetAsset, capConfig); TODO: rename needed */
             AddDefCapability("GetTexture", regionSeedID, Cap_GetAsset, capConfig);
             AddDefCapability("GetMesh", regionSeedID, Cap_GetAsset, capConfig);
             AddDefCapability("GetMesh2", regionSeedID, Cap_GetAsset, capConfig);
