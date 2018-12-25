@@ -74,22 +74,6 @@ namespace SilverSim.Groups.Common.Broker
 
         private readonly RwLockedDictionary<UUID, GroupsBrokerEntry> m_NameCache = new RwLockedDictionary<UUID, GroupsBrokerEntry>();
 
-        [Serializable]
-        public class GroupsServiceNotFoundException : KeyNotFoundException
-        {
-            public GroupsServiceNotFoundException()
-            {
-            }
-
-            public GroupsServiceNotFoundException(string message) : base(message)
-            {
-            }
-
-            public GroupsServiceNotFoundException(string message, Exception innerException) : base(message, innerException)
-            {
-            }
-        }
-
         private GroupsServiceInterface GetGroupsService(UGUI principal)
         {
             GroupsServiceInterface groupsService;

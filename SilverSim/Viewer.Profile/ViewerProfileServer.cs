@@ -27,6 +27,7 @@ using log4net;
 using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.Threading;
@@ -1028,6 +1029,10 @@ namespace SilverSim.Viewer.Profile
                             ListInProfile = gmem.IsListInProfile
                         });
                     }
+                }
+                catch(GroupsServiceNotFoundException)
+                {
+                    /* intentionally ignored */
                 }
                 catch
 #if DEBUG
