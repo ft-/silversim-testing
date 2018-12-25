@@ -56,12 +56,12 @@ namespace SilverSim.Scene.Types.Object
             public bool IsSculptMirrored; /* 19 */
 
             public ushort PathBegin; /* 20 */
-            public byte PathCurve; /* 22 */
+            public byte PathCurve = (byte)PrimitiveExtrusion.Straight; /* 22 */
             public ushort PathEnd; /* 23 */
             public sbyte PathRadiusOffset; /* 25 */
             public byte PathRevolutions; /* 26 */
-            public byte PathScaleX; /* 27 */
-            public byte PathScaleY; /* 28 */
+            public byte PathScaleX = 100; /* 27 */
+            public byte PathScaleY = 100; /* 28 */
             public byte PathShearX; /* 29 */
             public byte PathShearY; /* 30 */
             public sbyte PathSkew; /* 31 */
@@ -70,7 +70,7 @@ namespace SilverSim.Scene.Types.Object
             public sbyte PathTwist; /* 34 */
             public sbyte PathTwistBegin; /* 35 */
             public ushort ProfileBegin; /* 36 */
-            public byte ProfileCurve; /* 38 */
+            public byte ProfileCurve = (byte)PrimitiveProfileShape.Square; /* 38 */
             public ushort ProfileEnd; /* 39 */
             public ushort ProfileHollow; /* 41 */
 
