@@ -38,6 +38,8 @@ namespace SilverSim.Scene.Types.Physics
         private readonly UUID m_SceneID;
         private readonly RwLockedList<IAgent> m_Agents = new RwLockedList<IAgent>();
 
+        public double NominalPhysicsFPS => 0;
+
         public DummyPhysicsScene(SceneInterface scene)
         {
             m_SceneID = scene.ID;

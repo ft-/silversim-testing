@@ -56,6 +56,8 @@ namespace SilverSim.Scene.Types.Physics
 
         double PhysicsFPS { get; }
 
+        double NominalPhysicsFPS { get; }
+
         double PhysicsFPSNormalized { get; }
 
         /** <summary>physics dilation time in seconds</summary> */
