@@ -22,7 +22,6 @@
 using log4net;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object.Localization;
-using SilverSim.Scene.Types.Object.Parameters;
 using SilverSim.Scene.Types.Pathfinding;
 using SilverSim.Scene.Types.Physics.Vehicle;
 using SilverSim.Scene.Types.Scene;

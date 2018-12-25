@@ -338,7 +338,6 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 VehicleParams.VehicleType = value;
-                IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(UpdateChangedFlags.Physics);
             }
         }
@@ -350,7 +349,6 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 VehicleParams.Flags = value;
-                IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(UpdateChangedFlags.Physics);
             }
         }
@@ -358,14 +356,12 @@ namespace SilverSim.Scene.Types.Object
         public void SetVehicleFlags(VehicleFlags value)
         {
             VehicleParams.SetFlags(value);
-            IncrementPhysicsParameterUpdateSerial();
             TriggerOnUpdate(UpdateChangedFlags.Physics);
         }
 
         public void ClearVehicleFlags(VehicleFlags value)
         {
             VehicleParams.ClearFlags(value);
-            IncrementPhysicsParameterUpdateSerial();
             TriggerOnUpdate(UpdateChangedFlags.Physics);
         }
 
@@ -376,7 +372,6 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 VehicleParams[id] = value;
-                IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(UpdateChangedFlags.Physics);
             }
         }
@@ -388,7 +383,6 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 VehicleParams[id] = value;
-                IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(UpdateChangedFlags.Physics);
             }
         }
@@ -400,7 +394,6 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 VehicleParams[id] = value;
-                IncrementPhysicsParameterUpdateSerial();
                 TriggerOnUpdate(UpdateChangedFlags.Physics);
             }
         }
