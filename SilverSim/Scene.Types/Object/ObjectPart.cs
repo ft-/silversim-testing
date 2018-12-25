@@ -109,7 +109,7 @@ namespace SilverSim.Scene.Types.Object
         private ReferenceBoxed<Vector3> m_LocalPosition = Vector3.Zero;
         private ReferenceBoxed<Vector3> m_SandboxOrigin = Vector3.Zero;
         private ReferenceBoxed<Quaternion> m_LocalRotation = Quaternion.Identity;
-        private PrimitivePhysicsShapeType m_PhysicsShapeType;
+        private PrimitivePhysicsShapeType m_PhysicsShapeType = PrimitivePhysicsShapeType.Prim;
         private PrimitiveMaterial m_Material = PrimitiveMaterial.Wood;
         private ReferenceBoxed<Vector3> m_Size = new Vector3(0.5, 0.5, 0.5);
         private bool m_IsSitTargetActive;
