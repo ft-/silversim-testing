@@ -368,6 +368,15 @@ namespace SilverSim.Viewer.Groups
                     agent.SendMessageAlways(update, scene.ID);
                 }
             }
+            catch(GroupsServiceNotFoundException)
+            {
+                /* send an empty data block */
+                var update = new AgentGroupDataUpdate
+                {
+                    AgentID = agent.Owner.ID
+                };
+                agent.SendMessageAlways(update, scene.ID);
+            }
             catch
 #if DEBUG
                 (Exception e)
