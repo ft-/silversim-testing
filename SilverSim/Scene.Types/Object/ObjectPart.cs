@@ -1313,19 +1313,12 @@ namespace SilverSim.Scene.Types.Object
                 ObjectGroup grp = ObjectGroup;
                 if(grp != null)
                 {
-                    try
+                    foreach(KeyValuePair<int, ObjectPart> kvp in grp.Key1ValuePairs)
                     {
-                        foreach(KeyValuePair<int, ObjectPart> kvp in grp.Key1ValuePairs)
+                        if (kvp.Value == this)
                         {
-                            if (kvp.Value == this)
-                            {
-                                throw new ReturnValueException<int>(kvp.Key);
-                            }
+                            return kvp.Key;
                         }
-                    }
-                    catch(ReturnValueException<int> e)
-                    {
-                        return e.Value;
                     }
                 }
                 return -1;

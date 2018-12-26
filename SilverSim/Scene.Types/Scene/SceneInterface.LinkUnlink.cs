@@ -81,7 +81,7 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        public void LinkObjects(List<UUID> objectids)
+        public void LinkObjects(List<UUID> objectids, bool insertAtLink2 = false)
         {
             var groups = new List<ObjectGroup>();
             foreach(UUID objectid in objectids)
@@ -124,14 +124,34 @@ namespace SilverSim.Scene.Types.Scene
                     newChildRot.Add(part.ID, part.GlobalRotation / newRootRot);
                 }
 
-                foreach (var part in srcGrp.Values)
+                if (insertAtLink2)
                 {
-                    srcGrp.Remove(part.ID);
-                    targetGrp.AddLink(part);
-                    part.LocalPosition = newChildPos[part.ID];
-                    part.LocalRotation = newChildRot[part.ID];
-                    part.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.All);
-                    part.Inventory.ResumeScripts();
+                    ObjectPart[] parts = srcGrp.Values.ToArray();
+                    foreach (var part in parts)
+                    {
+                        srcGrp.Remove(part.ID);
+                    }
+                    targetGrp.InsertLinks(2, parts);
+                    foreach (var part in parts)
+                    {
+                        part.LocalPosition = newChildPos[part.ID];
+                        part.LocalRotation = newChildRot[part.ID];
+                        part.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.All);
+                        part.Inventory.ResumeScripts();
+                    }
+                }
+                else
+                {
+                    ObjectPart[] parts = srcGrp.Values.ToArray();
+                    foreach (var part in parts)
+                    {
+                        srcGrp.Remove(part.ID);
+                        targetGrp.AddLink(part);
+                        part.LocalPosition = newChildPos[part.ID];
+                        part.LocalRotation = newChildRot[part.ID];
+                        part.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.All);
+                        part.Inventory.ResumeScripts();
+                    }
                 }
             }
 

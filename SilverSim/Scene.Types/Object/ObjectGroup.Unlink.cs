@@ -21,6 +21,7 @@
 
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
+using System;
 using System.Collections.Generic;
 
 namespace SilverSim.Scene.Types.Object
@@ -36,6 +37,53 @@ namespace SilverSim.Scene.Types.Object
             }
             part.IncSerialNumber();
             Scene?.ScheduleUpdate(part.UpdateInfo);
+        }
+
+        public void InsertLinks(int linkno, ObjectPart[] parts)
+        {
+            if(linkno < 2)
+            {
+                throw new ArgumentOutOfRangeException(nameof(linkno));
+            }
+            if(parts == null)
+            {
+                throw new ArgumentNullException(nameof(parts));
+            }
+            if (parts.Length == 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(parts));
+            }
+            foreach(ObjectPart part in parts)
+            {
+                if(part == null)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(parts));
+                }
+            }
+
+            lock (m_LinkUnlinkLock)
+            {
+                for(int startlink = Count + 1; startlink-- > linkno;)
+                {
+                    ChangeKey(startlink + parts.Length, startlink);
+                }
+                for(int link = 0; link < parts.Length; ++link)
+                {
+                    ObjectPart part = parts[link];
+                    Add(link + 2, part.ID, part);
+                    part.ObjectGroup = this;
+                }
+            }
+
+            /* we have to update all */
+            foreach (ObjectPart part in ValuesByKey1)
+            {
+                if(part != RootPart)
+                {
+                    part.IncSerialNumber();
+                    Scene?.ScheduleUpdate(part.UpdateInfo);
+                }
+            }
         }
 
         private readonly object m_LinkUnlinkLock = new object();
