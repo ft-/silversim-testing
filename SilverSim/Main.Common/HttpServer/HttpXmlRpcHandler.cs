@@ -89,6 +89,10 @@ namespace SilverSim.Main.Common.HttpServer
                         }
                     }
                 }
+                else
+                {
+                    throw new HttpResponse.DisconnectFromThreadException();
+                }
             }
             else if(XmlRpcMethods.TryGetValue(req.MethodName, out del))
             {
