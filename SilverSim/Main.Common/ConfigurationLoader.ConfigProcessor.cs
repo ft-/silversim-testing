@@ -596,8 +596,8 @@ namespace SilverSim.Main.Common
                         if(!config.Contains(actkey))
                         {
                             config.Set(actkey, config.Get(key));
-                            config.Remove(key);
                         }
+                        config.Remove(key);
                     }
                 }
             }
