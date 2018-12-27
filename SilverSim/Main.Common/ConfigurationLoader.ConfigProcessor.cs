@@ -581,7 +581,28 @@ namespace SilverSim.Main.Common
                 }
             }
         }
-#endregion
+        #endregion
+
+        #region Process ? config entries
+        private void ProcessDefaultValues()
+        {
+            foreach(IConfig config in Config.Configs)
+            {
+                foreach(string key in config.GetKeys())
+                {
+                    if(key.EndsWith("?"))
+                    {
+                        string actkey = key.Substring(0, key.Length - 1);
+                        if(!config.Contains(actkey))
+                        {
+                            config.Set(actkey, config.Get(key));
+                            config.Remove(key);
+                        }
+                    }
+                }
+            }
+        }
+        #endregion
 
         #region Process [ParameterMap] section
         private void ProcessParameterMap()
@@ -882,6 +903,7 @@ namespace SilverSim.Main.Common
                 if (processParameterMap)
                 {
                     ProcessParameterMap();
+                    ProcessDefaultValues();
                 }
                 ProcessResourceMap();
             }
@@ -889,12 +911,14 @@ namespace SilverSim.Main.Common
             if (processParameterMap)
             {
                 ProcessParameterMap();
+                ProcessDefaultValues();
             }
             ProcessUseTemplates();
             bool res = ProcessParameterMapTemplates();
             if (res && processParameterMap)
             {
                 ProcessParameterMap();
+                ProcessDefaultValues();
             }
         }
 
