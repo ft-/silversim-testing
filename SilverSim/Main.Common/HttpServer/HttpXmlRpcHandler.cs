@@ -76,6 +76,12 @@ namespace SilverSim.Main.Common.HttpServer
                     return;
                 }
 
+                if(res == null)
+                {
+                    /* disconnect thread support for HTTP XmlRPC handling */
+                    throw new HttpResponse.DisconnectFromThreadException();
+                }
+
                 using (HttpResponse response = httpreq.BeginResponse())
                 {
                     response.ContentType = "text/xml";
