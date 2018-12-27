@@ -35,6 +35,7 @@ namespace SilverSim.Main.Common.HttpServer
         private static readonly ILog m_Log = LogManager.GetLogger("XMLRPC SERVER");
 
         public RwLockedDictionary<string, Func<XmlRpc.XmlRpcRequest, XmlRpc.XmlRpcResponse>> XmlRpcMethods = new RwLockedDictionary<string, Func<XmlRpc.XmlRpcRequest, XmlRpc.XmlRpcResponse>>();
+        public RwLockedDictionary<string, Func<HttpRequest, XmlRpc.XmlRpcRequest, XmlRpc.XmlRpcResponse>> XmlRpcMethods_DiscThread = new RwLockedDictionary<string, Func<HttpRequest, XmlRpc.XmlRpcRequest, XmlRpc.XmlRpcResponse>>();
 
         private void RequestHandler(HttpRequest httpreq)
         {
@@ -57,8 +58,39 @@ namespace SilverSim.Main.Common.HttpServer
             req.IsSsl = httpreq.IsSsl;
 
             Func<XmlRpc.XmlRpcRequest, XmlRpc.XmlRpcResponse> del;
+            Func<HttpRequest, XmlRpc.XmlRpcRequest, XmlRpc.XmlRpcResponse> del2;
             XmlRpc.XmlRpcResponse res;
-            if(XmlRpcMethods.TryGetValue(req.MethodName, out del))
+            if(XmlRpcMethods_DiscThread.TryGetValue(req.MethodName, out del2))
+            {
+                try
+                {
+                    res = del2(httpreq, req);
+                }
+                catch (XmlRpc.XmlRpcFaultException e)
+                {
+                    FaultResponse(httpreq, e.FaultCode, e.Message);
+                    return;
+                }
+                catch (Exception e)
+                {
+                    m_Log.WarnFormat("Unexpected exception at XMRPC method {0}: {1}\n{2}", req.MethodName, e.GetType().Name, e.StackTrace);
+                    FaultResponse(httpreq, -32700, "Internal service error");
+                    return;
+                }
+
+                if (res != null)
+                {
+                    using (HttpResponse response = httpreq.BeginResponse())
+                    {
+                        response.ContentType = "text/xml";
+                        using (Stream o = response.GetOutputStream())
+                        {
+                            res.Serialize(o);
+                        }
+                    }
+                }
+            }
+            else if(XmlRpcMethods.TryGetValue(req.MethodName, out del))
             {
                 try
                 {
@@ -74,12 +106,6 @@ namespace SilverSim.Main.Common.HttpServer
                     m_Log.WarnFormat("Unexpected exception at XMRPC method {0}: {1}\n{2}", req.MethodName, e.GetType().Name, e.StackTrace);
                     FaultResponse(httpreq, -32700, "Internal service error");
                     return;
-                }
-
-                if(res == null)
-                {
-                    /* disconnect thread support for HTTP XmlRPC handling */
-                    throw new HttpResponse.DisconnectFromThreadException();
                 }
 
                 using (HttpResponse response = httpreq.BeginResponse())
