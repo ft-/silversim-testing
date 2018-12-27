@@ -167,6 +167,7 @@ namespace SilverSim.Scene.Agent
         }
 
         public abstract void SendKillObject(UUID sceneID);
+        public abstract void SendUpdateObject(UUID sceneID);
 
         protected Agent(UUID agentId, Uri homeURI)
         {
@@ -236,6 +237,11 @@ namespace SilverSim.Scene.Agent
                 m_GlobalPosition = position * sitOn.GlobalRotation + sitOn.GlobalPosition;
             }
             IncUpdateInfoSerialNo();
+            UUID sceneID = SceneID;
+            if(sceneID != null)
+            {
+                SendUpdateObject(sceneID);
+            }
         }
 
         public void ClearSittingOn(Vector3 targetPosition, Quaternion targetRotation)
@@ -251,6 +257,11 @@ namespace SilverSim.Scene.Agent
                 }
             }
             IncUpdateInfoSerialNo();
+            UUID sceneID = SceneID;
+            if (sceneID != UUID.Zero)
+            {
+                SendUpdateObject(sceneID);
+            }
         }
 
         public ObjectGroup SittingOnObject

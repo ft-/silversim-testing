@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using SilverSim.Scene.Types.Agent;
+using SilverSim.Types;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -28,5 +29,7 @@ namespace SilverSim.Scene.Types.Scene
         void AddedAgent(IAgent agent);
         void AgentChangedScene(IAgent agent);
         void RemovedAgent(IAgent agent);
+        void ScheduleUpdate(AgentUpdateInfo info, UUID fromSceneID);
+        bool IgnorePhysicsLocationUpdates { get; }
     }
 }

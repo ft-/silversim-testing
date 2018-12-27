@@ -43,11 +43,19 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        public void ScheduleUpdate(AgentUpdateInfo agentinfo)
+        public void ScheduleUpdate(AgentUpdateInfo agentinfo, bool isPhysicsOrigin = false)
         {
             foreach(IAgent a in Agents)
             {
                 a.ScheduleUpdate(agentinfo, ID);
+            }
+            foreach (IAgentListener l in AgentListeners)
+            {
+                if (isPhysicsOrigin && l.IgnorePhysicsLocationUpdates)
+                {
+                    continue;
+                }
+                l.ScheduleUpdate(agentinfo, ID);
             }
         }
 

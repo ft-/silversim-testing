@@ -342,6 +342,11 @@ namespace SilverSim.Scene.Npc
             CurrentScene?.ScheduleUpdate(m_UpdateInfo);
         }
 
+        public override void SendUpdateObject(UUID sceneID)
+        {
+            CurrentScene?.ScheduleUpdate(m_UpdateInfo);
+        }
+
         public override UserAccount UntrustedAccountInfo => new UserAccount
         {
             Principal = NamedOwner,

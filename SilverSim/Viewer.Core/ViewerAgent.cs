@@ -153,6 +153,18 @@ namespace SilverSim.Viewer.Core
             }
         }
 
+        public override void SendUpdateObject(UUID sceneID)
+        {
+            AgentCircuit circuit;
+            if (Circuits.TryGetValue(sceneID, out circuit))
+            {
+#if DEBUG
+                m_Log.DebugFormat("Sending update for {0} at {1}", Owner, sceneID);
+#endif
+                circuit.Scene?.ScheduleUpdate(GetUpdateInfo(sceneID));
+            }
+        }
+
         public override ILocalIDAccessor LocalID => this;
 
         uint ILocalIDAccessor.this[UUID sceneID]

@@ -52,6 +52,13 @@ namespace SilverSim.Scene.Types.Physics
             m_Scene?.AgentListeners.Remove(this);
         }
 
+        bool IAgentListener.IgnorePhysicsLocationUpdates => true;
+
+        void IAgentListener.ScheduleUpdate(AgentUpdateInfo info, UUID fromSceneID)
+        {
+            /* intentionally left empty */
+        }
+
         void IAgentListener.AddedAgent(IAgent agent)
         {
             agent.PhysicsActors.Add(m_SceneID, new AgentUfoPhysics(agent, m_SceneID));
