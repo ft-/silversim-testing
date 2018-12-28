@@ -278,16 +278,22 @@ namespace SilverSim.Scene.Types.Object
             return renamed;
         }
 
-        public void Replace(string name, ObjectPartInventoryItem newItem)
+        public void Replace(string name, ObjectPartInventoryItem newItem, bool onlyIfExists = false)
         {
             ObjectPartInventoryItem oldItem;
-            ScriptInstance script;
+            ScriptInstance script = null;
             newItem.Name = name;
             lock(m_DataLock)
             {
-                oldItem = this[name];
-                script = oldItem.RemoveScriptInstance;
-                Remove(name);
+                if (TryGetValue(name, out oldItem))
+                {
+                    script = oldItem.RemoveScriptInstance;
+                    Remove(name);
+                }
+                else if(onlyIfExists)
+                {
+                    throw new KeyNotFoundException();
+                }
                 if(ContainsKey(newItem.ID))
                 {
                     newItem.SetNewID(UUID.Random);
@@ -296,8 +302,11 @@ namespace SilverSim.Scene.Types.Object
             }
             script?.Remove();
             Interlocked.Increment(ref InventorySerial);
-            oldItem.UpdateInfo.SetRemovedItem();
-            OnInventoryUpdate?.Invoke(oldItem.UpdateInfo);
+            if (oldItem != null)
+            {
+                oldItem.UpdateInfo.SetRemovedItem();
+                OnInventoryUpdate?.Invoke(oldItem.UpdateInfo);
+            }
             OnInventoryUpdate?.Invoke(newItem.UpdateInfo);
             OnChange?.Invoke(ChangeAction.Add, PartID, newItem.ID);
         }
