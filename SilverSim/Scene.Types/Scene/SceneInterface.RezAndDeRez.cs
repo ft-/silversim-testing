@@ -192,30 +192,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         public uint RezObject(ObjectGroup group, UGUI rezzingAgent, int startparameter = 0)
-        {
-            if (!group.Owner.EqualsGrid(rezzingAgent))
-            {
-                group.LastOwner = group.Owner;
-            }
-            foreach (ObjectPart part in group.Values)
-            {
-                part.Owner = rezzingAgent;
-                part.RezDate = Date.Now;
-                foreach(ObjectPartInventoryItem item in part.Inventory.ValuesByKey1)
-                {
-                    if (!item.Owner.EqualsGrid(item.Owner))
-                    {
-                        item.LastOwner = item.Owner;
-                        item.Owner = rezzingAgent;
-                    }
-                }
-            }
-            group.Owner = rezzingAgent;
-            group.RezzingObjectID = UUID.Zero;
-            Add(group);
-            RezScriptsForObject(group, startparameter);
-            return group.LocalID[ID];
-        }
+            => RezObject(group, rezzingAgent, startparameter, UUID.Zero);
 
         public uint RezObject(ObjectGroup group, UGUI rezzingAgent, int startparameter, UUID rezzingObjectID)
         {
@@ -229,7 +206,7 @@ namespace SilverSim.Scene.Types.Scene
                 part.RezDate = Date.Now;
                 foreach (ObjectPartInventoryItem item in part.Inventory.ValuesByKey1)
                 {
-                    if (!item.Owner.EqualsGrid(item.Owner))
+                    if (!item.Owner.EqualsGrid(rezzingAgent))
                     {
                         item.LastOwner = item.Owner;
                         item.Owner = rezzingAgent;
