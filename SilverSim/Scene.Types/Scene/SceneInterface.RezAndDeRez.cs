@@ -145,7 +145,7 @@ namespace SilverSim.Scene.Types.Scene
             return pos;
         }
 
-        public List<UInt32> RezObjects(List<ObjectGroup> groups, RezObjectParams rezparams)
+        public List<uint> RezObjects(List<ObjectGroup> groups, RezObjectParams rezparams)
         {
             var result = new List<uint>();
             if(groups.Count == 0)
@@ -183,7 +183,7 @@ namespace SilverSim.Scene.Types.Scene
             return result;
         }
 
-        public UInt32 RezObject(ObjectGroup group, RezObjectParams rezparams)
+        public uint RezObject(ObjectGroup group, RezObjectParams rezparams)
         {
             group.GlobalPosition = CalculateRezLocation(
                 rezparams,
@@ -191,7 +191,7 @@ namespace SilverSim.Scene.Types.Scene
             return RezObject(group, rezparams.RezzingAgent);
         }
 
-        public UInt32 RezObject(ObjectGroup group, UGUI rezzingAgent, int startparameter = 0)
+        public uint RezObject(ObjectGroup group, UGUI rezzingAgent, int startparameter = 0)
         {
             if (!group.Owner.EqualsGrid(rezzingAgent))
             {
@@ -212,6 +212,32 @@ namespace SilverSim.Scene.Types.Scene
             }
             group.Owner = rezzingAgent;
             group.RezzingObjectID = UUID.Zero;
+            Add(group);
+            RezScriptsForObject(group, startparameter);
+            return group.LocalID[ID];
+        }
+
+        public uint RezObject(ObjectGroup group, UGUI rezzingAgent, int startparameter, UUID rezzingObjectID)
+        {
+            if (!group.Owner.EqualsGrid(rezzingAgent))
+            {
+                group.LastOwner = group.Owner;
+            }
+            foreach (ObjectPart part in group.Values)
+            {
+                part.Owner = rezzingAgent;
+                part.RezDate = Date.Now;
+                foreach (ObjectPartInventoryItem item in part.Inventory.ValuesByKey1)
+                {
+                    if (!item.Owner.EqualsGrid(item.Owner))
+                    {
+                        item.LastOwner = item.Owner;
+                        item.Owner = rezzingAgent;
+                    }
+                }
+            }
+            group.Owner = rezzingAgent;
+            group.RezzingObjectID = rezzingObjectID;
             Add(group);
             RezScriptsForObject(group, startparameter);
             return group.LocalID[ID];
