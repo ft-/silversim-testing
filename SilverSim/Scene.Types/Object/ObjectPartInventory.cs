@@ -108,6 +108,61 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        public bool TryGetValue(InventoryType type, uint index, out ObjectPartInventoryItem objitem)
+        {
+            foreach (var item in ValuesByKey2)
+            {
+                if (type == item.InventoryType)
+                {
+                    if (index == 0)
+                    {
+                        objitem = item;
+                        return true;
+                    }
+                    --index;
+                }
+            }
+            objitem = null;
+            return false;
+        }
+
+        public ObjectPartInventoryItem this[AssetType type, uint index]
+        {
+            get
+            {
+                foreach (var item in ValuesByKey2)
+                {
+                    if (type == item.AssetType)
+                    {
+                        if (index == 0)
+                        {
+                            return item;
+                        }
+                        --index;
+                    }
+                }
+                throw new KeyNotFoundException();
+            }
+        }
+
+        public bool TryGetValue(AssetType type, uint index, out ObjectPartInventoryItem objitem)
+        {
+            foreach (var item in ValuesByKey2)
+            {
+                if (type == item.AssetType)
+                {
+                    if (index == 0)
+                    {
+                        objitem = item;
+                        return true;
+                    }
+                    --index;
+                }
+            }
+            objitem = null;
+            return false;
+        }
+
         public ObjectPartInventoryItem this[uint index]
         {
             get
@@ -121,6 +176,20 @@ namespace SilverSim.Scene.Types.Object
                 }
                 throw new KeyNotFoundException();
             }
+        }
+
+        public bool TryGetValue(uint index, out ObjectPartInventoryItem objitem)
+        {
+            foreach (var item in ValuesByKey2)
+            {
+                if (index-- == 0)
+                {
+                    objitem = item;
+                    return true;
+                }
+            }
+            objitem = null;
+            return false;
         }
         #endregion
 
