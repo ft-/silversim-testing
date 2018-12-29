@@ -139,6 +139,20 @@ namespace SilverSim.Scene.Types.Object
             return n;
         }
 
+        public int CountType(AssetType type)
+        {
+            int n = 0;
+            foreach (var item in this.Values)
+            {
+                if (item.AssetType == type)
+                {
+                    ++n;
+                }
+            }
+
+            return n;
+        }
+
         public int CountScripts
         {
             get
