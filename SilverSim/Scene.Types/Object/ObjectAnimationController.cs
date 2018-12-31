@@ -116,6 +116,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 agent.SendMessageAlways(m, scene.ID);
             }
+            m_Part.TriggerOnUpdate(UpdateChangedFlags.None);
         }
 
         public void PlayAnimation(UUID animid)
