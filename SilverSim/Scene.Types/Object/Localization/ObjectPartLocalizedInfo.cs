@@ -200,6 +200,8 @@ namespace SilverSim.Scene.Types.Object.Localization
                 throw new ArgumentNullException(nameof(parentInfo));
             }
             LocalizationName = localizationName;
+            m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.Material] = (byte)PrimitiveMaterial.Wood;
+            m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PCode] = (byte)PrimitiveCode.Prim;
             m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ObjectDataLength] = 60;
 
             m_Part = part;
@@ -231,6 +233,8 @@ namespace SilverSim.Scene.Types.Object.Localization
             }
 
             LocalizationName = localizationName;
+            m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.Material] = (byte)PrimitiveMaterial.Wood;
+            m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PCode] = (byte)PrimitiveCode.Prim;
             m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ObjectDataLength] = 60;
 
             m_Part = part;
@@ -240,6 +244,8 @@ namespace SilverSim.Scene.Types.Object.Localization
         public ObjectPartLocalizedInfo(ObjectPart part)
         {
             LocalizationName = string.Empty;
+            m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.Material] = (byte)PrimitiveMaterial.Wood;
+            m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PCode] = (byte)PrimitiveCode.Prim;
             m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ObjectDataLength] = 60;
 
             m_Projection = new ProjectionParam();
