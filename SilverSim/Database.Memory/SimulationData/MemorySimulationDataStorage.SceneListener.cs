@@ -227,7 +227,8 @@ namespace SilverSim.Database.Memory.SimulationData
                     { "AllowUnsit", objpart.AllowUnsit },
                     { "IsUnSitTargetActive", objpart.IsUnSitTargetActive },
                     { "UnSitTargetOffset", objpart.UnSitTargetOffset },
-                    { "UnSitTargetOrientation", objpart.UnSitTargetOrientation }
+                    { "UnSitTargetOrientation", objpart.UnSitTargetOrientation },
+                    { "AnimationData", new BinaryData(objpart.AnimationController.DbSerialization) }
                 };
                 using (var ms = new MemoryStream())
                 {

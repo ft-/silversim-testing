@@ -217,8 +217,9 @@ namespace SilverSim.Database.Memory.SimulationData
                 UnSitTargetOffset = map["UnSitTargetOffset"].AsVector3,
                 UnSitTargetOrientation = map["UnSitTargetOrientation"].AsQuaternion,
 
-                LocalizationSerialization = (BinaryData)map["LocalizationData"]
+                LocalizationSerialization = (BinaryData)map["LocalizationData"],
             };
+            objpart.AnimationController.DbSerialization = (BinaryData)map["AnimationData"];
             objpart.LoadFromVehicleSerialization((BinaryData)map["VehicleData"]);
 
             using (var ms = new MemoryStream((BinaryData)map["DynAttrs"]))

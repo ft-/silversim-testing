@@ -235,8 +235,14 @@ namespace SilverSim.Scene.Types.Object
             {
                 lock(m_Lock)
                 {
-                    byte[] retblock = new byte[m_ActiveAnimations.Count * 20];
-                    int offset = 0;
+                    byte[] retblock = new byte[m_ActiveAnimations.Count * 20 + 4];
+                    int offset = 4;
+                    byte[] d = BitConverter.GetBytes(m_NextAnimSeqNumber);
+                    if(!BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(d);
+                    }
+                    Buffer.BlockCopy(d, 0, retblock, 0, 4);
                     foreach (var info in m_ActiveAnimations)
                     {
                         info.AnimID.ToBytes(retblock, offset);
@@ -257,14 +263,26 @@ namespace SilverSim.Scene.Types.Object
                 {
                     throw new ArgumentNullException(nameof(value));
                 }
-                if(value.Length % 20 != 0)
+                if((value.Length - 4) % 20 != 0)
                 {
                     throw new ArgumentOutOfRangeException(nameof(value));
                 }
                 lock(m_Lock)
                 {
                     m_ActiveAnimations.Clear();
-                    for (int i = 0; i < value.Length; i += 20)
+                    if(!BitConverter.IsLittleEndian)
+                    {
+                        byte[] res = new byte[4];
+                        Buffer.BlockCopy(value, 0, res, 0, 4);
+                        Array.Reverse(res);
+                        m_NextAnimSeqNumber = BitConverter.ToUInt32(res, 0);
+                    }
+                    else
+                    {
+                        m_NextAnimSeqNumber = BitConverter.ToUInt32(value, 0);
+                    }
+
+                    for (int i = 4; i < value.Length; i += 20)
                     {
                         var e = new AnimationInfo
                         {
@@ -274,6 +292,7 @@ namespace SilverSim.Scene.Types.Object
                         {
                             byte[] res = new byte[4];
                             Buffer.BlockCopy(value, i + 16, res, 0, 4);
+                            Array.Reverse(res);
                             e.AnimSeq = BitConverter.ToUInt32(res, 0);
                         }
                         else
