@@ -40,5 +40,31 @@ namespace SilverSim.Types.Groups
         public bool IsOpenEnrollment;
         public int MembershipFee;
         public bool IsShownInList;
+
+        public GroupMembership()
+        {
+
+        }
+
+        public GroupMembership(GroupInfo info, GroupMember mem, GroupRole role, UUID activeRoleID)
+        {
+            Group = info.ID;
+            Principal = mem.Principal;
+            GroupPowers = role.Powers;
+            IsAcceptNotices = mem.IsAcceptNotices;
+            GroupInsigniaID = info.InsigniaID;
+            Contribution = mem.Contribution;
+            GroupTitle = role.Title;
+            IsListInProfile = mem.IsListInProfile;
+            IsAllowPublish = info.IsAllowPublish;
+            Charter = info.Charter;
+            ActiveRoleID = activeRoleID;
+            Founder = info.Founder;
+            AccessToken = mem.AccessToken;
+            IsMaturePublish = info.IsMaturePublish;
+            IsOpenEnrollment = info.IsOpenEnrollment;
+            MembershipFee = info.MembershipFee;
+            IsShownInList = info.IsShownInList;
+        }
     }
 }
