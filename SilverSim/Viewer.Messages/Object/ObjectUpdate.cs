@@ -226,6 +226,7 @@ namespace SilverSim.Viewer.Messages.Object
                 d.JointType = p.ReadUInt8();
                 d.JointPivot = p.ReadVector3f();
                 d.JointAxisOrAnchor = p.ReadVector3f();
+                m.ObjectData.Add(d);
             }
             return m;
         }
