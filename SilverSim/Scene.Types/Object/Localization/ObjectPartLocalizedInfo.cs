@@ -1208,6 +1208,9 @@ namespace SilverSim.Scene.Types.Object.Localization
                     compressedSize += 12;
                 }
 
+                compressedflags |= ObjectUpdateCompressed.CompressedFlags.HasSound;
+                compressedSize += 25;
+
                 if (textureanimbytes != null && textureanimbytes.Length != 0)
                 {
                     compressedflags |= ObjectUpdateCompressed.CompressedFlags.TextureAnimation;
@@ -1321,6 +1324,30 @@ namespace SilverSim.Scene.Types.Object.Localization
                 Buffer.BlockCopy(extrabytes, 0, compressedData, offset, extrabytes.Length);
                 offset += extrabytes.Length;
 
+                //SoundBlock
+                if((compressedflags & ObjectUpdateCompressed.CompressedFlags.HasSound) != 0)
+                {
+                    SoundParam p = Sound;
+                    p.SoundID.ToBytes(compressedData, offset);
+                    offset += 16;
+                    byte[] d = BitConverter.GetBytes((float)p.Gain);
+                    if(!BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(d);
+                    }
+                    Buffer.BlockCopy(d, 0, compressedData, offset, 4);
+                    offset += 4;
+                    compressedData[offset++] = (byte)p.Flags;
+                    d = BitConverter.GetBytes((float)p.Radius);
+                    if (!BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(d);
+                    }
+                    Buffer.BlockCopy(d, 0, compressedData, offset, 4);
+                    offset += 4;
+                }
+
+                //NameValueBlock
                 if ((compressedflags & ObjectUpdateCompressed.CompressedFlags.HasNameValues) != 0)
                 {
                     Buffer.BlockCopy(namebytes, 0, compressedData, offset, namebytes.Length);
