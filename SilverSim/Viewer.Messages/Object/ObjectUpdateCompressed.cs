@@ -31,10 +31,10 @@ namespace SilverSim.Viewer.Messages.Object
     public class ObjectUpdateCompressed : Message
     {
         public GridVector Location;
-        public UInt16 TimeDilation;
+        public ushort TimeDilation;
         public struct ObjData
         {
-            public UInt32 UpdateFlags;
+            public uint UpdateFlags;
             public byte[] Data;
         }
 
@@ -64,7 +64,7 @@ namespace SilverSim.Viewer.Messages.Object
             foreach (var d in ObjectData)
             {
                 p.WriteUInt32(d.UpdateFlags);
-                p.WriteUInt16((UInt16)d.Data.Length);
+                p.WriteUInt16((ushort)d.Data.Length);
                 p.WriteBytes(d.Data);
             }
         }
