@@ -87,6 +87,15 @@ namespace SilverSim.Types
             W = q.W;
         }
 
+        public Quaternion(byte[] byteArray, int pos, bool normalized)
+        {
+            X = 0;
+            Y = 0;
+            Z = 0;
+            W = 0;
+            FromBytes(byteArray, pos, normalized);
+        }
+
         #endregion Constructors
 
         #region Public Methods
