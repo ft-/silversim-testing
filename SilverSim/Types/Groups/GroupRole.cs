@@ -33,5 +33,20 @@ namespace SilverSim.Types.Groups
         #region Informational fields
         public uint Members;
         #endregion
+
+        public GroupRole()
+        {
+        }
+
+        public GroupRole(GroupRole src)
+        {
+            Group = new UGI(src.Group);
+            ID = src.ID;
+            Name = src.Name;
+            Description = src.Description;
+            Title = src.Title;
+            Powers = src.Powers;
+            Members = src.Members;
+        }
     }
 }

@@ -30,5 +30,20 @@ namespace SilverSim.Types.Groups
         public bool IsListInProfile;
         public bool IsAcceptNotices;
         public string AccessToken = string.Empty;
+
+        public GroupMember()
+        {
+        }
+
+        public GroupMember(GroupMember src)
+        {
+            Group = new UGI(src.Group);
+            Principal = src.Principal;
+            SelectedRoleID = src.SelectedRoleID;
+            Contribution = src.Contribution;
+            IsListInProfile = src.IsListInProfile;
+            IsAcceptNotices = src.IsAcceptNotices;
+            AccessToken = src.AccessToken;
+        }
     }
 }

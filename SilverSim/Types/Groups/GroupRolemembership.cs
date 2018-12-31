@@ -24,5 +24,15 @@ namespace SilverSim.Types.Groups
     public class GroupRolemembership : GroupRolemember
     {
         public string GroupTitle = string.Empty;
+
+        public GroupRolemembership()
+        {
+        }
+
+        public GroupRolemembership(GroupRolemembership src)
+            : base(src)
+        {
+            GroupTitle = src.GroupTitle;
+        }
     }
 }

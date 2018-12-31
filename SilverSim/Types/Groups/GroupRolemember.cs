@@ -29,5 +29,17 @@ namespace SilverSim.Types.Groups
 
         /* informative field */
         public GroupPowers Powers;
+
+        public GroupRolemember()
+        {
+        }
+
+        public GroupRolemember(GroupRolemember src)
+        {
+            Group = new UGI(src.Group);
+            RoleID = src.RoleID;
+            Principal = new UGUI(src.Principal);
+            Powers = src.Powers;
+        }
     }
 }

@@ -35,5 +35,24 @@ namespace SilverSim.Types.Groups
         public string AttachmentName = string.Empty;
         public UUID AttachmentItemID = UUID.Zero;
         public UGUI AttachmentOwner = UGUI.Unknown;
+
+        public GroupNotice()
+        {
+        }
+
+        public GroupNotice(GroupNotice src)
+        {
+            Group = new UGI(src.Group);
+            ID = src.ID;
+            Timestamp = new Date(src.Timestamp);
+            FromName = src.FromName;
+            Subject = src.Subject;
+            Message = src.Message;
+            HasAttachment = src.HasAttachment;
+            AttachmentType = src.AttachmentType;
+            AttachmentName = src.AttachmentName;
+            AttachmentItemID = src.AttachmentItemID;
+            AttachmentOwner = new UGUI(src.AttachmentOwner);
+        }
     }
 }

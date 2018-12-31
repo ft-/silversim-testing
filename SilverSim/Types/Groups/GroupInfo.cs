@@ -45,5 +45,25 @@ namespace SilverSim.Types.Groups
         public int MemberCount;
         public int RoleCount;
         #endregion
+
+        public GroupInfo()
+        {
+        }
+
+        public GroupInfo(GroupInfo src)
+        {
+            ID = new UGI(src.ID);
+            Charter = src.Charter;
+            InsigniaID = src.InsigniaID;
+            Founder = new UGUI(src.Founder);
+            MembershipFee = src.MembershipFee;
+            IsOpenEnrollment = src.IsOpenEnrollment;
+            IsShownInList = src.IsShownInList;
+            IsAllowPublish = src.IsAllowPublish;
+            IsMaturePublish = src.IsMaturePublish;
+            OwnerRoleID = src.OwnerRoleID;
+            MemberCount = src.MemberCount;
+            RoleCount = src.RoleCount;
+        }
     }
 }

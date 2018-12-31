@@ -28,5 +28,18 @@ namespace SilverSim.Types.Groups
         public UUID RoleID = UUID.Zero;
         public UGUI Principal = UGUI.Unknown;
         public Date Timestamp = new Date();
+
+        public GroupInvite()
+        {
+        }
+
+        public GroupInvite(GroupInvite src)
+        {
+            ID = src.ID;
+            Group = new UGI(src.Group);
+            RoleID = src.RoleID;
+            Principal = new UGUI(src.Principal);
+            Timestamp = new Date(src.Timestamp);
+        }
     }
 }
