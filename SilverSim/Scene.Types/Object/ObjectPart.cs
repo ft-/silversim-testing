@@ -443,6 +443,7 @@ namespace SilverSim.Scene.Types.Object
             WalkableCoefficientB = fromPart.WalkableCoefficientB;
             WalkableCoefficientC = fromPart.WalkableCoefficientC;
             WalkableCoefficientD = fromPart.WalkableCoefficientD;
+            AnimationController.DbSerialization = fromPart.AnimationController.DbSerialization;
 
             /* only enable IsSandbox and IsPhysics after loading everything else */
             IsSandbox = fromPart.IsSandbox;
