@@ -768,18 +768,20 @@ namespace SilverSim.Viewer.Core
 
                         if (ui.IsKilled)
                         {
-                            if (ko == null)
+                            if (LastObjSerialNo.Remove(ui.LocalID))
                             {
-                                ko = new KillObject();
-                            }
+                                if (ko == null)
+                                {
+                                    ko = new KillObject();
+                                }
 
-                            RemoveObjectImageUpdateLock(ui.ID);
-                            ko.LocalIDs.Add(ui.LocalID);
-                            LastObjSerialNo.Remove(ui.LocalID);
-                            if (ko.LocalIDs.Count > 250)
-                            {
-                                SendMessage(ko);
-                                ko = null;
+                                RemoveObjectImageUpdateLock(ui.ID);
+                                ko.LocalIDs.Add(ui.LocalID);
+                                if (ko.LocalIDs.Count > 250)
+                                {
+                                    SendMessage(ko);
+                                    ko = null;
+                                }
                             }
                         }
                         else
@@ -795,6 +797,7 @@ namespace SilverSim.Viewer.Core
                             }
                             else
                             {
+                                LastObjSerialNo[ui.LocalID] = ui.SerialNumber;
                                 dofull = true;
                             }
 
