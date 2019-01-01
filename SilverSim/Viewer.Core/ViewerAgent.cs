@@ -1259,17 +1259,18 @@ namespace SilverSim.Viewer.Core
 
         public override void SendAlertMessage(string msg, string notification, IValue llsd, UUID fromSceneID)
         {
-            var m = new AlertMessage(msg);
-            var d = new AlertMessage.Data();
-            d.Message = notification;
             byte[] b;
             using (var ms = new MemoryStream())
             {
                 LlsdXml.Serialize(llsd, ms);
                 b = ms.ToArray();
             }
-            d.ExtraParams = b;
-            m.AlertInfo.Add(d);
+            var m = new AlertMessage(msg);
+            m.AlertInfo.Add(new AlertMessage.Data
+            {
+                Message = notification,
+                ExtraParams = b
+            });
             SendMessageAlways(m, fromSceneID);
         }
 
