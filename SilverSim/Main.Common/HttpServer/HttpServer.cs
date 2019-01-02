@@ -71,6 +71,24 @@ namespace SilverSim.Main.Common.HttpServer
         private int m_AcceptedConnectionsCount;
         public int AcceptedConnectionsCount => m_AcceptedConnectionsCount;
 
+        private readonly List<Thread> m_Threads = new List<Thread>();
+
+        private void AddThread(Thread t)
+        {
+            lock (m_Threads)
+            {
+                m_Threads.Add(t);
+            }
+        }
+
+        private void RemoveThread(Thread t)
+        {
+            lock(m_Threads)
+            {
+                m_Threads.Remove(t);
+            }
+        }
+
         public BaseHttpServer(IConfig httpConfig, ConfigurationLoader loader, bool useSsl = false)
         {
             m_PortControlServices = loader.GetServicesByValue<IPortControlServiceInterface>();
@@ -239,6 +257,15 @@ namespace SilverSim.Main.Common.HttpServer
             m_CertificateWatcher = null;
             m_StoppingListeners = true;
             m_ListenerSocket.Close();
+            List<Thread> copyThreadList;
+            lock(m_Threads)
+            {
+                copyThreadList = new List<Thread>(m_Threads);
+            }
+            foreach(Thread t in copyThreadList)
+            {
+                t.Abort();
+            }
             while (m_ActiveThreadCount > 0)
             {
                 Thread.Sleep(1);
@@ -468,6 +495,7 @@ namespace SilverSim.Main.Common.HttpServer
             Interlocked.Increment(ref m_AcceptedConnectionsCount);
             try
             {
+                AddThread(Thread.CurrentThread);
                 while (true)
                 {
                     HttpRequest req;
@@ -605,6 +633,10 @@ namespace SilverSim.Main.Common.HttpServer
             catch (Exception e)
             {
                 m_Log.DebugFormat("Exception: {0}: {1}\n{2}", e.GetType().Name, e.Message, e.StackTrace);
+            }
+            finally
+            {
+                RemoveThread(Thread.CurrentThread);
             }
         }
 
