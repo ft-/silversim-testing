@@ -1035,7 +1035,14 @@ namespace SilverSim.Viewer.Core
                             SourceType = ListenEvent.ChatSourceType.Agent,
                             OwnerID = AgentID
                         };
-                        Server.RouteChat(ev);
+
+                        /* only allow Say, Shout and Whisper */
+                        if (ev.Type == ListenEvent.ChatType.Say ||
+                            ev.Type == ListenEvent.ChatType.Shout ||
+                            ev.Type == ListenEvent.ChatType.Whisper)
+                        {
+                            Server.RouteChat(ev);
+                        }
                     }
                     break;
 
