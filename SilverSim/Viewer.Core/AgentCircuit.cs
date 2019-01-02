@@ -191,6 +191,10 @@ namespace SilverSim.Viewer.Core
 
         private void ChatListenerAction(ListenEvent le)
         {
+            if(le.TargetID != UUID.Zero && le.TargetID != AgentID)
+            {
+                return;
+            }
             var cfs = new ChatFromSimulator
             {
                 Audible = ChatAudibleLevel.Fully,
