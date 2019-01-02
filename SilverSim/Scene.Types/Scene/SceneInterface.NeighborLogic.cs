@@ -149,6 +149,13 @@ namespace SilverSim.Scene.Types.Scene
 
         public void ChatPassInbound(UUID fromRegionID, ListenEvent ev)
         {
+            if (ev.Type != ListenEvent.ChatType.Say &&
+                ev.Type != ListenEvent.ChatType.Shout &&
+                ev.Type != ListenEvent.ChatType.Whisper)
+            {
+                /* only pass those above */
+                return;
+            }
             var activelist = m_ChatPassInEnableSetToLocal ? m_ChatPassInEnableLocal : m_ChatPassInEnableGlobal;
             if(activelist.Count == 0 || activelist.Contains(UUID.Zero) || activelist.Contains(ev.ID))
             {
@@ -158,6 +165,13 @@ namespace SilverSim.Scene.Types.Scene
 
         protected void ChatPassLocalNeighbors(ListenEvent le)
         {
+            if (le.Type != ListenEvent.ChatType.Say &&
+                le.Type != ListenEvent.ChatType.Shout &&
+                le.Type != ListenEvent.ChatType.Whisper)
+            {
+                /* only pass those above */
+                return;
+            }
             var activelist = m_ChatPassInEnableSetToLocal ? m_ChatPassInEnableLocal : m_ChatPassInEnableGlobal;
             foreach (var kvp in Neighbors)
             {
