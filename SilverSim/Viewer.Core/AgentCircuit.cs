@@ -1036,10 +1036,19 @@ namespace SilverSim.Viewer.Core
                             OwnerID = AgentID
                         };
 
+                        if(ev.Type == ListenEvent.ChatType.StartTyping ||
+                            ev.Type == ListenEvent.ChatType.StopTyping)
+                        {
+                            /* no hidden channel here */
+                            ev.Message = string.Empty;
+                        }
+
                         /* only allow Say, Shout and Whisper */
                         if (ev.Type == ListenEvent.ChatType.Say ||
                             ev.Type == ListenEvent.ChatType.Shout ||
-                            ev.Type == ListenEvent.ChatType.Whisper)
+                            ev.Type == ListenEvent.ChatType.Whisper ||
+                            ev.Type == ListenEvent.ChatType.StartTyping ||
+                            ev.Type == ListenEvent.ChatType.StopTyping)
                         {
                             Server.RouteChat(ev);
                         }
