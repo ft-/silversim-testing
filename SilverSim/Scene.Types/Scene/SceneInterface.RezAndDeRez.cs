@@ -488,6 +488,12 @@ namespace SilverSim.Scene.Types.Scene
                 case DeRezAction.GodTakeCopy:
                     if (!isActiveGod || !agent.IsInScene(this))
                     {
+                        ackres = new Viewer.Messages.Object.DeRezAck
+                        {
+                            TransactionID = req.TransactionID,
+                            Success = false
+                        };
+                        agent.SendMessageAlways(ackres, ID);
                         return;
                     }
                     break;
