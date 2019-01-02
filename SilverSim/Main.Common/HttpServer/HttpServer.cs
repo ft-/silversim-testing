@@ -480,8 +480,8 @@ namespace SilverSim.Main.Common.HttpServer
                 }
                 finally
                 {
-                    socket?.Close();
                     Interlocked.Decrement(ref m_ActiveThreadCount);
+                    socket?.Close();
                 }
             }
             catch (Exception e)
