@@ -1,6 +1,4 @@
-﻿using SilverSim.ServiceInterfaces.Experience;
-using SilverSim.Types;
-// SilverSim is distributed under the terms of the
+﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3 with
 // the following clarification and special exception.
 
@@ -21,6 +19,8 @@ using SilverSim.Types;
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.ServiceInterfaces.Experience;
+using SilverSim.Types;
 using System.Collections.Generic;
 
 namespace SilverSim.Experience.Common.Broker
