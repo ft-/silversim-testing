@@ -56,12 +56,22 @@ namespace SilverSim.Viewer.Messages.Agent
             {
                 agentDataMap
             };
-            var body = new MapType
+            return new MapType
             {
                 ["AgentData"] = agentDataArray
             };
+        }
 
-            return body;
+        public static Message DeserializeEQG(IValue value)
+        {
+            MapType mapType = (MapType)value;
+            AnArray array = (AnArray)mapType["AgentData"];
+            MapType dataMap = (MapType)array[0];
+            return new AgentDropGroup
+            {
+                AgentID = dataMap["AgentID"].AsUUID,
+                GroupID = dataMap["GroupID"].AsUUID
+            };
         }
     }
 }

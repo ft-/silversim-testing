@@ -19,27 +19,45 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.Types;
+using System;
+using System.Net;
 
-namespace SilverSim.Viewer.Messages.Console
+namespace SilverSim.Types
 {
-    [EventQueueGet("SimConsoleResponse")]
-    [Trusted]
-    public class SimConsoleResponse : Message
+    public static class IPEndPointHelpers
     {
-        public string Message;
-
-        public SimConsoleResponse()
+        public static IPEndPoint CreateIPEndPoint(string endPoint)
         {
+            IPEndPoint ep;
+            if(!TryCreateIPEndPoint(endPoint, out ep))
+            {
+                throw new ArgumentException(nameof(endPoint));
+            }
+            return ep;
         }
 
-        public SimConsoleResponse(string message)
+        public static bool TryCreateIPEndPoint(string endPoint, out IPEndPoint ep)
         {
-            Message = message;
+            int colonIndex = endPoint.LastIndexOf(':');
+            ep = default(IPEndPoint);
+            if(colonIndex < 0)
+            {
+                return false;
+            }
+
+            IPAddress ip;
+            if(!IPAddress.TryParse(endPoint.Substring(0, colonIndex), out ip))
+            {
+                return false;
+            }
+
+            int port;
+            if(!int.TryParse(endPoint.Substring(colonIndex + 1), out port))
+            {
+                return false;
+            }
+            ep = new IPEndPoint(ip, port);
+            return true;
         }
-
-        public override IValue SerializeEQG() => new AString(Message);
-
-        public static Message DeserializeEQG(IValue value) => new SimConsoleResponse(value.ToString());
     }
 }

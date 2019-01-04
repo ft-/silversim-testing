@@ -66,5 +66,18 @@ namespace SilverSim.Viewer.Messages.Script
                 ["Script"] = scriptArr
             };
         }
+
+        public static Message DeserializeEQG(IValue value)
+        {
+            Types.Map map = (Types.Map)value;
+            AnArray array = (AnArray)map["Script"];
+            Types.Map script = (Types.Map)array[0];
+            return new ScriptRunningReply
+            {
+                ObjectID = script["ObjectID"].AsUUID,
+                ItemID = script["ItemID"].AsUUID,
+                IsRunning = script["Running"].AsBoolean
+            };
+        }
     }
 }
