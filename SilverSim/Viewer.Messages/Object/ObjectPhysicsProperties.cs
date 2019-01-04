@@ -22,6 +22,7 @@
 using SilverSim.Types;
 using SilverSim.Types.Primitive;
 using System.Collections.Generic;
+using System.Linq;
 using MapType = SilverSim.Types.Map;
 
 namespace SilverSim.Viewer.Messages.Object
@@ -62,6 +63,24 @@ namespace SilverSim.Viewer.Messages.Object
             {
                 ["ObjectData"] = objectdata
             };
+        }
+
+        public static Message DeserializeEQG(IValue value)
+        {
+            var objData = (AnArray)((MapType)value)["ObjectData"];
+            var msg = new ObjectPhysicsProperties();
+            foreach(MapType m in objData.OfType<MapType>())
+            {
+                msg.ObjectData.Add(new ObjectDataEntry
+                {
+                    LocalID = m["LocalID"].AsUInt,
+                    PhysicsShapeType = (PrimitivePhysicsShapeType)m["PhysicsShapeType"].AsInt,
+                    Friction = m["Friction"].AsReal,
+                    Restitution = m["Restitution"].AsReal,
+                    GravityMultiplier = m["GravityMultiplier"].AsReal
+                });
+            }
+            return msg;
         }
     }
 }

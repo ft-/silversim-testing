@@ -114,5 +114,33 @@ namespace SilverSim.Viewer.Messages.Teleport
             m.Add("RegionSizeY", new BinaryData(b));
             return om;
         }
+
+        public static Message DeserializeEQG(IValue value)
+        {
+            var om = (Types.Map)value;
+            var array = (AnArray)om["Info"];
+            var m = (Types.Map)array[0];
+            var msg = new TeleportFinish
+            {
+                AgentID = m["AgentID"].AsUUID,
+                LocationID = m["LocationID"].AsUInt,
+                SeedCapability = m["SeedCapability"].ToString(),
+                SimAccess = (RegionAccess)m["SimAccess"].AsUInt,
+                SimIP = new IPAddress((BinaryData)m["SimIP"]),
+                SimPort = (ushort)m["SimPort"].AsUInt
+            };
+            byte[] tpflags = (BinaryData)m["TeleportFlags"];
+            byte[] rx = (BinaryData)m["RegionSizeX"];
+            byte[] ry = (BinaryData)m["RegionSizeY"];
+            if(BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(tpflags);
+                Array.Reverse(rx);
+                Array.Reverse(ry);
+            }
+            msg.TeleportFlags = (TeleportFlags)BitConverter.ToUInt64(tpflags, 0);
+            msg.RegionSize = new GridVector(BitConverter.ToUInt32(rx, 0), BitConverter.ToUInt32(ry, 0));
+            return msg;
+        }
     }
 }
