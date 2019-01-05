@@ -43,35 +43,35 @@ namespace SilverSim.Viewer.Messages.Parcel
         public const int SEQID_PARCEL_SELECTED = -10000;
 
         public RequestResultType RequestResult;
-        public Int32 SequenceID;
+        public int SequenceID;
         public bool SnapSelection;
-        public Int32 SelfCount;
-        public Int32 OtherCount;
-        public Int32 PublicCount;
-        public Int32 LocalID;
+        public int SelfCount;
+        public int OtherCount;
+        public int PublicCount;
+        public int LocalID;
         public UUID OwnerID;
         public bool IsGroupOwned;
-        public UInt32 AuctionID;
+        public uint AuctionID;
         public Date ClaimDate;
-        public Int32 ClaimPrice;
-        public Int32 RentPrice;
+        public int ClaimPrice;
+        public int RentPrice;
         public Vector3 AABBMin;
         public Vector3 AABBMax;
         public byte[] Bitmap = new byte[0];
-        public Int32 Area;
+        public int Area;
         public ParcelStatus Status;
-        public Int32 SimWideMaxPrims;
-        public Int32 SimWideTotalPrims;
-        public Int32 MaxPrims;
-        public Int32 TotalPrims;
-        public Int32 OwnerPrims;
-        public Int32 GroupPrims;
-        public Int32 OtherPrims;
-        public Int32 SelectedPrims;
+        public int SimWideMaxPrims;
+        public int SimWideTotalPrims;
+        public int MaxPrims;
+        public int TotalPrims;
+        public int OwnerPrims;
+        public int GroupPrims;
+        public int OtherPrims;
+        public int SelectedPrims;
         public double ParcelPrimBonus;
-        public Int32 OtherCleanTime;
+        public int OtherCleanTime;
         public ParcelFlags ParcelFlags;
-        public Int32 SalePrice;
+        public int SalePrice;
         public string Name;
         public string Description;
         public string MusicURL;
@@ -79,7 +79,7 @@ namespace SilverSim.Viewer.Messages.Parcel
         public UUID MediaID;
         public bool MediaAutoScale;
         public UUID GroupID;
-        public Int32 PassPrice;
+        public int PassPrice;
         public double PassHours;
         public ParcelCategory Category;
         public UUID AuthBuyerID;
@@ -106,7 +106,7 @@ namespace SilverSim.Viewer.Messages.Parcel
         public bool ObscureMedia;
         public bool ObscureMusic;
 
-        public override MessageType Number => 0;
+        public override MessageType Number => MessageType.ParcelProperties;
 
         public override IValue SerializeEQG()
         {
@@ -201,6 +201,82 @@ namespace SilverSim.Viewer.Messages.Parcel
             };
             m.Add("AgeVerificationBlock", ageArray);
             return m;
+        }
+
+        public static Message DeserializeEQG(IValue iv)
+        {
+            var m = (MapType)iv;
+            var parcelData = (MapType)((AnArray)m["ParcelData"])[0];
+            var mediaData = (MapType)((AnArray)m["MediaData"])[0];
+            var ageData = (MapType)((AnArray)m["AgeVerificationBlock"])[0];
+            byte[] parcelflagsdata = (BinaryData)parcelData["ParcelFlags"];
+            if(BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(parcelflagsdata);
+            }
+            return new ParcelProperties
+            {
+                LocalID = parcelData["LocalID"].AsInt,
+                AABBMax = parcelData["AABBMax"].AsVector3,
+                AABBMin = parcelData["AABBMin"].AsVector3,
+                Area = parcelData["Area"].AsInt,
+                AuctionID = parcelData["AuctionID"].AsUInt,
+                AuthBuyerID = parcelData["AuthBuyerID"].AsUUID,
+                Bitmap = (BinaryData)parcelData["Bitmap"],
+                Category = (ParcelCategory)parcelData["Category"].AsInt,
+                ClaimDate = (Date)parcelData["ClaimDate"],
+                ClaimPrice = parcelData["ClaimPrice"].AsInt,
+                Description = parcelData["Desc"].ToString(),
+                ParcelFlags = (ParcelFlags)BitConverter.ToUInt32(parcelflagsdata, 0),
+                GroupID = parcelData["GroupID"].AsUUID,
+                GroupPrims = parcelData["GroupPrims"].AsInt,
+                IsGroupOwned = parcelData["IsGroupOwned"].AsBoolean,
+                LandingType = (TeleportLandingType)parcelData["LandingType"].AsInt,
+                MaxPrims = parcelData["MaxPrims"].AsInt,
+                MediaID = parcelData["MediaID"].AsUUID,
+                MediaURL = parcelData["MediaURL"].ToString(),
+                MediaAutoScale = parcelData["MediaAutoScale"].AsBoolean,
+                MusicURL = parcelData["MusicURL"].ToString(),
+                Name = parcelData["Name"].ToString(),
+                OtherCleanTime = parcelData["OtherCleanTim"].AsInt,
+                OtherCount = parcelData["OtherCount"].AsInt,
+                OtherPrims = parcelData["OtherPrims"].AsInt,
+                OwnerID = parcelData["OwnerID"].AsUUID,
+                OwnerPrims = parcelData["OwnerPrims"].AsInt,
+                ParcelPrimBonus = parcelData["ParcelPrimBonus"].AsReal,
+                PassHours = parcelData["PassHours"].AsReal,
+                PassPrice = parcelData["PassPrice"].AsInt,
+                PublicCount = parcelData["PublicCount"].AsInt,
+                Privacy = parcelData["Privacy"].AsBoolean,
+                RegionDenyAnonymous = parcelData["RegionDenyAnonymous"].AsBoolean,
+                RegionDenyIdentified = parcelData["RegionDenyIdentified"].AsBoolean,
+                RegionPushOverride = parcelData["RegionPushOverride"].AsBoolean,
+                RentPrice = parcelData["RentPrice"].AsInt,
+                RequestResult = (RequestResultType)parcelData["RequestResult"].AsInt,
+                SalePrice = parcelData["SalePrice"].AsInt,
+                SelectedPrims = parcelData["SelectedPrims"].AsInt,
+                SelfCount = parcelData["SelfCount"].AsInt,
+                SequenceID = parcelData["SequenceID"].AsInt,
+                SimWideMaxPrims = parcelData["SimWideMaxPrims"].AsInt,
+                SimWideTotalPrims = parcelData["SimWideTotalPrims"].AsInt,
+                SnapSelection = parcelData["SnapSelection"].AsBoolean,
+                SnapshotID = parcelData["SnapshotID"].AsUUID,
+                Status = (ParcelStatus)parcelData["Status"].AsInt,
+                TotalPrims = parcelData["TotalPrims"].AsInt,
+                UserLocation = parcelData["UserLocation"].AsVector3,
+                UserLookAt = parcelData["UserLookAt"].AsVector3,
+                SeeAVs = parcelData["SeeAVs"].AsBoolean,
+                AnyAVSounds = parcelData["AnyAVSounds"].AsBoolean,
+                GroupAVSounds = parcelData["GroupAVSounds"].AsBoolean,
+                MediaDesc = mediaData["MediaDesc"].ToString(),
+                MediaWidth = mediaData["MediaWidth"].AsInt,
+                MediaHeight = mediaData["MediaHeight"].AsInt,
+                MediaLoop = mediaData["MediaLoop"].AsBoolean,
+                MediaType = mediaData["MediaType"].ToString(),
+                ObscureMedia = mediaData["ObscureMedia"].AsBoolean,
+                ObscureMusic = mediaData["ObscureMusic"].AsBoolean,
+                RegionDenyAgeUnverified = ageData["RegionDenyAgeUnverified"].AsBoolean
+            };
         }
     }
 }
