@@ -852,7 +852,7 @@ namespace SilverSim.Viewer.Messages
             }
             else
             {
-                return DataPos + 1 > DataLength ? Data[DataPos++] : defvalue;
+                return DataPos + 1 <= DataLength ? Data[DataPos++] : defvalue;
             }
         }
 
