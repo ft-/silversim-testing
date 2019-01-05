@@ -1120,6 +1120,7 @@ send_nonphys_packet:
                 if(ko != null)
                 {
                     SendMessage(ko);
+                    ko = null;
                 }
             }
         }
