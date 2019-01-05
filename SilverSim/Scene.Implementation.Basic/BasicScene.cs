@@ -584,7 +584,6 @@ namespace SilverSim.Scene.Implementation.Basic
                 }
                 agent.SendKillObject(ID);
                 RemoveLocalID(agent);
-                Interlocked.Decrement(ref m_AgentCount);
             }
             else
             {
