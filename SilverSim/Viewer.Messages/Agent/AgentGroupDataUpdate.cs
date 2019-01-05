@@ -102,7 +102,7 @@ namespace SilverSim.Viewer.Messages.Agent
             var newGroupDataArray = new AnArray();
             foreach(GroupDataEntry e in GroupData)
             {
-                byte[] groupPowers = BitConverter.GetBytes((UInt64)e.GroupPowers);
+                byte[] groupPowers = BitConverter.GetBytes((ulong)e.GroupPowers);
                 if(BitConverter.IsLittleEndian)
                 {
                     Array.Reverse(groupPowers);
@@ -125,6 +125,44 @@ namespace SilverSim.Viewer.Messages.Agent
             body.Add("NewGroupData", newGroupDataArray);
 
             return body;
+        }
+
+        public static Message DeserializeEQG(IValue value)
+        {
+            var m = (MapType)value;
+            var groupDataArray = (AnArray)m["GroupData"];
+            var newGroupDataArray = (AnArray)m["NewGroupData"];
+            var agentData = (MapType)((AnArray)m["AgentData"])[0];
+            var res = new AgentGroupDataUpdate
+            {
+                AgentID = agentData["AgentID"].AsUUID
+            };
+
+            int n = Math.Min(groupDataArray.Count, newGroupDataArray.Count);
+
+            for (int i = 0; i < n; ++i)
+            {
+                var groupData = (MapType)groupDataArray[i];
+                var newGroupData = (MapType)newGroupDataArray[i];
+                byte[] grouppowers = (BinaryData)groupData["GroupPowers"];
+                if(BitConverter.IsLittleEndian)
+                {
+                    Array.Reverse(grouppowers);
+                }
+
+                res.GroupData.Add(new GroupDataEntry
+                {
+                    GroupID = groupData["GroupID"].AsUUID,
+                    GroupInsigniaID = groupData["GroupInsigniaID"].AsUUID,
+                    Contribution = groupData["Contribution"].AsInt,
+                    GroupPowers = (GroupPowers)BitConverter.ToUInt64(grouppowers, 0),
+                    GroupName = groupData["GroupName"].ToString(),
+                    AcceptNotices = groupData["AcceptNotices"].AsBoolean,
+                    ListInProfile = groupData["ListInProfile"].AsBoolean
+                });
+            }
+
+            return res;
         }
     }
 }

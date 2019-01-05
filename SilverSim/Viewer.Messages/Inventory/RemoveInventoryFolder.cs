@@ -21,6 +21,7 @@
 
 using SilverSim.Types;
 using System.Collections.Generic;
+using System.Linq;
 using MapType = SilverSim.Types.Map;
 
 namespace SilverSim.Viewer.Messages.Inventory
@@ -88,6 +89,24 @@ namespace SilverSim.Viewer.Messages.Inventory
             llsd.Add("FolderData", folderDataArray);
 
             return llsd;
+        }
+
+        public static Message DeserializeEQG(IValue value)
+        {
+            var m = (MapType)value;
+            var a = (MapType)((AnArray)m["AgentData"])[0];
+            var res = new RemoveInventoryFolder
+            {
+                AgentID = a["AgentID"].AsUUID,
+                SessionID = a["SessionID"].AsUUID
+            };
+
+            foreach(MapType foldermap in ((AnArray)m["FolderData"]).OfType<MapType>())
+            {
+                res.FolderData.Add(foldermap["FolderID"].AsUUID);
+            }
+
+            return res;
         }
     }
 }

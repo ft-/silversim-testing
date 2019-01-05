@@ -45,5 +45,18 @@ namespace SilverSim.Viewer.Messages.Parcel
                 }
             }
         };
+
+        public static Message DeserializeEQG(IValue value)
+        {
+            var m = (MapType)value;
+            var c = (MapType)m["voice_credentials"];
+            return new ParcelVoiceInfo
+            {
+                RegionName = m["region_name"].ToString(),
+                ParcelLocalId = m["parcel_local_id"].AsInt,
+                ChannelUri = c["channel_uri"].ToString(),
+                ChannelCredentials = c["channel_credentials"].ToString()
+            };
+        }
     }
 }

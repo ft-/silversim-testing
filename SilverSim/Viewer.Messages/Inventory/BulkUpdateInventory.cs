@@ -24,6 +24,7 @@ using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using MapType = SilverSim.Types.Map;
 
 namespace SilverSim.Viewer.Messages.Inventory
@@ -264,7 +265,7 @@ namespace SilverSim.Viewer.Messages.Inventory
             return m;
         }
 
-        private BinaryData EncodeU32ToBinary(uint val)
+        private static BinaryData EncodeU32ToBinary(uint val)
         {
             byte[] ret = BitConverter.GetBytes(val);
             if(BitConverter.IsLittleEndian)
@@ -335,6 +336,70 @@ namespace SilverSim.Viewer.Messages.Inventory
             llsd.Add("ItemData", itemDataArray);
 
             return llsd;
+        }
+
+        private static uint DecodeU32FromBinary(BinaryData val)
+        {
+            byte[] ret = val;
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(ret);
+            }
+            return BitConverter.ToUInt32(ret, 0);
+        }
+
+        public static Message DeserializeEQG(IValue value)
+        {
+            var llsd = (MapType)value;
+            var agentData = (MapType)((AnArray)llsd["AgentData"])[0];
+            var folderDataArray = (AnArray)llsd["FolderData"];
+            var itemDataArray = (AnArray)llsd["ItemData"];
+            var res = new BulkUpdateInventory
+            {
+                AgentID = agentData["AgentID"].AsUUID,
+                TransactionID = agentData["TransactionID"].AsUUID
+            };
+
+            foreach(MapType folderData in folderDataArray.OfType<MapType>())
+            {
+                res.FolderData.Add(new FolderDataEntry
+                {
+                    FolderID = folderData["FolderID"].AsUUID,
+                    ParentID = folderData["ParentID"].AsUUID,
+                    DefaultType = (AssetType)folderData["Type"].AsInt,
+                    Name = folderData["Name"].ToString()
+                });
+            }
+
+            foreach(MapType itemData in itemDataArray.OfType<MapType>())
+            {
+                res.ItemData.Add(new ItemDataEntry
+                {
+                    ItemID = itemData["ItemID"].AsUUID,
+                    FolderID = itemData["FolderID"].AsUUID,
+                    CreatorID = itemData["CreatorID"].AsUUID,
+                    OwnerID = itemData["OwnerID"].AsUUID,
+                    GroupID = itemData["GroupID"].AsUUID,
+                    BaseMask = (InventoryPermissionsMask)DecodeU32FromBinary((BinaryData)itemData["BaseMask"]),
+                    OwnerMask = (InventoryPermissionsMask)DecodeU32FromBinary((BinaryData)itemData["OwnerMask"]),
+                    GroupMask = (InventoryPermissionsMask)DecodeU32FromBinary((BinaryData)itemData["GroupMask"]),
+                    EveryoneMask = (InventoryPermissionsMask)DecodeU32FromBinary((BinaryData)itemData["EveryoneMask"]),
+                    NextOwnerMask = (InventoryPermissionsMask)DecodeU32FromBinary((BinaryData)itemData["NextOwnerMask"]),
+                    IsGroupOwned = itemData["GroupOwned"].AsBoolean,
+                    AssetID = itemData["AssetID"].AsUUID,
+                    Type = (AssetType)itemData["Type"].AsInt,
+                    InvType = (InventoryType)itemData["InvType"].AsInt,
+                    Flags = (InventoryFlags)DecodeU32FromBinary((BinaryData)itemData["Flags"]),
+                    SaleType = (InventoryItem.SaleInfoData.SaleType)itemData["SaleType"].AsInt,
+                    SalePrice = itemData["SalePrice"].AsInt,
+                    Name = itemData["Name"].ToString(),
+                    Description = itemData["Description"].ToString(),
+                    CreationDate = itemData["CreationDate"].AsUInt,
+                    CallbackID = DecodeU32FromBinary((BinaryData)itemData["CallbackID"])
+                });
+            }
+
+            return res;
         }
     }
 }

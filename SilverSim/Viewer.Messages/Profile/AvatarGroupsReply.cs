@@ -107,5 +107,39 @@ namespace SilverSim.Viewer.Messages.Profile
 
             return llsd;
         }
+
+        public static Message DeserializeEQG(IValue value)
+        {
+            var m = (MapType)value;
+            var groupDataArray = (AnArray)m["GroupData"];
+            var newGroupDataArray = (AnArray)m["NewGroupData"];
+            var agentData = (MapType)((AnArray)m["AgentData"])[0];
+            var res = new AvatarGroupsReply
+            {
+                AgentID = agentData["AgentID"].AsUUID,
+                AvatarID = agentData["AvatarID"].AsUUID
+            };
+
+            int n = Math.Min(groupDataArray.Count, newGroupDataArray.Count);
+
+            for(int i = 0; i < n; ++i)
+            {
+                var groupData = (MapType)groupDataArray[i];
+                var newGroupData = (MapType)newGroupDataArray[i];
+
+                res.GroupData.Add(new GroupDataEntry
+                {
+                    GroupPowers = (GroupPowers)ulong.Parse(groupData["GroupPowers"].ToString()),
+                    AcceptNotices = groupData["AcceptNotices"].AsBoolean,
+                    GroupTitle = groupData["GroupTitle"].ToString(),
+                    GroupID = groupData["GroupID"].AsUUID,
+                    GroupName = groupData["GroupName"].ToString(),
+                    GroupInsigniaID = groupData["GroupInsigniaID"].AsUUID,
+                    ListInProfile = groupData["ListInProfile"].AsBoolean
+                });
+            }
+
+            return res;
+        }
     }
 }

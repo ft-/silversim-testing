@@ -31,14 +31,14 @@ namespace SilverSim.Viewer.Messages.Agent
     [Trusted]
     public class CoarseLocationUpdate : Message
     {
-        public Int16 You;
-        public Int16 Prey;
+        public short You;
+        public short Prey;
 
         public struct AgentDataEntry
         {
-            public byte X;
-            public byte Y;
-            public byte Z;
+            public int X;
+            public int Y;
+            public int Z;
             public UUID AgentID;
         }
         public List<AgentDataEntry> AgentData = new List<AgentDataEntry>();
@@ -48,9 +48,9 @@ namespace SilverSim.Viewer.Messages.Agent
             p.WriteUInt8((byte)AgentData.Count);
             foreach (AgentDataEntry d in AgentData)
             {
-                p.WriteUInt8(d.X);
-                p.WriteUInt8(d.Y);
-                p.WriteUInt8(d.Z);
+                p.WriteUInt8((byte)d.X.Clamp(0, 255));
+                p.WriteUInt8((byte)d.Y.Clamp(0, 255));
+                p.WriteUInt8((byte)d.Z.Clamp(0, 255));
             }
             p.WriteInt16(You);
             p.WriteInt16(Prey);
@@ -67,11 +67,12 @@ namespace SilverSim.Viewer.Messages.Agent
             uint cnt = p.ReadUInt8();
             for (uint i = 0; i < cnt; ++i)
             {
-                var d = new AgentDataEntry();
-                d.X = p.ReadUInt8();
-                d.Y = p.ReadUInt8();
-                d.Z = p.ReadUInt8();
-                m.AgentData.Add(d);
+                m.AgentData.Add(new AgentDataEntry
+                {
+                    X = p.ReadUInt8(),
+                    Y = p.ReadUInt8(),
+                    Z = p.ReadUInt8()
+                });
             }
 
             m.You = p.ReadInt16();
@@ -122,6 +123,37 @@ namespace SilverSim.Viewer.Messages.Agent
                 ["Location"] = location,
                 ["AgentData"] = agentdata
             };
+        }
+
+        public static Message DeserializeEQG(IValue value)
+        {
+            var m = (MapType)value;
+            var index = (MapType)((AnArray)m["Index"])[0];
+            var location = (AnArray)m["Location"];
+            var agentdata = (AnArray)m["AgentData"];
+            int n = Math.Min(agentdata.Count, location.Count);
+
+            var res = new CoarseLocationUpdate
+            {
+                Prey = (short)index["Prey"].AsInt,
+                You = (short)index["You"].AsInt
+            };
+
+            for(int i = 0; i < n; ++i)
+            {
+                var l = (MapType)location[i];
+                var a = (MapType)agentdata[i];
+
+                res.AgentData.Add(new AgentDataEntry
+                {
+                    X = l["X"].AsInt,
+                    Y = l["Y"].AsInt,
+                    Z = l["Z"].AsInt,
+                    AgentID = a["AgentID"].AsUUID
+                });
+            }
+
+            return res;
         }
     }
 }
