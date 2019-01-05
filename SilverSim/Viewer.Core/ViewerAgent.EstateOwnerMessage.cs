@@ -401,7 +401,7 @@ namespace SilverSim.Viewer.Core
                     }
                     if (data.Type != AssetType.Texture)
                     {
-                        /* do not allow to set anything else than a notecard here */
+                        /* do not allow to set anything else than a texture here */
                         continue;
                     }
 
