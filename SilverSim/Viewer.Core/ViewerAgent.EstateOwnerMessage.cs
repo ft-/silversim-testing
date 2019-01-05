@@ -26,6 +26,7 @@ using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
+using SilverSim.Types.Asset;
 using SilverSim.Types.Estate;
 using SilverSim.Types.Experience;
 using SilverSim.Types.Grid;
@@ -386,6 +387,24 @@ namespace SilverSim.Viewer.Core
 
                     var corner = Int16.Parse(splitfield[0]);
                     var textureUUID = UUID.Parse(splitfield[1]);
+                    AssetData data;
+                    if (!circuit.Scene.AssetService.TryGetValue(textureUUID, out data))
+                    {
+                        if (circuit.Agent.AssetService.TryGetValue(textureUUID, out data))
+                        {
+                            circuit.Scene.AssetService.Store(data);
+                        }
+                        else
+                        {
+                            return;
+                        }
+                    }
+                    if (data.Type != AssetType.Texture)
+                    {
+                        /* do not allow to set anything else than a notecard here */
+                        continue;
+                    }
+
                     switch (corner)
                     {
                         case 0:
@@ -528,6 +547,27 @@ namespace SilverSim.Viewer.Core
             EstateInfo estate;
             uint estateID;
             var estateService = circuit.Scene.EstateService;
+            if(covenantID != UUID.Zero)
+            {
+                AssetData data;
+                if(!circuit.Scene.AssetService.TryGetValue(covenantID, out data))
+                {
+                    if(circuit.Agent.AssetService.TryGetValue(covenantID, out data))
+                    {
+                        circuit.Scene.AssetService.Store(data);
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
+                if(data.Type != AssetType.Notecard)
+                {
+                    /* do not allow to set anything else than a notecard here */
+                    return;
+                }
+            }
+
             if(estateService.RegionMap.TryGetValue(circuit.Scene.ID, out estateID) &&
                 estateService.TryGetValue(estateID, out estate))
             {
