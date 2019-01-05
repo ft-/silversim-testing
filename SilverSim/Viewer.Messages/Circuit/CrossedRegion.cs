@@ -83,5 +83,30 @@ namespace SilverSim.Viewer.Messages.Circuit
                 { "RegionData", r }
             };
         }
+
+        public static Message DeserializeEQG(IValue value)
+        {
+            var m = (Types.Map)value;
+            var i = (Types.Map)m["Info"];
+            var a = (Types.Map)m["AgentData"];
+            var r = (Types.Map)m["RegionData"];
+            byte[] reghandle = (BinaryData)r["RegionHandle"];
+            if(BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(reghandle);
+            }
+            return new CrossedRegion
+            {
+                LookAt = i["LookAt"].AsVector3,
+                Position = i["Position"].AsVector3,
+                AgentID = a["AgentID"].AsUUID,
+                SessionID = a["SessionID"].AsUUID,
+                GridPosition = new GridVector(BitConverter.ToUInt64(reghandle, 0)),
+                SeedCapability = r["SeedCapability"].ToString(),
+                SimIP = new IPAddress((BinaryData)r["SimIP"]),
+                SimPort = (ushort)r["SimPort"].AsInt,
+                RegionSize = new GridVector(r["RegionSizeX"].AsUInt, r["RegionSizeY"].AsUInt)
+            };
+        }
     }
 }

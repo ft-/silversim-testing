@@ -34,7 +34,7 @@ namespace SilverSim.Viewer.Messages.Circuit
     {
         public GridVector GridPosition;
         public IPAddress SimIP;
-        public UInt16 SimPort;
+        public ushort SimPort;
 
         /* EQG extension */
         public GridVector RegionSize;
@@ -63,6 +63,25 @@ namespace SilverSim.Viewer.Messages.Circuit
             return new Types.Map
             {
                 { "SimulatorInfo", arr }
+            };
+        }
+
+        public static Message DeserializeEQG(IValue value)
+        {
+            var m = (Types.Map)value;
+            var arr = (AnArray)m["SimulatorInfo"];
+            var i = (Types.Map)arr[0];
+            byte[] reghandle = (BinaryData)i["Handle"];
+            if(BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(reghandle);
+            }
+            return new EnableSimulator
+            {
+                GridPosition = new GridVector(BitConverter.ToUInt64(reghandle, 0)),
+                SimIP = new IPAddress((BinaryData)i["IP"]),
+                SimPort = (ushort)i["Port"].AsInt,
+                RegionSize = new GridVector(i["RegionSizeX"].AsUInt, i["RegionSizeY"].AsUInt)
             };
         }
     }
