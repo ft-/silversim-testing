@@ -28,7 +28,6 @@ namespace SilverSim.Scene.Types.Object
 {
     public class ObjectUpdateInfo : IObjUpdateInfo
     {
-        private bool m_Killed;
         public uint LocalID { get; internal set; }
         public ObjectPart Part { get; }
         public UUID ID { get; internal set; }
@@ -41,14 +40,14 @@ namespace SilverSim.Scene.Types.Object
 
         public void KillObject()
         {
-            m_Killed = true;
+            IsKilled = true;
         }
 
         public UGUI Owner => Part.ObjectGroup.Owner;
 
         public virtual bool IsAlwaysFull => false;
 
-        public bool IsKilled => m_Killed;
+        public bool IsKilled { get; private set; }
 
         public bool IsTemporary => Part.ObjectGroup.IsTemporary;
 
@@ -62,7 +61,7 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                if(Part != null && !m_Killed)
+                if(Part != null && !IsKilled)
                 {
                     return Part.ObjectGroup.IsPhysics;
                 }
@@ -99,7 +98,7 @@ namespace SilverSim.Scene.Types.Object
 
         public byte[] GetFullUpdate(CultureInfo cultureInfo)
         {
-            if(Part != null && !m_Killed)
+            if(Part != null && !IsKilled)
             {
                 return Part.GetFullUpdateData(cultureInfo);
             }
@@ -108,7 +107,7 @@ namespace SilverSim.Scene.Types.Object
 
         public byte[] GetTerseUpdate(CultureInfo cultureInfo)
         {
-            if (Part != null && !m_Killed)
+            if (Part != null && !IsKilled)
             {
                 return Part.GetTerseUpdateData(cultureInfo);
             }
@@ -117,7 +116,7 @@ namespace SilverSim.Scene.Types.Object
 
         public byte[] GetCompressedUpdate(CultureInfo cultureInfo)
         {
-            if(Part != null && !m_Killed)
+            if(Part != null && !IsKilled)
             {
                 return Part.GetCompressedUpdateData(cultureInfo);
             }
@@ -126,7 +125,7 @@ namespace SilverSim.Scene.Types.Object
 
         public byte[] GetFullUpdateLimited(CultureInfo cultureInfo)
         {
-            if (Part != null && !m_Killed)
+            if (Part != null && !IsKilled)
             {
                 return Part.GetFullUpdateDataLimited(cultureInfo);
             }
@@ -135,7 +134,7 @@ namespace SilverSim.Scene.Types.Object
 
         public byte[] GetTerseUpdateLimited(CultureInfo cultureInfo)
         {
-            if (Part != null && !m_Killed)
+            if (Part != null && !IsKilled)
             {
                 return Part.GetTerseUpdateDataLimited(cultureInfo);
             }
@@ -144,7 +143,7 @@ namespace SilverSim.Scene.Types.Object
 
         public byte[] GetCompressedUpdateLimited(CultureInfo cultureInfo)
         {
-            if(Part != null && !m_Killed)
+            if(Part != null && !IsKilled)
             {
                 return Part.GetCompressedUpdateDataLimited(cultureInfo);
             }
@@ -153,7 +152,7 @@ namespace SilverSim.Scene.Types.Object
 
         public byte[] GetPropertiesUpdate(CultureInfo cultureInfo)
         {
-            if (Part != null && !m_Killed)
+            if (Part != null && !IsKilled)
             {
                 return Part.GetPropertiesUpdateData(cultureInfo);
             }

@@ -30,11 +30,10 @@ namespace SilverSim.Scene.Types.Agent
 {
     public sealed class AgentUpdateInfo : IObjUpdateInfo
     {
-        private bool m_Killed;
         public uint LocalID { get; set; }
         public IAgent Agent { get; }
         public UUID ID { get; internal set; }
-        public UUID SceneID { get; set; }
+        public UUID SceneID { get; private set; }
 
         public bool IsAlwaysFull => true;
 
@@ -197,16 +196,16 @@ namespace SilverSim.Scene.Types.Agent
 
         public void KillObject()
         {
-            m_Killed = true;
+            IsKilled = true;
         }
 
-        public bool IsKilled => m_Killed;
+        public bool IsKilled { get; private set; }
 
         public bool IsPhysics
         {
             get
             {
-                if (Agent != null && !m_Killed)
+                if (Agent != null && !IsKilled)
                 {
                     return Agent.SittingOnObject == null;
                 }
@@ -228,7 +227,7 @@ namespace SilverSim.Scene.Types.Agent
 
         public byte[] GetFullUpdate(CultureInfo cultureInfo)
         {
-            if (Agent != null && !m_Killed)
+            if (Agent != null && !IsKilled)
             {
                 byte[] updateDataBlock = m_UpdateDataBlock; /* we use the GC nature here */
                 var newUpdateDataBlock = new byte[updateDataBlock.Length];
