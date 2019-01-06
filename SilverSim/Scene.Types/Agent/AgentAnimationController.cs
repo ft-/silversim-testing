@@ -253,6 +253,19 @@ namespace SilverSim.Scene.Types.Agent
             }
         }
 
+        public Dictionary<AnimationState, UUID> GetAnimationOverrides()
+        {
+            var result = new Dictionary<AnimationState, UUID>();
+            lock(m_Lock)
+            {
+                foreach(KeyValuePair<AnimationState, UUID> kvp in m_AnimationOverride)
+                {
+                    result.Add(kvp.Key, kvp.Value);
+                }
+            }
+            return result;
+        }
+
         public void PlayAnimation(UUID animid, UUID objectid)
         {
             if(objectid == UUID.Zero)

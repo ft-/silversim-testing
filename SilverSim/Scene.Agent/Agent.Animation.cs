@@ -48,6 +48,7 @@ namespace SilverSim.Scene.Agent
         public void SetAnimationOverride(AgentAnimationController.AnimationState anim_state, UUID anim_id) => m_AnimationController.SetAnimationOverride(anim_state, anim_id);
 
         public string GetAnimationOverride(AgentAnimationController.AnimationState anim_state) => m_AnimationController.GetAnimationOverride(anim_state);
+        public Dictionary<AgentAnimationController.AnimationState, UUID> GetAnimationOverrides() => m_AnimationController.GetAnimationOverrides();
         #endregion
 
         public void PlayAnimation(UUID animid, UUID objectid) => m_AnimationController.PlayAnimation(animid, objectid);
