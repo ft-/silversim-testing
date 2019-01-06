@@ -245,11 +245,11 @@ namespace SilverSim.Scene.Types.Agent
             }
         }
 
-        public string GetAnimationOverride(AnimationState anim_state)
+        public UUID GetAnimationOverride(AnimationState anim_state)
         {
             lock (m_Lock)
             {
-                return (string)m_AnimationOverride[anim_state];
+                return m_AnimationOverride[anim_state];
             }
         }
 

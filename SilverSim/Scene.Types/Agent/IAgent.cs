@@ -246,7 +246,8 @@ namespace SilverSim.Scene.Types.Agent
         void ResetAnimationOverride();
         void ResetAnimationOverride(AgentAnimationController.AnimationState anim_state);
         void SetAnimationOverride(AgentAnimationController.AnimationState anim_state, UUID anim);
-        string GetAnimationOverride(AgentAnimationController.AnimationState anim_state);
+        UUID GetAnimationOverride(AgentAnimationController.AnimationState anim_state);
+        Dictionary<AgentAnimationController.AnimationState, UUID> GetAnimationOverrides();
         void PlayAnimation(UUID anim, UUID objectid);
         void StopAnimation(UUID anim, UUID objectid);
         void StopAllAnimations(UUID sourceid);
