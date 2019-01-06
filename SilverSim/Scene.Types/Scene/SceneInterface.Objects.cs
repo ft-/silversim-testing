@@ -705,7 +705,7 @@ namespace SilverSim.Scene.Types.Scene
                 }
             }
 
-            LinkObjects(primids);
+            LinkObjects(primids, true);
         }
 
         [PacketHandler(MessageType.ObjectDelink)]
