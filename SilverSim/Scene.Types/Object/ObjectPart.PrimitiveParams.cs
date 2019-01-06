@@ -1273,6 +1273,10 @@ namespace SilverSim.Scene.Types.Object
         public void GetPrimitiveParams(AnArray.Enumerator enumerator, AnArray paramList, CultureInfo cultureInfo)
         {
             ObjectPartLocalizedInfo localization = GetLocalization(cultureInfo);
+            if (enumerator.Current == null)
+            {
+                throw new ArgumentException(nameof(enumerator));
+            }
             PrimitiveParamsType paramtype = ParamsHelper.GetPrimParamType(enumerator);
             switch (paramtype)
             {
@@ -1509,6 +1513,10 @@ namespace SilverSim.Scene.Types.Object
             ObjectPartLocalizedInfo localization = GetOrCreateLocalization(culturename);
             UpdateChangedFlags flags = 0;
             bool isUpdated = false;
+            if(enumerator.Current == null)
+            {
+                throw new ArgumentException(nameof(enumerator));
+            }
             PrimitiveParamsType paramtype = ParamsHelper.GetPrimParamType(enumerator);
             switch (paramtype)
             {
