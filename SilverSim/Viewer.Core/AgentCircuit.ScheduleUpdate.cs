@@ -516,7 +516,7 @@ namespace SilverSim.Viewer.Core
 
         private readonly object m_PhysQueueThrottleLock = new object();
         private C5.TreeDictionary<uint, uint> m_PhysFullQueueThrottleInflight = new C5.TreeDictionary<uint, uint>();
-        private C5.TreeDictionary<uint, uint> m_PhysTerseQueueThrottleInflight = new C5.TreeDictionary<uint, uint>();
+        private C5.TreeDictionary<uint, uint> m_PhysCompressedQueueThrottleInflight = new C5.TreeDictionary<uint, uint>();
 
         internal sealed class PhysFullObjectReleaseThrottle : Message
         {
@@ -563,18 +563,18 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        internal sealed class PhysTerseObjectReleaseThrottle : Message
+        internal sealed class PhysCompressedObjectReleaseThrottle : Message
         {
             private readonly AgentCircuit m_Circuit;
             private readonly List<uint> m_ObjectsInFlight = new List<uint>();
 
-            public PhysTerseObjectReleaseThrottle(AgentCircuit circ)
+            public PhysCompressedObjectReleaseThrottle(AgentCircuit circ)
             {
                 m_Circuit = circ;
                 OnSendCompletion += Acked;
             }
 
-            ~PhysTerseObjectReleaseThrottle()
+            ~PhysCompressedObjectReleaseThrottle()
             {
                 OnSendCompletion -= Acked;
             }
@@ -585,11 +585,11 @@ namespace SilverSim.Viewer.Core
                 lock (m_Circuit.m_PhysQueueThrottleLock)
                 {
                     uint val = 0;
-                    if (m_Circuit.m_PhysTerseQueueThrottleInflight.Contains(localid))
+                    if (m_Circuit.m_PhysCompressedQueueThrottleInflight.Contains(localid))
                     {
-                        val = m_Circuit.m_PhysTerseQueueThrottleInflight[localid];
+                        val = m_Circuit.m_PhysCompressedQueueThrottleInflight[localid];
                     }
-                    m_Circuit.m_PhysTerseQueueThrottleInflight[localid] = val + 1;
+                    m_Circuit.m_PhysCompressedQueueThrottleInflight[localid] = val + 1;
                 }
             }
 
@@ -599,9 +599,9 @@ namespace SilverSim.Viewer.Core
                 {
                     lock (m_Circuit.m_PhysQueueThrottleLock)
                     {
-                        if (--m_Circuit.m_PhysTerseQueueThrottleInflight[localid] == 0)
+                        if (--m_Circuit.m_PhysCompressedQueueThrottleInflight[localid] == 0)
                         {
-                            m_Circuit.m_PhysTerseQueueThrottleInflight.Remove(localid);
+                            m_Circuit.m_PhysCompressedQueueThrottleInflight.Remove(localid);
                         }
                     }
                 }
@@ -616,11 +616,11 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        private bool CanPhysTerseBeSent(uint localid)
+        private bool CanPhysCompressedBeSent(uint localid)
         {
             lock (m_PhysQueueThrottleLock)
             {
-                return !m_PhysTerseQueueThrottleInflight.Contains(localid) || m_PhysTerseQueueThrottleInflight[localid] < 10;
+                return !m_PhysCompressedQueueThrottleInflight.Contains(localid) || m_PhysCompressedQueueThrottleInflight[localid] < 10;
             }
         }
 
@@ -726,21 +726,28 @@ namespace SilverSim.Viewer.Core
 
                 KillObject ko = null;
 
-                UDPPacket phys_terse_packet = null;
-                byte phys_terse_packet_count = 0;
                 List<KeyValuePair<IObjUpdateInfo, byte[]>> phys_full_packet_data = null;
                 int phys_full_packet_data_length = 0;
-                PhysFullObjectReleaseThrottle phys_full_object_release = null;
-                PhysTerseObjectReleaseThrottle phys_terse_object_release = null;
 
-                UDPPacket nonphys_terse_packet = null;
-                byte nonphys_terse_packet_count = 0;
+                List<KeyValuePair<IObjUpdateInfo, byte[]>> phys_compressed_packet_data = null;
+                int phys_compressed_packet_data_length = 0;
+
+                PhysFullObjectReleaseThrottle phys_full_object_release = null;
+                PhysCompressedObjectReleaseThrottle phys_compressed_object_release = null;
+
+                List<KeyValuePair<IObjUpdateInfo, byte[]>> nonphys_compressed_packet_data = null;
+                int nonphys_compressed_packet_data_length = 0;
+
                 List<KeyValuePair<IObjUpdateInfo, byte[]>> nonphys_full_packet_data = null;
                 int nonphys_full_packet_data_length = 0;
 
                 ObjectPropertiesTriggerMessage full_packet_objprop = null;
                 ObjectAnimationTriggerMessage full_packet_objanim = null;
                 AvatarAnimationTriggerMessage full_packet_agentanim = null;
+
+                ObjectPropertiesTriggerMessage compressed_packet_objprop = null;
+                ObjectAnimationTriggerMessage compressed_packet_objanim = null;
+                AvatarAnimationTriggerMessage compressed_packet_agentanim = null;
 
                 while (physicalOutQueue.Count != 0 || nonPhysicalOutQueue.Count != 0)
                 {
@@ -846,6 +853,16 @@ namespace SilverSim.Viewer.Core
                                         }
                                         full_packet_agentanim.Agents.Add(aui.Agent);
                                     }
+                                }
+                            }
+
+                            byte[] compressedUpdate = null;
+                            if(!dofull)
+                            {
+                                compressedUpdate = IsLightLimited(ui) ? ui.GetCompressedUpdateLimited(Agent.CurrentCulture) : ui.GetCompressedUpdate(Agent.CurrentCulture);
+                                if(compressedUpdate == null)
+                                {
+                                    dofull = true;
                                 }
                             }
 
@@ -972,75 +989,118 @@ send_nonphys_packet:
                             }
                             else
                             {
-                                byte[] terseUpdate = IsLightLimited(ui) ? ui.GetTerseUpdateLimited(Agent.CurrentCulture) : ui.GetTerseUpdate(Agent.CurrentCulture);
-
-                                if (terseUpdate != null)
+                                if (ui.IsPhysics && !mustBeNonPhys)
                                 {
-                                    uint localID = ui.LocalID;
-                                    terseUpdate[0] = (byte)(localID & 0xFF);
-                                    terseUpdate[1] = (byte)((localID >> 8) & 0xFF);
-                                    terseUpdate[2] = (byte)((localID >> 16) & 0xFF);
-                                    terseUpdate[3] = (byte)((localID >> 24) & 0xFF);
-
-                                    if (ui.IsPhysics)
+                                    if (CanPhysCompressedBeSent(ui.LocalID))
                                     {
-                                        if (CanPhysTerseBeSent(localID))
+                                        bool foundobject = false;
+                                        send_phys_packet:
+                                        if (phys_compressed_packet_data != null && (compressedUpdate.Length + phys_compressed_packet_data_length > 1400 || foundobject))
                                         {
-                                            if (phys_terse_packet != null && terseUpdate.Length + phys_terse_packet.DataLength > 1400)
-                                            {
-                                                phys_terse_packet.Data[17] = phys_terse_packet_count;
-                                                SendObjectUpdateMsg(phys_terse_packet);
-                                                phys_terse_packet = null;
-                                                phys_terse_packet_count = 0;
-                                            }
-
-                                            if (phys_terse_packet == null)
-                                            {
-                                                phys_terse_packet = new UDPPacket();
-                                                if (phys_terse_packet == null)
-                                                {
-                                                    break;
-                                                }
-                                                phys_terse_object_release = new PhysTerseObjectReleaseThrottle(this);
-                                                phys_terse_packet.IsReliable = true;
-                                                phys_terse_packet.AckMessage = phys_terse_object_release;
-                                                phys_terse_packet.WriteMessageNumber(MessageType.ImprovedTerseObjectUpdate);
-                                                phys_terse_packet.WriteUInt64(regionHandle);
-                                                phys_terse_packet.WriteUInt16(GetPhysicsDilation()); /* dilation */
-                                                phys_terse_packet.WriteUInt8(0);
-                                            }
-
-                                            phys_terse_packet.WriteBytes(terseUpdate);
-                                            phys_terse_object_release.Add(ui.LocalID);
-                                            ++phys_terse_packet_count;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        if (nonphys_terse_packet != null && terseUpdate.Length + nonphys_terse_packet.DataLength > 1400)
-                                        {
-                                            nonphys_terse_packet.Data[17] = nonphys_terse_packet_count;
-                                            SendObjectUpdateMsg(nonphys_terse_packet);
-                                            nonphys_terse_packet = null;
-                                            nonphys_terse_packet_count = 0;
-                                        }
-
-                                        if (nonphys_terse_packet == null)
-                                        {
-                                            nonphys_terse_packet = GetTxObjectPoolPacket();
-                                            if (nonphys_terse_packet == null)
+                                            var compressed_packet = new UDPPacket();
+                                            if (compressed_packet == null)
                                             {
                                                 break;
                                             }
-                                            nonphys_terse_packet.IsReliable = true;
-                                            nonphys_terse_packet.WriteMessageNumber(MessageType.ImprovedTerseObjectUpdate);
-                                            nonphys_terse_packet.WriteUInt64(regionHandle);
-                                            nonphys_terse_packet.WriteUInt16(GetPhysicsDilation()); /* dilation */
-                                            nonphys_terse_packet.WriteUInt8(0);
+                                            compressed_packet.IsReliable = true;
+                                            compressed_packet.AckMessage = phys_compressed_object_release;
+                                            phys_compressed_object_release = null;
+                                            SendCompressedUpdateMsg(compressed_packet, phys_compressed_packet_data);
+                                            phys_compressed_packet_data = null;
                                         }
-                                        nonphys_terse_packet.WriteBytes(terseUpdate);
-                                        ++nonphys_terse_packet_count;
+
+                                        if (phys_compressed_packet_data == null)
+                                        {
+                                            phys_compressed_packet_data = new List<KeyValuePair<IObjUpdateInfo, byte[]>>();
+                                            phys_compressed_packet_data_length = 0;
+                                            phys_compressed_object_release = new PhysCompressedObjectReleaseThrottle(this);
+                                        }
+                                        else
+                                        {
+                                            foreach (KeyValuePair<IObjUpdateInfo, byte[]> kvp in phys_compressed_packet_data)
+                                            {
+                                                if (kvp.Key.LocalID == ui.LocalID)
+                                                {
+                                                    foundobject = true;
+                                                    goto send_phys_packet;
+                                                }
+                                            }
+                                        }
+
+                                        phys_compressed_object_release.Add(ui.LocalID);
+                                        phys_compressed_packet_data.Add(new KeyValuePair<IObjUpdateInfo, byte[]>(ui, compressedUpdate));
+                                        phys_compressed_packet_data_length += compressedUpdate.Length;
                                     }
+                                }
+                                else
+                                {
+                                    bool foundobject = false;
+                                    send_nonphys_packet:
+                                    if (nonphys_compressed_packet_data != null && (compressedUpdate.Length + nonphys_compressed_packet_data_length > 1400 || foundobject))
+                                    {
+                                        var compressed_packet = GetTxObjectPoolPacket();
+                                        if (compressed_packet == null)
+                                        {
+                                            break;
+                                        }
+                                        compressed_packet.IsReliable = true;
+
+                                        ChainMessage chain = null;
+
+                                        if (compressed_packet_agentanim != null)
+                                        {
+                                            chain = compressed_packet_agentanim;
+                                            compressed_packet.AckMessage = compressed_packet_agentanim;
+                                            compressed_packet_agentanim = null;
+                                        }
+
+                                        if (compressed_packet_objanim != null)
+                                        {
+                                            if (chain != null)
+                                            {
+                                                chain.ChainedMessage = compressed_packet_objanim;
+                                            }
+                                            else
+                                            {
+                                                compressed_packet.AckMessage = compressed_packet_objanim;
+                                            }
+                                            chain = compressed_packet_objanim;
+                                            compressed_packet_objanim = null;
+                                        }
+
+                                        if (chain != null)
+                                        {
+                                            chain.ChainedMessage = compressed_packet_objprop;
+                                        }
+                                        else
+                                        {
+                                            compressed_packet.AckMessage = compressed_packet_objprop;
+                                        }
+
+                                        compressed_packet_objprop = null;
+                                        SendCompressedUpdateMsg(compressed_packet, nonphys_compressed_packet_data);
+                                        nonphys_compressed_packet_data = null;
+                                    }
+
+                                    if (nonphys_compressed_packet_data == null)
+                                    {
+                                        nonphys_compressed_packet_data = new List<KeyValuePair<IObjUpdateInfo, byte[]>>();
+                                        nonphys_compressed_packet_data_length = 0;
+                                    }
+                                    else
+                                    {
+                                        foreach (KeyValuePair<IObjUpdateInfo, byte[]> kvp in nonphys_compressed_packet_data)
+                                        {
+                                            if (kvp.Key.LocalID == ui.LocalID)
+                                            {
+                                                foundobject = true;
+                                                goto send_nonphys_packet;
+                                            }
+                                        }
+                                    }
+
+                                    nonphys_compressed_packet_data.Add(new KeyValuePair<IObjUpdateInfo, byte[]>(ui, compressedUpdate));
+                                    nonphys_compressed_packet_data_length += compressedUpdate.Length;
                                 }
                             }
                         }
@@ -1060,12 +1120,19 @@ send_nonphys_packet:
                         phys_full_packet_data = null;
                     }
 
-                    if (phys_terse_packet != null && physicalOutQueue.Count == 0)
+
+                    if (phys_compressed_packet_data != null && physicalOutQueue.Count == 0)
                     {
-                        phys_terse_packet.Data[17] = phys_terse_packet_count;
-                        SendObjectUpdateMsg(phys_terse_packet);
-                        phys_terse_packet = null;
-                        phys_terse_object_release = null;
+                        var compressed_packet = new UDPPacket();
+                        if (compressed_packet == null)
+                        {
+                            break;
+                        }
+                        compressed_packet.IsReliable = true;
+                        compressed_packet.AckMessage = phys_compressed_object_release;
+                        phys_compressed_object_release = null;
+                        SendCompressedUpdateMsg(compressed_packet, phys_compressed_packet_data);
+                        phys_compressed_packet_data = null;
                     }
                 }
 
@@ -1111,11 +1178,48 @@ send_nonphys_packet:
                     SendFullUpdateMsg(full_packet, nonphys_full_packet_data);
                 }
 
-                if (nonphys_terse_packet != null)
+                if (nonphys_compressed_packet_data != null)
                 {
-                    nonphys_terse_packet.Data[17] = nonphys_terse_packet_count;
-                    SendObjectUpdateMsg(nonphys_terse_packet);
+                    var compressed_packet = GetTxObjectPoolPacket();
+                    if (compressed_packet == null)
+                    {
+                        break;
+                    }
+                    compressed_packet.IsReliable = true;
+
+                    ChainMessage chain = null;
+
+                    if (compressed_packet_agentanim != null)
+                    {
+                        chain = compressed_packet_agentanim;
+                        compressed_packet.AckMessage = compressed_packet_agentanim;
+                    }
+
+                    if (compressed_packet_objanim != null)
+                    {
+                        if (chain != null)
+                        {
+                            chain.ChainedMessage = compressed_packet_objanim;
+                        }
+                        else
+                        {
+                            compressed_packet.AckMessage = compressed_packet_objanim;
+                        }
+                        chain = compressed_packet_objanim;
+                    }
+
+                    if (chain != null)
+                    {
+                        chain.ChainedMessage = compressed_packet_objprop;
+                    }
+                    else
+                    {
+                        compressed_packet.AckMessage = compressed_packet_objprop;
+                    }
+
+                    SendCompressedUpdateMsg(compressed_packet, nonphys_compressed_packet_data);
                 }
+
 
                 if(ko != null)
                 {
