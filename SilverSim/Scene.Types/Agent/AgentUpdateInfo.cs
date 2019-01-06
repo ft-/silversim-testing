@@ -33,7 +33,7 @@ namespace SilverSim.Scene.Types.Agent
         public uint LocalID { get; set; }
         public IAgent Agent { get; }
         public UUID ID { get; internal set; }
-        public UUID SceneID { get; private set; }
+        public UUID SceneID { get; }
 
         public bool IsAlwaysFull => true;
 

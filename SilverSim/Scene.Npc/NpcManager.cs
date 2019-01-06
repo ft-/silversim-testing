@@ -178,7 +178,7 @@ namespace SilverSim.Scene.Npc
                         m_Log.InfoFormat("Rezzing persistent NPC {0} {1} ({2})", npcInfo.Npc.FirstName, npcInfo.Npc.LastName, npcInfo.Npc.ID);
                         try
                         {
-                            agent = new NpcAgent(npcInfo.Npc, m_PersistentAgentServices)
+                            agent = new NpcAgent(npcInfo.Npc, m_PersistentAgentServices, sceneID)
                             {
                                 GlobalPosition = npcInfo.Position,
                                 LookAt = npcInfo.LookAt,
@@ -294,7 +294,7 @@ namespace SilverSim.Scene.Npc
             };
             if (m_KnownScenes.TryGetValue(sceneid, out scene))
             {
-                var agent = new NpcAgent(npcId, agentServiceList)
+                var agent = new NpcAgent(npcId, agentServiceList, sceneid)
                 {
                     NpcOwner = owner,
                     Group = group
@@ -312,7 +312,6 @@ namespace SilverSim.Scene.Npc
                     inventoryService.CheckInventory(npcInfo.Npc.ID);
                     presenceService.Store(npcInfo);
                     agent.CurrentScene = scene;
-                    agent.GetUpdateInfo(scene.ID).SceneID = scene.ID;
                     agent.Position = position;
                     scene.Add(agent);
                 }

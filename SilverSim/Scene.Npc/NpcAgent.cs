@@ -100,7 +100,8 @@ namespace SilverSim.Scene.Npc
 
         public NpcAgent(
             UGUIWithName npcID,
-            AgentServiceList serviceList)
+            AgentServiceList serviceList,
+            UUID sceneID)
             : base(npcID.ID, npcID.HomeURI)
         {
             FirstName = npcID.FirstName;
@@ -109,7 +110,7 @@ namespace SilverSim.Scene.Npc
             m_ProfileService = serviceList.Get<ProfileServiceInterface>();
             m_PresenceService = serviceList.Get<IPresenceServiceInterface>();
             NpcPresenceService = serviceList.Get<NpcPresenceServiceInterface>();
-            m_UpdateInfo = new AgentUpdateInfo(this, UUID.Zero);
+            m_UpdateInfo = new AgentUpdateInfo(this, sceneID);
             OnAppearanceUpdate += HandleAppearanceUpdate;
         }
 
