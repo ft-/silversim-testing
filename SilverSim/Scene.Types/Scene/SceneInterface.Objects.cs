@@ -293,7 +293,7 @@ namespace SilverSim.Scene.Types.Scene
             foreach(MultipleObjectUpdate.ObjectDataEntry d in req.ObjectData)
             {
 #if DEBUG
-                m_Log.DebugFormat("MultipleObjectUpdate localid={0}", d.ObjectLocalID);
+                m_Log.DebugFormat("MultipleObjectUpdate localid={0} flags={1}", d.ObjectLocalID, d.Flags);
 #endif
 
                 ObjectPart prim;
