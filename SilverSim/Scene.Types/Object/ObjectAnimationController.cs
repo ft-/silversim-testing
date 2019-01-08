@@ -263,7 +263,16 @@ namespace SilverSim.Scene.Types.Object
                 {
                     throw new ArgumentNullException(nameof(value));
                 }
-                if((value.Length - 4) % 20 != 0)
+                if (value.Length == 0)
+                {
+                    lock (m_Lock)
+                    {
+                        m_ActiveAnimations.Clear();
+                    }
+                    return;
+                }
+
+                if ((value.Length - 4) % 20 != 0)
                 {
                     throw new ArgumentOutOfRangeException(nameof(value));
                 }
