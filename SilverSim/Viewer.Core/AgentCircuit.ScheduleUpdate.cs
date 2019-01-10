@@ -877,7 +877,7 @@ namespace SilverSim.Viewer.Core
                                         {
                                             bool foundobject = false;
                                             send_phys_packet:
-                                            if (phys_full_packet_data != null && (fullUpdate.Length + phys_full_packet_data_length > 1400 || foundobject))
+                                            if (phys_full_packet_data != null && (fullUpdate.Length + phys_full_packet_data_length > 1400 || phys_full_packet_data.Count == 255 || foundobject))
                                             {
                                                 var full_packet = new UDPPacket();
                                                 if (full_packet == null)
@@ -918,7 +918,7 @@ namespace SilverSim.Viewer.Core
                                     {
                                         bool foundobject = false;
 send_nonphys_packet:
-                                        if (nonphys_full_packet_data != null && (fullUpdate.Length + nonphys_full_packet_data_length > 1400 || foundobject))
+                                        if (nonphys_full_packet_data != null && (fullUpdate.Length + nonphys_full_packet_data_length > 1400 || nonphys_full_packet_data.Count == 255 || foundobject))
                                         {
                                             var full_packet = GetTxObjectPoolPacket();
                                             if (full_packet == null)
@@ -994,7 +994,7 @@ send_nonphys_packet:
                                     {
                                         bool foundobject = false;
                                         send_phys_packet:
-                                        if (phys_compressed_packet_data != null && (compressedUpdate.Length + phys_compressed_packet_data_length > 1400 || foundobject))
+                                        if (phys_compressed_packet_data != null && (compressedUpdate.Length + phys_compressed_packet_data_length > 1400 || phys_compressed_packet_data.Count == 255 || foundobject))
                                         {
                                             var compressed_packet = new UDPPacket();
                                             if (compressed_packet == null)
@@ -1035,7 +1035,7 @@ send_nonphys_packet:
                                 {
                                     bool foundobject = false;
                                     send_nonphys_packet:
-                                    if (nonphys_compressed_packet_data != null && (compressedUpdate.Length + nonphys_compressed_packet_data_length > 1400 || foundobject))
+                                    if (nonphys_compressed_packet_data != null && (compressedUpdate.Length + nonphys_compressed_packet_data_length > 1400 || nonphys_compressed_packet_data.Count == 255 || foundobject))
                                     {
                                         var compressed_packet = GetTxObjectPoolPacket();
                                         if (compressed_packet == null)
