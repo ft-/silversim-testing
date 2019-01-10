@@ -1193,7 +1193,7 @@ namespace SilverSim.Scene.Types.Object.Localization
             {
                 var compressedflags = ObjectUpdateCompressed.CompressedFlags.None;
                 TextParam textparam = Text;
-                int compressedSize = 86;
+                int compressedSize = (int)CompressedUpdateFixedOffset.DynamicPart;
                 byte[] textbytes = null;
                 byte[] mediaurlbytes = null;
                 byte[] namebytes = null;
@@ -1254,38 +1254,38 @@ namespace SilverSim.Scene.Types.Object.Localization
                 }
 
                 var compressedData = new byte[compressedSize];
-                compressedData[0] = (byte)primUpdateFlags;
-                compressedData[1] = (byte)(primUpdateFlags >> 8);
-                compressedData[2] = (byte)(primUpdateFlags >> 16);
-                compressedData[3] = (byte)(primUpdateFlags >> 24);
-                compressedData[4] = (byte)(compressedData.Length - 6);
-                compressedData[5] = (byte)((compressedData.Length - 6) >> 8);
-                m_Part.ID.ToBytes(compressedData, 6);
+                compressedData[(int)CompressedUpdateFixedOffset.UpdateFlags + 0] = (byte)primUpdateFlags;
+                compressedData[(int)CompressedUpdateFixedOffset.UpdateFlags + 1] = (byte)(primUpdateFlags >> 8);
+                compressedData[(int)CompressedUpdateFixedOffset.UpdateFlags + 2] = (byte)(primUpdateFlags >> 16);
+                compressedData[(int)CompressedUpdateFixedOffset.UpdateFlags + 3] = (byte)(primUpdateFlags >> 24);
+                compressedData[(int)CompressedUpdateFixedOffset.CompressedUpdateDataSize + 0] = (byte)(compressedData.Length - 6);
+                compressedData[(int)CompressedUpdateFixedOffset.CompressedUpdateDataSize + 1] = (byte)((compressedData.Length - 6) >> 8);
+                m_Part.ID.ToBytes(compressedData, (int)CompressedUpdateFixedOffset.ObjectID);
                 //LocalID integrated later in sender
-                compressedData[16 + 6] = 0;//(byte)(LocalID & 0xFF);
-                compressedData[17 + 6] = 0;//(byte)((LocalID >> 8) & 0xFF);
-                compressedData[18 + 6] = 0;//(byte)((LocalID >> 16) & 0xFF);
-                compressedData[19 + 6] = 0;// (byte)((LocalID >> 24) & 0xFF);
+                compressedData[(int)CompressedUpdateFixedOffset.LocalID + 0] = 0;//(byte)(LocalID & 0xFF);
+                compressedData[(int)CompressedUpdateFixedOffset.LocalID + 1] = 0;//(byte)((LocalID >> 8) & 0xFF);
+                compressedData[(int)CompressedUpdateFixedOffset.LocalID + 2] = 0;//(byte)((LocalID >> 16) & 0xFF);
+                compressedData[(int)CompressedUpdateFixedOffset.LocalID + 3] = 0;// (byte)((LocalID >> 24) & 0xFF);
                 ObjectPart.PrimitiveShape shape = m_Part.Shape;
-                compressedData[20 + 6] = (byte)shape.PCode;
-                compressedData[21 + 6] = shape.State;
+                compressedData[(int)CompressedUpdateFixedOffset.PCode] = (byte)shape.PCode;
+                compressedData[(int)CompressedUpdateFixedOffset.State] = shape.State;
                 //CRC
-                compressedData[22 + 6] = 0;
-                compressedData[23 + 6] = 0;
-                compressedData[24 + 6] = 0;
-                compressedData[25 + 6] = 0;
-                compressedData[26 + 6] = (byte)m_Part.Material;
-                compressedData[27 + 6] = (byte)m_Part.ClickAction;
-                m_Part.Size.ToBytes(compressedData, 28 + 6);
-                m_Part.Position.ToBytes(compressedData, 40 + 6);
-                m_Part.Rotation.ToBytes(compressedData, 52 + 6);
-                compressedData[64] = (byte)((uint)compressedflags & 0xFF);
-                compressedData[65] = (byte)(((uint)compressedflags >> 8) & 0xFF);
-                compressedData[66] = (byte)(((uint)compressedflags >> 16) & 0xFF);
-                compressedData[67] = (byte)(((uint)compressedflags >> 24) & 0xFF);
-                m_Part.Owner.ID.ToBytes(compressedData, 68 + 6);
+                compressedData[(int)CompressedUpdateFixedOffset.Crc + 0] = 0;
+                compressedData[(int)CompressedUpdateFixedOffset.Crc + 1] = 0;
+                compressedData[(int)CompressedUpdateFixedOffset.Crc + 2] = 0;
+                compressedData[(int)CompressedUpdateFixedOffset.Crc + 3] = 0;
+                compressedData[(int)CompressedUpdateFixedOffset.Material] = (byte)m_Part.Material;
+                compressedData[(int)CompressedUpdateFixedOffset.ClickAction] = (byte)m_Part.ClickAction;
+                m_Part.Size.ToBytes(compressedData, (int)CompressedUpdateFixedOffset.Scale);
+                m_Part.Position.ToBytes(compressedData, (int)CompressedUpdateFixedOffset.Position);
+                m_Part.Rotation.ToBytes(compressedData, (int)CompressedUpdateFixedOffset.Rotation);
+                compressedData[(int)CompressedUpdateFixedOffset.CompressedFlags + 0] = (byte)((uint)compressedflags & 0xFF);
+                compressedData[(int)CompressedUpdateFixedOffset.CompressedFlags + 1] = (byte)(((uint)compressedflags >> 8) & 0xFF);
+                compressedData[(int)CompressedUpdateFixedOffset.CompressedFlags + 2] = (byte)(((uint)compressedflags >> 16) & 0xFF);
+                compressedData[(int)CompressedUpdateFixedOffset.CompressedFlags + 3] = (byte)(((uint)compressedflags >> 24) & 0xFF);
+                m_Part.Owner.ID.ToBytes(compressedData, (int)CompressedUpdateFixedOffset.OwnerID);
 
-                int offset = 86;
+                int offset = (int)CompressedUpdateFixedOffset.DynamicPart;
 
                 //Angular velocity
                 if ((compressedflags & ObjectUpdateCompressed.CompressedFlags.HasAngularVelocity) != 0)

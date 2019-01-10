@@ -793,19 +793,18 @@ namespace SilverSim.Viewer.Core
                         }
                         else
                         {
-                            var dofull = false;
+                            var dofull = ui.IsAlwaysFull;
                             var mustBeNonPhys = false;
                             var objknown = false;
-                            if(!ui.IsAlwaysFull && LastObjSerialNo.Contains(ui.LocalID))
+                            if(LastObjSerialNo.Contains(ui.LocalID))
                             {
                                 int serialno = LastObjSerialNo[ui.LocalID];
-                                dofull = serialno != ui.SerialNumber;
+                                dofull |= ui.IsPhysics;// serialno != ui.SerialNumber;
                                 objknown = true;
                             }
                             else
                             {
                                 LastObjSerialNo[ui.LocalID] = ui.SerialNumber;
-                                dofull = true;
                             }
 
                             byte[] propUpdate = ui.GetPropertiesUpdate(Agent.CurrentCulture);
