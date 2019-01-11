@@ -1946,7 +1946,7 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region Object Details Methods
-        public void GetObjectDetails(AnArray.Enumerator enumerator, AnArray paramList)
+        public void GetObjectDetails(IEnumerator<IValue> enumerator, AnArray paramList)
         {
             while (enumerator.MoveNext())
             {

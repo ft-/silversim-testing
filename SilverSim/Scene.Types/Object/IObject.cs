@@ -269,10 +269,10 @@ namespace SilverSim.Scene.Types.Object
 
         #region Methods
         void GetBoundingBox(out BoundingBox box);
-        void GetPrimitiveParams(AnArray.Enumerator enumerator, AnArray paramList);
-        void GetPrimitiveParams(AnArray.Enumerator enumerator, AnArray paramList, CultureInfo cultureInfo);
+        void GetPrimitiveParams(IEnumerator<IValue> enumerator, AnArray paramList);
+        void GetPrimitiveParams(IEnumerator<IValue> enumerator, AnArray paramList, CultureInfo cultureInfo);
         void SetPrimitiveParams(AnArray.MarkEnumerator enumerator);
-        void GetObjectDetails(AnArray.Enumerator enumerator, AnArray paramList);
+        void GetObjectDetails(IEnumerator<IValue> enumerator, AnArray paramList);
         DetectedTypeFlags DetectedType { get; }
         void PostEvent(IScriptEvent ev);
 

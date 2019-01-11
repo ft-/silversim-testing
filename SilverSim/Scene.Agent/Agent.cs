@@ -584,10 +584,10 @@ namespace SilverSim.Scene.Agent
         #endregion
 
         #region IObject Methods
-        public void GetPrimitiveParams(AnArray.Enumerator enumerator, AnArray paramList, CultureInfo currentCulture) =>
+        public void GetPrimitiveParams(IEnumerator<IValue> enumerator, AnArray paramList, CultureInfo currentCulture) =>
             GetPrimitiveParams(enumerator, paramList);
 
-        public void GetPrimitiveParams(AnArray.Enumerator enumerator, AnArray paramList)
+        public void GetPrimitiveParams(IEnumerator<IValue> enumerator, AnArray paramList)
         {
             PrimitiveParamsType paramtype = ParamsHelper.GetPrimParamType(enumerator);
             switch (paramtype)
@@ -682,7 +682,7 @@ namespace SilverSim.Scene.Agent
             }
         }
 
-        public void GetObjectDetails(AnArray.Enumerator enumerator, AnArray paramList)
+        public void GetObjectDetails(IEnumerator<IValue> enumerator, AnArray paramList)
         {
             while (enumerator.MoveNext())
             {

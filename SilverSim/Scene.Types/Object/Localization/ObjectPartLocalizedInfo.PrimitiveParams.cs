@@ -55,7 +55,7 @@ namespace SilverSim.Scene.Types.Object.Localization
             }
         }
 
-        internal void GetTexPrimitiveParams(AnArray.Enumerator enumerator, PrimitiveParamsType type, AnArray paramList, string paramtypename)
+        internal void GetTexPrimitiveParams(IEnumerator<IValue> enumerator, PrimitiveParamsType type, AnArray paramList, string paramtypename)
         {
             m_TextureEntryLock.AcquireReaderLock(() =>
             {

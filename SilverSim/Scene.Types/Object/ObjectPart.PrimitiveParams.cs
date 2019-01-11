@@ -1268,9 +1268,9 @@ namespace SilverSim.Scene.Types.Object
         }
 
         #region Primitive Methods
-        public void GetPrimitiveParams(AnArray.Enumerator enumerator, AnArray paramList) => GetPrimitiveParams(enumerator, paramList, null);
+        public void GetPrimitiveParams(IEnumerator<IValue> enumerator, AnArray paramList) => GetPrimitiveParams(enumerator, paramList, null);
 
-        public void GetPrimitiveParams(AnArray.Enumerator enumerator, AnArray paramList, CultureInfo cultureInfo)
+        public void GetPrimitiveParams(IEnumerator<IValue> enumerator, AnArray paramList, CultureInfo cultureInfo)
         {
             ObjectPartLocalizedInfo localization = GetLocalization(cultureInfo);
             if (enumerator.Current == null)

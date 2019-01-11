@@ -922,10 +922,10 @@ namespace SilverSim.Scene.Types.Object
         }
 
         #region Primitive Params Methods
-        public void GetPrimitiveParams(int linkThis, int linkTarget, AnArray.Enumerator enumerator, AnArray paramList) =>
+        public void GetPrimitiveParams(int linkThis, int linkTarget, IEnumerator<IValue> enumerator, AnArray paramList) =>
             GetPrimitiveParams(linkThis, linkTarget, enumerator, paramList, null);
 
-        public void GetPrimitiveParams(int linkThis, int linkTarget, AnArray.Enumerator enumerator, AnArray paramList, CultureInfo initialCulture)
+        public void GetPrimitiveParams(int linkThis, int linkTarget, IEnumerator<IValue> enumerator, AnArray paramList, CultureInfo initialCulture)
         {
             CultureInfo currentCulture = initialCulture;
             if(0 == linkTarget)
@@ -1024,12 +1024,12 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        public void GetPrimitiveParams(AnArray.Enumerator enumerator, AnArray paramList)
+        public void GetPrimitiveParams(IEnumerator<IValue> enumerator, AnArray paramList)
         {
             GetPrimitiveParams(LINK_ROOT, LINK_ROOT, enumerator, paramList, null);
         }
 
-        public void GetPrimitiveParams(AnArray.Enumerator enumerator, AnArray paramList, CultureInfo currentCulture)
+        public void GetPrimitiveParams(IEnumerator<IValue> enumerator, AnArray paramList, CultureInfo currentCulture)
         {
             GetPrimitiveParams(LINK_ROOT, LINK_ROOT, enumerator, paramList, currentCulture);
         }
@@ -1247,7 +1247,7 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region Object Details Methods
-        public void GetObjectDetails(AnArray.Enumerator enumerator, AnArray paramList)
+        public void GetObjectDetails(IEnumerator<IValue> enumerator, AnArray paramList)
         {
             throw new NotSupportedException();
         }
