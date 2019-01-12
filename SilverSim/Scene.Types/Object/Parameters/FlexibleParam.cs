@@ -45,6 +45,7 @@ namespace SilverSim.Scene.Types.Object.Parameters
 
             return new FlexibleParam
             {
+                IsFlexible = true,
                 Softness = ((value[0] & 0x80) >> 6) | ((value[1] & 0x80) >> 7),
                 Tension = (value[0] & 0x7F) / 10.0f,
                 Friction = (value[1] & 0x7F) / 10.0f,
