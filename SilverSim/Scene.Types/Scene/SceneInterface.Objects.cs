@@ -980,6 +980,7 @@ namespace SilverSim.Scene.Types.Scene
                             byte[] param = data.ParamData;
                             ObjectPart.PrimitiveShape shape = part.Shape;
                             shape.SculptMap = new UUID(param, 0);
+                            shape.SculptType = (PrimitiveSculptType)(param[16] & 0x3F);
                             shape.IsSculptInverted = (param[16] & 0x40) != 0;
                             shape.IsSculptMirrored = (param[16] & 0x80) != 0;
                             part.Shape = shape;
