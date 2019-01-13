@@ -30,7 +30,6 @@ namespace SilverSim.Types.Primitive
         public const int MAX_TEXTURE_FACES = 45;
         private readonly TextureEntryFace[] m_FaceTextures = new TextureEntryFace[MAX_TEXTURE_FACES];
         public TextureEntryFace DefaultTexture;
-        public static readonly UUID WHITE_TEXTURE = "5748decc-f629-461c-9a36-a35a221fe21f";
         private readonly object m_Lock = new object();
 
         public TextureEntry()
