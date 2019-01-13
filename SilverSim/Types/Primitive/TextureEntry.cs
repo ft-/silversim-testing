@@ -659,7 +659,7 @@ namespace SilverSim.Types.Primitive
 
                     #region OffsetV
                     binWriter.Write(TEOffsetShort(DefaultTexture.OffsetV));
-                    for (i = 0, mask = 1; i < MAX_TEXTURE_FACES && offsetvs != 0; i++, mask <<= 1)
+                    for (i = 0, mask = 1; offsetvs != 0; i++, mask <<= 1)
                     {
                         short offsetvdata = TEOffsetShort(m_FaceTextures[i].OffsetV);
                         if ((offsetvs & mask) == 0)
@@ -689,7 +689,7 @@ namespace SilverSim.Types.Primitive
 
                     #region Rotation
                     binWriter.Write(TERotationShort(DefaultTexture.Rotation));
-                    for (i = 0, mask = 1; i < MAX_TEXTURE_FACES && rotations != 0; i++, mask <<= 1)
+                    for (i = 0, mask = 1; rotations != 0; i++, mask <<= 1)
                     {
                         short rotationdata = TERotationShort(m_FaceTextures[i].Rotation);
                         if ((rotations & mask) == 0)
@@ -720,7 +720,7 @@ namespace SilverSim.Types.Primitive
                     #region Material
                     byte fbright_mask = (byte)~(fullbrightdisable ? FULLBRIGHT_MASK : 0);
                     binWriter.Write(DefaultTexture.Material & fbright_mask);
-                    for (i = 0, mask = 1; i < MAX_TEXTURE_FACES && materials != 0; i++, mask <<= 1)
+                    for (i = 0, mask = 1; materials != 0; i++, mask <<= 1)
                     {
                         if ((materials & mask) == 0)
                         {
@@ -749,7 +749,7 @@ namespace SilverSim.Types.Primitive
 
                     #region Media
                     binWriter.Write(DefaultTexture.Media);
-                    for (i = 0, mask = 1; i < MAX_TEXTURE_FACES && medias != 0; i++, mask <<= 1)
+                    for (i = 0, mask = 1; medias != 0; i++, mask <<= 1)
                     {
                         if ((medias & mask) == 0)
                         {
@@ -778,7 +778,7 @@ namespace SilverSim.Types.Primitive
 
                     #region Glow
                     binWriter.Write(TEGlowByte(Math.Min(glowintensitylimit, DefaultTexture.Glow)));
-                    for (i = 0, mask = 1; i < MAX_TEXTURE_FACES && glows != 0; i++, mask <<= 1)
+                    for (i = 0, mask = 1; glows != 0; i++, mask <<= 1)
                     {
                         byte glowbyte = TEGlowByte(Math.Min(glowintensitylimit, m_FaceTextures[i].Glow));
                         if ((glows & mask) == 0)
@@ -808,7 +808,7 @@ namespace SilverSim.Types.Primitive
 
                     #region MaterialID
                     binWriter.Write(DefaultTexture.MaterialID.GetBytes());
-                    for (i = 0, mask = 1; i < MAX_TEXTURE_FACES && 0 != materialIDs; i++, mask <<= 1)
+                    for (i = 0, mask = 1; 0 != materialIDs; i++, mask <<= 1)
                     {
                         if ((materialIDs & mask) == 0)
                         {
