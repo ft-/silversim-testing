@@ -255,7 +255,7 @@ namespace SilverSim.Scene.Types.Object.Localization
             m_ParticleSystem = new byte[0];
             m_TextureAnimationBytes = new byte[0];
             m_TextureEntry = new TextureEntry();
-            m_TextureEntryBytes = new byte[0];
+            m_TextureEntryBytes = m_TextureEntry.GetBytes();
             m_TextureEntryBytes_LimitsEnabled = new byte[0];
             m_CollisionSound = new CollisionSoundParam();
             m_TouchText = string.Empty;

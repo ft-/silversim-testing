@@ -36,7 +36,7 @@ namespace SilverSim.Types.Primitive
         private byte m_Material;
         private byte m_MediaByte;
         private TextureAttributes m_AttributeFlags /* = TextureAttributes.None */;
-        private UUID m_TextureID = TextureConstant.Blank;
+        private UUID m_TextureID = TextureConstant.Default;
         private UUID m_MaterialID = UUID.Zero;
 
         private readonly TextureEntryFace m_DefaultTexture;
