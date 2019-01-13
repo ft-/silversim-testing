@@ -601,8 +601,8 @@ namespace SilverSim.Types.Primitive
                     #endregion Rotation
 
                     #region Material
-                    binWriter.Write(DefaultTexture.Material);
                     byte fbright_mask = (byte)~(fullbrightdisable ? FULLBRIGHT_MASK : 0);
+                    binWriter.Write(DefaultTexture.Material & fbright_mask);
                     for (i = 0, mask = 1; i < MAX_TEXTURE_FACES; i++, mask <<= 1)
                     {
                         if ((materials & mask) != 0)
@@ -628,7 +628,7 @@ namespace SilverSim.Types.Primitive
                     #endregion Media
 
                     #region Glow
-                    binWriter.Write(TEGlowByte(DefaultTexture.Glow));
+                    binWriter.Write(TEGlowByte(Math.Min(glowintensitylimit, DefaultTexture.Glow)));
                     for (i = 0, mask = 1; i < MAX_TEXTURE_FACES; i++, mask <<= 1)
                     {
                         if ((glows & mask) != 0)
