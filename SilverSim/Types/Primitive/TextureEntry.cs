@@ -451,8 +451,10 @@ namespace SilverSim.Types.Primitive
 
                     ulong mask;
                     int i;
+                    int j;
+                    ulong mask2;
 
-                    for (i = MAX_TEXTURE_FACES; i-- != 0;)
+                    for (i = MAX_TEXTURE_FACES, mask = (ulong)1 << (MAX_TEXTURE_FACES - 1); i-- != 0; mask >>= 1)
                     {
                         if (m_FaceTextures[i] == null)
                         {
@@ -461,47 +463,47 @@ namespace SilverSim.Types.Primitive
 
                         if (m_FaceTextures[i].TextureID != DefaultTexture.TextureID)
                         {
-                            textures |= (ulong)1 << i;
+                            textures |= mask;
                         }
                         if (m_FaceTextures[i].TextureColor != DefaultTexture.TextureColor)
                         {
-                            texturecolors |= (ulong)1 << i;
+                            texturecolors |= mask;
                         }
                         if (m_FaceTextures[i].RepeatU != DefaultTexture.RepeatU)
                         {
-                            repeatus |= (ulong)1 << i;
+                            repeatus |= mask;
                         }
                         if (m_FaceTextures[i].RepeatV != DefaultTexture.RepeatV)
                         {
-                            repeatvs |= (ulong)1 << i;
+                            repeatvs |= mask;
                         }
                         if (TEOffsetShort(m_FaceTextures[i].OffsetU) != TEOffsetShort(DefaultTexture.OffsetU))
                         {
-                            offsetus |= (ulong)1 << i;
+                            offsetus |= mask;
                         }
                         if (TEOffsetShort(m_FaceTextures[i].OffsetV) != TEOffsetShort(DefaultTexture.OffsetV))
                         {
-                            offsetvs |= (ulong)1 << i;
+                            offsetvs |= mask;
                         }
                         if (TERotationShort(m_FaceTextures[i].Rotation) != TERotationShort(DefaultTexture.Rotation))
                         {
-                            rotations |= (ulong)1 << i;
+                            rotations |= mask;
                         }
                         if (m_FaceTextures[i].Material != DefaultTexture.Material)
                         {
-                            materials |= (ulong)1 << i;
+                            materials |= mask;
                         }
                         if (m_FaceTextures[i].Media != DefaultTexture.Media)
                         {
-                            medias |= (ulong)1 << i;
+                            medias |= mask;
                         }
                         if (TEGlowByte(m_FaceTextures[i].Glow) != TEGlowByte(DefaultTexture.Glow))
                         {
-                            glows |= (ulong)1 << i;
+                            glows |= mask;
                         }
                         if (m_FaceTextures[i].MaterialID != DefaultTexture.MaterialID)
                         {
-                            materialIDs |= (ulong)1 << i;
+                            materialIDs |= mask;
                         }
                     }
 
@@ -509,13 +511,29 @@ namespace SilverSim.Types.Primitive
 
                     #region Texture
                     binWriter.Write(DefaultTexture.TextureID.GetBytes());
-                    for (i = 0, mask = 1; i < MAX_TEXTURE_FACES; i++, mask <<= 1)
+                    for (i = 0, mask = 1; textures != 0; i++, mask <<= 1)
                     {
-                        if ((textures & mask) != 0)
+                        if ((textures & mask) == 0)
                         {
-                            binWriter.Write(GetFaceBitfieldBytes(mask));
-                            binWriter.Write(m_FaceTextures[i].TextureID.GetBytes());
+                            continue;
                         }
+
+                        ulong finalmask = mask;
+                        for(j = i + 1, mask2 = mask << 1; j < MAX_TEXTURE_FACES && mask2 <= textures; j++, mask2 <<= 1)
+                        {
+                            if((textures & mask2) == 0)
+                            {
+                                continue;
+                            }
+                            if(m_FaceTextures[j].TextureID == m_FaceTextures[i].TextureID)
+                            {
+                                finalmask |= mask2;
+                            }
+                        }
+                        textures &= ~finalmask;
+
+                        binWriter.Write(GetFaceBitfieldBytes(finalmask));
+                        binWriter.Write(m_FaceTextures[i].TextureID.GetBytes());
                     }
                     binWriter.Write((byte)0);
                     #endregion Texture
@@ -523,79 +541,178 @@ namespace SilverSim.Types.Primitive
                     #region Color
                     // Serialize the color bytes inverted to optimize for zerocoding
                     binWriter.Write(ColorToBytes(DefaultTexture.TextureColor));
-                    for (i = 0, mask = 1; i < MAX_TEXTURE_FACES; i++, mask <<= 1)
+                    for (i = 0, mask = 1; texturecolors != 0; i++, mask <<= 1)
                     {
-                        if ((texturecolors & mask) != 0)
+                        if ((texturecolors & mask) == 0)
                         {
-                            binWriter.Write(GetFaceBitfieldBytes(mask));
-                            // Serialize the color bytes inverted to optimize for zerocoding
-                            binWriter.Write(ColorToBytes(m_FaceTextures[i].TextureColor));
+                            continue;
                         }
+
+                        ulong finalmask = mask;
+                        for (j = i + 1, mask2 = mask << 1; j < MAX_TEXTURE_FACES && mask2 <= texturecolors; j++, mask2 <<= 1)
+                        {
+                            if ((texturecolors & mask2) == 0)
+                            {
+                                continue;
+                            }
+                            if (m_FaceTextures[j].TextureColor == m_FaceTextures[i].TextureColor)
+                            {
+                                finalmask |= mask2;
+                            }
+                        }
+                        texturecolors &= ~finalmask;
+
+                        binWriter.Write(GetFaceBitfieldBytes(finalmask));
+                        // Serialize the color bytes inverted to optimize for zerocoding
+                        binWriter.Write(ColorToBytes(m_FaceTextures[i].TextureColor));
                     }
                     binWriter.Write((byte)0);
                     #endregion Color
 
                     #region RepeatU
                     binWriter.Write(DefaultTexture.RepeatU);
-                    for (i = 0, mask = 1; i < MAX_TEXTURE_FACES; i++, mask <<= 1)
+                    for (i = 0, mask = 1; repeatus != 0; i++, mask <<= 1)
                     {
-                        if ((repeatus & mask) != 0)
+                        if ((repeatus & mask) == 0)
                         {
-                            binWriter.Write(GetFaceBitfieldBytes(mask));
-                            binWriter.Write(FloatToBytes(m_FaceTextures[i].RepeatU));
+                            continue;
                         }
+
+                        ulong finalmask = mask;
+                        for (j = i + 1, mask2 = mask << 1; j < MAX_TEXTURE_FACES && mask2 <= repeatus; j++, mask2 <<= 1)
+                        {
+                            if ((repeatus & mask2) == 0)
+                            {
+                                continue;
+                            }
+                            if (m_FaceTextures[j].RepeatU == m_FaceTextures[i].RepeatU)
+                            {
+                                finalmask |= mask2;
+                            }
+                        }
+                        repeatus &= ~finalmask;
+
+                        binWriter.Write(GetFaceBitfieldBytes(finalmask));
+                        binWriter.Write(FloatToBytes(m_FaceTextures[i].RepeatU));
                     }
                     binWriter.Write((byte)0);
                     #endregion RepeatU
 
                     #region RepeatV
                     binWriter.Write(DefaultTexture.RepeatV);
-                    for (i = 0, mask = 1; i < MAX_TEXTURE_FACES; i++, mask <<= 1)
+                    for (i = 0, mask = 1; repeatvs != 0; i++, mask <<= 1)
                     {
-                        if ((repeatvs & mask) != 0)
+                        if ((repeatvs & mask) == 0)
                         {
-                            binWriter.Write(GetFaceBitfieldBytes(mask));
-                            binWriter.Write(FloatToBytes(m_FaceTextures[i].RepeatV));
+                            continue;
                         }
+
+                        ulong finalmask = mask;
+                        for (j = i + 1, mask2 = mask << 1; j < MAX_TEXTURE_FACES && mask2 <= repeatvs; j++, mask2 <<= 1)
+                        {
+                            if ((repeatvs & mask2) == 0)
+                            {
+                                continue;
+                            }
+                            if (m_FaceTextures[j].RepeatV == m_FaceTextures[i].RepeatV)
+                            {
+                                finalmask |= mask2;
+                            }
+                        }
+                        repeatvs &= ~finalmask;
+
+                        binWriter.Write(GetFaceBitfieldBytes(finalmask));
+                        binWriter.Write(FloatToBytes(m_FaceTextures[i].RepeatV));
                     }
                     binWriter.Write((byte)0);
                     #endregion RepeatV
 
                     #region OffsetU
                     binWriter.Write(TEOffsetShort(DefaultTexture.OffsetU));
-                    for (i = 0, mask = 1; i < MAX_TEXTURE_FACES; i++, mask <<= 1)
+                    for (i = 0, mask = 1; offsetus != 0; i++, mask <<= 1)
                     {
-                        if ((offsetus & mask) != 0)
+                        short offsetudata = TEOffsetShort(m_FaceTextures[i].OffsetU);
+                        if ((offsetus & mask) == 0)
                         {
-                            binWriter.Write(GetFaceBitfieldBytes(mask));
-                            binWriter.Write(TEOffsetShort(m_FaceTextures[i].OffsetU));
+                            continue;
                         }
+
+                        ulong finalmask = mask;
+                        for (j = i + 1, mask2 = mask << 1; j < MAX_TEXTURE_FACES && mask2 <= offsetus; j++, mask2 <<= 1)
+                        {
+                            if ((offsetus & mask2) == 0)
+                            {
+                                continue;
+                            }
+                            if (TEOffsetShort(m_FaceTextures[j].OffsetU) == offsetudata)
+                            {
+                                finalmask |= mask2;
+                            }
+                        }
+                        offsetus &= ~finalmask;
+
+                        binWriter.Write(GetFaceBitfieldBytes(finalmask));
+                        binWriter.Write(offsetudata);
                     }
                     binWriter.Write((byte)0);
                     #endregion OffsetU
 
                     #region OffsetV
                     binWriter.Write(TEOffsetShort(DefaultTexture.OffsetV));
-                    for (i = 0, mask = 1; i < MAX_TEXTURE_FACES; i++, mask <<= 1)
+                    for (i = 0, mask = 1; i < MAX_TEXTURE_FACES && offsetvs != 0; i++, mask <<= 1)
                     {
-                        if ((offsetvs & mask) != 0)
+                        short offsetvdata = TEOffsetShort(m_FaceTextures[i].OffsetV);
+                        if ((offsetvs & mask) == 0)
                         {
-                            binWriter.Write(GetFaceBitfieldBytes(mask));
-                            binWriter.Write(TEOffsetShort(m_FaceTextures[i].OffsetV));
+                            continue;
                         }
+
+                        ulong finalmask = mask;
+                        for (j = i + 1, mask2 = mask << 1; j < MAX_TEXTURE_FACES && mask2 <= offsetvs; j++, mask2 <<= 1)
+                        {
+                            if ((offsetvs & mask2) == 0)
+                            {
+                                continue;
+                            }
+                            if (TEOffsetShort(m_FaceTextures[j].OffsetV) == offsetvdata)
+                            {
+                                finalmask |= mask2;
+                            }
+                        }
+                        offsetvs &= ~finalmask;
+
+                        binWriter.Write(GetFaceBitfieldBytes(finalmask));
+                        binWriter.Write(offsetvdata);
                     }
                     binWriter.Write((byte)0);
                     #endregion OffsetV
 
                     #region Rotation
                     binWriter.Write(TERotationShort(DefaultTexture.Rotation));
-                    for (i = 0, mask = 1; i < MAX_TEXTURE_FACES; i++, mask <<= 1)
+                    for (i = 0, mask = 1; i < MAX_TEXTURE_FACES && rotations != 0; i++, mask <<= 1)
                     {
-                        if ((rotations & mask) != 0)
+                        short rotationdata = TERotationShort(m_FaceTextures[i].Rotation);
+                        if ((rotations & mask) == 0)
                         {
-                            binWriter.Write(GetFaceBitfieldBytes(mask));
-                            binWriter.Write(TERotationShort(m_FaceTextures[i].Rotation));
+                            continue;
                         }
+
+                        ulong finalmask = mask;
+                        for (j = i + 1, mask2 = mask << 1; j < MAX_TEXTURE_FACES && mask2 <= rotations; j++, mask2 <<= 1)
+                        {
+                            if ((rotations & mask2) == 0)
+                            {
+                                continue;
+                            }
+                            if (TERotationShort(m_FaceTextures[j].Rotation) == rotationdata)
+                            {
+                                finalmask |= mask2;
+                            }
+                        }
+                        rotations &= ~finalmask;
+
+                        binWriter.Write(GetFaceBitfieldBytes(finalmask));
+                        binWriter.Write(rotationdata);
                     }
                     binWriter.Write((byte)0);
                     #endregion Rotation
@@ -603,53 +720,119 @@ namespace SilverSim.Types.Primitive
                     #region Material
                     byte fbright_mask = (byte)~(fullbrightdisable ? FULLBRIGHT_MASK : 0);
                     binWriter.Write(DefaultTexture.Material & fbright_mask);
-                    for (i = 0, mask = 1; i < MAX_TEXTURE_FACES; i++, mask <<= 1)
+                    for (i = 0, mask = 1; i < MAX_TEXTURE_FACES && materials != 0; i++, mask <<= 1)
                     {
-                        if ((materials & mask) != 0)
+                        if ((materials & mask) == 0)
                         {
-                            binWriter.Write(GetFaceBitfieldBytes(mask));
-                            binWriter.Write(m_FaceTextures[i].Material & fbright_mask);
+                            continue;
                         }
+
+                        ulong finalmask = mask;
+                        for (j = i + 1, mask2 = mask << 1; j < MAX_TEXTURE_FACES && mask2 <= materials; j++, mask2 <<= 1)
+                        {
+                            if ((materials & mask2) == 0)
+                            {
+                                continue;
+                            }
+                            if (m_FaceTextures[j].Material == m_FaceTextures[i].Material)
+                            {
+                                finalmask |= mask2;
+                            }
+                        }
+                        materials &= ~finalmask;
+
+                        binWriter.Write(GetFaceBitfieldBytes(finalmask));
+                        binWriter.Write(m_FaceTextures[i].Material & fbright_mask);
                     }
                     binWriter.Write((byte)0);
                     #endregion Material
 
                     #region Media
                     binWriter.Write(DefaultTexture.Media);
-                    for (i = 0, mask = 1; i < MAX_TEXTURE_FACES; i++, mask <<= 1)
+                    for (i = 0, mask = 1; i < MAX_TEXTURE_FACES && medias != 0; i++, mask <<= 1)
                     {
-                        if ((medias & mask) != 0)
+                        if ((medias & mask) == 0)
                         {
-                            binWriter.Write(GetFaceBitfieldBytes(mask));
-                            binWriter.Write(m_FaceTextures[i].Media);
+                            continue;
                         }
+
+                        ulong finalmask = mask;
+                        for (j = i + 1, mask2 = mask << 1; j < MAX_TEXTURE_FACES && mask2 <= medias; j++, mask2 <<= 1)
+                        {
+                            if ((medias & mask2) == 0)
+                            {
+                                continue;
+                            }
+                            if (m_FaceTextures[j].Media == m_FaceTextures[i].Media)
+                            {
+                                finalmask |= mask2;
+                            }
+                        }
+                        medias &= ~finalmask;
+
+                        binWriter.Write(GetFaceBitfieldBytes(finalmask));
+                        binWriter.Write(m_FaceTextures[i].Media);
                     }
                     binWriter.Write((byte)0);
                     #endregion Media
 
                     #region Glow
                     binWriter.Write(TEGlowByte(Math.Min(glowintensitylimit, DefaultTexture.Glow)));
-                    for (i = 0, mask = 1; i < MAX_TEXTURE_FACES; i++, mask <<= 1)
+                    for (i = 0, mask = 1; i < MAX_TEXTURE_FACES && glows != 0; i++, mask <<= 1)
                     {
-                        if ((glows & mask) != 0)
+                        byte glowbyte = TEGlowByte(Math.Min(glowintensitylimit, m_FaceTextures[i].Glow));
+                        if ((glows & mask) == 0)
                         {
-                            binWriter.Write(GetFaceBitfieldBytes(mask));
-                            binWriter.Write(TEGlowByte(Math.Min(glowintensitylimit, m_FaceTextures[i].Glow)));
+                            continue;
                         }
+
+                        ulong finalmask = mask;
+                        for (j = i + 1, mask2 = mask << 1; j < MAX_TEXTURE_FACES && mask2 <= glows; j++, mask2 <<= 1)
+                        {
+                            if ((glows & mask2) == 0)
+                            {
+                                continue;
+                            }
+                            if (TEGlowByte(Math.Min(glowintensitylimit, m_FaceTextures[j].Glow)) == glowbyte)
+                            {
+                                finalmask |= mask2;
+                            }
+                        }
+                        glows &= ~finalmask;
+
+                        binWriter.Write(GetFaceBitfieldBytes(finalmask));
+                        binWriter.Write(glowbyte);
                     }
                     binWriter.Write((byte)0);
                     #endregion Glow
 
                     #region MaterialID
                     binWriter.Write(DefaultTexture.MaterialID.GetBytes());
-                    for (i = 0, mask = 1; i < MAX_TEXTURE_FACES; i++, mask <<= 1)
+                    for (i = 0, mask = 1; i < MAX_TEXTURE_FACES && 0 != materialIDs; i++, mask <<= 1)
                     {
-                        if ((materialIDs & mask) != 0)
+                        if ((materialIDs & mask) == 0)
                         {
-                            binWriter.Write(GetFaceBitfieldBytes(mask));
-                            binWriter.Write(m_FaceTextures[i].MaterialID.GetBytes());
+                            continue;
                         }
+
+                        ulong finalmask = mask;
+                        for (j = i + 1, mask2 = mask << 1; j < MAX_TEXTURE_FACES && mask2 <= materialIDs; j++, mask2 <<= 1)
+                        {
+                            if ((materialIDs & mask2) == 0)
+                            {
+                                continue;
+                            }
+                            if (m_FaceTextures[j].MaterialID == m_FaceTextures[i].MaterialID)
+                            {
+                                finalmask |= mask2;
+                            }
+                        }
+                        materialIDs &= ~finalmask;
+
+                        binWriter.Write(GetFaceBitfieldBytes(finalmask));
+                        binWriter.Write(m_FaceTextures[i].MaterialID.GetBytes());
                     }
+                    binWriter.Write((byte)0);
                     #endregion MaterialID
 
                     return memStream.ToArray();
