@@ -437,30 +437,22 @@ namespace SilverSim.Types.Primitive
                 {
                     #region Bitfield Setup
 
-                    var textures = new ulong[m_FaceTextures.Length];
-                    InitializeArray(textures);
-                    var texturecolors = new ulong[m_FaceTextures.Length];
-                    InitializeArray(texturecolors);
-                    var repeatus = new ulong[m_FaceTextures.Length];
-                    InitializeArray(repeatus);
-                    var repeatvs = new ulong[m_FaceTextures.Length];
-                    InitializeArray(repeatvs);
-                    var offsetus = new ulong[m_FaceTextures.Length];
-                    InitializeArray(offsetus);
-                    var offsetvs = new ulong[m_FaceTextures.Length];
-                    InitializeArray(offsetvs);
-                    var rotations = new ulong[m_FaceTextures.Length];
-                    InitializeArray(rotations);
-                    var materials = new ulong[m_FaceTextures.Length];
-                    InitializeArray(materials);
-                    var medias = new ulong[m_FaceTextures.Length];
-                    InitializeArray(medias);
-                    var glows = new ulong[m_FaceTextures.Length];
-                    InitializeArray(glows);
-                    var materialIDs = new ulong[m_FaceTextures.Length];
-                    InitializeArray(materialIDs);
+                    ulong textures = 0;
+                    ulong texturecolors = 0;
+                    ulong repeatus = 0;
+                    ulong repeatvs = 0;
+                    ulong offsetus = 0;
+                    ulong offsetvs = 0;
+                    ulong rotations = 0;
+                    ulong materials = 0;
+                    ulong medias = 0;
+                    ulong glows = 0;
+                    ulong materialIDs = 0;
 
-                    for (int i = 0; i < m_FaceTextures.Length; i++)
+                    ulong mask;
+                    int i;
+
+                    for (i = MAX_TEXTURE_FACES; i-- != 0;)
                     {
                         if (m_FaceTextures[i] == null)
                         {
@@ -469,91 +461,47 @@ namespace SilverSim.Types.Primitive
 
                         if (m_FaceTextures[i].TextureID != DefaultTexture.TextureID)
                         {
-                            if (textures[i] == ulong.MaxValue)
-                            {
-                                textures[i] = 0;
-                            }
-                            textures[i] |= (ulong)1 << i;
+                            textures |= (ulong)1 << i;
                         }
                         if (m_FaceTextures[i].TextureColor != DefaultTexture.TextureColor)
                         {
-                            if (texturecolors[i] == ulong.MaxValue)
-                            {
-                                texturecolors[i] = 0;
-                            }
-                            texturecolors[i] |= (ulong)1 << i;
+                            texturecolors |= (ulong)1 << i;
                         }
                         if (m_FaceTextures[i].RepeatU != DefaultTexture.RepeatU)
                         {
-                            if (repeatus[i] == ulong.MaxValue)
-                            {
-                                repeatus[i] = 0;
-                            }
-                            repeatus[i] |= (ulong)1 << i;
+                            repeatus |= (ulong)1 << i;
                         }
                         if (m_FaceTextures[i].RepeatV != DefaultTexture.RepeatV)
                         {
-                            if (repeatvs[i] == ulong.MaxValue)
-                            {
-                                repeatvs[i] = 0;
-                            }
-                            repeatvs[i] |= (ulong)1 << i;
+                            repeatvs |= (ulong)1 << i;
                         }
                         if (TEOffsetShort(m_FaceTextures[i].OffsetU) != TEOffsetShort(DefaultTexture.OffsetU))
                         {
-                            if (offsetus[i] == ulong.MaxValue)
-                            {
-                                offsetus[i] = 0;
-                            }
-                            offsetus[i] |= (ulong)1 << i;
+                            offsetus |= (ulong)1 << i;
                         }
                         if (TEOffsetShort(m_FaceTextures[i].OffsetV) != TEOffsetShort(DefaultTexture.OffsetV))
                         {
-                            if (offsetvs[i] == ulong.MaxValue)
-                            {
-                                offsetvs[i] = 0;
-                            }
-                            offsetvs[i] |= (ulong)1 << i;
+                            offsetvs |= (ulong)1 << i;
                         }
                         if (TERotationShort(m_FaceTextures[i].Rotation) != TERotationShort(DefaultTexture.Rotation))
                         {
-                            if (rotations[i] == ulong.MaxValue)
-                            {
-                                rotations[i] = 0;
-                            }
-                            rotations[i] |= (ulong)1 << i;
+                            rotations |= (ulong)1 << i;
                         }
                         if (m_FaceTextures[i].Material != DefaultTexture.Material)
                         {
-                            if (materials[i] == ulong.MaxValue)
-                            {
-                                materials[i] = 0;
-                            }
-                            materials[i] |= (ulong)1 << i;
+                            materials |= (ulong)1 << i;
                         }
                         if (m_FaceTextures[i].Media != DefaultTexture.Media)
                         {
-                            if (medias[i] == ulong.MaxValue)
-                            {
-                                medias[i] = 0;
-                            }
-                            medias[i] |= (ulong)1 << i;
+                            medias |= (ulong)1 << i;
                         }
                         if (TEGlowByte(m_FaceTextures[i].Glow) != TEGlowByte(DefaultTexture.Glow))
                         {
-                            if (glows[i] == ulong.MaxValue)
-                            {
-                                glows[i] = 0;
-                            }
-                            glows[i] |= (ulong)1 << i;
+                            glows |= (ulong)1 << i;
                         }
                         if (m_FaceTextures[i].MaterialID != DefaultTexture.MaterialID)
                         {
-                            if (materialIDs[i] == ulong.MaxValue)
-                            {
-                                materialIDs[i] = 0;
-                            }
-                            materialIDs[i] |= (ulong)1 << i;
+                            materialIDs |= (ulong)1 << i;
                         }
                     }
 
@@ -561,11 +509,11 @@ namespace SilverSim.Types.Primitive
 
                     #region Texture
                     binWriter.Write(DefaultTexture.TextureID.GetBytes());
-                    for (int i = 0; i < textures.Length; i++)
+                    for (i = 0, mask = 1; i < MAX_TEXTURE_FACES; i++, mask <<= 1)
                     {
-                        if (textures[i] != ulong.MaxValue)
+                        if ((textures & mask) != 0)
                         {
-                            binWriter.Write(GetFaceBitfieldBytes(textures[i]));
+                            binWriter.Write(GetFaceBitfieldBytes(mask));
                             binWriter.Write(m_FaceTextures[i].TextureID.GetBytes());
                         }
                     }
@@ -575,11 +523,11 @@ namespace SilverSim.Types.Primitive
                     #region Color
                     // Serialize the color bytes inverted to optimize for zerocoding
                     binWriter.Write(ColorToBytes(DefaultTexture.TextureColor));
-                    for (int i = 0; i < texturecolors.Length; i++)
+                    for (i = 0, mask = 1; i < MAX_TEXTURE_FACES; i++, mask <<= 1)
                     {
-                        if (texturecolors[i] != ulong.MaxValue)
+                        if ((texturecolors & mask) != 0)
                         {
-                            binWriter.Write(GetFaceBitfieldBytes(texturecolors[i]));
+                            binWriter.Write(GetFaceBitfieldBytes(mask));
                             // Serialize the color bytes inverted to optimize for zerocoding
                             binWriter.Write(ColorToBytes(m_FaceTextures[i].TextureColor));
                         }
@@ -589,11 +537,11 @@ namespace SilverSim.Types.Primitive
 
                     #region RepeatU
                     binWriter.Write(DefaultTexture.RepeatU);
-                    for (int i = 0; i < repeatus.Length; i++)
+                    for (i = 0, mask = 1; i < MAX_TEXTURE_FACES; i++, mask <<= 1)
                     {
-                        if (repeatus[i] != ulong.MaxValue)
+                        if ((repeatus & mask) != 0)
                         {
-                            binWriter.Write(GetFaceBitfieldBytes(repeatus[i]));
+                            binWriter.Write(GetFaceBitfieldBytes(mask));
                             binWriter.Write(FloatToBytes(m_FaceTextures[i].RepeatU));
                         }
                     }
@@ -602,11 +550,11 @@ namespace SilverSim.Types.Primitive
 
                     #region RepeatV
                     binWriter.Write(DefaultTexture.RepeatV);
-                    for (int i = 0; i < repeatvs.Length; i++)
+                    for (i = 0, mask = 1; i < MAX_TEXTURE_FACES; i++, mask <<= 1)
                     {
-                        if (repeatvs[i] != ulong.MaxValue)
+                        if ((repeatvs & mask) != 0)
                         {
-                            binWriter.Write(GetFaceBitfieldBytes(repeatvs[i]));
+                            binWriter.Write(GetFaceBitfieldBytes(mask));
                             binWriter.Write(FloatToBytes(m_FaceTextures[i].RepeatV));
                         }
                     }
@@ -615,11 +563,11 @@ namespace SilverSim.Types.Primitive
 
                     #region OffsetU
                     binWriter.Write(TEOffsetShort(DefaultTexture.OffsetU));
-                    for (int i = 0; i < offsetus.Length; i++)
+                    for (i = 0, mask = 1; i < MAX_TEXTURE_FACES; i++, mask <<= 1)
                     {
-                        if (offsetus[i] != ulong.MaxValue)
+                        if ((offsetus & mask) != 0)
                         {
-                            binWriter.Write(GetFaceBitfieldBytes(offsetus[i]));
+                            binWriter.Write(GetFaceBitfieldBytes(mask));
                             binWriter.Write(TEOffsetShort(m_FaceTextures[i].OffsetU));
                         }
                     }
@@ -628,11 +576,11 @@ namespace SilverSim.Types.Primitive
 
                     #region OffsetV
                     binWriter.Write(TEOffsetShort(DefaultTexture.OffsetV));
-                    for (int i = 0; i < offsetvs.Length; i++)
+                    for (i = 0, mask = 1; i < MAX_TEXTURE_FACES; i++, mask <<= 1)
                     {
-                        if (offsetvs[i] != ulong.MaxValue)
+                        if ((offsetvs & mask) != 0)
                         {
-                            binWriter.Write(GetFaceBitfieldBytes(offsetvs[i]));
+                            binWriter.Write(GetFaceBitfieldBytes(mask));
                             binWriter.Write(TEOffsetShort(m_FaceTextures[i].OffsetV));
                         }
                     }
@@ -641,11 +589,11 @@ namespace SilverSim.Types.Primitive
 
                     #region Rotation
                     binWriter.Write(TERotationShort(DefaultTexture.Rotation));
-                    for (int i = 0; i < rotations.Length; i++)
+                    for (i = 0, mask = 1; i < MAX_TEXTURE_FACES; i++, mask <<= 1)
                     {
-                        if (rotations[i] != ulong.MaxValue)
+                        if ((rotations & mask) != 0)
                         {
-                            binWriter.Write(GetFaceBitfieldBytes(rotations[i]));
+                            binWriter.Write(GetFaceBitfieldBytes(mask));
                             binWriter.Write(TERotationShort(m_FaceTextures[i].Rotation));
                         }
                     }
@@ -654,13 +602,13 @@ namespace SilverSim.Types.Primitive
 
                     #region Material
                     binWriter.Write(DefaultTexture.Material);
-                    byte mask = (byte)~(fullbrightdisable ? FULLBRIGHT_MASK : 0);
-                    for (int i = 0; i < materials.Length; i++)
+                    byte fbright_mask = (byte)~(fullbrightdisable ? FULLBRIGHT_MASK : 0);
+                    for (i = 0, mask = 1; i < MAX_TEXTURE_FACES; i++, mask <<= 1)
                     {
-                        if (materials[i] != ulong.MaxValue)
+                        if ((materials & mask) != 0)
                         {
-                            binWriter.Write(GetFaceBitfieldBytes(materials[i]));
-                            binWriter.Write(m_FaceTextures[i].Material & mask);
+                            binWriter.Write(GetFaceBitfieldBytes(mask));
+                            binWriter.Write(m_FaceTextures[i].Material & fbright_mask);
                         }
                     }
                     binWriter.Write((byte)0);
@@ -668,11 +616,11 @@ namespace SilverSim.Types.Primitive
 
                     #region Media
                     binWriter.Write(DefaultTexture.Media);
-                    for (int i = 0; i < medias.Length; i++)
+                    for (i = 0, mask = 1; i < MAX_TEXTURE_FACES; i++, mask <<= 1)
                     {
-                        if (medias[i] != ulong.MaxValue)
+                        if ((medias & mask) != 0)
                         {
-                            binWriter.Write(GetFaceBitfieldBytes(medias[i]));
+                            binWriter.Write(GetFaceBitfieldBytes(mask));
                             binWriter.Write(m_FaceTextures[i].Media);
                         }
                     }
@@ -681,11 +629,11 @@ namespace SilverSim.Types.Primitive
 
                     #region Glow
                     binWriter.Write(TEGlowByte(DefaultTexture.Glow));
-                    for (int i = 0; i < glows.Length; i++)
+                    for (i = 0, mask = 1; i < MAX_TEXTURE_FACES; i++, mask <<= 1)
                     {
-                        if (glows[i] != ulong.MaxValue)
+                        if ((glows & mask) != 0)
                         {
-                            binWriter.Write(GetFaceBitfieldBytes(glows[i]));
+                            binWriter.Write(GetFaceBitfieldBytes(mask));
                             binWriter.Write(TEGlowByte(Math.Min(glowintensitylimit, m_FaceTextures[i].Glow)));
                         }
                     }
@@ -694,11 +642,11 @@ namespace SilverSim.Types.Primitive
 
                     #region MaterialID
                     binWriter.Write(DefaultTexture.MaterialID.GetBytes());
-                    for (int i = 0; i < materialIDs.Length; i++)
+                    for (i = 0, mask = 1; i < MAX_TEXTURE_FACES; i++, mask <<= 1)
                     {
-                        if (materialIDs[i] != ulong.MaxValue && materialIDs[i] != 0)
+                        if ((materialIDs & mask) != 0)
                         {
-                            binWriter.Write(GetFaceBitfieldBytes(materialIDs[i]));
+                            binWriter.Write(GetFaceBitfieldBytes(mask));
                             binWriter.Write(m_FaceTextures[i].MaterialID.GetBytes());
                         }
                     }
