@@ -51,6 +51,25 @@ namespace SilverSim.Types.Agent
         HairAlpha,
         HeadTattoo,
         UpperTattoo,
-        LowerTattoo
+        LowerTattoo,
+        /* Universal Wearables */
+        HeadUniversalTattoo,
+        UpperUniversalTattoo,
+        LowerUniversalTattoo,
+        SkirtTattoo,
+        HairTattoo,
+        EyesTattoo,
+        LeftArmTattoo,
+        LeftLegTattoo,
+        Aux1Tattoo,
+        Aux2Tattoo,
+        Aux3Tattoo,
+        LeftArmBaked,
+        LeftLegBaked,
+        Aux1Baked,
+        Aux2Baked,
+        Aux3Baked,
+
+        NumTextures
     }
 }

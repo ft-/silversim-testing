@@ -35,7 +35,7 @@ namespace SilverSim.Types.Agent
     {
         public class AvatarTextureData
         {
-            public readonly static int TextureCount = 21;
+            public readonly static int TextureCount = (int)AvatarTextureIndex.NumTextures;
             public static readonly UUID DefaultAvatarTextureID = new UUID("c228d1cf-4b5d-4ba8-84f4-899a0796aa97");
 
             private readonly UUID[] m_AvatarTextures = new UUID[TextureCount];
@@ -111,7 +111,7 @@ namespace SilverSim.Types.Agent
         public double AvatarHeight;
         public int Serial = 1;
 
-        public static byte[] BakeIndices => new byte[] { 8, 9, 10, 11, 19, 20 };
+        public static byte[] BakeIndices => new byte[] { 8, 9, 10, 11, 19, 20, 40, 41, 42, 43, 44 };
 
         public static readonly int MaxVisualParams = 255;
 

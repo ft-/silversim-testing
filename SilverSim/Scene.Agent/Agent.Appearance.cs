@@ -86,7 +86,7 @@ namespace SilverSim.Scene.Agent
         private readonly AppearanceInfo.AvatarTextureData m_Textures = new AppearanceInfo.AvatarTextureData();
         public int Serial = 1;
         public const int MaxVisualParams = 255;
-        protected const int NUM_AVATAR_TEXTURES = 21;
+        protected const int NUM_AVATAR_TEXTURES = (int)AvatarTextureIndex.NumTextures;
 
         public static UUID IMG_DEFAULT_AVATAR => new UUID("c228d1cf-4b5d-4ba8-84f4-899a0796aa97");
 

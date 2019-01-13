@@ -27,7 +27,7 @@ namespace SilverSim.Types.Primitive
 {
     public class TextureEntry : Asset.Format.IReferencesAccessor
     {
-        public const int MAX_TEXTURE_FACES = 32;
+        public const int MAX_TEXTURE_FACES = 45;
         private readonly TextureEntryFace[] m_FaceTextures = new TextureEntryFace[MAX_TEXTURE_FACES];
         public TextureEntryFace DefaultTexture;
         public static readonly UUID WHITE_TEXTURE = "5748decc-f629-461c-9a36-a35a221fe21f";
@@ -175,7 +175,7 @@ namespace SilverSim.Types.Primitive
             }
 
             uint bitfieldSize = 0;
-            uint faceBits = 0;
+            ulong faceBits = 0;
             int i = pos;
 
             #region Texture
@@ -719,7 +719,7 @@ namespace SilverSim.Types.Primitive
             }
         }
 
-        private bool ReadFaceBitfield(byte[] data, ref int pos, ref uint faceBits, ref uint bitfieldSize)
+        private bool ReadFaceBitfield(byte[] data, ref int pos, ref ulong faceBits, ref uint bitfieldSize)
         {
             faceBits = 0;
             bitfieldSize = 0;
@@ -741,10 +741,10 @@ namespace SilverSim.Types.Primitive
             return faceBits != 0;
         }
 
-        private byte[] GetFaceBitfieldBytes(uint bitfield)
+        private byte[] GetFaceBitfieldBytes(ulong bitfield)
         {
             int byteLength = 0;
-            uint tmpBitfield = bitfield;
+            ulong tmpBitfield = bitfield;
 
             while (tmpBitfield != 0)
             {

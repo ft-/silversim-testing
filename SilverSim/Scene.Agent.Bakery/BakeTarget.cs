@@ -28,6 +28,11 @@ namespace SilverSim.Scene.Agent.Bakery
         Hair,
         UpperBody,
         LowerBody,
-        Skirt
+        Skirt,
+        LeftArm,
+        LeftLeg,
+        Aux1,
+        Aux2,
+        Aux3
     }
 }

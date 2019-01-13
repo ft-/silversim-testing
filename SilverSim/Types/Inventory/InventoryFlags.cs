@@ -58,6 +58,7 @@ namespace SilverSim.Types.Inventory
         WearableType_Alpha = 13,
         WearableType_Tattoo = 14,
         WearableType_Physics = 15,
+        WearableType_Universal = 16,
 
         SettingsType_Mask = 0xFF,
 

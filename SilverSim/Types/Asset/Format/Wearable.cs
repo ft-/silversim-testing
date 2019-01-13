@@ -46,7 +46,8 @@ namespace SilverSim.Types.Asset.Format
         Alpha = 13,
         Tattoo = 14,
         Physics = 15,
-        NumWearables = 16,
+        Universal = 16,
+        NumWearables = 17,
         Invalid = 255
     }
 
