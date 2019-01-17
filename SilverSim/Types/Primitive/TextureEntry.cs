@@ -1036,7 +1036,7 @@ namespace SilverSim.Types.Primitive
 
             bool firstLazyCopy = true;
 
-            for (int i = 0; i < MAX_TEXTURE_FACES; ++i)
+            for (int i = MAX_TEXTURE_FACES; i-- != 0;)
             {
                 TextureEntryFace face = m_FaceTextures[i];
                 if(face == null)
