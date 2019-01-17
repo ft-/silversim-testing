@@ -50,13 +50,13 @@ namespace SilverSim.Types.Primitive
 
         public TextureEntry(TextureEntry src)
         {
-            DefaultTexture = new TextureEntryFace(null, src.DefaultTexture);
+            DefaultTexture = new TextureEntryFace(src.DefaultTexture);
             for(int i = 0; i < MAX_TEXTURE_FACES; ++i)
             {
                 TextureEntryFace face = src.m_FaceTextures[i];
                 if(face != null)
                 {
-                    m_FaceTextures[i] = new TextureEntryFace(DefaultTexture, face);
+                    m_FaceTextures[i] = new TextureEntryFace(face);
                 }
             }
         }
@@ -934,11 +934,6 @@ namespace SilverSim.Types.Primitive
             {
                 int cnt;
                 TextureEntryFace face = m_FaceTextures[i];
-                if(face == null)
-                {
-                    face = new TextureEntryFace(DefaultTexture, DefaultTexture, TextureAttributes.All);
-                    m_FaceTextures[i] = face;
-                }
 
                 float repeatU = face.RepeatU;
                 repeatUCounts.TryGetValue(repeatU, out cnt);

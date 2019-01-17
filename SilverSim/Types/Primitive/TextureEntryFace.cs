@@ -19,27 +19,14 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.Types.Asset.Format;
 using System;
 using System.Collections.Generic;
 
 namespace SilverSim.Types.Primitive
 {
-    public class TextureEntryFace : ICloneable, Asset.Format.IReferencesAccessor
+    public class TextureEntryFace : IReferencesAccessor
     {
-        private ColorAlpha m_TextureColor = new ColorAlpha(1, 1, 1, 1);
-        private float m_RepeatU = 1;
-        private float m_RepeatV = 1;
-        private float m_OffsetU;
-        private float m_OffsetV;
-        private float m_Rotation;
-        private float m_Glow;
-        private byte m_Material;
-        private byte m_MediaByte;
-        private TextureAttributes m_AttributeFlags /* = TextureAttributes.None */;
-        private UUID m_TextureID = TextureConstant.Default;
-        private UUID m_MaterialID = UUID.Zero;
-
-        private readonly TextureEntryFace m_DefaultTexture;
 
         // +----------+ S = Shiny
         // | SSFBBBBB | F = Fullbright
@@ -58,12 +45,12 @@ namespace SilverSim.Types.Primitive
         #region References accessor
         public List<UUID> References => new List<UUID>
                 {
-                    m_TextureID,
-                    m_MaterialID
+                    TextureID,
+                    MaterialID
                 };
         #endregion
 
-        public bool IsSame(TextureEntryFace face) => TextureColor == face.m_TextureColor &&
+        public bool IsSame(TextureEntryFace face) => TextureColor == face.TextureColor &&
                 RepeatU == face.RepeatU &&
                 RepeatV == face.RepeatV &&
                 OffsetU == face.OffsetU &&
@@ -75,148 +62,29 @@ namespace SilverSim.Types.Primitive
                 TextureID == face.TextureID &&
                 MaterialID == face.MaterialID;
 
-        internal byte Material
-        {
-            get
-            {
-                return ((m_AttributeFlags & TextureAttributes.Material) != 0 || m_DefaultTexture == null) ?
-                    m_Material :
-                    m_DefaultTexture.Material;
-            }
-            set
-            {
-                m_Material = value;
-                m_AttributeFlags |= TextureAttributes.Material;
-            }
-        }
+        internal byte Material { get; set; }
 
-        internal byte Media
-        {
-            get
-            {
-                return ((m_AttributeFlags & TextureAttributes.Media) != 0 || m_DefaultTexture == null) ?
-                    m_MediaByte :
-                    m_DefaultTexture.Media;
-            }
-            set
-            {
-                m_MediaByte = value;
-                m_AttributeFlags |= TextureAttributes.Media;
-            }
-        }
+        internal byte Media { get; set; }
 
-        public ColorAlpha TextureColor
-        {
-            get
-            {
-                return ((m_AttributeFlags & TextureAttributes.RGBA) != 0 || m_DefaultTexture == null) ?
-                    m_TextureColor :
-                    m_DefaultTexture.TextureColor;
-            }
-            set
-            {
-                m_TextureColor = value;
-                m_AttributeFlags |= TextureAttributes.RGBA;
-            }
-        }
+        public ColorAlpha TextureColor { get; set; } = new ColorAlpha(1, 1, 1, 1);
 
-        public float RepeatU
-        {
-            get
-            {
-                return ((m_AttributeFlags & TextureAttributes.RepeatU) != 0 || m_DefaultTexture == null) ?
-                    m_RepeatU :
-                    m_DefaultTexture.RepeatU;
-            }
-            set
-            {
-                m_RepeatU = value;
-                m_AttributeFlags |= TextureAttributes.RepeatU;
-            }
-        }
+        public float RepeatU { get; set; } = 1;
 
-        public float RepeatV
-        {
-            get
-            {
-                return ((m_AttributeFlags & TextureAttributes.RepeatV) != 0 || m_DefaultTexture == null) ?
-                    m_RepeatV :
-                     m_DefaultTexture.RepeatV;
-            }
-            set
-            {
-                m_RepeatV = value;
-                m_AttributeFlags |= TextureAttributes.RepeatV;
-            }
-        }
+        public float RepeatV { get; set; } = 1;
 
-        public float OffsetU
-        {
-            get
-            {
-                return ((m_AttributeFlags & TextureAttributes.OffsetU) != 0 || m_DefaultTexture == null) ?
-                    m_OffsetU :
-                    m_DefaultTexture.OffsetU;
-            }
-            set
-            {
-                m_OffsetU = value;
-                m_AttributeFlags |= TextureAttributes.OffsetU;
-            }
-        }
+        public float OffsetU { get; set; }
 
-        public float OffsetV
-        {
-            get
-            {
-                return ((m_AttributeFlags & TextureAttributes.OffsetV) != 0 || m_DefaultTexture == null) ?
-                    m_OffsetV :
-                    m_DefaultTexture.OffsetV;
-            }
-            set
-            {
-                m_OffsetV = value;
-                m_AttributeFlags |= TextureAttributes.OffsetV;
-            }
-        }
+        public float OffsetV { get; set; }
 
-        public float Rotation
-        {
-            get
-            {
-                return ((m_AttributeFlags & TextureAttributes.Rotation) != 0 || m_DefaultTexture == null) ?
-                    m_Rotation :
-                    m_DefaultTexture.Rotation;
-            }
-            set
-            {
-                m_Rotation = value;
-                m_AttributeFlags |= TextureAttributes.Rotation;
-            }
-        }
+        public float Rotation { get; set; }
 
-        public float Glow
-        {
-            get
-            {
-                return ((m_AttributeFlags & TextureAttributes.Glow) != 0 || m_DefaultTexture == null) ?
-                    m_Glow :
-                    m_DefaultTexture.Glow;
-            }
-            set
-            {
-                m_Glow = value;
-                m_AttributeFlags |= TextureAttributes.Glow;
-            }
-        }
+        public float Glow { get; set; }
 
         public Bumpiness Bump
         {
             get
             {
-                return ((m_AttributeFlags & TextureAttributes.Material) != 0 || m_DefaultTexture == null) ?
-                    (Bumpiness)(Material & BUMP_MASK) :
-                    m_DefaultTexture.Bump;
+                return (Bumpiness)(Material & BUMP_MASK);
             }
             set
             {
@@ -230,9 +98,7 @@ namespace SilverSim.Types.Primitive
         {
             get
             {
-                return ((m_AttributeFlags & TextureAttributes.Material) != 0 || m_DefaultTexture == null) ?
-                    (Shininess)(Material & SHINY_MASK) :
-                    m_DefaultTexture.Shiny;
+                return (Shininess)(Material & SHINY_MASK);
             }
             set
             {
@@ -246,9 +112,7 @@ namespace SilverSim.Types.Primitive
         {
             get
             {
-                return ((m_AttributeFlags & TextureAttributes.Material) != 0 || m_DefaultTexture == null) ?
-                    (Material & FULLBRIGHT_MASK) != 0 :
-                    m_DefaultTexture.FullBright;
+                return (Material & FULLBRIGHT_MASK) != 0;
             }
             set
             {
@@ -264,9 +128,7 @@ namespace SilverSim.Types.Primitive
         {
             get
             {
-                return ((m_AttributeFlags & TextureAttributes.Media) != 0 || m_DefaultTexture == null) ?
-                    (Media & MEDIA_MASK) != 0 :
-                    m_DefaultTexture.MediaFlags;
+                return (Media & MEDIA_MASK) != 0;
             }
             set
             {
@@ -282,9 +144,7 @@ namespace SilverSim.Types.Primitive
         {
             get
             {
-                return ((m_AttributeFlags & TextureAttributes.Media) != 0 || m_DefaultTexture == null) ?
-                    (MappingType)(Media & TEX_MAP_MASK) :
-                    m_DefaultTexture.TexMapType;
+                return (MappingType)(Media & TEX_MAP_MASK);
             }
             set
             {
@@ -293,94 +153,32 @@ namespace SilverSim.Types.Primitive
             }
         }
 
-        public UUID TextureID
-        {
-            get
-            {
-                return ((m_AttributeFlags & TextureAttributes.TextureID) != 0 || m_DefaultTexture == null) ?
-                    m_TextureID :
-                    m_DefaultTexture.TextureID;
-            }
-            set
-            {
-                m_TextureID = value;
-                m_AttributeFlags |= TextureAttributes.TextureID;
-            }
-        }
+        public UUID TextureID { get; set; } = TextureConstant.Default;
 
-        public UUID MaterialID
-        {
-            get
-            {
-                return ((m_AttributeFlags & TextureAttributes.MaterialID) != 0 || m_DefaultTexture == null) ?
-                    m_MaterialID :
-                    m_DefaultTexture.MaterialID;
-            }
-            set
-            {
-                m_MaterialID = value;
-                m_AttributeFlags |= TextureAttributes.MaterialID;
-            }
-        }
-
-        public object Clone() => new TextureEntryFace(m_DefaultTexture)
-        {
-            TextureColor = TextureColor,
-            RepeatU = RepeatU,
-            RepeatV = RepeatV,
-            OffsetU = OffsetU,
-            OffsetV = OffsetV,
-            Rotation = Rotation,
-            Glow = Glow,
-            Material = Material,
-            Media = Media,
-            TextureID = TextureID,
-            MaterialID = MaterialID,
-            m_AttributeFlags = m_AttributeFlags
-        };
+        public UUID MaterialID { get; set; } = UUID.Zero;
 
         public override string ToString() => String.Format("Color: {0} RepeatU: {1} RepeatV: {2} OffsetU: {3} OffsetV: {4} " +
                 "Rotation: {5} Bump: {6} Shiny: {7} Fullbright: {8} Mapping: {9} Media: {10} Glow: {11} ID: {12} MaterialID: {13}",
                 TextureColor.ToString(), RepeatU, RepeatV, OffsetU, OffsetV, Rotation, Bump.ToString(), Shiny.ToString(), FullBright, TexMapType.ToString(),
                 MediaFlags, Glow, TextureID.ToString(), MaterialID.ToString());
 
-        public TextureEntryFace(TextureEntryFace defaultTexture)
+        public TextureEntryFace()
         {
-            if (defaultTexture == null)
-            {
-                m_AttributeFlags = TextureAttributes.All;
-                m_TextureID = TextureConstant.Default;
-            }
-            else
-            {
-                m_DefaultTexture = defaultTexture;
-            }
         }
 
-        internal TextureEntryFace(TextureEntryFace defaultTexture, TextureEntryFace src, TextureAttributes attrs = TextureAttributes.None)
+        internal TextureEntryFace(TextureEntryFace src)
         {
-            if (defaultTexture == null)
-            {
-                m_AttributeFlags = TextureAttributes.All;
-                m_TextureID = TextureConstant.Default;
-            }
-            else
-            {
-                m_AttributeFlags = src.m_AttributeFlags | attrs;
-                m_DefaultTexture = defaultTexture;
-                m_TextureColor = new ColorAlpha(src.m_TextureColor);
-                m_RepeatU = src.m_RepeatU;
-                m_RepeatV = src.m_RepeatV;
-                m_OffsetU = src.m_OffsetU;
-                m_OffsetV = src.m_OffsetV;
-                m_Rotation = src.m_Rotation;
-                m_Glow = src.m_Glow;
-                m_Material = src.m_Material;
-                m_MediaByte = src.m_MediaByte;
-                m_AttributeFlags = src.m_AttributeFlags;
-                m_TextureID = src.m_TextureID;
-                m_MaterialID = src.m_MaterialID;
-            }
+            TextureColor = new ColorAlpha(src.TextureColor);
+            RepeatU = src.RepeatU;
+            RepeatV = src.RepeatV;
+            OffsetU = src.OffsetU;
+            OffsetV = src.OffsetV;
+            Rotation = src.Rotation;
+            Glow = src.Glow;
+            Material = src.Material;
+            Media = src.Media;
+            TextureID = src.TextureID;
+            MaterialID = src.MaterialID;
         }
     }
 }
