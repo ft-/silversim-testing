@@ -930,10 +930,21 @@ namespace SilverSim.Types.Primitive
             var materialCounts = new Dictionary<byte, int>();
             var mediaCounts = new Dictionary<byte, int>();
             var materialIDCounts = new Dictionary<UUID, int>();
+            TextureEntryFace lazyDefaultCopy = null;
+
             for (int i = MAX_TEXTURE_FACES; i-- != 0; )
             {
                 int cnt;
-                TextureEntryFace face = this[(uint)i];
+                TextureEntryFace face = m_FaceTextures[(uint)i];
+                if(face == null)
+                {
+                    if(lazyDefaultCopy == null)
+                    {
+                        lazyDefaultCopy = new TextureEntryFace(DefaultTexture);
+                    }
+                    m_FaceTextures[(uint)i] = lazyDefaultCopy;
+                    face = lazyDefaultCopy;
+                }
 
                 float repeatU = face.RepeatU;
                 repeatUCounts.TryGetValue(repeatU, out cnt);
@@ -1023,6 +1034,8 @@ namespace SilverSim.Types.Primitive
                 DefaultTexture.MaterialID = materialIDCounts.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
             }
 
+            bool firstLazyCopy = true;
+
             for (int i = 0; i < MAX_TEXTURE_FACES; ++i)
             {
                 TextureEntryFace face = m_FaceTextures[i];
@@ -1034,6 +1047,15 @@ namespace SilverSim.Types.Primitive
                 if(face.IsSame(DefaultTexture))
                 {
                     m_FaceTextures[i] = null;
+                }
+                else if(lazyDefaultCopy == face)
+                {
+                    /* ensure that we have non-shared objects */
+                    if(!firstLazyCopy)
+                    {
+                        m_FaceTextures[i] = new TextureEntryFace(lazyDefaultCopy);
+                    }
+                    firstLazyCopy = false;
                 }
             }
         }
