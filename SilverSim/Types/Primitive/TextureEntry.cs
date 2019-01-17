@@ -930,7 +930,7 @@ namespace SilverSim.Types.Primitive
             var materialCounts = new Dictionary<byte, int>();
             var mediaCounts = new Dictionary<byte, int>();
             var materialIDCounts = new Dictionary<UUID, int>();
-            for (int i = 0; i < Math.Min(optimizeForNumfaces, MAX_TEXTURE_FACES); ++i)
+            for (int i = 0; i < MAX_TEXTURE_FACES; ++i)
             {
                 int cnt;
                 TextureEntryFace face = m_FaceTextures[i];
