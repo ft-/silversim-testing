@@ -357,7 +357,7 @@ namespace SilverSim.Types.Primitive
             }
         }
 
-        internal TextureEntryFace(TextureEntryFace defaultTexture, TextureEntryFace src)
+        internal TextureEntryFace(TextureEntryFace defaultTexture, TextureEntryFace src, TextureAttributes attrs = TextureAttributes.None)
         {
             if (defaultTexture == null)
             {
@@ -366,6 +366,7 @@ namespace SilverSim.Types.Primitive
             }
             else
             {
+                m_AttributeFlags = src.m_AttributeFlags | attrs;
                 m_DefaultTexture = defaultTexture;
                 m_TextureColor = new ColorAlpha(src.m_TextureColor);
                 m_RepeatU = src.m_RepeatU;

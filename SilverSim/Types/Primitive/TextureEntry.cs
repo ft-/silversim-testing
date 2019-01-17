@@ -936,7 +936,7 @@ namespace SilverSim.Types.Primitive
                 TextureEntryFace face = m_FaceTextures[i];
                 if(face == null)
                 {
-                    face = new TextureEntryFace(DefaultTexture, DefaultTexture);
+                    face = new TextureEntryFace(DefaultTexture, DefaultTexture, TextureAttributes.All);
                     m_FaceTextures[i] = face;
                 }
 
