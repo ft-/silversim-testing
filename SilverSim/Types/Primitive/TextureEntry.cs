@@ -35,7 +35,7 @@ namespace SilverSim.Types.Primitive
 
         public TextureEntry()
         {
-            DefaultTexture = new TextureEntryFace(null);
+            DefaultTexture = new TextureEntryFace();
         }
 
         public TextureEntry(byte[] data, int pos, int length)
@@ -177,14 +177,14 @@ namespace SilverSim.Types.Primitive
 
         private void FromBytes(byte[] data, int pos, int length)
         {
-            if(length < 16)
+            DefaultTexture = new TextureEntryFace();
+            if (length < 16)
             {
-                DefaultTexture = new TextureEntryFace(null);
+                for (int idx = m_FaceTextures.Length; idx-- != 0;)
+                {
+                    m_FaceTextures[idx] = null;
+                }
                 return;
-            }
-            else
-            {
-                DefaultTexture = new TextureEntryFace(null);
             }
 
             uint bitfieldSize = 0;
@@ -930,10 +930,10 @@ namespace SilverSim.Types.Primitive
             var materialCounts = new Dictionary<byte, int>();
             var mediaCounts = new Dictionary<byte, int>();
             var materialIDCounts = new Dictionary<UUID, int>();
-            for (int i = 0; i < MAX_TEXTURE_FACES; ++i)
+            for (int i = MAX_TEXTURE_FACES; i-- != 0; )
             {
                 int cnt;
-                TextureEntryFace face = m_FaceTextures[i];
+                TextureEntryFace face = this[(uint)i];
 
                 float repeatU = face.RepeatU;
                 repeatUCounts.TryGetValue(repeatU, out cnt);

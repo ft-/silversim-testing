@@ -168,6 +168,10 @@ namespace SilverSim.Types.Primitive
 
         internal TextureEntryFace(TextureEntryFace src)
         {
+            if(src == null)
+            {
+                throw new ArgumentNullException(nameof(src));
+            }
             TextureColor = new ColorAlpha(src.TextureColor);
             RepeatU = src.RepeatU;
             RepeatV = src.RepeatV;
