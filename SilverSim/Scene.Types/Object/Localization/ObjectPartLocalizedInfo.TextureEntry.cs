@@ -110,12 +110,12 @@ namespace SilverSim.Scene.Types.Object.Localization
         {
             get
             {
-                return m_TextureEntryLock.AcquireReaderLock(() => new TextureEntry(m_TextureEntryBytes));
+                return m_TextureEntryLock.AcquireReaderLock(() => new TextureEntry(m_TextureEntry));
             }
             set
             {
                 UpdateChangedFlags flags = 0;
-                var copy = new TextureEntry(value.GetBytes());
+                var copy = new TextureEntry(value);
                 m_TextureEntryLock.AcquireWriterLock(() =>
                 {
                     flags = ChangedTexParams(m_TextureEntry, copy);

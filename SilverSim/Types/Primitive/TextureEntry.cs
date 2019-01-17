@@ -48,6 +48,19 @@ namespace SilverSim.Types.Primitive
             FromBytes(data, 0, data.Length);
         }
 
+        public TextureEntry(TextureEntry src)
+        {
+            DefaultTexture = new TextureEntryFace(null, src.DefaultTexture);
+            for(int i = 0; i < MAX_TEXTURE_FACES; ++i)
+            {
+                TextureEntryFace face = src.m_FaceTextures[i];
+                if(face != null)
+                {
+                    m_FaceTextures[i] = new TextureEntryFace(DefaultTexture, face);
+                }
+            }
+        }
+
         #region References accessor
         public List<UUID> References
         {
@@ -577,6 +590,7 @@ namespace SilverSim.Types.Primitive
                         {
                             continue;
                         }
+                        float repeatu = m_FaceTextures[i].RepeatU;
 
                         ulong finalmask = mask;
                         for (j = i + 1, mask2 = mask << 1; j < MAX_TEXTURE_FACES && mask2 <= repeatus; j++, mask2 <<= 1)
@@ -585,7 +599,7 @@ namespace SilverSim.Types.Primitive
                             {
                                 continue;
                             }
-                            if (m_FaceTextures[j].RepeatU == m_FaceTextures[i].RepeatU)
+                            if (m_FaceTextures[j].RepeatU == repeatu)
                             {
                                 finalmask |= mask2;
                             }
@@ -593,7 +607,7 @@ namespace SilverSim.Types.Primitive
                         repeatus &= ~finalmask;
 
                         binWriter.Write(GetFaceBitfieldBytes(finalmask));
-                        binWriter.Write(FloatToBytes(m_FaceTextures[i].RepeatU));
+                        binWriter.Write(FloatToBytes(repeatu));
                     }
                     binWriter.Write((byte)0);
                     #endregion RepeatU
@@ -607,6 +621,8 @@ namespace SilverSim.Types.Primitive
                             continue;
                         }
 
+                        float repeatv = m_FaceTextures[i].RepeatV;
+
                         ulong finalmask = mask;
                         for (j = i + 1, mask2 = mask << 1; j < MAX_TEXTURE_FACES && mask2 <= repeatvs; j++, mask2 <<= 1)
                         {
@@ -614,7 +630,7 @@ namespace SilverSim.Types.Primitive
                             {
                                 continue;
                             }
-                            if (m_FaceTextures[j].RepeatV == m_FaceTextures[i].RepeatV)
+                            if (m_FaceTextures[j].RepeatV == repeatv)
                             {
                                 finalmask |= mask2;
                             }
@@ -622,7 +638,7 @@ namespace SilverSim.Types.Primitive
                         repeatvs &= ~finalmask;
 
                         binWriter.Write(GetFaceBitfieldBytes(finalmask));
-                        binWriter.Write(FloatToBytes(m_FaceTextures[i].RepeatV));
+                        binWriter.Write(FloatToBytes(repeatv));
                     }
                     binWriter.Write((byte)0);
                     #endregion RepeatV
@@ -898,7 +914,7 @@ namespace SilverSim.Types.Primitive
 
         #endregion Helpers
 
-        public void OptimizeDefault()
+        public void OptimizeDefault(int optimizeForNumfaces)
         {
             if(DefaultTexture == null)
             {
@@ -914,20 +930,23 @@ namespace SilverSim.Types.Primitive
             var materialCounts = new Dictionary<byte, int>();
             var mediaCounts = new Dictionary<byte, int>();
             var materialIDCounts = new Dictionary<UUID, int>();
-            for (int i = 0; i < m_FaceTextures.Length; ++i)
+            for (int i = 0; i < Math.Min(optimizeForNumfaces, MAX_TEXTURE_FACES); ++i)
             {
                 int cnt;
                 TextureEntryFace face = m_FaceTextures[i];
                 if(face == null)
                 {
-                    continue;
+                    face = new TextureEntryFace(DefaultTexture, DefaultTexture);
+                    m_FaceTextures[i] = face;
                 }
 
-                repeatUCounts.TryGetValue(face.RepeatU, out cnt);
-                repeatUCounts[face.RepeatU] = cnt + 1;
+                float repeatU = face.RepeatU;
+                repeatUCounts.TryGetValue(repeatU, out cnt);
+                repeatUCounts[repeatU] = cnt + 1;
 
-                repeatVCounts.TryGetValue(face.RepeatV, out cnt);
-                repeatVCounts[face.RepeatV] = cnt + 1;
+                float repeatV = face.RepeatV;
+                repeatVCounts.TryGetValue(repeatV, out cnt);
+                repeatVCounts[repeatV] = cnt + 1;
 
                 KeyValuePair<float, int> fk;
                 short offsetu = TEOffsetShort(face.OffsetU);
@@ -971,10 +990,10 @@ namespace SilverSim.Types.Primitive
 
             if (repeatVCounts.Count > 0)
             {
-                DefaultTexture.RepeatU = repeatVCounts.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
+                DefaultTexture.RepeatV = repeatVCounts.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
             }
 
-            if(offsetUCounts.Count > 0)
+            if (offsetUCounts.Count > 0)
             {
                 DefaultTexture.OffsetU = offsetUCounts.Aggregate((l, r) => l.Value.Value > r.Value.Value ? l : r).Value.Key;
             }
@@ -1007,6 +1026,20 @@ namespace SilverSim.Types.Primitive
             if(materialIDCounts.Count > 0)
             {
                 DefaultTexture.MaterialID = materialIDCounts.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
+            }
+
+            for (int i = 0; i < MAX_TEXTURE_FACES; ++i)
+            {
+                TextureEntryFace face = m_FaceTextures[i];
+                if(face == null)
+                {
+                    continue;
+                }
+
+                if(face.IsSame(DefaultTexture))
+                {
+                    m_FaceTextures[i] = null;
+                }
             }
         }
     }

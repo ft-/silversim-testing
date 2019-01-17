@@ -63,6 +63,18 @@ namespace SilverSim.Types.Primitive
                 };
         #endregion
 
+        public bool IsSame(TextureEntryFace face) => TextureColor == face.m_TextureColor &&
+                RepeatU == face.RepeatU &&
+                RepeatV == face.RepeatV &&
+                OffsetU == face.OffsetU &&
+                OffsetV == face.OffsetV &&
+                Rotation == face.Rotation &&
+                Glow == face.Glow &&
+                Material == face.Material &&
+                Media == face.Media &&
+                TextureID == face.TextureID &&
+                MaterialID == face.MaterialID;
+
         internal byte Material
         {
             get
@@ -342,6 +354,31 @@ namespace SilverSim.Types.Primitive
             else
             {
                 m_DefaultTexture = defaultTexture;
+            }
+        }
+
+        internal TextureEntryFace(TextureEntryFace defaultTexture, TextureEntryFace src)
+        {
+            if (defaultTexture == null)
+            {
+                m_AttributeFlags = TextureAttributes.All;
+                m_TextureID = TextureConstant.Default;
+            }
+            else
+            {
+                m_DefaultTexture = defaultTexture;
+                m_TextureColor = new ColorAlpha(src.m_TextureColor);
+                m_RepeatU = src.m_RepeatU;
+                m_RepeatV = src.m_RepeatV;
+                m_OffsetU = src.m_OffsetU;
+                m_OffsetV = src.m_OffsetV;
+                m_Rotation = src.m_Rotation;
+                m_Glow = src.m_Glow;
+                m_Material = src.m_Material;
+                m_MediaByte = src.m_MediaByte;
+                m_AttributeFlags = src.m_AttributeFlags;
+                m_TextureID = src.m_TextureID;
+                m_MaterialID = src.m_MaterialID;
             }
         }
     }
