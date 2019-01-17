@@ -22,6 +22,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace SilverSim.Types.Primitive
 {
@@ -399,7 +400,7 @@ namespace SilverSim.Types.Primitive
             return (short)Math.Round(offset);
         }
 
-        private static short TERotationShort(float rotation) => (short)Math.Round(((Math.IEEERemainder(rotation, TwoPi) / TwoPi) * 32768.0f) + 0.5f);
+        private static short TERotationShort(float rotation) => (short)Math.Floor(((Math.IEEERemainder(rotation, TwoPi) / TwoPi) * 32768.0f) + 0.5f);
 
         public static implicit operator byte[] (TextureEntry e) => e.GetBytes();
 
@@ -630,11 +631,12 @@ namespace SilverSim.Types.Primitive
                     binWriter.Write(TEOffsetShort(DefaultTexture.OffsetU));
                     for (i = 0, mask = 1; offsetus != 0; i++, mask <<= 1)
                     {
-                        short offsetudata = TEOffsetShort(m_FaceTextures[i].OffsetU);
+                        short offsetudata;
                         if ((offsetus & mask) == 0)
                         {
                             continue;
                         }
+                        offsetudata = TEOffsetShort(m_FaceTextures[i].OffsetU);
 
                         ulong finalmask = mask;
                         for (j = i + 1, mask2 = mask << 1; j < MAX_TEXTURE_FACES && mask2 <= offsetus; j++, mask2 <<= 1)
@@ -660,11 +662,12 @@ namespace SilverSim.Types.Primitive
                     binWriter.Write(TEOffsetShort(DefaultTexture.OffsetV));
                     for (i = 0, mask = 1; offsetvs != 0; i++, mask <<= 1)
                     {
-                        short offsetvdata = TEOffsetShort(m_FaceTextures[i].OffsetV);
+                        short offsetvdata;
                         if ((offsetvs & mask) == 0)
                         {
                             continue;
                         }
+                        offsetvdata = TEOffsetShort(m_FaceTextures[i].OffsetV);
 
                         ulong finalmask = mask;
                         for (j = i + 1, mask2 = mask << 1; j < MAX_TEXTURE_FACES && mask2 <= offsetvs; j++, mask2 <<= 1)
@@ -690,11 +693,13 @@ namespace SilverSim.Types.Primitive
                     binWriter.Write(TERotationShort(DefaultTexture.Rotation));
                     for (i = 0, mask = 1; rotations != 0; i++, mask <<= 1)
                     {
-                        short rotationdata = TERotationShort(m_FaceTextures[i].Rotation);
+                        short rotationdata;
                         if ((rotations & mask) == 0)
                         {
                             continue;
                         }
+
+                        rotationdata = TERotationShort(m_FaceTextures[i].Rotation);
 
                         ulong finalmask = mask;
                         for (j = i + 1, mask2 = mask << 1; j < MAX_TEXTURE_FACES && mask2 <= rotations; j++, mask2 <<= 1)
@@ -779,11 +784,12 @@ namespace SilverSim.Types.Primitive
                     binWriter.Write(TEGlowByte(Math.Min(glowintensitylimit, DefaultTexture.Glow)));
                     for (i = 0, mask = 1; glows != 0; i++, mask <<= 1)
                     {
-                        byte glowbyte = TEGlowByte(Math.Min(glowintensitylimit, m_FaceTextures[i].Glow));
+                        byte glowbyte;
                         if ((glows & mask) == 0)
                         {
                             continue;
                         }
+                        glowbyte = TEGlowByte(Math.Min(glowintensitylimit, m_FaceTextures[i].Glow));
 
                         ulong finalmask = mask;
                         for (j = i + 1, mask2 = mask << 1; j < MAX_TEXTURE_FACES && mask2 <= glows; j++, mask2 <<= 1)
@@ -840,15 +846,6 @@ namespace SilverSim.Types.Primitive
         }
 
         #region Helpers
-
-        private void InitializeArray(ulong[] array)
-        {
-            for (int i = 0; i < array.Length; i++)
-            {
-                array[i] = ulong.MaxValue;
-            }
-        }
-
         private bool ReadFaceBitfield(byte[] data, ref int pos, ref ulong faceBits, ref uint bitfieldSize)
         {
             faceBits = 0;
@@ -900,5 +897,117 @@ namespace SilverSim.Types.Primitive
         }
 
         #endregion Helpers
+
+        public void OptimizeDefault()
+        {
+            if(DefaultTexture == null)
+            {
+                return;
+            }
+            var textureCounts = new Dictionary<UUID, int>();
+            var repeatUCounts = new Dictionary<float, int>();
+            var repeatVCounts = new Dictionary<float, int>();
+            var offsetUCounts = new Dictionary<short, KeyValuePair<float, int>>();
+            var offsetVCounts = new Dictionary<short, KeyValuePair<float, int>>();
+            var rotationCounts = new Dictionary<short, KeyValuePair<float, int>>();
+            var glowCounts = new Dictionary<byte, KeyValuePair<float, int>>();
+            var materialCounts = new Dictionary<byte, int>();
+            var mediaCounts = new Dictionary<byte, int>();
+            var materialIDCounts = new Dictionary<UUID, int>();
+            for (int i = 0; i < m_FaceTextures.Length; ++i)
+            {
+                int cnt;
+                TextureEntryFace face = m_FaceTextures[i];
+                if(face == null)
+                {
+                    continue;
+                }
+
+                repeatUCounts.TryGetValue(face.RepeatU, out cnt);
+                repeatUCounts[face.RepeatU] = cnt + 1;
+
+                repeatVCounts.TryGetValue(face.RepeatV, out cnt);
+                repeatVCounts[face.RepeatV] = cnt + 1;
+
+                KeyValuePair<float, int> fk;
+                short offsetu = TEOffsetShort(face.OffsetU);
+                offsetUCounts.TryGetValue(offsetu, out fk);
+                offsetUCounts[offsetu] = new KeyValuePair<float, int>(fk.Key, cnt + 1);
+
+                short offsetv = TEOffsetShort(face.OffsetV);
+                offsetVCounts.TryGetValue(offsetv, out fk);
+                offsetVCounts[offsetv] = new KeyValuePair<float, int>(fk.Key, cnt + 1);
+
+                short rotation = TERotationShort(face.Rotation);
+                rotationCounts.TryGetValue(rotation, out fk);
+                rotationCounts[rotation] = new KeyValuePair<float, int>(fk.Key, cnt + 1);
+
+                byte glow = TEGlowByte(face.Glow);
+                glowCounts.TryGetValue(glow, out fk);
+                glowCounts[glow] = new KeyValuePair<float, int>(fk.Key, cnt + 1);
+
+                byte material = face.Material;
+                materialCounts.TryGetValue(material, out cnt);
+                materialCounts[material] = cnt + 1;
+
+                byte media = face.Media;
+                mediaCounts.TryGetValue(media, out cnt);
+                mediaCounts[media] = cnt + 1;
+
+                UUID materialID = face.MaterialID;
+                materialIDCounts.TryGetValue(materialID, out cnt);
+                materialIDCounts[materialID] = cnt + 1;
+            }
+
+            if (textureCounts.Count > 0)
+            {
+                DefaultTexture.TextureID = textureCounts.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
+            }
+
+            if(repeatUCounts.Count > 0)
+            {
+                DefaultTexture.RepeatU = repeatUCounts.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
+            }
+
+            if (repeatVCounts.Count > 0)
+            {
+                DefaultTexture.RepeatU = repeatVCounts.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
+            }
+
+            if(offsetUCounts.Count > 0)
+            {
+                DefaultTexture.OffsetU = offsetUCounts.Aggregate((l, r) => l.Value.Value > r.Value.Value ? l : r).Value.Key;
+            }
+
+            if (offsetVCounts.Count > 0)
+            {
+                DefaultTexture.OffsetV = offsetUCounts.Aggregate((l, r) => l.Value.Value > r.Value.Value ? l : r).Value.Key;
+            }
+
+            if(rotationCounts.Count > 0)
+            {
+                DefaultTexture.Rotation = rotationCounts.Aggregate((l, r) => l.Value.Value > r.Value.Value ? l : r).Value.Key;
+            }
+
+            if(glowCounts.Count > 0)
+            {
+                DefaultTexture.Glow = glowCounts.Aggregate((l, r) => l.Value.Value > r.Value.Value ? l : r).Value.Key;
+            }
+
+            if(materialCounts.Count > 0)
+            {
+                DefaultTexture.Material = materialCounts.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
+            }
+
+            if(mediaCounts.Count > 0)
+            {
+                DefaultTexture.Media = mediaCounts.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
+            }
+
+            if(materialIDCounts.Count > 0)
+            {
+                DefaultTexture.MaterialID = materialIDCounts.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
+            }
+        }
     }
 }

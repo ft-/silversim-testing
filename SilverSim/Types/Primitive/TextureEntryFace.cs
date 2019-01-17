@@ -337,7 +337,7 @@ namespace SilverSim.Types.Primitive
             if (defaultTexture == null)
             {
                 m_AttributeFlags = TextureAttributes.All;
-                m_TextureID = TextureConstant.Blank;
+                m_TextureID = TextureConstant.Default;
             }
             else
             {
