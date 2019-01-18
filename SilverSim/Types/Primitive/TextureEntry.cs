@@ -469,52 +469,53 @@ namespace SilverSim.Types.Primitive
 
                     for (i = MAX_TEXTURE_FACES, mask = (ulong)1 << (MAX_TEXTURE_FACES - 1); i-- != 0; mask >>= 1)
                     {
-                        if (m_FaceTextures[i] == null)
+                        TextureEntryFace face = m_FaceTextures[i];
+                        if (face == null)
                         {
                             continue;
                         }
 
-                        if (m_FaceTextures[i].TextureID != DefaultTexture.TextureID)
+                        if (face.TextureID != DefaultTexture.TextureID)
                         {
                             textures |= mask;
                         }
-                        if (m_FaceTextures[i].TextureColor != DefaultTexture.TextureColor)
+                        if (face.TextureColor != DefaultTexture.TextureColor)
                         {
                             texturecolors |= mask;
                         }
-                        if (m_FaceTextures[i].RepeatU != DefaultTexture.RepeatU)
+                        if (face.RepeatU != DefaultTexture.RepeatU)
                         {
                             repeatus |= mask;
                         }
-                        if (m_FaceTextures[i].RepeatV != DefaultTexture.RepeatV)
+                        if (face.RepeatV != DefaultTexture.RepeatV)
                         {
                             repeatvs |= mask;
                         }
-                        if (TEOffsetShort(m_FaceTextures[i].OffsetU) != TEOffsetShort(DefaultTexture.OffsetU))
+                        if (TEOffsetShort(face.OffsetU) != TEOffsetShort(DefaultTexture.OffsetU))
                         {
                             offsetus |= mask;
                         }
-                        if (TEOffsetShort(m_FaceTextures[i].OffsetV) != TEOffsetShort(DefaultTexture.OffsetV))
+                        if (TEOffsetShort(face.OffsetV) != TEOffsetShort(DefaultTexture.OffsetV))
                         {
                             offsetvs |= mask;
                         }
-                        if (TERotationShort(m_FaceTextures[i].Rotation) != TERotationShort(DefaultTexture.Rotation))
+                        if (TERotationShort(face.Rotation) != TERotationShort(DefaultTexture.Rotation))
                         {
                             rotations |= mask;
                         }
-                        if (m_FaceTextures[i].Material != DefaultTexture.Material)
+                        if (face.Material != DefaultTexture.Material)
                         {
                             materials |= mask;
                         }
-                        if (m_FaceTextures[i].Media != DefaultTexture.Media)
+                        if (face.Media != DefaultTexture.Media)
                         {
                             medias |= mask;
                         }
-                        if (TEGlowByte(m_FaceTextures[i].Glow) != TEGlowByte(DefaultTexture.Glow))
+                        if (TEGlowByte(face.Glow) != TEGlowByte(DefaultTexture.Glow))
                         {
                             glows |= mask;
                         }
-                        if (m_FaceTextures[i].MaterialID != DefaultTexture.MaterialID)
+                        if (face.MaterialID != DefaultTexture.MaterialID)
                         {
                             materialIDs |= mask;
                         }
