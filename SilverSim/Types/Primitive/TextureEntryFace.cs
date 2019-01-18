@@ -98,12 +98,12 @@ namespace SilverSim.Types.Primitive
         {
             get
             {
-                return (Shininess)(Material & SHINY_MASK);
+                return (Shininess)((Material & SHINY_MASK) >> 6);
             }
             set
             {
                 Material &= 0x3F;
-                var v = (byte)value;
+                var v = (byte)value << 6;
                 Material |= (byte)(v & SHINY_MASK);
             }
         }
@@ -144,12 +144,13 @@ namespace SilverSim.Types.Primitive
         {
             get
             {
-                return (MappingType)(Media & TEX_MAP_MASK);
+                return (MappingType)((Media & TEX_MAP_MASK) >> 1);
             }
             set
             {
                 Media &= 0xF9;
-                Media |= (byte)((byte)value & 0x6);
+                var v = (byte)value << 1;
+                Media |= (byte)((byte)v & 0x6);
             }
         }
 

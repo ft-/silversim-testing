@@ -740,7 +740,7 @@ namespace SilverSim.Types.Primitive
 
                     #region Material
                     byte fbright_mask = (byte)~(fullbrightdisable ? FULLBRIGHT_MASK : 0);
-                    binWriter.Write(DefaultTexture.Material & fbright_mask);
+                    binWriter.Write((byte)(DefaultTexture.Material & fbright_mask));
                     for (i = 0, mask = 1; materials != 0; i++, mask <<= 1)
                     {
                         if ((materials & mask) == 0)
@@ -763,7 +763,7 @@ namespace SilverSim.Types.Primitive
                         materials &= ~finalmask;
 
                         binWriter.Write(GetFaceBitfieldBytes(finalmask));
-                        binWriter.Write(m_FaceTextures[i].Material & fbright_mask);
+                        binWriter.Write((byte)(m_FaceTextures[i].Material & fbright_mask));
                     }
                     binWriter.Write((byte)0);
                     #endregion Material

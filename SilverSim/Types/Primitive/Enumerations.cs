@@ -50,17 +50,17 @@ namespace SilverSim.Types.Primitive
     public enum Shininess : byte
     {
         None = 0,
-        Low = 0x40,
-        Medium = 0x80,
-        High = 0xc0
+        Low = 1,
+        Medium = 2,
+        High = 3
     }
 
     public enum MappingType : byte
     {
         Default = 0,
-        Planar = 2,
-        Spherical = 4,
-        Cylindrical = 6
+        Planar = 1,
+        Spherical = 2,
+        Cylindrical = 3
     }
 
     public enum ClickActionType : byte
