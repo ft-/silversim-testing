@@ -1848,7 +1848,7 @@ namespace SilverSim.Scene.Types.Object
             throw new ArgumentException("texture does not name either a inventory item or a uuid");
         }
 
-        internal bool TryFetchTexture(UUID textureID)
+        public bool TryFetchTexture(UUID textureID)
         {
             ObjectGroup grp = ObjectGroup;
             SceneInterface scene = grp.Scene;
