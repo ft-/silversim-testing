@@ -282,7 +282,7 @@ namespace SilverSim.Scene.Types.Object.Localization
                     break;
 
                 case PrimitiveParamsType.Glow:
-                    face.Glow = (float)ParamsHelper.GetDouble(enumerator, "PRIM_GLOW");
+                    face.Glow = (float)ParamsHelper.GetDouble(enumerator, "PRIM_GLOW").Clamp(0, 1);
                     flags |= UpdateChangedFlags.Color;
                     isUpdated = true;
                     break;
@@ -398,7 +398,7 @@ namespace SilverSim.Scene.Types.Object.Localization
                     break;
 
                 default:
-                    throw new ArgumentException(String.Format("Internal error! Primitive parameter type {0} should not be passed to PrimitiveFace", type));
+                    throw new ArgumentException($"Internal error! Primitive parameter type {type} should not be passed to PrimitiveFace");
             }
         }
         #endregion

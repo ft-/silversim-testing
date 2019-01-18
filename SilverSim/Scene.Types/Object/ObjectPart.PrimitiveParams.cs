@@ -1836,14 +1836,14 @@ namespace SilverSim.Scene.Types.Object
             var texture = ParamsHelper.GetString(enumerator, paraName);
             UUID uuid;
             ObjectPartInventoryItem texitem;
-            if(UUID.TryParse(texture, out uuid))
-            {
-                return uuid;
-            }
-            else if(Inventory.TryGetValue(texture, out texitem) &&
+            if (Inventory.TryGetValue(texture, out texitem) &&
                 texitem.AssetType == AssetType.Texture)
             {
                 return texitem.AssetID;
+            }
+            else if (UUID.TryParse(texture, out uuid))
+            {
+                return uuid;
             }
             throw new ArgumentException("texture does not name either a inventory item or a uuid");
         }
