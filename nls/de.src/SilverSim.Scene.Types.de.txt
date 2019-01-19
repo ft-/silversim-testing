@@ -36,3 +36,4 @@ UnableToBuyInsufficientFunds=Kaufen nicht möglich. Vorhandenes Geld reicht nich
 UnableToBuyNoEconomyConfigured=Kaufen nicht möglich. Keine Währung konfiguriert.
 YouHaveBeenKickedFromParcel=Du wurdest aus der Parzelle geworfen.
 InvalidLanguageParameter0=Ungültiger Sprachparameter '{0}'
+AllLanguagesNotAllowedForGet=Selektor für alle Sprachen ist beim Abrufen nicht erlaubt.

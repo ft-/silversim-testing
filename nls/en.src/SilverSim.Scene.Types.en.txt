@@ -36,3 +36,4 @@ UnableToBuyInsufficientFunds=Unable to buy. Insufficient funds.
 UnableToBuyNoEconomyConfigured=Unable to buy. No economy configured.
 YouHaveBeenKickedFromParcel=You have been kicked from parcel.
 InvalidLanguageParameter0=Invalid language parameter '{0}'
+AllLanguagesNotAllowedForGet=All languages is not allowed for get params.

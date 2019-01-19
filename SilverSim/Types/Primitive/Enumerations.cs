@@ -128,7 +128,8 @@ namespace SilverSim.Types.Primitive
         LoopSound = 12005,
         SoundRadius = 12006,
         SoundVolume = 12007,
-        SoundQueueing = 12008
+        SoundQueueing = 12008,
+        AllLanguages = 12009
     }
 
     public static class PrimitiveParamsToLslMethodsExtension
@@ -168,6 +169,7 @@ namespace SilverSim.Types.Primitive
                 case PrimitiveParamsType.ProjectorTexture: return "PRIM_PROJECTOR_TEXTURE";
                 case PrimitiveParamsType.RemoveAllLanguages: return "PRIM_REMOVE_ALL_LANGUAGES";
                 case PrimitiveParamsType.RemoveLanguage: return "PRIM_REMOVE_LANGUAGE";
+                case PrimitiveParamsType.AllLanguages: return "PRIM_ALL_LANGUAGES";
                 case PrimitiveParamsType.Rotation: return "PRIM_ROTATION";
                 case PrimitiveParamsType.RotLocal: return "PRIM_ROT_LOCAL";
                 case PrimitiveParamsType.ScriptedSitOnly: return "PRIM_SCRIPTED_SIT_ONLY";

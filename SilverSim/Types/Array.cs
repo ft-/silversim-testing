@@ -177,6 +177,7 @@ namespace SilverSim.Types
         {
             private int m_CurrentIndex;
             private int m_MarkIndex;
+            private int m_MarkIndex2;
             private AnArray m_Array;
 
             public MarkEnumerator(AnArray array)
@@ -209,6 +210,16 @@ namespace SilverSim.Types
             public void GoToMarkPosition()
             {
                 m_CurrentIndex = m_MarkIndex;
+            }
+
+            public void MarkPosition2()
+            {
+                m_MarkIndex2 = m_CurrentIndex;
+            }
+
+            public void GoToMarkPosition2()
+            {
+                m_CurrentIndex = m_MarkIndex2;
             }
         }
 

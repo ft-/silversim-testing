@@ -945,6 +945,9 @@ namespace SilverSim.Scene.Types.Object
             {
                 switch(ParamsHelper.GetPrimParamType(enumerator))
                 {
+                    case PrimitiveParamsType.AllLanguages:
+                        throw new LocalizedScriptErrorException(this, "AllLanguagesNotAllowedForGet", "All languages is not allowed for get");
+
                     case PrimitiveParamsType.Language:
                         {
                             string cultureName = ParamsHelper.GetString(enumerator, "PRIM_LANGUAGE");
@@ -1051,6 +1054,10 @@ namespace SilverSim.Scene.Types.Object
             {
                 switch (ParamsHelper.GetPrimParamType(enumerator))
                 {
+                    case PrimitiveParamsType.AllLanguages:
+                        cultureName = "*";
+                        break;
+
                     case PrimitiveParamsType.Language:
                         {
                             cultureName = ParamsHelper.GetString(enumerator, "PRIM_LANGUAGE");

@@ -1510,7 +1510,15 @@ namespace SilverSim.Scene.Types.Object
 
         public void SetPrimitiveParams(AnArray.MarkEnumerator enumerator, string culturename)
         {
-            ObjectPartLocalizedInfo localization = GetOrCreateLocalization(culturename);
+            ObjectPartLocalizedInfo[] localizations;
+            if (culturename == "*")
+            {
+                localizations = Localizations;
+            }
+            else
+            {
+                localizations = new ObjectPartLocalizedInfo[] { GetOrCreateLocalization(culturename) };
+            }
             UpdateChangedFlags flags = 0;
             bool isUpdated = false;
             if(enumerator.Current == null)
@@ -1576,11 +1584,23 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.Name:
-                    localization.Name = ParamsHelper.GetString(enumerator, "PRIM_NAME");
+                    {
+                        string name = ParamsHelper.GetString(enumerator, "PRIM_NAME");
+                        foreach(ObjectPartLocalizedInfo localization in localizations)
+                        {
+                            localization.Name = name;
+                        }
+                    }
                     break;
 
                 case PrimitiveParamsType.Desc:
-                    localization.Description = ParamsHelper.GetString(enumerator, "PRIM_DESC");
+                    {
+                        string desc = ParamsHelper.GetString(enumerator, "PRIM_DESC");
+                        foreach (ObjectPartLocalizedInfo localization in localizations)
+                        {
+                            localization.Description = desc;
+                        }
+                    }
                     break;
 
                 case PrimitiveParamsType.Type:
@@ -1620,41 +1640,81 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.AlphaMode:
-                    localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isUpdated, "PRIM_ALPHAMODE");
+                    enumerator.MarkPosition2();
+                    foreach (ObjectPartLocalizedInfo localization in localizations)
+                    {
+                        enumerator.GoToMarkPosition2();
+                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isUpdated, "PRIM_ALPHAMODE");
+                    }
                     break;
 
                 case PrimitiveParamsType.Normal:
-                    localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isUpdated, "PRIM_NORMAL");
+                    enumerator.MarkPosition2();
+                    foreach (ObjectPartLocalizedInfo localization in localizations)
+                    {
+                        enumerator.GoToMarkPosition2();
+                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isUpdated, "PRIM_NORMAL");
+                    }
                     break;
 
                 case PrimitiveParamsType.Specular:
-                    localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isUpdated, "PRIM_SPECULAR");
+                    enumerator.MarkPosition2();
+                    foreach (ObjectPartLocalizedInfo localization in localizations)
+                    {
+                        enumerator.GoToMarkPosition2();
+                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isUpdated, "PRIM_SPECULAR");
+                    }
                     break;
 
                 case PrimitiveParamsType.Texture:
-                    localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isUpdated, "PRIM_TEXTURE");
+                    enumerator.MarkPosition2();
+                    foreach (ObjectPartLocalizedInfo localization in localizations)
+                    {
+                        enumerator.GoToMarkPosition2();
+                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isUpdated, "PRIM_TEXTURE");
+                    }
                     break;
 
                 case PrimitiveParamsType.Text:
-                    localization.Text = new TextParam
+                    enumerator.MarkPosition2();
+                    foreach (ObjectPartLocalizedInfo localization in localizations)
                     {
-                        Text = ParamsHelper.GetString(enumerator, "PRIM_TEXT"),
-                        TextColor = new ColorAlpha(
+                        enumerator.GoToMarkPosition2();
+                        localization.Text = new TextParam
+                        {
+                            Text = ParamsHelper.GetString(enumerator, "PRIM_TEXT"),
+                            TextColor = new ColorAlpha(
                             ParamsHelper.GetVector(enumerator, "PRIM_TEXT"),
                             ParamsHelper.GetDouble(enumerator, "PRIM_TEXT"))
-                    };
+                        };
+                    }
                     break;
 
                 case PrimitiveParamsType.Color:
-                    localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isUpdated, "PRIM_COLOR");
+                    enumerator.MarkPosition2();
+                    foreach (ObjectPartLocalizedInfo localization in localizations)
+                    {
+                        enumerator.GoToMarkPosition2();
+                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isUpdated, "PRIM_COLOR");
+                    }
                     break;
 
                 case PrimitiveParamsType.Alpha:
-                    localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isUpdated, "PRIM_ALPHA");
+                    enumerator.MarkPosition2();
+                    foreach (ObjectPartLocalizedInfo localization in localizations)
+                    {
+                        enumerator.GoToMarkPosition2();
+                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isUpdated, "PRIM_ALPHA");
+                    }
                     break;
 
                 case PrimitiveParamsType.BumpShiny:
-                    localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isUpdated, "PRIM_BUMP_SHINY");
+                    enumerator.MarkPosition2();
+                    foreach (ObjectPartLocalizedInfo localization in localizations)
+                    {
+                        enumerator.GoToMarkPosition2();
+                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isUpdated, "PRIM_BUMP_SHINY");
+                    }
                     break;
 
                 case PrimitiveParamsType.PointLight:
@@ -1669,7 +1729,12 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.FullBright:
-                    localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isUpdated, "PRIM_FULLBRIGHT");
+                    enumerator.MarkPosition2();
+                    foreach (ObjectPartLocalizedInfo localization in localizations)
+                    {
+                        enumerator.GoToMarkPosition2();
+                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isUpdated, "PRIM_FULLBRIGHT");
+                    }
                     break;
 
                 case PrimitiveParamsType.Flexible:
@@ -1685,11 +1750,21 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.TexGen:
-                    localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isUpdated, "PRIM_TEXGEN");
+                    enumerator.MarkPosition2();
+                    foreach (ObjectPartLocalizedInfo localization in localizations)
+                    {
+                        enumerator.GoToMarkPosition2();
+                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isUpdated, "PRIM_TEXGEN");
+                    }
                     break;
 
                 case PrimitiveParamsType.Glow:
-                    localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isUpdated, "PRIM_GLOW");
+                    enumerator.MarkPosition2();
+                    foreach (ObjectPartLocalizedInfo localization in localizations)
+                    {
+                        enumerator.GoToMarkPosition2();
+                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isUpdated, "PRIM_GLOW");
+                    }
                     break;
 
                 case PrimitiveParamsType.Omega:
@@ -1750,18 +1825,26 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.Projector:
-                    localization.Projection = new ProjectionParam
+                    enumerator.MarkPosition2();
+                    foreach (ObjectPartLocalizedInfo localization in localizations)
                     {
-                        IsProjecting = ParamsHelper.GetBoolean(enumerator, "PRIM_PROJECTOR"),
-                        ProjectionTextureID = GetTextureParam(enumerator, "PRIM_PROJECTOR"),
-                        ProjectionFOV = ParamsHelper.GetDouble(enumerator, "PRIM_PROJECTOR"),
-                        ProjectionFocus = ParamsHelper.GetDouble(enumerator, "PRIM_PROJECTOR"),
-                        ProjectionAmbience = ParamsHelper.GetDouble(enumerator, "PRIM_PROJECTOR")
-                    };
+                        enumerator.GoToMarkPosition2();
+                        localization.Projection = new ProjectionParam
+                        {
+                            IsProjecting = ParamsHelper.GetBoolean(enumerator, "PRIM_PROJECTOR"),
+                            ProjectionTextureID = GetTextureParam(enumerator, "PRIM_PROJECTOR"),
+                            ProjectionFOV = ParamsHelper.GetDouble(enumerator, "PRIM_PROJECTOR"),
+                            ProjectionFocus = ParamsHelper.GetDouble(enumerator, "PRIM_PROJECTOR"),
+                            ProjectionAmbience = ParamsHelper.GetDouble(enumerator, "PRIM_PROJECTOR")
+                        };
+                    }
                     break;
 
                 case PrimitiveParamsType.ProjectorEnabled:
+                    enumerator.MarkPosition2();
+                    foreach (ObjectPartLocalizedInfo localization in localizations)
                     {
+                        enumerator.GoToMarkPosition2();
                         var param = localization.Projection;
                         param.IsProjecting = ParamsHelper.GetBoolean(enumerator, "PRIM_PROJECTOR_ENABLED");
                         localization.Projection = param;
@@ -1769,7 +1852,10 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.ProjectorTexture:
+                    enumerator.MarkPosition2();
+                    foreach (ObjectPartLocalizedInfo localization in localizations)
                     {
+                        enumerator.GoToMarkPosition2();
                         var param = localization.Projection;
                         param.ProjectionTextureID = GetTextureParam(enumerator, "PRIM_PROJECTOR_TEXTURE");
                         localization.Projection = param;
@@ -1777,7 +1863,10 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.ProjectorFov:
+                    enumerator.MarkPosition2();
+                    foreach (ObjectPartLocalizedInfo localization in localizations)
                     {
+                        enumerator.GoToMarkPosition2();
                         var param = localization.Projection;
                         param.ProjectionFOV = ParamsHelper.GetDouble(enumerator, "PRIM_PROJECTOR_FOV");
                         localization.Projection = param;
@@ -1785,7 +1874,10 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.ProjectorFocus:
+                    enumerator.MarkPosition2();
+                    foreach (ObjectPartLocalizedInfo localization in localizations)
                     {
+                        enumerator.GoToMarkPosition2();
                         ProjectionParam param = localization.Projection;
                         param.ProjectionFocus = ParamsHelper.GetDouble(enumerator, "PRIM_PROJECTOR_FOCUS");
                         localization.Projection = param;
@@ -1793,7 +1885,10 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.ProjectorAmbience:
+                    enumerator.MarkPosition2();
+                    foreach (ObjectPartLocalizedInfo localization in localizations)
                     {
+                        enumerator.GoToMarkPosition2();
                         var param = localization.Projection;
                         param.ProjectionAmbience = ParamsHelper.GetDouble(enumerator, "PRIM_PROJECTION_AMBIENCE");
                         localization.Projection = param;
@@ -1810,7 +1905,10 @@ namespace SilverSim.Scene.Types.Object
 
             if(isUpdated)
             {
-                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.All | ObjectPartLocalizedInfo.UpdateDataFlags.Compressed);
+                foreach (ObjectPartLocalizedInfo localization in localizations)
+                {
+                    localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.All | ObjectPartLocalizedInfo.UpdateDataFlags.Compressed);
+                }
                 TriggerOnUpdate(flags);
             }
         }
