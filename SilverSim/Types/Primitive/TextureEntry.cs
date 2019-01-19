@@ -174,10 +174,16 @@ namespace SilverSim.Types.Primitive
             return offset / 32767.0f;
         }
 
+        private static float TEOffsetFloat(short offset) => offset / 32767.0f;
+
         private const float TwoPi = (float)Math.PI * 2;
         private static float TERotationFloat(byte[] bytes, int pos) => (bytes[pos] | (bytes[pos + 1] << 8)) / 32768.0f * TwoPi;
 
+        private static float TERotationFloat(short rot) => rot / 32768.0f * TwoPi;
+
         private static float TEGlowFloat(byte[] bytes, int pos) => bytes[pos] / 255.0f;
+
+        private static float TEGlowFloat(byte glowbyte) => glowbyte / 255.0f;
 
         private static ColorAlpha ColorFromBytes(byte[] data, int pos) => new ColorAlpha
         {
@@ -936,10 +942,10 @@ namespace SilverSim.Types.Primitive
             var textureCounts = new Dictionary<UUID, int>();
             var repeatUCounts = new Dictionary<float, int>();
             var repeatVCounts = new Dictionary<float, int>();
-            var offsetUCounts = new Dictionary<short, KeyValuePair<float, int>>();
-            var offsetVCounts = new Dictionary<short, KeyValuePair<float, int>>();
-            var rotationCounts = new Dictionary<short, KeyValuePair<float, int>>();
-            var glowCounts = new Dictionary<byte, KeyValuePair<float, int>>();
+            var offsetUCounts = new Dictionary<short, int>();
+            var offsetVCounts = new Dictionary<short, int>();
+            var rotationCounts = new Dictionary<short, int>();
+            var glowCounts = new Dictionary<byte, int>();
             var materialCounts = new Dictionary<byte, int>();
             var mediaCounts = new Dictionary<byte, int>();
             var materialIDCounts = new Dictionary<UUID, int>();
@@ -977,22 +983,25 @@ namespace SilverSim.Types.Primitive
                 repeatVCounts.TryGetValue(repeatV, out cnt);
                 repeatVCounts[repeatV] = cnt + 1;
 
-                KeyValuePair<float, int> fk;
                 short offsetu = TEOffsetShort(face.OffsetU);
-                offsetUCounts.TryGetValue(offsetu, out fk);
-                offsetUCounts[offsetu] = new KeyValuePair<float, int>(fk.Key, cnt + 1);
+                face.OffsetU = TEOffsetFloat(offsetu);
+                offsetUCounts.TryGetValue(offsetu, out cnt);
+                offsetUCounts[offsetu] = cnt + 1;
 
                 short offsetv = TEOffsetShort(face.OffsetV);
-                offsetVCounts.TryGetValue(offsetv, out fk);
-                offsetVCounts[offsetv] = new KeyValuePair<float, int>(fk.Key, cnt + 1);
+                face.OffsetV = TEOffsetFloat(offsetv);
+                offsetVCounts.TryGetValue(offsetv, out cnt);
+                offsetVCounts[offsetv] = cnt + 1;
 
                 short rotation = TERotationShort(face.Rotation);
-                rotationCounts.TryGetValue(rotation, out fk);
-                rotationCounts[rotation] = new KeyValuePair<float, int>(fk.Key, cnt + 1);
+                face.Rotation = TERotationFloat(rotation);
+                rotationCounts.TryGetValue(rotation, out cnt);
+                rotationCounts[rotation] = cnt + 1;
 
                 byte glow = TEGlowByte(face.Glow);
-                glowCounts.TryGetValue(glow, out fk);
-                glowCounts[glow] = new KeyValuePair<float, int>(fk.Key, cnt + 1);
+                face.Glow = TEGlowFloat(glow);
+                glowCounts.TryGetValue(glow, out cnt);
+                glowCounts[glow] = cnt + 1;
 
                 byte material = face.Material;
                 materialCounts.TryGetValue(material, out cnt);
@@ -1033,22 +1042,22 @@ namespace SilverSim.Types.Primitive
 
             if (offsetUCounts.Count > 0)
             {
-                DefaultTexture.OffsetU = offsetUCounts.Aggregate((l, r) => l.Value.Value > r.Value.Value ? l : r).Value.Key;
+                DefaultTexture.OffsetU = TEOffsetFloat(offsetUCounts.Aggregate((l, r) => l.Value > r.Value ? l : r).Key);
             }
 
             if (offsetVCounts.Count > 0)
             {
-                DefaultTexture.OffsetV = offsetUCounts.Aggregate((l, r) => l.Value.Value > r.Value.Value ? l : r).Value.Key;
+                DefaultTexture.OffsetV = TEOffsetFloat(offsetVCounts.Aggregate((l, r) => l.Value > r.Value ? l : r).Key);
             }
 
             if(rotationCounts.Count > 0)
             {
-                DefaultTexture.Rotation = rotationCounts.Aggregate((l, r) => l.Value.Value > r.Value.Value ? l : r).Value.Key;
+                DefaultTexture.Rotation = TERotationFloat(rotationCounts.Aggregate((l, r) => l.Value > r.Value ? l : r).Key);
             }
 
             if(glowCounts.Count > 0)
             {
-                DefaultTexture.Glow = glowCounts.Aggregate((l, r) => l.Value.Value > r.Value.Value ? l : r).Value.Key;
+                DefaultTexture.Glow = TEGlowFloat(glowCounts.Aggregate((l, r) => l.Value > r.Value ? l : r).Key);
             }
 
             if(materialCounts.Count > 0)
