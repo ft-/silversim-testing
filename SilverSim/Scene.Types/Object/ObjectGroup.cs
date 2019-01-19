@@ -1175,7 +1175,15 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     throw new LocalizedScriptErrorException(this, "LinkTarget0DoesNotExist", "Link target {0} does not exist", linkTarget);
                                 }
-                                linkobj.SetPrimitiveParams(enumerator);
+                                ObjectPart linkpart = linkobj as ObjectPart;
+                                if (linkpart != null)
+                                {
+                                    linkpart.SetPrimitiveParams(enumerator, cultureName);
+                                }
+                                else
+                                {
+                                    linkobj.SetPrimitiveParams(enumerator);
+                                }
                                 break;
                         }
                         break;

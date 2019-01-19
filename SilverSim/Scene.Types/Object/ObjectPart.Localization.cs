@@ -62,14 +62,16 @@ namespace SilverSim.Scene.Types.Object
 
         public void RemoveLocalization(string culturename)
         {
-            m_NamedLocalizations.Remove(culturename);
-            TriggerOnUpdate(UpdateChangedFlags.None);
+            if (m_NamedLocalizations.Remove(culturename))
+            {
+                TriggerOnUpdate(UpdateChangedFlags.Texture);
+            }
         }
 
         public void RemoveAllLocalizations()
         {
             m_NamedLocalizations.Clear();
-            TriggerOnUpdate(UpdateChangedFlags.None);
+            TriggerOnUpdate(UpdateChangedFlags.Texture);
         }
 
         public byte[] LocalizationSerialization

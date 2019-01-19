@@ -1810,6 +1810,7 @@ namespace SilverSim.Scene.Types.Object
 
             if(isUpdated)
             {
+                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.All | ObjectPartLocalizedInfo.UpdateDataFlags.Compressed);
                 TriggerOnUpdate(flags);
             }
         }

@@ -238,6 +238,8 @@ namespace SilverSim.Scene.Types.Object.Localization
             m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ObjectDataLength] = 60;
 
             m_Part = part;
+            m_TextureEntry = parentInfo.TextureEntry;
+            m_TextureEntryBytes = m_TextureEntry?.GetBytes();
             m_ParentInfo = parentInfo;
         }
 
