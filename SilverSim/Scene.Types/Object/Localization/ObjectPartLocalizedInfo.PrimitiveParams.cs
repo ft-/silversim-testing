@@ -42,7 +42,6 @@ namespace SilverSim.Scene.Types.Object.Localization
                 TextureEntry te = m_ParentInfo.TextureEntry;
                 m_TextureEntryLock.AcquireWriterLock(() =>
                 {
-                    ChangedTexParams(m_TextureEntry, te);
                     m_TextureEntry = te;
                     m_TextureEntryBytes = te.GetBytes();
                     ObjectPart part = m_Part;
