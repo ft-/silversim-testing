@@ -70,6 +70,7 @@ namespace SilverSim.Scene.Types.Object.Localization
                 }
                 if (changed)
                 {
+                    UpdateData(UpdateDataFlags.Compressed | UpdateDataFlags.Full);
                     m_Part.TriggerOnUpdate(UpdateChangedFlags.None);
                 }
             }
@@ -91,23 +92,18 @@ namespace SilverSim.Scene.Types.Object.Localization
 
             set
             {
+                bool changed;
                 if (value == null)
                 {
                     if (m_ParentInfo == null)
                     {
                         byte[] oldBytes = Interlocked.Exchange(ref m_ParticleSystem, new byte[0]);
-                        if(oldBytes.Length != 0)
-                        {
-                            m_Part.TriggerOnUpdate(UpdateChangedFlags.None);
-                        }
+                        changed = oldBytes.Length != 0;
                     }
                     else
                     {
                         byte[] oldBytes = Interlocked.Exchange(ref m_ParticleSystem, null);
-                        if (oldBytes != null)
-                        {
-                            m_Part.TriggerOnUpdate(UpdateChangedFlags.None);
-                        }
+                        changed = oldBytes != null;
                     }
                 }
                 else
@@ -116,10 +112,12 @@ namespace SilverSim.Scene.Types.Object.Localization
                     Buffer.BlockCopy(value, 0, ps, 0, value.Length);
                     byte[] oldBytes = Interlocked.Exchange(ref m_ParticleSystem, ps);
 
-                    if(oldBytes == null || oldBytes.Length == 0 || !oldBytes.SequenceEqual(ps))
-                    {
-                        m_Part.TriggerOnUpdate(UpdateChangedFlags.None);
-                    }
+                    changed = oldBytes == null || oldBytes.Length == 0 || !oldBytes.SequenceEqual(ps);
+                }
+                if(changed)
+                {
+                    UpdateData(UpdateDataFlags.Compressed | UpdateDataFlags.Full);
+                    m_Part.TriggerOnUpdate(UpdateChangedFlags.None);
                 }
             }
         }
