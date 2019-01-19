@@ -951,7 +951,7 @@ namespace SilverSim.Types.Primitive
                 m_FaceTextures[i] = null;
             }
 
-            for (int i = MAX_TEXTURE_FACES; i-- != 0; )
+            for (int i = optimizeForNumfaces; i-- != 0; )
             {
                 int cnt;
                 TextureEntryFace face = m_FaceTextures[(uint)i];
@@ -964,6 +964,10 @@ namespace SilverSim.Types.Primitive
                     m_FaceTextures[(uint)i] = lazyDefaultCopy;
                     face = lazyDefaultCopy;
                 }
+
+                UUID textureID = face.TextureID;
+                textureCounts.TryGetValue(textureID, out cnt);
+                textureCounts[textureID] = cnt + 1;
 
                 float repeatU = face.RepeatU;
                 repeatUCounts.TryGetValue(repeatU, out cnt);
