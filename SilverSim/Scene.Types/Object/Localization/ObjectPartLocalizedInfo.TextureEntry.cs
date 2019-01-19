@@ -110,7 +110,12 @@ namespace SilverSim.Scene.Types.Object.Localization
         {
             get
             {
-                return m_TextureEntryLock.AcquireReaderLock(() => new TextureEntry(m_TextureEntry));
+                TextureEntry t = m_TextureEntryLock.AcquireReaderLock(() => m_TextureEntry != null ? new TextureEntry(m_TextureEntry) : null);
+                if(t == null && m_ParentInfo != null)
+                {
+                    t = m_ParentInfo.TextureEntry;
+                }
+                return t;
             }
             set
             {
@@ -135,18 +140,42 @@ namespace SilverSim.Scene.Types.Object.Localization
             }
         }
 
-        public byte[] TextureEntryBytesLimitedLight => m_TextureEntryBytes_LimitsEnabled;
+        public byte[] TextureEntryBytesLimitedLight
+        {
+            get
+            {
+                byte[] t = m_TextureEntryBytes_LimitsEnabled;
+                if(t == null && m_ParentInfo != null)
+                {
+                    t = m_ParentInfo.m_TextureEntryBytes_LimitsEnabled;
+                }
+                return t;
+            }
+        }
 
         public byte[] TextureEntryBytes
         {
             get
             {
-                return m_TextureEntryLock.AcquireReaderLock(() =>
+                byte[] t = m_TextureEntryLock.AcquireReaderLock(() =>
                 {
-                    var b = new byte[m_TextureEntryBytes.Length];
-                    Buffer.BlockCopy(m_TextureEntryBytes, 0, b, 0, m_TextureEntryBytes.Length);
-                    return b;
+                    if (m_TextureEntryBytes != null)
+                    {
+                        byte[] b = new byte[m_TextureEntryBytes.Length];
+                        Buffer.BlockCopy(m_TextureEntryBytes, 0, b, 0, m_TextureEntryBytes.Length);
+                        return b;
+                    }
+                    else
+                    {
+                        return null;
+                    }
                 });
+
+                if(t == null && m_ParentInfo != null)
+                {
+                    t = m_ParentInfo.TextureEntryBytes;
+                }
+                return t;
             }
             set
             {
