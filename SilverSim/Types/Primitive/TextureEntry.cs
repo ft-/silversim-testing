@@ -135,6 +135,18 @@ namespace SilverSim.Types.Primitive
             return true;
         }
 
+        public bool ContainsKey(uint index)
+        {
+            if(index >= MAX_TEXTURE_FACES)
+            {
+                return false;
+            }
+            lock(m_Lock)
+            {
+                return m_FaceTextures[index] != null;
+            }
+        }
+
         private static float BytesToFloat(byte[] bytes, int pos)
         {
             if(!BitConverter.IsLittleEndian)
