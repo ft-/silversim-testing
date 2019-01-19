@@ -80,6 +80,10 @@ namespace SilverSim.Scene.Types.Object.Localization
             get
             {
                 var ps = m_ParticleSystem;
+                if(ps == null && m_ParentInfo != null)
+                {
+                    return m_ParentInfo.ParticleSystemBytes;
+                }
                 var o = new byte[ps.Length];
                 Buffer.BlockCopy(ps, 0, o, 0, ps.Length);
                 return o;
