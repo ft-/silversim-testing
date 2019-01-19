@@ -37,6 +37,25 @@ namespace SilverSim.Scene.Types.Object.Localization
 
         public ICollection<TextureEntryFace> GetFaces(int face)
         {
+            if (m_ParentInfo != null && m_TextureEntry == null)
+            {
+                TextureEntry te = m_ParentInfo.TextureEntry;
+                m_TextureEntryLock.AcquireWriterLock(() =>
+                {
+                    ChangedTexParams(m_TextureEntry, te);
+                    m_TextureEntry = te;
+                    m_TextureEntryBytes = te.GetBytes();
+                    ObjectPart part = m_Part;
+                    if (part != null)
+                    {
+                        m_TextureEntryBytes_LimitsEnabled = te.GetBytes(part.IsFullbrightDisabled, (float)part.GlowLimitIntensity);
+                    }
+                    else
+                    {
+                        m_TextureEntryBytes_LimitsEnabled = m_TextureEntryBytes;
+                    }
+                });
+            }
             if (face == ALL_SIDES)
             {
                 var list = new List<TextureEntryFace>();
