@@ -1309,6 +1309,14 @@ namespace SilverSim.Scene.Types.Object
                     paramList.Add(localization.Description);
                     break;
 
+                case PrimitiveParamsType.SitText:
+                    paramList.Add(localization.SitText);
+                    break;
+
+                case PrimitiveParamsType.TouchText:
+                    paramList.Add(localization.TouchText);
+                    break;
+
                 case PrimitiveParamsType.Type:
                     Shape.ToPrimitiveParams(paramList);
                     break;
@@ -1599,6 +1607,26 @@ namespace SilverSim.Scene.Types.Object
                         foreach (ObjectPartLocalizedInfo localization in localizations)
                         {
                             localization.Description = desc;
+                        }
+                    }
+                    break;
+
+                case PrimitiveParamsType.SitText:
+                    {
+                        string desc = ParamsHelper.GetString(enumerator, "PRIM_SIT_TEXT");
+                        foreach (ObjectPartLocalizedInfo localization in localizations)
+                        {
+                            localization.SitText = desc;
+                        }
+                    }
+                    break;
+
+                case PrimitiveParamsType.TouchText:
+                    {
+                        string desc = ParamsHelper.GetString(enumerator, "PRIM_TOUCH_TEXT");
+                        foreach (ObjectPartLocalizedInfo localization in localizations)
+                        {
+                            localization.TouchText = desc;
                         }
                     }
                     break;
@@ -1897,6 +1925,61 @@ namespace SilverSim.Scene.Types.Object
 
                 case PrimitiveParamsType.SitAnimation:
                     SitAnimation = ParamsHelper.GetString(enumerator, "PRIM_SIT_ANIMATION");
+                    break;
+
+                case PrimitiveParamsType.ResetParamToDefaultLang:
+                    if (!enumerator.MoveNext())
+                    {
+                        throw new LocalizedScriptErrorException(this, "NoParameterFor0", "No parameter for {0}", "PRIM_RESET_PARAM_TO_DEFAULT_LANGUAGE");
+                    }
+                    {
+                        PrimitiveParamsType resetParam = ParamsHelper.GetPrimParamType(enumerator);
+                        foreach (ObjectPartLocalizedInfo localization in localizations)
+                        {
+                            if(localization == m_DefaultLocalization)
+                            {
+                                /* skip this one. it is the default */
+                                continue;
+                            }
+                            switch (resetParam)
+                            {
+                                case PrimitiveParamsType.Desc:
+                                    localization.Description = null;
+                                    isUpdated = true;
+                                    break;
+
+                                case PrimitiveParamsType.Name:
+                                    localization.Name = null;
+                                    isUpdated = true;
+                                    break;
+
+                                case PrimitiveParamsType.Projector:
+                                    localization.Projection = null;
+                                    isUpdated = true;
+                                    break;
+
+                                case PrimitiveParamsType.Text:
+                                    localization.Text = null;
+                                    isUpdated = true;
+                                    break;
+
+                                case PrimitiveParamsType.Texture:
+                                    localization.TextureEntry = null;
+                                    isUpdated = true;
+                                    break;
+
+                                case PrimitiveParamsType.SitText:
+                                    localization.SitText = null;
+                                    isUpdated = true;
+                                    break;
+
+                                case PrimitiveParamsType.TouchText:
+                                    localization.TouchText = null;
+                                    isUpdated = true;
+                                    break;
+                            }
+                        }
+                    }
                     break;
 
                 default:

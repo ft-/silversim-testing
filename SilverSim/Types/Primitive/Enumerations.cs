@@ -129,7 +129,10 @@ namespace SilverSim.Types.Primitive
         SoundRadius = 12006,
         SoundVolume = 12007,
         SoundQueueing = 12008,
-        AllLanguages = 12009
+        AllLanguages = 12009,
+        ResetParamToDefaultLang = 12010,
+        SitText = 12011,
+        TouchText = 12012
     }
 
     public static class PrimitiveParamsToLslMethodsExtension
@@ -170,6 +173,7 @@ namespace SilverSim.Types.Primitive
                 case PrimitiveParamsType.RemoveAllLanguages: return "PRIM_REMOVE_ALL_LANGUAGES";
                 case PrimitiveParamsType.RemoveLanguage: return "PRIM_REMOVE_LANGUAGE";
                 case PrimitiveParamsType.AllLanguages: return "PRIM_ALL_LANGUAGES";
+                case PrimitiveParamsType.ResetParamToDefaultLang: return "PRIM_RESET_PARAM_TO_DEFAULT_LANGUAGE";
                 case PrimitiveParamsType.Rotation: return "PRIM_ROTATION";
                 case PrimitiveParamsType.RotLocal: return "PRIM_ROT_LOCAL";
                 case PrimitiveParamsType.ScriptedSitOnly: return "PRIM_SCRIPTED_SIT_ONLY";
@@ -187,6 +191,8 @@ namespace SilverSim.Types.Primitive
                 case PrimitiveParamsType.Texture: return "PRIM_TEXTURE";
                 case PrimitiveParamsType.Type: return "PRIM_TYPE";
                 case PrimitiveParamsType.UnSitTarget: return "PRIM_UNSIT_TARGET";
+                case PrimitiveParamsType.SitText: return "PRIM_SIT_TEXT";
+                case PrimitiveParamsType.TouchText: return "PRIM_TOUCH_TEXT";
             }
             return string.Format("PRIM_{0}", (int)paramtype);
         }
