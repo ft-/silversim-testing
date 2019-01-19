@@ -20,12 +20,13 @@
 // exception statement from your version.
 
 using SilverSim.Viewer.Messages.Object;
+using System.Globalization;
 
 namespace SilverSim.Scene.Types.Object
 {
     public partial class ObjectPart
     {
-        public ObjectPropertiesFamily PropertiesFamily => new ObjectPropertiesFamily
+        public ObjectPropertiesFamily GetPropertiesFamily(CultureInfo currentCulture) => new ObjectPropertiesFamily
         {
             ObjectID = ID,
             OwnerID = Owner.ID,
@@ -40,8 +41,8 @@ namespace SilverSim.Scene.Types.Object
             SalePrice = ObjectGroup.SalePrice,
             Category = ObjectGroup.Category,
             LastOwnerID = ObjectGroup.LastOwner.ID,
-            Name = Name,
-            Description = Description
+            Name = GetLocalization(currentCulture).Name,
+            Description = GetLocalization(currentCulture).Description
         };
     }
 }

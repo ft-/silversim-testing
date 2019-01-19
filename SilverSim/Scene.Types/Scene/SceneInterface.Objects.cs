@@ -1287,11 +1287,11 @@ namespace SilverSim.Scene.Types.Scene
             {
                 return;
             }
-            ObjectPropertiesFamily res = part.PropertiesFamily;
-            res.RequestFlags = req.RequestFlags;
             IAgent agent;
             if (Agents.TryGetValue(req.AgentID, out agent))
             {
+                ObjectPropertiesFamily res = part.GetPropertiesFamily(agent.CurrentCulture);
+                res.RequestFlags = req.RequestFlags;
                 agent.SendMessageAlways(res, ID);
             }
         }
