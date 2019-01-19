@@ -66,7 +66,7 @@ namespace SilverSim.Scene.Types.Object.Localization
                 {
                     byte[] newBytes = value.GetBytes();
                     byte[] oldBytes = Interlocked.Exchange(ref m_ParticleSystem, newBytes);
-                    changed = oldBytes?.Length == 0 || oldBytes.SequenceEqual(newBytes);
+                    changed = oldBytes == null || oldBytes.Length == 0 || !oldBytes.SequenceEqual(newBytes);
                 }
                 if (changed)
                 {
@@ -112,7 +112,7 @@ namespace SilverSim.Scene.Types.Object.Localization
                     Buffer.BlockCopy(value, 0, ps, 0, value.Length);
                     byte[] oldBytes = Interlocked.Exchange(ref m_ParticleSystem, ps);
 
-                    if(oldBytes?.Length == 0 || oldBytes.SequenceEqual(ps))
+                    if(oldBytes == null || oldBytes.Length == 0 || !oldBytes.SequenceEqual(ps))
                     {
                         m_Part.TriggerOnUpdate(UpdateChangedFlags.None);
                     }
