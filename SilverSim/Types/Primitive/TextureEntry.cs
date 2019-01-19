@@ -943,7 +943,13 @@ namespace SilverSim.Types.Primitive
             var materialCounts = new Dictionary<byte, int>();
             var mediaCounts = new Dictionary<byte, int>();
             var materialIDCounts = new Dictionary<UUID, int>();
+            var textureColorCounts = new Dictionary<ColorAlpha, int>();
             TextureEntryFace lazyDefaultCopy = null;
+
+            for(int i = MAX_TEXTURE_FACES; i-- > optimizeForNumfaces; )
+            {
+                m_FaceTextures[i] = null;
+            }
 
             for (int i = MAX_TEXTURE_FACES; i-- != 0; )
             {
@@ -995,6 +1001,15 @@ namespace SilverSim.Types.Primitive
                 UUID materialID = face.MaterialID;
                 materialIDCounts.TryGetValue(materialID, out cnt);
                 materialIDCounts[materialID] = cnt + 1;
+
+                ColorAlpha color = face.TextureColor;
+                textureColorCounts.TryGetValue(color, out cnt);
+                textureColorCounts[color] = cnt + 1;
+            }
+
+            if(textureColorCounts.Count > 0)
+            {
+                DefaultTexture.TextureColor = textureColorCounts.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
             }
 
             if (textureCounts.Count > 0)
