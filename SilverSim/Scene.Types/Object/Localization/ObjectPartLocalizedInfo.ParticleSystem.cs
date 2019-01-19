@@ -54,18 +54,19 @@ namespace SilverSim.Scene.Types.Object.Localization
                     if(m_ParentInfo == null)
                     {
                         byte[] oldBytes = Interlocked.Exchange(ref m_ParticleSystem, new byte[0]);
-                        changed = oldBytes == null || oldBytes.Length != 0;
+                        changed = oldBytes.Length != 0;
                     }
                     else
                     {
-                        changed = Interlocked.Exchange(ref m_ParticleSystem, null) != null;
+                        byte[] oldBytes = Interlocked.Exchange(ref m_ParticleSystem, new byte[0]);
+                        changed = oldBytes.Length != 0;
                     }
                 }
                 else
                 {
                     byte[] newBytes = value.GetBytes();
                     byte[] oldBytes = Interlocked.Exchange(ref m_ParticleSystem, newBytes);
-                    changed = oldBytes == null || oldBytes.SequenceEqual(newBytes);
+                    changed = oldBytes.Length == 0 || oldBytes.SequenceEqual(newBytes);
                 }
                 if (changed)
                 {
