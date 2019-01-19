@@ -466,6 +466,7 @@ namespace SilverSim.Types.Primitive
                     int i;
                     int j;
                     ulong mask2;
+                    byte fbright_mask = (byte)~(fullbrightdisable ? FULLBRIGHT_MASK : 0);
 
                     for (i = MAX_TEXTURE_FACES, mask = (ulong)1 << (MAX_TEXTURE_FACES - 1); i-- != 0; mask >>= 1)
                     {
@@ -503,7 +504,7 @@ namespace SilverSim.Types.Primitive
                         {
                             rotations |= mask;
                         }
-                        if (face.Material != DefaultTexture.Material)
+                        if ((face.Material & fbright_mask) != (DefaultTexture.Material & fbright_mask))
                         {
                             materials |= mask;
                         }
@@ -511,7 +512,7 @@ namespace SilverSim.Types.Primitive
                         {
                             medias |= mask;
                         }
-                        if (TEGlowByte(face.Glow) != TEGlowByte(DefaultTexture.Glow))
+                        if (TEGlowByte(Math.Min(glowintensitylimit, face.Glow)) != TEGlowByte(Math.Min(glowintensitylimit, DefaultTexture.Glow)))
                         {
                             glows |= mask;
                         }
@@ -739,7 +740,6 @@ namespace SilverSim.Types.Primitive
                     #endregion Rotation
 
                     #region Material
-                    byte fbright_mask = (byte)~(fullbrightdisable ? FULLBRIGHT_MASK : 0);
                     binWriter.Write((byte)(DefaultTexture.Material & fbright_mask));
                     for (i = 0, mask = 1; materials != 0; i++, mask <<= 1)
                     {
