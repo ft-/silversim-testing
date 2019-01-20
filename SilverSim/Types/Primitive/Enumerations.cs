@@ -113,7 +113,7 @@ namespace SilverSim.Types.Primitive
 
         Alpha = 11001,
 
-        Projector = 11110,
+        Projector = 11100,
         ProjectorEnabled = 11101,
         ProjectorTexture = 11102,
         ProjectorFov = 11103,
