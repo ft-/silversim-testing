@@ -216,7 +216,7 @@ namespace SilverSim.Scene.Types.Object.Localization
             }
         }
 
-        internal void SetTexPrimitiveParams(PrimitiveParamsType paramtype, AnArray.MarkEnumerator enumerator, ref UpdateChangedFlags flags, ref bool isUpdated, string paramtypename)
+        internal void SetTexPrimitiveParams(PrimitiveParamsType paramtype, AnArray.MarkEnumerator enumerator, ref UpdateChangedFlags flags, ref bool isUpdated, string paramtypename, bool updateParams)
         {
             m_TextureEntryLock.AcquireWriterLock(-1);
             try
@@ -226,7 +226,7 @@ namespace SilverSim.Scene.Types.Object.Localization
                 foreach (var face in faces)
                 {
                     enumerator.GoToMarkPosition();
-                    SetTexPrimitiveParams(face, paramtype, enumerator, ref flags, ref isUpdated);
+                    SetTexPrimitiveParams(face, paramtype, enumerator, ref flags, ref isUpdated, updateParams);
                 }
                 m_TextureEntryBytes = m_TextureEntry.GetBytes();
             }
@@ -236,73 +236,109 @@ namespace SilverSim.Scene.Types.Object.Localization
             }
         }
 
-        public void SetTexPrimitiveParams(TextureEntryFace face, PrimitiveParamsType type, AnArray.MarkEnumerator enumerator, ref UpdateChangedFlags flags, ref bool isUpdated)
+        private void SetTexPrimitiveParams(TextureEntryFace face, PrimitiveParamsType type, AnArray.MarkEnumerator enumerator, ref UpdateChangedFlags flags, ref bool isUpdated, bool updateParams)
         {
             switch (type)
             {
                 case PrimitiveParamsType.Texture:
                     {
                         UUID textureID = m_Part.GetTextureParam(enumerator, "PRIM_TEXTURE");
-                        if(m_Part.TryFetchTexture(textureID))
+                        Vector3 repeats = ParamsHelper.GetVector(enumerator, "PRIM_TEXTURE");
+                        Vector3 offsets = ParamsHelper.GetVector(enumerator, "PRIM_TEXTURE");
+                        float rot = (float)ParamsHelper.GetDouble(enumerator, "PRIM_TEXTURE");
+
+                        if (updateParams)
                         {
-                            face.TextureID = textureID;
+                            if (m_Part.TryFetchTexture(textureID))
+                            {
+                                face.TextureID = textureID;
+                            }
+                            face.RepeatU = (float)repeats.X;
+                            face.RepeatV = (float)repeats.Y;
+                            face.OffsetU = (float)offsets.X;
+                            face.OffsetV = (float)offsets.Y;
+                            face.Rotation = rot;
+                            flags |= UpdateChangedFlags.Texture;
+                            isUpdated = true;
                         }
-                        Vector3 v = ParamsHelper.GetVector(enumerator, "PRIM_TEXTURE");
-                        face.RepeatU = (float)v.X;
-                        face.RepeatV = (float)v.Y;
-                        v = ParamsHelper.GetVector(enumerator, "PRIM_TEXTURE");
-                        face.OffsetU = (float)v.X;
-                        face.OffsetV = (float)v.Y;
-                        face.Rotation = (float)ParamsHelper.GetDouble(enumerator, "PRIM_TEXTURE");
                     }
-                    flags |= UpdateChangedFlags.Texture;
-                    isUpdated = true;
                     break;
 
                 case PrimitiveParamsType.Color:
                     {
                         Vector3 color = ParamsHelper.GetVector(enumerator, "PRIM_COLOR");
                         double alpha = ParamsHelper.GetDouble(enumerator, "PRIM_COLOR").Clamp(0, 1);
-                        face.TextureColor = new ColorAlpha(color, alpha);
+                        if (updateParams)
+                        {
+                            face.TextureColor = new ColorAlpha(color, alpha);
+                            flags |= UpdateChangedFlags.Color;
+                            isUpdated = true;
+                        }
                     }
-                    flags |= UpdateChangedFlags.Color;
-                    isUpdated = true;
                     break;
 
                 case PrimitiveParamsType.Alpha:
                     {
                         double alpha = ParamsHelper.GetDouble(enumerator, "PRIM_ALPHA").Clamp(0, 1);
-                        ColorAlpha color = face.TextureColor;
-                        color.A = alpha;
-                        face.TextureColor = color;
+                        if (updateParams)
+                        {
+                            ColorAlpha color = face.TextureColor;
+                            color.A = alpha;
+                            face.TextureColor = color;
+                            flags |= UpdateChangedFlags.Color;
+                            isUpdated = true;
+                        }
                     }
-                    flags |= UpdateChangedFlags.Color;
-                    isUpdated = true;
                     break;
 
                 case PrimitiveParamsType.BumpShiny:
-                    face.Shiny = (Shininess)ParamsHelper.GetInteger(enumerator, "PRIM_BUMP_SHINY");
-                    face.Bump = (Bumpiness)ParamsHelper.GetInteger(enumerator, "PRIM_BUMP_SHINY");
-                    flags |= UpdateChangedFlags.Texture;
-                    isUpdated = true;
+                    {
+                        Shininess shiny = (Shininess)ParamsHelper.GetInteger(enumerator, "PRIM_BUMP_SHINY");
+                        Bumpiness bump = (Bumpiness)ParamsHelper.GetInteger(enumerator, "PRIM_BUMP_SHINY");
+                        if (updateParams)
+                        {
+                            face.Shiny = shiny;
+                            face.Bump = bump;
+                            flags |= UpdateChangedFlags.Texture;
+                            isUpdated = true;
+                        }
+                    }
                     break;
 
                 case PrimitiveParamsType.FullBright:
-                    face.FullBright = ParamsHelper.GetBoolean(enumerator, "PRIM_FULLBRIGHT");
-                    flags |= UpdateChangedFlags.Color;
-                    isUpdated = true;
+                    {
+                        bool fbright = ParamsHelper.GetBoolean(enumerator, "PRIM_FULLBRIGHT");
+                        if (updateParams)
+                        {
+                            face.FullBright = fbright;
+                            flags |= UpdateChangedFlags.Color;
+                            isUpdated = true;
+                        }
+                    }
                     break;
 
                 case PrimitiveParamsType.TexGen:
-                    face.TexMapType = (MappingType)ParamsHelper.GetInteger(enumerator, "PRIM_TEXGEN");
-                    flags |= UpdateChangedFlags.Texture;
-                    isUpdated = true;
+                    {
+                        MappingType mapType = (MappingType)ParamsHelper.GetInteger(enumerator, "PRIM_TEXGEN");
+                        if (updateParams)
+                        {
+                            face.TexMapType = mapType;
+                            flags |= UpdateChangedFlags.Texture;
+                            isUpdated = true;
+                        }
+                    }
                     break;
 
                 case PrimitiveParamsType.Glow:
-                    face.Glow = (float)ParamsHelper.GetDouble(enumerator, "PRIM_GLOW").Clamp(0, 1);
-                    flags |= UpdateChangedFlags.Color;
-                    isUpdated = true;
+                    {
+                        float glow = (float)ParamsHelper.GetDouble(enumerator, "PRIM_GLOW").Clamp(0, 1);
+                        if (updateParams)
+                        {
+                            face.Glow = glow;
+                            flags |= UpdateChangedFlags.Color;
+                            isUpdated = true;
+                        }
+                    }
                     break;
 
                 case PrimitiveParamsType.AlphaMode:
@@ -319,14 +355,18 @@ namespace SilverSim.Scene.Types.Object.Localization
                         }
                         mat.DiffuseAlphaMode = ParamsHelper.GetInteger(enumerator, "PRIM_ALPHA_MODE");
                         mat.AlphaMaskCutoff = ParamsHelper.GetInteger(enumerator, "PRIM_ALPHA_MODE");
-                        mat.DiffuseAlphaMode = mat.DiffuseAlphaMode.Clamp(0, 3);
-                        mat.AlphaMaskCutoff = mat.AlphaMaskCutoff.Clamp(0, 3);
-                        mat.MaterialID = UUID.Random;
-                        m_Part.ObjectGroup.Scene.StoreMaterial(mat);
-                        face.MaterialID = mat.MaterialID;
+
+                        if (updateParams)
+                        {
+                            mat.DiffuseAlphaMode = mat.DiffuseAlphaMode.Clamp(0, 3);
+                            mat.AlphaMaskCutoff = mat.AlphaMaskCutoff.Clamp(0, 3);
+                            mat.MaterialID = UUID.Random;
+                            m_Part.ObjectGroup.Scene.StoreMaterial(mat);
+                            face.MaterialID = mat.MaterialID;
+                            flags |= UpdateChangedFlags.Texture;
+                            isUpdated = true;
+                        }
                     }
-                    flags |= UpdateChangedFlags.Texture;
-                    isUpdated = true;
                     break;
 
                 case PrimitiveParamsType.Normal:
@@ -337,37 +377,40 @@ namespace SilverSim.Scene.Types.Object.Localization
                         Vector3 offsets = ParamsHelper.GetVector(enumerator, "PRIM_NORMAL");
                         double rotation = ParamsHelper.GetDouble(enumerator, "PRIM_NORMAL");
 
-                        repeats.X *= Material.MATERIALS_MULTIPLIER;
-                        repeats.Y *= Material.MATERIALS_MULTIPLIER;
-                        offsets.X *= Material.MATERIALS_MULTIPLIER;
-                        offsets.Y *= Material.MATERIALS_MULTIPLIER;
-                        rotation %= Math.PI * 2;
-                        rotation *= Material.MATERIALS_MULTIPLIER;
+                        if (updateParams)
+                        {
+                            repeats.X *= Material.MATERIALS_MULTIPLIER;
+                            repeats.Y *= Material.MATERIALS_MULTIPLIER;
+                            offsets.X *= Material.MATERIALS_MULTIPLIER;
+                            offsets.Y *= Material.MATERIALS_MULTIPLIER;
+                            rotation %= Math.PI * 2;
+                            rotation *= Material.MATERIALS_MULTIPLIER;
 
-                        Material mat;
-                        try
-                        {
-                            mat = m_Part.ObjectGroup.Scene.GetMaterial(face.MaterialID);
-                        }
-                        catch
-                        {
-                            mat = new Material();
-                        }
-                        mat.NormMap = texture;
-                        mat.NormOffsetX = (int)Math.Round(offsets.X);
-                        mat.NormOffsetY = (int)Math.Round(offsets.Y);
-                        mat.NormRepeatX = (int)Math.Round(repeats.X);
-                        mat.NormRepeatY = (int)Math.Round(repeats.Y);
-                        mat.NormRotation = (int)Math.Round(rotation);
-                        mat.MaterialID = UUID.Random;
-                        if (m_Part.TryFetchTexture(texture))
-                        {
-                            m_Part.ObjectGroup.Scene.StoreMaterial(mat);
-                            face.MaterialID = mat.MaterialID;
+                            Material mat;
+                            try
+                            {
+                                mat = m_Part.ObjectGroup.Scene.GetMaterial(face.MaterialID);
+                            }
+                            catch
+                            {
+                                mat = new Material();
+                            }
+                            mat.NormMap = texture;
+                            mat.NormOffsetX = (int)Math.Round(offsets.X);
+                            mat.NormOffsetY = (int)Math.Round(offsets.Y);
+                            mat.NormRepeatX = (int)Math.Round(repeats.X);
+                            mat.NormRepeatY = (int)Math.Round(repeats.Y);
+                            mat.NormRotation = (int)Math.Round(rotation);
+                            mat.MaterialID = UUID.Random;
+                            if (m_Part.TryFetchTexture(texture))
+                            {
+                                m_Part.ObjectGroup.Scene.StoreMaterial(mat);
+                                face.MaterialID = mat.MaterialID;
+                            }
+                            flags |= UpdateChangedFlags.Texture;
+                            isUpdated = true;
                         }
                     }
-                    flags |= UpdateChangedFlags.Texture;
-                    isUpdated = true;
                     break;
 
                 case PrimitiveParamsType.Specular:
@@ -384,35 +427,38 @@ namespace SilverSim.Scene.Types.Object.Localization
                         var color = new ColorAlpha(ParamsHelper.GetVector(enumerator, "PRIM_SPECULAR"), 1);
                         int glossiness = ParamsHelper.GetInteger(enumerator, "PRIM_SPECULAR");
                         int environment = ParamsHelper.GetInteger(enumerator, "PRIM_SPECULAR");
-                        environment = environment.Clamp(0, 255);
-                        glossiness = glossiness.Clamp(0, 255);
-                        Material mat;
-                        try
+                        if (updateParams)
                         {
-                            mat = m_Part.ObjectGroup.Scene.GetMaterial(face.MaterialID);
-                        }
-                        catch
-                        {
-                            mat = new Material();
-                        }
-                        mat.SpecColor = color;
-                        mat.SpecMap = texture;
-                        mat.SpecOffsetX = (int)Math.Round(offsets.X);
-                        mat.SpecOffsetY = (int)Math.Round(offsets.Y);
-                        mat.SpecRepeatX = (int)Math.Round(repeats.X);
-                        mat.SpecRepeatY = (int)Math.Round(repeats.Y);
-                        mat.SpecRotation = (int)Math.Round(rotation);
-                        mat.EnvIntensity = environment;
-                        mat.SpecExp = glossiness;
-                        mat.MaterialID = UUID.Random;
-                        if (m_Part.TryFetchTexture(texture))
-                        {
-                            m_Part.ObjectGroup.Scene.StoreMaterial(mat);
-                            face.MaterialID = mat.MaterialID;
+                            environment = environment.Clamp(0, 255);
+                            glossiness = glossiness.Clamp(0, 255);
+                            Material mat;
+                            try
+                            {
+                                mat = m_Part.ObjectGroup.Scene.GetMaterial(face.MaterialID);
+                            }
+                            catch
+                            {
+                                mat = new Material();
+                            }
+                            mat.SpecColor = color;
+                            mat.SpecMap = texture;
+                            mat.SpecOffsetX = (int)Math.Round(offsets.X);
+                            mat.SpecOffsetY = (int)Math.Round(offsets.Y);
+                            mat.SpecRepeatX = (int)Math.Round(repeats.X);
+                            mat.SpecRepeatY = (int)Math.Round(repeats.Y);
+                            mat.SpecRotation = (int)Math.Round(rotation);
+                            mat.EnvIntensity = environment;
+                            mat.SpecExp = glossiness;
+                            mat.MaterialID = UUID.Random;
+                            if (m_Part.TryFetchTexture(texture))
+                            {
+                                m_Part.ObjectGroup.Scene.StoreMaterial(mat);
+                                face.MaterialID = mat.MaterialID;
+                            }
+                            flags |= UpdateChangedFlags.Texture;
+                            isUpdated = true;
                         }
                     }
-                    flags |= UpdateChangedFlags.Texture;
-                    isUpdated = true;
                     break;
 
                 default:

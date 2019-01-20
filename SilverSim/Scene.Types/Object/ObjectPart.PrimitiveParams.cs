@@ -1766,7 +1766,7 @@ namespace SilverSim.Scene.Types.Object
                     foreach (ObjectPartLocalizedInfo localization in localizations)
                     {
                         enumerator.GoToMarkPosition2();
-                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isTextureEntryUpdated, "PRIM_ALPHAMODE");
+                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isTextureEntryUpdated, "PRIM_ALPHAMODE", localization.HasTextureEntry || localizations.Length == 1);
                     }
                     break;
 
@@ -1775,7 +1775,7 @@ namespace SilverSim.Scene.Types.Object
                     foreach (ObjectPartLocalizedInfo localization in localizations)
                     {
                         enumerator.GoToMarkPosition2();
-                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isTextureEntryUpdated, "PRIM_NORMAL");
+                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isTextureEntryUpdated, "PRIM_NORMAL", localization.HasTextureEntry || localizations.Length == 1);
                     }
                     break;
 
@@ -1784,7 +1784,7 @@ namespace SilverSim.Scene.Types.Object
                     foreach (ObjectPartLocalizedInfo localization in localizations)
                     {
                         enumerator.GoToMarkPosition2();
-                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isTextureEntryUpdated, "PRIM_SPECULAR");
+                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isTextureEntryUpdated, "PRIM_SPECULAR", localization.HasTextureEntry || localizations.Length == 1);
                     }
                     break;
 
@@ -1793,7 +1793,7 @@ namespace SilverSim.Scene.Types.Object
                     foreach (ObjectPartLocalizedInfo localization in localizations)
                     {
                         enumerator.GoToMarkPosition2();
-                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isTextureEntryUpdated, "PRIM_TEXTURE");
+                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isTextureEntryUpdated, "PRIM_TEXTURE", localization.HasTextureEntry || localizations.Length == 1);
                     }
                     break;
 
@@ -1821,7 +1821,7 @@ namespace SilverSim.Scene.Types.Object
                     foreach (ObjectPartLocalizedInfo localization in localizations)
                     {
                         enumerator.GoToMarkPosition2();
-                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isTextureEntryUpdated, "PRIM_COLOR");
+                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isTextureEntryUpdated, "PRIM_COLOR", localization.HasTextureEntry || localizations.Length == 1);
                     }
                     break;
 
@@ -1830,7 +1830,7 @@ namespace SilverSim.Scene.Types.Object
                     foreach (ObjectPartLocalizedInfo localization in localizations)
                     {
                         enumerator.GoToMarkPosition2();
-                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isTextureEntryUpdated, "PRIM_ALPHA");
+                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isTextureEntryUpdated, "PRIM_ALPHA", localization.HasTextureEntry || localizations.Length == 1);
                     }
                     break;
 
@@ -1839,7 +1839,7 @@ namespace SilverSim.Scene.Types.Object
                     foreach (ObjectPartLocalizedInfo localization in localizations)
                     {
                         enumerator.GoToMarkPosition2();
-                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isTextureEntryUpdated, "PRIM_BUMP_SHINY");
+                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isTextureEntryUpdated, "PRIM_BUMP_SHINY", localization.HasTextureEntry || localizations.Length == 1);
                     }
                     break;
 
@@ -1859,7 +1859,7 @@ namespace SilverSim.Scene.Types.Object
                     foreach (ObjectPartLocalizedInfo localization in localizations)
                     {
                         enumerator.GoToMarkPosition2();
-                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isTextureEntryUpdated, "PRIM_FULLBRIGHT");
+                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isTextureEntryUpdated, "PRIM_FULLBRIGHT", localization.HasTextureEntry || localizations.Length == 1);
                     }
                     break;
 
@@ -1880,7 +1880,7 @@ namespace SilverSim.Scene.Types.Object
                     foreach (ObjectPartLocalizedInfo localization in localizations)
                     {
                         enumerator.GoToMarkPosition2();
-                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isTextureEntryUpdated, "PRIM_TEXGEN");
+                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isTextureEntryUpdated, "PRIM_TEXGEN", localization.HasTextureEntry || localizations.Length == 1);
                     }
                     break;
 
@@ -1889,7 +1889,7 @@ namespace SilverSim.Scene.Types.Object
                     foreach (ObjectPartLocalizedInfo localization in localizations)
                     {
                         enumerator.GoToMarkPosition2();
-                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isTextureEntryUpdated, "PRIM_GLOW");
+                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isTextureEntryUpdated, "PRIM_GLOW", localization.HasTextureEntry || localizations.Length == 1);
                     }
                     break;
 
