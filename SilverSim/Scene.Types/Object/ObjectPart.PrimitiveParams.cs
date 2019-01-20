@@ -1538,6 +1538,14 @@ namespace SilverSim.Scene.Types.Object
                     }
                     break;
 
+                case PrimitiveParamsType.PhysicsMaterial:
+                    paramList.Add(15);
+                    paramList.Add(PhysicsGravityMultiplier);
+                    paramList.Add(PhysicsRestitution);
+                    paramList.Add(PhysicsFriction);
+                    paramList.Add(PhysicsDensity);
+                    break;
+
                 default:
                     throw new LocalizedScriptErrorException(this, "PRIMInvalidParameterType0", "Invalid primitive parameter type {0}", enumerator.Current.AsUInt);
             }
@@ -1873,6 +1881,32 @@ namespace SilverSim.Scene.Types.Object
                         Wind = ParamsHelper.GetDouble(enumerator, "PRIM_FLEXIBLE"),
                         Force = ParamsHelper.GetVector(enumerator, "PRIM_FLEXIBLE")
                     };
+                    break;
+
+                case PrimitiveParamsType.PhysicsMaterial:
+                    {
+                        int material_bits = ParamsHelper.GetInteger(enumerator, "PRIM_PHYSICS_MATERIAL");
+                        double gravity_multiplier = ParamsHelper.GetDouble(enumerator, "PRIM_PHYSICS_MATERIAL");
+                        double restitution = ParamsHelper.GetDouble(enumerator, "PRIM_PHYSICS_MATERIAL");
+                        double friction = ParamsHelper.GetDouble(enumerator, "PRIM_PHYSICS_MATERIAL");
+                        double density = ParamsHelper.GetDouble(enumerator, "PRIM_PHYSICS_MATERIAL");
+                        if((material_bits & 1) != 0)
+                        {
+                            PhysicsDensity = density;
+                        }
+                        if((material_bits & 2) != 0)
+                        {
+                            PhysicsFriction = friction;
+                        }
+                        if((material_bits & 4) != 0)
+                        {
+                            PhysicsRestitution = restitution;
+                        }
+                        if((material_bits & 8) != 0)
+                        {
+                            PhysicsGravityMultiplier = gravity_multiplier;
+                        }
+                    }
                     break;
 
                 case PrimitiveParamsType.TexGen:

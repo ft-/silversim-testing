@@ -110,6 +110,7 @@ namespace SilverSim.Types.Primitive
         ScriptedSitOnly = 40,
         SitTarget = 41,
         CastShadows = 24,
+        PhysicsMaterial = 31,
 
         Alpha = 11001,
 
