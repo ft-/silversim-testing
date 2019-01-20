@@ -133,7 +133,8 @@ namespace SilverSim.Types.Primitive
         ResetParamToDefaultLang = 12010,
         SitText = 12011,
         TouchText = 12012,
-        TextureAnim = 12013
+        TextureAnim = 12013,
+        CollisionSound = 12014
     }
 
     public static class PrimitiveParamsToLslMethodsExtension

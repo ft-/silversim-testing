@@ -27,7 +27,7 @@ namespace SilverSim.Scene.Types.Object.Parameters
     public class CollisionSoundParam
     {
         [Flags]
-        private enum CollisionSoundFlags : uint
+        public enum CollisionSoundFlags : uint
         {
             None = 0,
             UseHitpoint = 1,

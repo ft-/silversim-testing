@@ -1280,9 +1280,28 @@ namespace SilverSim.Scene.Types.Object
             PrimitiveParamsType paramtype = ParamsHelper.GetPrimParamType(enumerator);
             switch (paramtype)
             {
+                case PrimitiveParamsType.CollisionSound:
+                    {
+                        CollisionSoundParam p = localization.CollisionSound;
+                        paramList.Add(GetSoundInventoryItem(p.ImpactSound));
+                        paramList.Add(p.ImpactVolume);
+                        paramList.Add(p.ImpactSoundRadius);
+                        int colsoundflags = 0;
+                        if (p.ImpactUseChilds)
+                        {
+                            colsoundflags |= (int)CollisionSoundParam.CollisionSoundFlags.UseChilds;
+                        }
+                        if (p.ImpactUseHitpoint)
+                        {
+                            colsoundflags |= (int)CollisionSoundParam.CollisionSoundFlags.UseHitpoint;
+                        }
+                        paramList.Add(colsoundflags);
+                    }
+                    break;
+
                 case PrimitiveParamsType.LoopSound:
                     {
-                        SoundParam p = Sound;
+                        SoundParam p = localization.Sound;
                         paramList.Add(GetSoundInventoryItem(p.SoundID));
                         paramList.Add(p.Gain);
                         paramList.Add((int)(p.Flags & (PrimitiveSoundFlags.SyncMaster | PrimitiveSoundFlags.SyncSlave)));
@@ -1291,11 +1310,11 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.SoundRadius:
-                    paramList.Add(Sound.Radius);
+                    paramList.Add(localization.Sound.Radius);
                     break;
 
                 case PrimitiveParamsType.SoundVolume:
-                    paramList.Add(Sound.Gain);
+                    paramList.Add(localization.Sound.Gain);
                     break;
 
                 case PrimitiveParamsType.SoundQueueing:
@@ -1550,6 +1569,31 @@ namespace SilverSim.Scene.Types.Object
             PrimitiveParamsType paramtype = ParamsHelper.GetPrimParamType(enumerator);
             switch (paramtype)
             {
+                case PrimitiveParamsType.CollisionSound:
+                    {
+                        var p = new CollisionSoundParam
+                        {
+                            ImpactSound = GetSoundParam(enumerator, "PRIM_COLLISION_SOUND"),
+                            ImpactVolume = ParamsHelper.GetDouble(enumerator, "PRIM_COLLISION_SOUND"),
+                            ImpactSoundRadius = ParamsHelper.GetDouble(enumerator, "PRIM_COLLISION_SOUND")
+                        };
+                        int colsoundflags = ParamsHelper.GetInteger(enumerator, "PRIM_COLLISION_SOUND");
+                        p.ImpactUseHitpoint = (colsoundflags & (int)CollisionSoundParam.CollisionSoundFlags.UseHitpoint) != 0;
+                        p.ImpactUseChilds = (colsoundflags & (int)CollisionSoundParam.CollisionSoundFlags.UseChilds) != 0;
+
+                        if (p.ImpactSound == UUID.Zero || TryFetchSound(p.ImpactSound))
+                        {
+                            foreach (ObjectPartLocalizedInfo localization in localizations)
+                            {
+                                if (localization.HasCollisionSound || localizations.Length == 1)
+                                {
+                                    localization.CollisionSound = p;
+                                }
+                            }
+                        }
+                    }
+                    break;
+
                 case PrimitiveParamsType.LoopSound:
                     {
                         var p = new SoundParam
@@ -1580,7 +1624,7 @@ namespace SilverSim.Scene.Types.Object
                             {
                                 if (localization.HasSound || localizations.Length == 1)
                                 {
-                                    Sound = p;
+                                    localization.Sound = p;
                                 }
                             }
                         }
