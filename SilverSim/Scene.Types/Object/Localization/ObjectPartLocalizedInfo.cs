@@ -601,6 +601,7 @@ namespace SilverSim.Scene.Types.Object.Localization
                 }
                 if (Interlocked.Exchange(ref m_SitText, value) != value)
                 {
+                    UpdateData(UpdateDataFlags.Properties);
                     m_Part.TriggerOnUpdate(0);
                 }
             }
@@ -620,6 +621,7 @@ namespace SilverSim.Scene.Types.Object.Localization
                 }
                 if (Interlocked.Exchange(ref m_TouchText, value) != value)
                 {
+                    UpdateData(UpdateDataFlags.Properties);
                     m_Part.TriggerOnUpdate(0);
                 }
             }
