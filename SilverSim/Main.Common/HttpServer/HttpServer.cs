@@ -401,6 +401,10 @@ namespace SilverSim.Main.Common.HttpServer
                 {
                     socket = null;
                 }
+                catch(ThreadAbortException)
+                {
+                    Thread.ResetAbort();
+                }
                 catch (Exception e)
                 {
                     m_Log.DebugFormat("Exception: {0}: {1}\n{2}", e.GetType().Name, e.Message, e.StackTrace);
@@ -473,6 +477,10 @@ namespace SilverSim.Main.Common.HttpServer
                 catch (ObjectDisposedException)
                 {
                     /* commonly a broken pipe */
+                }
+                catch (ThreadAbortException)
+                {
+                    Thread.ResetAbort();
                 }
                 catch (Exception e)
                 {
