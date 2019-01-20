@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using System.Collections.Generic;
+using System.IO;
 
 namespace SilverSim.Viewer.Messages.Object
 {
@@ -38,6 +39,30 @@ namespace SilverSim.Viewer.Messages.Object
             {
                 p.WriteBytes(d);
             }
+        }
+
+        public static Message Decode(UDPPacket p)
+        {
+            var msg = new ObjectProperties();
+            int n = p.ReadUInt8();
+            while(n-- != 0)
+            {
+                using (var ms = new MemoryStream())
+                {
+                    byte[] b = p.ReadBytes(174);
+                    ms.Write(b, 0, b.Length);
+                    int k = 4;
+                    while (k-- != 0)
+                    {
+                        byte c = p.ReadUInt8();
+                        ms.WriteByte(c);
+                        b = p.ReadBytes(c);
+                        ms.Write(b, 0, b.Length);
+                    }
+                    msg.ObjectData.Add(ms.ToArray());
+                }
+            }
+            return msg;
         }
     }
 }
