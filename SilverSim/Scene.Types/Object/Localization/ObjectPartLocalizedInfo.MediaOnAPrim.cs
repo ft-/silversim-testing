@@ -31,6 +31,8 @@ namespace SilverSim.Scene.Types.Object.Localization
 
         public PrimitiveMedia Media => m_Media ?? m_ParentInfo?.m_Media;
 
+        public bool HasMedia => m_Media != null;
+
         public void RestoreMedia(PrimitiveMedia media)
         {
             lock (m_DataLock)
@@ -95,7 +97,7 @@ namespace SilverSim.Scene.Types.Object.Localization
                     int version = int.Parse(rawVersion);
                     mediaURL = string.Format("x-mv:{0:D10}/{1}", ++version, updaterID);
                 }
-                if (null == m_Media)
+                if (m_Media == null)
                 {
                     m_Media = new PrimitiveMedia();
                 }

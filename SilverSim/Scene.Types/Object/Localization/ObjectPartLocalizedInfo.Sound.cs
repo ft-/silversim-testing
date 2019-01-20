@@ -96,6 +96,8 @@ namespace SilverSim.Scene.Types.Object.Localization
             }
         }
 
+        public bool HasSound => m_Sound != null;
+
         private CollisionSoundParam m_CollisionSound;
 
         public CollisionSoundParam CollisionSound
@@ -136,5 +138,7 @@ namespace SilverSim.Scene.Types.Object.Localization
                 }
             }
         }
+
+        public bool HasCollisionSound => m_CollisionSound != null;
     }
 }

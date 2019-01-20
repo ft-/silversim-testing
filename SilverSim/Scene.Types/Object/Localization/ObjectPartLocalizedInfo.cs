@@ -557,6 +557,8 @@ namespace SilverSim.Scene.Types.Object.Localization
             }
         }
 
+        public bool HasName => m_Name != null;
+
         public string Description
         {
             get
@@ -587,6 +589,8 @@ namespace SilverSim.Scene.Types.Object.Localization
             }
         }
 
+        public bool HasDescription => m_Description != null;
+
         public string SitText
         {
             get
@@ -607,6 +611,8 @@ namespace SilverSim.Scene.Types.Object.Localization
             }
         }
 
+        public bool HasSitText => m_SitText != null;
+
         public string TouchText
         {
             get
@@ -626,6 +632,8 @@ namespace SilverSim.Scene.Types.Object.Localization
                 }
             }
         }
+
+        public bool HasTouchText => m_TouchText != null;
 
         private readonly byte[] m_FullUpdateFixedBlock1 = new byte[(int)FullFixedBlock1Offset.BlockLength];
         private readonly byte[] m_FullUpdateFixedBlock2 = new byte[(int)FullFixedBlock2Offset.BlockLength];
@@ -862,6 +870,7 @@ namespace SilverSim.Scene.Types.Object.Localization
             Terse = 2,
             Properties = 4,
             Compressed = 8,
+            AllObjectUpdate = Full | Terse | Compressed,
             All = 0xFFFFFFFF
         }
 

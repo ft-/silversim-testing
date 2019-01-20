@@ -76,6 +76,8 @@ namespace SilverSim.Scene.Types.Object.Localization
             }
         }
 
+        public bool HasParticleSystem => m_ParticleSystem != null;
+
         public byte[] ParticleSystemBytes
         {
             get

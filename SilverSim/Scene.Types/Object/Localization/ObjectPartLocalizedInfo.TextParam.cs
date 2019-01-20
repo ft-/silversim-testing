@@ -66,5 +66,7 @@ namespace SilverSim.Scene.Types.Object.Localization
                 }
             }
         }
+
+        public bool HasText => m_Text != null;
     }
 }

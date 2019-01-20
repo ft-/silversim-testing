@@ -132,7 +132,8 @@ namespace SilverSim.Types.Primitive
         AllLanguages = 12009,
         ResetParamToDefaultLang = 12010,
         SitText = 12011,
-        TouchText = 12012
+        TouchText = 12012,
+        TextureAnim = 12013
     }
 
     public static class PrimitiveParamsToLslMethodsExtension

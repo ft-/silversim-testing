@@ -1286,6 +1286,7 @@ namespace SilverSim.Scene.Types.Object
                         paramList.Add(GetSoundInventoryItem(p.SoundID));
                         paramList.Add(p.Gain);
                         paramList.Add((int)(p.Flags & (PrimitiveSoundFlags.SyncMaster | PrimitiveSoundFlags.SyncSlave)));
+                        paramList.Add(p.Radius);
                     }
                     break;
 
@@ -1505,6 +1506,19 @@ namespace SilverSim.Scene.Types.Object
                     }
                     break;
 
+                case PrimitiveParamsType.TextureAnim:
+                    {
+                        var param = localization.TextureAnimation;
+                        paramList.Add((int)param.Flags);
+                        paramList.Add(param.Face);
+                        paramList.Add(param.SizeX);
+                        paramList.Add(param.SizeY);
+                        paramList.Add(param.Start);
+                        paramList.Add(param.Length);
+                        paramList.Add(param.Rate);
+                    }
+                    break;
+
                 default:
                     throw new LocalizedScriptErrorException(this, "PRIMInvalidParameterType0", "Invalid primitive parameter type {0}", enumerator.Current.AsUInt);
             }
@@ -1519,6 +1533,7 @@ namespace SilverSim.Scene.Types.Object
         public void SetPrimitiveParams(AnArray.MarkEnumerator enumerator, string culturename)
         {
             ObjectPartLocalizedInfo[] localizations;
+            bool isDefault = false;
             if (culturename == "*")
             {
                 localizations = Localizations;
@@ -1526,9 +1541,10 @@ namespace SilverSim.Scene.Types.Object
             else
             {
                 localizations = new ObjectPartLocalizedInfo[] { GetOrCreateLocalization(culturename) };
+                isDefault = localizations[0] == m_DefaultLocalization;
             }
             UpdateChangedFlags flags = 0;
-            bool isUpdated = false;
+            bool isTextureEntryUpdated = false;
             if(enumerator.Current == null)
             {
                 throw new ArgumentException(nameof(enumerator));
@@ -1538,44 +1554,113 @@ namespace SilverSim.Scene.Types.Object
             {
                 case PrimitiveParamsType.LoopSound:
                     {
-                        UUID soundID = GetSoundParam(enumerator, "PRIM_LOOP_SOUND");
-                        double volume = ParamsHelper.GetDouble(enumerator, "PRIM_LOOP_SOUND").Clamp(0, 1);
-                        int soundflags = ParamsHelper.GetInteger(enumerator, "PRIM_LOOP_SOUND");
-                        if(TryFetchSound(soundID))
+                        var p = new SoundParam
                         {
-                            SoundParam p = Sound;
-                            p.SoundID = soundID;
-                            p.Gain = volume;
-                            p.Flags = PrimitiveSoundFlags.Looped;
-                            if(IsSoundQueueing)
+                            SoundID = GetSoundParam(enumerator, "PRIM_LOOP_SOUND"),
+                            Gain = ParamsHelper.GetDouble(enumerator, "PRIM_LOOP_SOUND").Clamp(0, 1),
+                            Flags = PrimitiveSoundFlags.Looped
+                        };
+                        PrimitiveSoundFlags soundflags = (PrimitiveSoundFlags)ParamsHelper.GetInteger(enumerator, "PRIM_LOOP_SOUND");
+                        p.Radius = Math.Max(0, ParamsHelper.GetDouble(enumerator, "PRIM_LOOP_SOUND"));
+                        p.Flags = PrimitiveSoundFlags.Looped;
+                        if (IsSoundQueueing)
+                        {
+                            p.Flags |= PrimitiveSoundFlags.Queue;
+                        }
+                        if ((soundflags & PrimitiveSoundFlags.SyncMaster) != 0)
+                        {
+                            p.Flags |= PrimitiveSoundFlags.SyncMaster;
+                        }
+                        if ((soundflags & PrimitiveSoundFlags.SyncSlave) != 0)
+                        {
+                            p.Flags |= PrimitiveSoundFlags.SyncSlave;
+                        }
+
+                        if (TryFetchSound(p.SoundID))
+                        {
+                            foreach (ObjectPartLocalizedInfo localization in localizations)
                             {
-                                p.Flags |= PrimitiveSoundFlags.Queue;
+                                if (localization.HasSound || localizations.Length == 1)
+                                {
+                                    Sound = p;
+                                }
+                                else
+                                {
+                                    localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
+                                }
                             }
-                            if((soundflags & (int)PrimitiveSoundFlags.SyncMaster) != 0)
+
+                            if(isDefault)
                             {
-                                p.Flags |= PrimitiveSoundFlags.SyncMaster;
+                                foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
+                                {
+                                    if (!localization.HasSound)
+                                    {
+                                        localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
+                                    }
+                                }
                             }
-                            if ((soundflags & (int)PrimitiveSoundFlags.SyncSlave) != 0)
-                            {
-                                p.Flags |= PrimitiveSoundFlags.SyncSlave;
-                            }
-                            Sound = p;
                         }
                     }
                     break;
 
                 case PrimitiveParamsType.SoundRadius:
                     {
-                        SoundParam p = Sound;
-                        p.Radius = Math.Max(0, ParamsHelper.GetDouble(enumerator, "PRIM_SOUND_RADIUS"));
+                        double radius = Math.Max(0, ParamsHelper.GetDouble(enumerator, "PRIM_SOUND_RADIUS"));
+                        foreach (ObjectPartLocalizedInfo localization in localizations)
+                        {
+                            if (localization.HasSound || localizations.Length == 1)
+                            {
+                                SoundParam p = localization.Sound;
+                                p.Radius = radius;
+                                localization.Sound = p;
+                            }
+                            else
+                            {
+                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
+                            }
+                        }
+
+                        if (isDefault)
+                        {
+                            foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
+                            {
+                                if (!localization.HasSound)
+                                {
+                                    localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
+                                }
+                            }
+                        }
                     }
                     break;
 
                 case PrimitiveParamsType.SoundVolume:
                     {
-                        SoundParam p = Sound;
-                        p.Gain = ParamsHelper.GetDouble(enumerator, "PRIM_SOUND_VOLUME").Clamp(0, 1);
-                        Sound = p;
+                        double gain = ParamsHelper.GetDouble(enumerator, "PRIM_SOUND_VOLUME").Clamp(0, 1);
+                        foreach (ObjectPartLocalizedInfo localization in localizations)
+                        {
+                            if (localization.HasSound || localizations.Length == 1)
+                            {
+                                SoundParam p = localization.Sound;
+                                p.Gain = gain;
+                                localization.Sound = p;
+                            }
+                            else
+                            {
+                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
+                            }
+                        }
+
+                        if (isDefault)
+                        {
+                            foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
+                            {
+                                if (!localization.HasSound)
+                                {
+                                    localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
+                                }
+                            }
+                        }
                     }
                     break;
 
@@ -1596,7 +1681,25 @@ namespace SilverSim.Scene.Types.Object
                         string name = ParamsHelper.GetString(enumerator, "PRIM_NAME");
                         foreach(ObjectPartLocalizedInfo localization in localizations)
                         {
-                            localization.Name = name;
+                            if (localization.HasName || localizations.Length == 1)
+                            {
+                                localization.Name = name;
+                            }
+                            else
+                            {
+                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.Properties);
+                            }
+                        }
+
+                        if (isDefault)
+                        {
+                            foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
+                            {
+                                if (!localization.HasName)
+                                {
+                                    localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.Properties);
+                                }
+                            }
                         }
                     }
                     break;
@@ -1606,7 +1709,25 @@ namespace SilverSim.Scene.Types.Object
                         string desc = ParamsHelper.GetString(enumerator, "PRIM_DESC");
                         foreach (ObjectPartLocalizedInfo localization in localizations)
                         {
-                            localization.Description = desc;
+                            if (localization.HasDescription || localizations.Length == 1)
+                            {
+                                localization.Description = desc;
+                            }
+                            else
+                            {
+                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.Properties);
+                            }
+                        }
+
+                        if (isDefault)
+                        {
+                            foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
+                            {
+                                if (!localization.HasDescription)
+                                {
+                                    localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.Properties);
+                                }
+                            }
                         }
                     }
                     break;
@@ -1616,7 +1737,25 @@ namespace SilverSim.Scene.Types.Object
                         string desc = ParamsHelper.GetString(enumerator, "PRIM_SIT_TEXT");
                         foreach (ObjectPartLocalizedInfo localization in localizations)
                         {
-                            localization.SitText = desc;
+                            if (localization.HasSitText || localizations.Length == 1)
+                            {
+                                localization.SitText = desc;
+                            }
+                            else
+                            {
+                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.Properties);
+                            }
+                        }
+
+                        if (isDefault)
+                        {
+                            foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
+                            {
+                                if (!localization.HasSitText)
+                                {
+                                    localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.Properties);
+                                }
+                            }
                         }
                     }
                     break;
@@ -1626,7 +1765,25 @@ namespace SilverSim.Scene.Types.Object
                         string desc = ParamsHelper.GetString(enumerator, "PRIM_TOUCH_TEXT");
                         foreach (ObjectPartLocalizedInfo localization in localizations)
                         {
-                            localization.TouchText = desc;
+                            if (localization.HasTouchText || localizations.Length == 1)
+                            {
+                                localization.TouchText = desc;
+                            }
+                            else
+                            {
+                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.Properties);
+                            }
+                        }
+
+                        if (isDefault)
+                        {
+                            foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
+                            {
+                                if (!localization.HasTouchText)
+                                {
+                                    localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.Properties);
+                                }
+                            }
                         }
                     }
                     break;
@@ -1672,7 +1829,18 @@ namespace SilverSim.Scene.Types.Object
                     foreach (ObjectPartLocalizedInfo localization in localizations)
                     {
                         enumerator.GoToMarkPosition2();
-                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isUpdated, "PRIM_ALPHAMODE");
+                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isTextureEntryUpdated, "PRIM_ALPHAMODE");
+                    }
+
+                    if (isDefault)
+                    {
+                        foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
+                        {
+                            if (!localization.HasTextureEntry)
+                            {
+                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
+                            }
+                        }
                     }
                     break;
 
@@ -1681,7 +1849,18 @@ namespace SilverSim.Scene.Types.Object
                     foreach (ObjectPartLocalizedInfo localization in localizations)
                     {
                         enumerator.GoToMarkPosition2();
-                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isUpdated, "PRIM_NORMAL");
+                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isTextureEntryUpdated, "PRIM_NORMAL");
+                    }
+
+                    if (isDefault)
+                    {
+                        foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
+                        {
+                            if (!localization.HasTextureEntry)
+                            {
+                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
+                            }
+                        }
                     }
                     break;
 
@@ -1690,7 +1869,18 @@ namespace SilverSim.Scene.Types.Object
                     foreach (ObjectPartLocalizedInfo localization in localizations)
                     {
                         enumerator.GoToMarkPosition2();
-                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isUpdated, "PRIM_SPECULAR");
+                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isTextureEntryUpdated, "PRIM_SPECULAR");
+                    }
+
+                    if (isDefault)
+                    {
+                        foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
+                        {
+                            if (!localization.HasTextureEntry)
+                            {
+                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
+                            }
+                        }
                     }
                     break;
 
@@ -1699,22 +1889,52 @@ namespace SilverSim.Scene.Types.Object
                     foreach (ObjectPartLocalizedInfo localization in localizations)
                     {
                         enumerator.GoToMarkPosition2();
-                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isUpdated, "PRIM_TEXTURE");
+                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isTextureEntryUpdated, "PRIM_TEXTURE");
+                    }
+
+                    if (isDefault)
+                    {
+                        foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
+                        {
+                            if (!localization.HasTextureEntry)
+                            {
+                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
+                            }
+                        }
                     }
                     break;
 
                 case PrimitiveParamsType.Text:
-                    enumerator.MarkPosition2();
-                    foreach (ObjectPartLocalizedInfo localization in localizations)
                     {
-                        enumerator.GoToMarkPosition2();
-                        localization.Text = new TextParam
+                        var text = new TextParam
                         {
                             Text = ParamsHelper.GetString(enumerator, "PRIM_TEXT"),
                             TextColor = new ColorAlpha(
                             ParamsHelper.GetVector(enumerator, "PRIM_TEXT"),
                             ParamsHelper.GetDouble(enumerator, "PRIM_TEXT"))
                         };
+                        foreach (ObjectPartLocalizedInfo localization in localizations)
+                        {
+                            if(localization.HasText || localizations.Length == 1)
+                            {
+                                localization.Text = text;
+                            }
+                            else
+                            {
+                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
+                            }
+                        }
+
+                        if (isDefault)
+                        {
+                            foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
+                            {
+                                if (!localization.HasText)
+                                {
+                                    localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
+                                }
+                            }
+                        }
                     }
                     break;
 
@@ -1723,7 +1943,18 @@ namespace SilverSim.Scene.Types.Object
                     foreach (ObjectPartLocalizedInfo localization in localizations)
                     {
                         enumerator.GoToMarkPosition2();
-                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isUpdated, "PRIM_COLOR");
+                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isTextureEntryUpdated, "PRIM_COLOR");
+                    }
+
+                    if (isDefault)
+                    {
+                        foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
+                        {
+                            if (!localization.HasTextureEntry)
+                            {
+                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
+                            }
+                        }
                     }
                     break;
 
@@ -1732,7 +1963,18 @@ namespace SilverSim.Scene.Types.Object
                     foreach (ObjectPartLocalizedInfo localization in localizations)
                     {
                         enumerator.GoToMarkPosition2();
-                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isUpdated, "PRIM_ALPHA");
+                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isTextureEntryUpdated, "PRIM_ALPHA");
+                    }
+
+                    if (isDefault)
+                    {
+                        foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
+                        {
+                            if (!localization.HasTextureEntry)
+                            {
+                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
+                            }
+                        }
                     }
                     break;
 
@@ -1741,7 +1983,18 @@ namespace SilverSim.Scene.Types.Object
                     foreach (ObjectPartLocalizedInfo localization in localizations)
                     {
                         enumerator.GoToMarkPosition2();
-                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isUpdated, "PRIM_BUMP_SHINY");
+                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isTextureEntryUpdated, "PRIM_BUMP_SHINY");
+                    }
+
+                    if (isDefault)
+                    {
+                        foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
+                        {
+                            if (!localization.HasTextureEntry)
+                            {
+                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
+                            }
+                        }
                     }
                     break;
 
@@ -1761,7 +2014,18 @@ namespace SilverSim.Scene.Types.Object
                     foreach (ObjectPartLocalizedInfo localization in localizations)
                     {
                         enumerator.GoToMarkPosition2();
-                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isUpdated, "PRIM_FULLBRIGHT");
+                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isTextureEntryUpdated, "PRIM_FULLBRIGHT");
+                    }
+
+                    if (isDefault)
+                    {
+                        foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
+                        {
+                            if (!localization.HasTextureEntry)
+                            {
+                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
+                            }
+                        }
                     }
                     break;
 
@@ -1782,7 +2046,18 @@ namespace SilverSim.Scene.Types.Object
                     foreach (ObjectPartLocalizedInfo localization in localizations)
                     {
                         enumerator.GoToMarkPosition2();
-                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isUpdated, "PRIM_TEXGEN");
+                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isTextureEntryUpdated, "PRIM_TEXGEN");
+                    }
+
+                    if (isDefault)
+                    {
+                        foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
+                        {
+                            if (!localization.HasTextureEntry)
+                            {
+                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
+                            }
+                        }
                     }
                     break;
 
@@ -1791,7 +2066,18 @@ namespace SilverSim.Scene.Types.Object
                     foreach (ObjectPartLocalizedInfo localization in localizations)
                     {
                         enumerator.GoToMarkPosition2();
-                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isUpdated, "PRIM_GLOW");
+                        localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isTextureEntryUpdated, "PRIM_GLOW");
+                    }
+
+                    if (isDefault)
+                    {
+                        foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
+                        {
+                            if (!localization.HasTextureEntry)
+                            {
+                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
+                            }
+                        }
                     }
                     break;
 
@@ -1853,11 +2139,8 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.Projector:
-                    enumerator.MarkPosition2();
-                    foreach (ObjectPartLocalizedInfo localization in localizations)
                     {
-                        enumerator.GoToMarkPosition2();
-                        localization.Projection = new ProjectionParam
+                        var proj = new ProjectionParam
                         {
                             IsProjecting = ParamsHelper.GetBoolean(enumerator, "PRIM_PROJECTOR"),
                             ProjectionTextureID = GetTextureParam(enumerator, "PRIM_PROJECTOR"),
@@ -1865,66 +2148,219 @@ namespace SilverSim.Scene.Types.Object
                             ProjectionFocus = ParamsHelper.GetDouble(enumerator, "PRIM_PROJECTOR"),
                             ProjectionAmbience = ParamsHelper.GetDouble(enumerator, "PRIM_PROJECTOR")
                         };
+                        foreach (ObjectPartLocalizedInfo localization in localizations)
+                        {
+                            if (localization.HasProjection)
+                            {
+                                localization.Projection = proj;
+                            }
+                            else
+                            {
+                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
+                            }
+                        }
+
+                        if (isDefault)
+                        {
+                            foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
+                            {
+                                if (!localization.HasProjection)
+                                {
+                                    localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
+                                }
+                            }
+                        }
                     }
                     break;
 
                 case PrimitiveParamsType.ProjectorEnabled:
-                    enumerator.MarkPosition2();
-                    foreach (ObjectPartLocalizedInfo localization in localizations)
                     {
-                        enumerator.GoToMarkPosition2();
-                        var param = localization.Projection;
-                        param.IsProjecting = ParamsHelper.GetBoolean(enumerator, "PRIM_PROJECTOR_ENABLED");
-                        localization.Projection = param;
+                        bool isProjecting = ParamsHelper.GetBoolean(enumerator, "PRIM_PROJECTOR_ENABLED");
+                        foreach (ObjectPartLocalizedInfo localization in localizations)
+                        {
+                            if (localization.HasProjection || localizations.Length == 1)
+                            {
+                                var param = localization.Projection;
+                                param.IsProjecting = isProjecting;
+                                localization.Projection = param;
+                            }
+                            else
+                            {
+                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
+                            }
+                        }
+
+                        if (isDefault)
+                        {
+                            foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
+                            {
+                                if (!localization.HasProjection)
+                                {
+                                    localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
+                                }
+                            }
+                        }
                     }
                     break;
 
                 case PrimitiveParamsType.ProjectorTexture:
-                    enumerator.MarkPosition2();
-                    foreach (ObjectPartLocalizedInfo localization in localizations)
                     {
-                        enumerator.GoToMarkPosition2();
-                        var param = localization.Projection;
-                        param.ProjectionTextureID = GetTextureParam(enumerator, "PRIM_PROJECTOR_TEXTURE");
-                        localization.Projection = param;
+                        UUID textureID = GetTextureParam(enumerator, "PRIM_PROJECTOR_TEXTURE");
+
+                        foreach (ObjectPartLocalizedInfo localization in localizations)
+                        {
+                            if (localization.HasProjection || localizations.Length == 1)
+                            {
+                                var param = localization.Projection;
+                                param.ProjectionTextureID = textureID;
+                                localization.Projection = param;
+                            }
+                            else
+                            {
+                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
+                            }
+                        }
+
+                        if (isDefault)
+                        {
+                            foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
+                            {
+                                if (!localization.HasProjection)
+                                {
+                                    localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
+                                }
+                            }
+                        }
                     }
                     break;
 
                 case PrimitiveParamsType.ProjectorFov:
-                    enumerator.MarkPosition2();
-                    foreach (ObjectPartLocalizedInfo localization in localizations)
                     {
-                        enumerator.GoToMarkPosition2();
-                        var param = localization.Projection;
-                        param.ProjectionFOV = ParamsHelper.GetDouble(enumerator, "PRIM_PROJECTOR_FOV");
-                        localization.Projection = param;
+                        double fov = ParamsHelper.GetDouble(enumerator, "PRIM_PROJECTOR_FOV");
+                        foreach (ObjectPartLocalizedInfo localization in localizations)
+                        {
+                            if (localization.HasProjection || localizations.Length == 1)
+                            {
+                                var param = localization.Projection;
+                                param.ProjectionFOV = fov;
+                                localization.Projection = param;
+                            }
+                            else
+                            {
+                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
+                            }
+                        }
+
+                        if (isDefault)
+                        {
+                            foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
+                            {
+                                if (!localization.HasProjection)
+                                {
+                                    localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
+                                }
+                            }
+                        }
                     }
                     break;
 
                 case PrimitiveParamsType.ProjectorFocus:
-                    enumerator.MarkPosition2();
-                    foreach (ObjectPartLocalizedInfo localization in localizations)
                     {
-                        enumerator.GoToMarkPosition2();
-                        ProjectionParam param = localization.Projection;
-                        param.ProjectionFocus = ParamsHelper.GetDouble(enumerator, "PRIM_PROJECTOR_FOCUS");
-                        localization.Projection = param;
+                        double focus = ParamsHelper.GetDouble(enumerator, "PRIM_PROJECTOR_FOCUS");
+                        foreach (ObjectPartLocalizedInfo localization in localizations)
+                        {
+                            if (localization.HasProjection || localizations.Length == 1)
+                            {
+                                ProjectionParam param = localization.Projection;
+                                param.ProjectionFocus = focus;
+                                localization.Projection = param;
+                            }
+                            else
+                            {
+                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
+                            }
+                        }
                     }
                     break;
 
                 case PrimitiveParamsType.ProjectorAmbience:
-                    enumerator.MarkPosition2();
-                    foreach (ObjectPartLocalizedInfo localization in localizations)
                     {
-                        enumerator.GoToMarkPosition2();
-                        var param = localization.Projection;
-                        param.ProjectionAmbience = ParamsHelper.GetDouble(enumerator, "PRIM_PROJECTION_AMBIENCE");
-                        localization.Projection = param;
+                        double ambience = ParamsHelper.GetDouble(enumerator, "PRIM_PROJECTION_AMBIENCE");
+                        foreach (ObjectPartLocalizedInfo localization in localizations)
+                        {
+                            if (localization.HasProjection || localizations.Length == 1)
+                            {
+                                var param = localization.Projection;
+                                param.ProjectionAmbience = ambience;
+                                localization.Projection = param;
+                            }
+                            else
+                            {
+                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
+                            }
+                        }
+
+                        if (isDefault)
+                        {
+                            foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
+                            {
+                                if (!localization.HasProjection)
+                                {
+                                    localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
+                                }
+                            }
+                        }
                     }
                     break;
 
                 case PrimitiveParamsType.SitAnimation:
                     SitAnimation = ParamsHelper.GetString(enumerator, "PRIM_SIT_ANIMATION");
+                    break;
+
+                case PrimitiveParamsType.TextureAnim:
+                    {
+                        var texanim = new TextureAnimationEntry
+                        {
+                            Flags = (TextureAnimationEntry.TextureAnimMode)ParamsHelper.GetInteger(enumerator, "PRIM_TEXTURE_ANIM"),
+                            Face = (sbyte)ParamsHelper.GetInteger(enumerator, "PRIM_TEXTURE_ANIM").Clamp(ALL_SIDES, 63),
+                            SizeX = (byte)ParamsHelper.GetInteger(enumerator, "PRIM_TEXTURE_ANIM").Clamp(0, 255),
+                            SizeY = (byte)ParamsHelper.GetInteger(enumerator, "PRIM_TEXTURE_ANIM").Clamp(0, 255),
+                            Start = (float)ParamsHelper.GetDouble(enumerator, "PRIM_TEXTURE_ANIM"),
+                            Length = (float)ParamsHelper.GetDouble(enumerator, "PRIM_TEXTURE_ANIM"),
+                            Rate = (float)ParamsHelper.GetDouble(enumerator, "PRIM_TEXTURE_ANIM")
+                        };
+                        if((texanim.Flags & TextureAnimationEntry.TextureAnimMode.ANIM_ON) == 0)
+                        {
+                            texanim.Face = 0;
+                            texanim.SizeX = 0;
+                            texanim.SizeY = 0;
+                            texanim.Start = 0;
+                            texanim.Length = 0;
+                            texanim.Rate = 0;
+                        }
+                        foreach (ObjectPartLocalizedInfo localization in localizations)
+                        {
+                            if (localization.HasTextureAnimation || localizations.Length == 1)
+                            {
+                                localization.TextureAnimation = texanim;
+                            }
+                            else
+                            {
+                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
+                            }
+                        }
+
+                        if (isDefault)
+                        {
+                            foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
+                            {
+                                if (!localization.HasTextureAnimation)
+                                {
+                                    localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
+                                }
+                            }
+                        }
+                    }
                     break;
 
                 case PrimitiveParamsType.ResetParamToDefaultLang:
@@ -1945,37 +2381,47 @@ namespace SilverSim.Scene.Types.Object
                             {
                                 case PrimitiveParamsType.Desc:
                                     localization.Description = null;
-                                    isUpdated = true;
+                                    localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.Properties);
                                     break;
 
                                 case PrimitiveParamsType.Name:
                                     localization.Name = null;
-                                    isUpdated = true;
+                                    localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.Properties);
                                     break;
 
                                 case PrimitiveParamsType.Projector:
                                     localization.Projection = null;
-                                    isUpdated = true;
+                                    localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
                                     break;
 
                                 case PrimitiveParamsType.Text:
                                     localization.Text = null;
-                                    isUpdated = true;
+                                    localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
                                     break;
 
                                 case PrimitiveParamsType.Texture:
                                     localization.TextureEntry = null;
-                                    isUpdated = true;
+                                    isTextureEntryUpdated = true;
                                     break;
 
                                 case PrimitiveParamsType.SitText:
                                     localization.SitText = null;
-                                    isUpdated = true;
+                                    localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.Properties);
                                     break;
 
                                 case PrimitiveParamsType.TouchText:
                                     localization.TouchText = null;
-                                    isUpdated = true;
+                                    localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.Properties);
+                                    break;
+
+                                case PrimitiveParamsType.TextureAnim:
+                                    localization.TextureAnimation = null;
+                                    localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
+                                    break;
+
+                                case PrimitiveParamsType.LoopSound:
+                                    localization.Sound = null;
+                                    localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
                                     break;
                             }
                         }
@@ -1986,11 +2432,22 @@ namespace SilverSim.Scene.Types.Object
                     throw new LocalizedScriptErrorException(this, "PRIMInvalidParameterType0", "Invalid primitive parameter type {0}", enumerator.Current.AsUInt);
             }
 
-            if(isUpdated)
+            if(isTextureEntryUpdated)
             {
                 foreach (ObjectPartLocalizedInfo localization in localizations)
                 {
-                    localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.All | ObjectPartLocalizedInfo.UpdateDataFlags.Compressed);
+                    localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
+                }
+
+                if(isDefault)
+                {
+                    foreach(ObjectPartLocalizedInfo localization in NamedLocalizations)
+                    {
+                        if (!localization.HasTextureEntry)
+                        {
+                            localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
+                        }
+                    }
                 }
                 TriggerOnUpdate(flags);
             }

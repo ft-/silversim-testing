@@ -152,7 +152,7 @@ namespace SilverSim.Scene.Types.Object
             get
             {
                 var list = new List<ObjectPartLocalizedInfo>();
-                list.Add(m_DefaultLocalization);
+                list.Add(m_DefaultLocalization); /* must always be first */
                 list.AddRange(m_NamedLocalizations.Values);
                 return list.ToArray();
             }

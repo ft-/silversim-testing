@@ -356,5 +356,7 @@ namespace SilverSim.Scene.Types.Object.Localization
                 }
             }
         }
+
+        public bool HasProjection => m_Projection != null;
     }
 }

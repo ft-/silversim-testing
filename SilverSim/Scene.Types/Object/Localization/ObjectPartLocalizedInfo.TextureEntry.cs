@@ -61,6 +61,8 @@ namespace SilverSim.Scene.Types.Object.Localization
             }
         }
 
+        public bool HasMediaURL => m_MediaURL != null;
+
         private UpdateChangedFlags ChangedTexParams(TextureEntryFace oldTexFace, TextureEntryFace newTexFace)
         {
             UpdateChangedFlags flags = 0;
@@ -139,6 +141,8 @@ namespace SilverSim.Scene.Types.Object.Localization
                 m_Part.TriggerOnUpdate(flags);
             }
         }
+
+        public bool HasTextureEntry => m_TextureEntry != null;
 
         public byte[] TextureEntryBytesLimitedLight
         {
@@ -242,6 +246,8 @@ namespace SilverSim.Scene.Types.Object.Localization
                 m_Part.TriggerOnUpdate(0);
             }
         }
+
+        public bool HasTextureAnimation => m_TextureAnimationBytes != null;
 
         public byte[] TextureAnimationBytes
         {
