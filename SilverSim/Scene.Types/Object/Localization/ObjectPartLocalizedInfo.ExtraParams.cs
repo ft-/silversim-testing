@@ -359,6 +359,7 @@ namespace SilverSim.Scene.Types.Object.Localization
                         {
                             if (!localization.HasProjection)
                             {
+                                localization.UpdateExtraParams();
                                 localization.UpdateData(UpdateDataFlags.AllObjectUpdate);
                             }
                         }

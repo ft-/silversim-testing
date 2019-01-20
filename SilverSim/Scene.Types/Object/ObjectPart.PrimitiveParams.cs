@@ -1642,10 +1642,6 @@ namespace SilverSim.Scene.Types.Object
                                 p.Radius = radius;
                                 localization.Sound = p;
                             }
-                            else
-                            {
-                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
-                            }
                         }
                     }
                     break;
@@ -1660,10 +1656,6 @@ namespace SilverSim.Scene.Types.Object
                                 SoundParam p = localization.Sound;
                                 p.Gain = gain;
                                 localization.Sound = p;
-                            }
-                            else
-                            {
-                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
                             }
                         }
                     }
@@ -1690,10 +1682,6 @@ namespace SilverSim.Scene.Types.Object
                             {
                                 localization.Name = name;
                             }
-                            else
-                            {
-                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.Properties);
-                            }
                         }
                     }
                     break;
@@ -1706,10 +1694,6 @@ namespace SilverSim.Scene.Types.Object
                             if (localization.HasDescription || localizations.Length == 1)
                             {
                                 localization.Description = desc;
-                            }
-                            else
-                            {
-                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.Properties);
                             }
                         }
                     }
@@ -1724,10 +1708,6 @@ namespace SilverSim.Scene.Types.Object
                             {
                                 localization.SitText = desc;
                             }
-                            else
-                            {
-                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.Properties);
-                            }
                         }
                     }
                     break;
@@ -1740,10 +1720,6 @@ namespace SilverSim.Scene.Types.Object
                             if (localization.HasTouchText || localizations.Length == 1)
                             {
                                 localization.TouchText = desc;
-                            }
-                            else
-                            {
-                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.Properties);
                             }
                         }
                     }
@@ -1835,10 +1811,6 @@ namespace SilverSim.Scene.Types.Object
                             if(localization.HasText || localizations.Length == 1)
                             {
                                 localization.Text = text;
-                            }
-                            else
-                            {
-                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
                             }
                         }
                     }
@@ -1990,13 +1962,9 @@ namespace SilverSim.Scene.Types.Object
                         };
                         foreach (ObjectPartLocalizedInfo localization in localizations)
                         {
-                            if (localization.HasProjection)
+                            if (localization.HasProjection || localizations.Length == 1)
                             {
                                 localization.Projection = proj;
-                            }
-                            else
-                            {
-                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
                             }
                         }
                     }
@@ -2012,10 +1980,6 @@ namespace SilverSim.Scene.Types.Object
                                 var param = localization.Projection;
                                 param.IsProjecting = isProjecting;
                                 localization.Projection = param;
-                            }
-                            else
-                            {
-                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
                             }
                         }
                     }
@@ -2033,10 +1997,6 @@ namespace SilverSim.Scene.Types.Object
                                 param.ProjectionTextureID = textureID;
                                 localization.Projection = param;
                             }
-                            else
-                            {
-                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
-                            }
                         }
                     }
                     break;
@@ -2051,10 +2011,6 @@ namespace SilverSim.Scene.Types.Object
                                 var param = localization.Projection;
                                 param.ProjectionFOV = fov;
                                 localization.Projection = param;
-                            }
-                            else
-                            {
-                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
                             }
                         }
                     }
@@ -2071,10 +2027,6 @@ namespace SilverSim.Scene.Types.Object
                                 param.ProjectionFocus = focus;
                                 localization.Projection = param;
                             }
-                            else
-                            {
-                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
-                            }
                         }
                     }
                     break;
@@ -2089,10 +2041,6 @@ namespace SilverSim.Scene.Types.Object
                                 var param = localization.Projection;
                                 param.ProjectionAmbience = ambience;
                                 localization.Projection = param;
-                            }
-                            else
-                            {
-                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
                             }
                         }
                     }
@@ -2128,10 +2076,6 @@ namespace SilverSim.Scene.Types.Object
                             if (localization.HasTextureAnimation || localizations.Length == 1)
                             {
                                 localization.TextureAnimation = texanim;
-                            }
-                            else
-                            {
-                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
                             }
                         }
                     }
