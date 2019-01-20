@@ -70,7 +70,7 @@ namespace SilverSim.Scene.Types.Object.Localization
                 }
                 if (changed)
                 {
-                    UpdateData(UpdateDataFlags.Compressed | UpdateDataFlags.Full);
+                    UpdateData(UpdateDataFlags.AllObjectUpdate);
                     m_Part.TriggerOnUpdate(UpdateChangedFlags.None);
                 }
             }
@@ -118,7 +118,7 @@ namespace SilverSim.Scene.Types.Object.Localization
                 }
                 if(changed)
                 {
-                    UpdateData(UpdateDataFlags.Compressed | UpdateDataFlags.Full);
+                    UpdateData(UpdateDataFlags.AllObjectUpdate);
                     m_Part.TriggerOnUpdate(UpdateChangedFlags.None);
                 }
             }

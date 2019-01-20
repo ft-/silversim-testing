@@ -57,6 +57,7 @@ namespace SilverSim.Scene.Types.Object.Localization
                     }
                     m_MediaURL = value;
                 }
+                UpdateData(UpdateDataFlags.AllObjectUpdate);
                 m_Part.TriggerOnUpdate(0);
             }
         }
@@ -138,6 +139,7 @@ namespace SilverSim.Scene.Types.Object.Localization
                         m_TextureEntryBytes_LimitsEnabled = m_TextureEntryBytes;
                     }
                 });
+                UpdateData(UpdateDataFlags.AllObjectUpdate);
                 m_Part.TriggerOnUpdate(flags);
             }
         }
@@ -195,6 +197,7 @@ namespace SilverSim.Scene.Types.Object.Localization
                         m_TextureEntryBytes_LimitsEnabled = null;
                         m_TextureEntry = null;
                     });
+                    UpdateData(UpdateDataFlags.AllObjectUpdate);
                     m_Part.TriggerOnUpdate(UpdateChangedFlags.Texture | UpdateChangedFlags.Color);
                 }
                 else
@@ -217,6 +220,7 @@ namespace SilverSim.Scene.Types.Object.Localization
                         }
                         return flag;
                     });
+                    UpdateData(UpdateDataFlags.AllObjectUpdate);
                     m_Part.TriggerOnUpdate(flags);
                 }
             }
@@ -243,6 +247,7 @@ namespace SilverSim.Scene.Types.Object.Localization
                 {
                     m_TextureAnimationBytes = value.GetBytes();
                 }
+                UpdateData(UpdateDataFlags.AllObjectUpdate);
                 m_Part.TriggerOnUpdate(0);
             }
         }
@@ -275,6 +280,7 @@ namespace SilverSim.Scene.Types.Object.Localization
                 {
                     m_TextureAnimationBytes = value;
                 }
+                UpdateData(UpdateDataFlags.AllObjectUpdate);
                 m_Part.TriggerOnUpdate(0);
             }
         }

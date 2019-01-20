@@ -552,6 +552,7 @@ namespace SilverSim.Scene.Types.Object.Localization
                 }
                 if (changed)
                 {
+                    UpdateData(UpdateDataFlags.Properties);
                     m_Part.TriggerOnUpdate(0);
                 }
             }
@@ -584,6 +585,7 @@ namespace SilverSim.Scene.Types.Object.Localization
                 }
                 if (changed)
                 {
+                    UpdateData(UpdateDataFlags.Properties);
                     m_Part.TriggerOnUpdate(0);
                 }
             }

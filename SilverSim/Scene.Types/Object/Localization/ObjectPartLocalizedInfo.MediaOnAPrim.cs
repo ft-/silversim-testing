@@ -52,7 +52,7 @@ namespace SilverSim.Scene.Types.Object.Localization
                 m_Media = null;
                 m_MediaURL = string.Empty;
             }
-            UpdateData(UpdateDataFlags.Compressed | UpdateDataFlags.Full);
+            UpdateData(UpdateDataFlags.AllObjectUpdate);
             m_Part.TriggerOnUpdate(UpdateChangedFlags.Media);
         }
 
@@ -74,7 +74,7 @@ namespace SilverSim.Scene.Types.Object.Localization
                 m_MediaURL = mediaURL;
                 m_Media = media;
             }
-            UpdateData(UpdateDataFlags.Compressed | UpdateDataFlags.Full);
+            UpdateData(UpdateDataFlags.AllObjectUpdate);
             m_Part.TriggerOnUpdate(UpdateChangedFlags.Media);
         }
 
@@ -108,7 +108,7 @@ namespace SilverSim.Scene.Types.Object.Localization
                 m_Media[face] = entry;
                 m_MediaURL = mediaURL;
             }
-            UpdateData(UpdateDataFlags.Compressed | UpdateDataFlags.Full);
+            UpdateData(UpdateDataFlags.AllObjectUpdate);
             m_Part.TriggerOnUpdate(UpdateChangedFlags.Media);
         }
         #endregion
