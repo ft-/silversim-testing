@@ -57,8 +57,7 @@ namespace SilverSim.Scene.Types.Object.Localization
                 }
                 else
                 {
-                    SoundParam oldParam;
-                    oldParam = Interlocked.Exchange(ref m_Sound, new SoundParam(value));
+                    SoundParam oldParam = Interlocked.Exchange(ref m_Sound, new SoundParam(value));
                     changed = oldParam?.IsDifferent(value) ?? true;
                 }
                 lock (m_UpdateDataLock)
@@ -92,6 +91,16 @@ namespace SilverSim.Scene.Types.Object.Localization
                 if (changed)
                 {
                     UpdateData(UpdateDataFlags.AllObjectUpdate);
+                    if (m_ParentInfo == null)
+                    {
+                        foreach (ObjectPartLocalizedInfo localization in m_Part.NamedLocalizations)
+                        {
+                            if (!localization.HasSound)
+                            {
+                                localization.UpdateData(UpdateDataFlags.AllObjectUpdate);
+                            }
+                        }
+                    }
                     m_Part.TriggerOnUpdate(0);
                 }
             }
@@ -128,13 +137,22 @@ namespace SilverSim.Scene.Types.Object.Localization
                 }
                 else
                 {
-                    CollisionSoundParam oldParam;
-                    oldParam = Interlocked.Exchange(ref m_CollisionSound, new CollisionSoundParam(value));
+                    CollisionSoundParam oldParam = Interlocked.Exchange(ref m_CollisionSound, new CollisionSoundParam(value));
                     changed = oldParam?.IsDifferent(value) ?? true;
                 }
                 if (changed)
                 {
                     UpdateData(UpdateDataFlags.AllObjectUpdate);
+                    if (m_ParentInfo == null)
+                    {
+                        foreach (ObjectPartLocalizedInfo localization in m_Part.NamedLocalizations)
+                        {
+                            if (!localization.HasCollisionSound)
+                            {
+                                localization.UpdateData(UpdateDataFlags.AllObjectUpdate);
+                            }
+                        }
+                    }
                     m_Part.TriggerOnUpdate(0);
                 }
             }

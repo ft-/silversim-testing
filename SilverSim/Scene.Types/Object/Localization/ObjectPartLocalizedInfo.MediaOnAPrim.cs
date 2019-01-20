@@ -53,6 +53,16 @@ namespace SilverSim.Scene.Types.Object.Localization
                 m_MediaURL = string.Empty;
             }
             UpdateData(UpdateDataFlags.AllObjectUpdate);
+            if (m_ParentInfo == null)
+            {
+                foreach (ObjectPartLocalizedInfo localization in m_Part.NamedLocalizations)
+                {
+                    if (!localization.HasMedia)
+                    {
+                        localization.UpdateData(UpdateDataFlags.AllObjectUpdate);
+                    }
+                }
+            }
             m_Part.TriggerOnUpdate(UpdateChangedFlags.Media);
         }
 
@@ -75,6 +85,16 @@ namespace SilverSim.Scene.Types.Object.Localization
                 m_Media = media;
             }
             UpdateData(UpdateDataFlags.AllObjectUpdate);
+            if (m_ParentInfo == null)
+            {
+                foreach (ObjectPartLocalizedInfo localization in m_Part.NamedLocalizations)
+                {
+                    if (!localization.HasMedia)
+                    {
+                        localization.UpdateData(UpdateDataFlags.AllObjectUpdate);
+                    }
+                }
+            }
             m_Part.TriggerOnUpdate(UpdateChangedFlags.Media);
         }
 
@@ -109,6 +129,16 @@ namespace SilverSim.Scene.Types.Object.Localization
                 m_MediaURL = mediaURL;
             }
             UpdateData(UpdateDataFlags.AllObjectUpdate);
+            if (m_ParentInfo == null)
+            {
+                foreach (ObjectPartLocalizedInfo localization in m_Part.NamedLocalizations)
+                {
+                    if (!localization.HasMedia)
+                    {
+                        localization.UpdateData(UpdateDataFlags.AllObjectUpdate);
+                    }
+                }
+            }
             m_Part.TriggerOnUpdate(UpdateChangedFlags.Media);
         }
         #endregion

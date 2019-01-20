@@ -62,6 +62,16 @@ namespace SilverSim.Scene.Types.Object.Localization
                 if (changed)
                 {
                     UpdateData(UpdateDataFlags.AllObjectUpdate);
+                    if (m_ParentInfo == null)
+                    {
+                        foreach (ObjectPartLocalizedInfo localization in m_Part.NamedLocalizations)
+                        {
+                            if (!localization.HasText)
+                            {
+                                localization.UpdateData(UpdateDataFlags.AllObjectUpdate);
+                            }
+                        }
+                    }
                     m_Part.TriggerOnUpdate(0);
                 }
             }

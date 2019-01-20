@@ -352,6 +352,18 @@ namespace SilverSim.Scene.Types.Object.Localization
                 if (changed)
                 {
                     UpdateExtraParams();
+                    UpdateData(UpdateDataFlags.AllObjectUpdate);
+                    if (m_ParentInfo == null)
+                    {
+                        foreach (ObjectPartLocalizedInfo localization in m_Part.NamedLocalizations)
+                        {
+                            if (!localization.HasProjection)
+                            {
+                                localization.UpdateData(UpdateDataFlags.AllObjectUpdate);
+                            }
+                        }
+                    }
+
                     m_Part.TriggerOnUpdate(0);
                 }
             }

@@ -1533,7 +1533,6 @@ namespace SilverSim.Scene.Types.Object
         public void SetPrimitiveParams(AnArray.MarkEnumerator enumerator, string culturename)
         {
             ObjectPartLocalizedInfo[] localizations;
-            bool isDefault = false;
             if (culturename == "*")
             {
                 localizations = Localizations;
@@ -1541,7 +1540,6 @@ namespace SilverSim.Scene.Types.Object
             else
             {
                 localizations = new ObjectPartLocalizedInfo[] { GetOrCreateLocalization(culturename) };
-                isDefault = localizations[0] == m_DefaultLocalization;
             }
             UpdateChangedFlags flags = 0;
             bool isTextureEntryUpdated = false;
@@ -1584,21 +1582,6 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     Sound = p;
                                 }
-                                else
-                                {
-                                    localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
-                                }
-                            }
-
-                            if(isDefault)
-                            {
-                                foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
-                                {
-                                    if (!localization.HasSound)
-                                    {
-                                        localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
-                                    }
-                                }
                             }
                         }
                     }
@@ -1620,17 +1603,6 @@ namespace SilverSim.Scene.Types.Object
                                 localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
                             }
                         }
-
-                        if (isDefault)
-                        {
-                            foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
-                            {
-                                if (!localization.HasSound)
-                                {
-                                    localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
-                                }
-                            }
-                        }
                     }
                     break;
 
@@ -1648,17 +1620,6 @@ namespace SilverSim.Scene.Types.Object
                             else
                             {
                                 localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
-                            }
-                        }
-
-                        if (isDefault)
-                        {
-                            foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
-                            {
-                                if (!localization.HasSound)
-                                {
-                                    localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
-                                }
                             }
                         }
                     }
@@ -1690,17 +1651,6 @@ namespace SilverSim.Scene.Types.Object
                                 localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.Properties);
                             }
                         }
-
-                        if (isDefault)
-                        {
-                            foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
-                            {
-                                if (!localization.HasName)
-                                {
-                                    localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.Properties);
-                                }
-                            }
-                        }
                     }
                     break;
 
@@ -1716,17 +1666,6 @@ namespace SilverSim.Scene.Types.Object
                             else
                             {
                                 localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.Properties);
-                            }
-                        }
-
-                        if (isDefault)
-                        {
-                            foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
-                            {
-                                if (!localization.HasDescription)
-                                {
-                                    localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.Properties);
-                                }
                             }
                         }
                     }
@@ -1746,17 +1685,6 @@ namespace SilverSim.Scene.Types.Object
                                 localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.Properties);
                             }
                         }
-
-                        if (isDefault)
-                        {
-                            foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
-                            {
-                                if (!localization.HasSitText)
-                                {
-                                    localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.Properties);
-                                }
-                            }
-                        }
                     }
                     break;
 
@@ -1772,17 +1700,6 @@ namespace SilverSim.Scene.Types.Object
                             else
                             {
                                 localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.Properties);
-                            }
-                        }
-
-                        if (isDefault)
-                        {
-                            foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
-                            {
-                                if (!localization.HasTouchText)
-                                {
-                                    localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.Properties);
-                                }
                             }
                         }
                     }
@@ -1831,17 +1748,6 @@ namespace SilverSim.Scene.Types.Object
                         enumerator.GoToMarkPosition2();
                         localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isTextureEntryUpdated, "PRIM_ALPHAMODE");
                     }
-
-                    if (isDefault)
-                    {
-                        foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
-                        {
-                            if (!localization.HasTextureEntry)
-                            {
-                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
-                            }
-                        }
-                    }
                     break;
 
                 case PrimitiveParamsType.Normal:
@@ -1850,17 +1756,6 @@ namespace SilverSim.Scene.Types.Object
                     {
                         enumerator.GoToMarkPosition2();
                         localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isTextureEntryUpdated, "PRIM_NORMAL");
-                    }
-
-                    if (isDefault)
-                    {
-                        foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
-                        {
-                            if (!localization.HasTextureEntry)
-                            {
-                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
-                            }
-                        }
                     }
                     break;
 
@@ -1871,17 +1766,6 @@ namespace SilverSim.Scene.Types.Object
                         enumerator.GoToMarkPosition2();
                         localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isTextureEntryUpdated, "PRIM_SPECULAR");
                     }
-
-                    if (isDefault)
-                    {
-                        foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
-                        {
-                            if (!localization.HasTextureEntry)
-                            {
-                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
-                            }
-                        }
-                    }
                     break;
 
                 case PrimitiveParamsType.Texture:
@@ -1890,17 +1774,6 @@ namespace SilverSim.Scene.Types.Object
                     {
                         enumerator.GoToMarkPosition2();
                         localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isTextureEntryUpdated, "PRIM_TEXTURE");
-                    }
-
-                    if (isDefault)
-                    {
-                        foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
-                        {
-                            if (!localization.HasTextureEntry)
-                            {
-                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
-                            }
-                        }
                     }
                     break;
 
@@ -1924,17 +1797,6 @@ namespace SilverSim.Scene.Types.Object
                                 localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
                             }
                         }
-
-                        if (isDefault)
-                        {
-                            foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
-                            {
-                                if (!localization.HasText)
-                                {
-                                    localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
-                                }
-                            }
-                        }
                     }
                     break;
 
@@ -1945,17 +1807,6 @@ namespace SilverSim.Scene.Types.Object
                         enumerator.GoToMarkPosition2();
                         localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isTextureEntryUpdated, "PRIM_COLOR");
                     }
-
-                    if (isDefault)
-                    {
-                        foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
-                        {
-                            if (!localization.HasTextureEntry)
-                            {
-                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
-                            }
-                        }
-                    }
                     break;
 
                 case PrimitiveParamsType.Alpha:
@@ -1965,17 +1816,6 @@ namespace SilverSim.Scene.Types.Object
                         enumerator.GoToMarkPosition2();
                         localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isTextureEntryUpdated, "PRIM_ALPHA");
                     }
-
-                    if (isDefault)
-                    {
-                        foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
-                        {
-                            if (!localization.HasTextureEntry)
-                            {
-                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
-                            }
-                        }
-                    }
                     break;
 
                 case PrimitiveParamsType.BumpShiny:
@@ -1984,17 +1824,6 @@ namespace SilverSim.Scene.Types.Object
                     {
                         enumerator.GoToMarkPosition2();
                         localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isTextureEntryUpdated, "PRIM_BUMP_SHINY");
-                    }
-
-                    if (isDefault)
-                    {
-                        foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
-                        {
-                            if (!localization.HasTextureEntry)
-                            {
-                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
-                            }
-                        }
                     }
                     break;
 
@@ -2015,17 +1844,6 @@ namespace SilverSim.Scene.Types.Object
                     {
                         enumerator.GoToMarkPosition2();
                         localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isTextureEntryUpdated, "PRIM_FULLBRIGHT");
-                    }
-
-                    if (isDefault)
-                    {
-                        foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
-                        {
-                            if (!localization.HasTextureEntry)
-                            {
-                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
-                            }
-                        }
                     }
                     break;
 
@@ -2048,17 +1866,6 @@ namespace SilverSim.Scene.Types.Object
                         enumerator.GoToMarkPosition2();
                         localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isTextureEntryUpdated, "PRIM_TEXGEN");
                     }
-
-                    if (isDefault)
-                    {
-                        foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
-                        {
-                            if (!localization.HasTextureEntry)
-                            {
-                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
-                            }
-                        }
-                    }
                     break;
 
                 case PrimitiveParamsType.Glow:
@@ -2067,17 +1874,6 @@ namespace SilverSim.Scene.Types.Object
                     {
                         enumerator.GoToMarkPosition2();
                         localization.SetTexPrimitiveParams(paramtype, enumerator, ref flags, ref isTextureEntryUpdated, "PRIM_GLOW");
-                    }
-
-                    if (isDefault)
-                    {
-                        foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
-                        {
-                            if (!localization.HasTextureEntry)
-                            {
-                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
-                            }
-                        }
                     }
                     break;
 
@@ -2159,17 +1955,6 @@ namespace SilverSim.Scene.Types.Object
                                 localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
                             }
                         }
-
-                        if (isDefault)
-                        {
-                            foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
-                            {
-                                if (!localization.HasProjection)
-                                {
-                                    localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
-                                }
-                            }
-                        }
                     }
                     break;
 
@@ -2187,17 +1972,6 @@ namespace SilverSim.Scene.Types.Object
                             else
                             {
                                 localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
-                            }
-                        }
-
-                        if (isDefault)
-                        {
-                            foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
-                            {
-                                if (!localization.HasProjection)
-                                {
-                                    localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
-                                }
                             }
                         }
                     }
@@ -2220,17 +1994,6 @@ namespace SilverSim.Scene.Types.Object
                                 localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
                             }
                         }
-
-                        if (isDefault)
-                        {
-                            foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
-                            {
-                                if (!localization.HasProjection)
-                                {
-                                    localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
-                                }
-                            }
-                        }
                     }
                     break;
 
@@ -2248,17 +2011,6 @@ namespace SilverSim.Scene.Types.Object
                             else
                             {
                                 localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
-                            }
-                        }
-
-                        if (isDefault)
-                        {
-                            foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
-                            {
-                                if (!localization.HasProjection)
-                                {
-                                    localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
-                                }
                             }
                         }
                     }
@@ -2299,17 +2051,6 @@ namespace SilverSim.Scene.Types.Object
                                 localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
                             }
                         }
-
-                        if (isDefault)
-                        {
-                            foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
-                            {
-                                if (!localization.HasProjection)
-                                {
-                                    localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
-                                }
-                            }
-                        }
                     }
                     break;
 
@@ -2347,17 +2088,6 @@ namespace SilverSim.Scene.Types.Object
                             else
                             {
                                 localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
-                            }
-                        }
-
-                        if (isDefault)
-                        {
-                            foreach (ObjectPartLocalizedInfo localization in NamedLocalizations)
-                            {
-                                if (!localization.HasTextureAnimation)
-                                {
-                                    localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
-                                }
                             }
                         }
                     }
@@ -2439,7 +2169,7 @@ namespace SilverSim.Scene.Types.Object
                     localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.AllObjectUpdate);
                 }
 
-                if(isDefault)
+                if(localizations.Length == 1 && localizations[0] == m_DefaultLocalization)
                 {
                     foreach(ObjectPartLocalizedInfo localization in NamedLocalizations)
                     {

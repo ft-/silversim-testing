@@ -553,6 +553,16 @@ namespace SilverSim.Scene.Types.Object.Localization
                 if (changed)
                 {
                     UpdateData(UpdateDataFlags.Properties);
+                    if (m_ParentInfo == null)
+                    {
+                        foreach (ObjectPartLocalizedInfo localization in m_Part.NamedLocalizations)
+                        {
+                            if (!localization.HasName)
+                            {
+                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.Properties);
+                            }
+                        }
+                    }
                     m_Part.TriggerOnUpdate(0);
                 }
             }
@@ -586,6 +596,16 @@ namespace SilverSim.Scene.Types.Object.Localization
                 if (changed)
                 {
                     UpdateData(UpdateDataFlags.Properties);
+                    if (m_ParentInfo == null)
+                    {
+                        foreach (ObjectPartLocalizedInfo localization in m_Part.NamedLocalizations)
+                        {
+                            if (!localization.HasDescription)
+                            {
+                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.Properties);
+                            }
+                        }
+                    }
                     m_Part.TriggerOnUpdate(0);
                 }
             }
@@ -608,6 +628,16 @@ namespace SilverSim.Scene.Types.Object.Localization
                 if (Interlocked.Exchange(ref m_SitText, value) != value)
                 {
                     UpdateData(UpdateDataFlags.Properties);
+                    if (m_ParentInfo == null)
+                    {
+                        foreach (ObjectPartLocalizedInfo localization in m_Part.NamedLocalizations)
+                        {
+                            if (!localization.HasSitText)
+                            {
+                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.Properties);
+                            }
+                        }
+                    }
                     m_Part.TriggerOnUpdate(0);
                 }
             }
@@ -630,6 +660,16 @@ namespace SilverSim.Scene.Types.Object.Localization
                 if (Interlocked.Exchange(ref m_TouchText, value) != value)
                 {
                     UpdateData(UpdateDataFlags.Properties);
+                    if (m_ParentInfo == null)
+                    {
+                        foreach (ObjectPartLocalizedInfo localization in m_Part.NamedLocalizations)
+                        {
+                            if (!localization.HasTouchText)
+                            {
+                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.Properties);
+                            }
+                        }
+                    }
                     m_Part.TriggerOnUpdate(0);
                 }
             }

@@ -58,6 +58,16 @@ namespace SilverSim.Scene.Types.Object.Localization
                     m_MediaURL = value;
                 }
                 UpdateData(UpdateDataFlags.AllObjectUpdate);
+                if (m_ParentInfo == null)
+                {
+                    foreach (ObjectPartLocalizedInfo localization in m_Part.NamedLocalizations)
+                    {
+                        if (!localization.HasMediaURL)
+                        {
+                            localization.UpdateData(UpdateDataFlags.AllObjectUpdate);
+                        }
+                    }
+                }
                 m_Part.TriggerOnUpdate(0);
             }
         }
@@ -140,6 +150,16 @@ namespace SilverSim.Scene.Types.Object.Localization
                     }
                 });
                 UpdateData(UpdateDataFlags.AllObjectUpdate);
+                if (m_ParentInfo == null)
+                {
+                    foreach (ObjectPartLocalizedInfo localization in m_Part.NamedLocalizations)
+                    {
+                        if (!localization.HasTextureEntry)
+                        {
+                            localization.UpdateData(UpdateDataFlags.AllObjectUpdate);
+                        }
+                    }
+                }
                 m_Part.TriggerOnUpdate(flags);
             }
         }
@@ -198,6 +218,16 @@ namespace SilverSim.Scene.Types.Object.Localization
                         m_TextureEntry = null;
                     });
                     UpdateData(UpdateDataFlags.AllObjectUpdate);
+                    if (m_ParentInfo == null)
+                    {
+                        foreach (ObjectPartLocalizedInfo localization in m_Part.NamedLocalizations)
+                        {
+                            if (!localization.HasTextureEntry)
+                            {
+                                localization.UpdateData(UpdateDataFlags.AllObjectUpdate);
+                            }
+                        }
+                    }
                     m_Part.TriggerOnUpdate(UpdateChangedFlags.Texture | UpdateChangedFlags.Color);
                 }
                 else
@@ -221,6 +251,16 @@ namespace SilverSim.Scene.Types.Object.Localization
                         return flag;
                     });
                     UpdateData(UpdateDataFlags.AllObjectUpdate);
+                    if (m_ParentInfo == null)
+                    {
+                        foreach (ObjectPartLocalizedInfo localization in m_Part.NamedLocalizations)
+                        {
+                            if (!localization.HasTextureEntry)
+                            {
+                                localization.UpdateData(UpdateDataFlags.AllObjectUpdate);
+                            }
+                        }
+                    }
                     m_Part.TriggerOnUpdate(flags);
                 }
             }
@@ -248,6 +288,16 @@ namespace SilverSim.Scene.Types.Object.Localization
                     m_TextureAnimationBytes = value.GetBytes();
                 }
                 UpdateData(UpdateDataFlags.AllObjectUpdate);
+                if (m_ParentInfo == null)
+                {
+                    foreach (ObjectPartLocalizedInfo localization in m_Part.NamedLocalizations)
+                    {
+                        if (!localization.HasTextureAnimation)
+                        {
+                            localization.UpdateData(UpdateDataFlags.AllObjectUpdate);
+                        }
+                    }
+                }
                 m_Part.TriggerOnUpdate(0);
             }
         }
@@ -281,6 +331,16 @@ namespace SilverSim.Scene.Types.Object.Localization
                     m_TextureAnimationBytes = value;
                 }
                 UpdateData(UpdateDataFlags.AllObjectUpdate);
+                if (m_ParentInfo == null)
+                {
+                    foreach (ObjectPartLocalizedInfo localization in m_Part.NamedLocalizations)
+                    {
+                        if (!localization.HasTextureAnimation)
+                        {
+                            localization.UpdateData(UpdateDataFlags.AllObjectUpdate);
+                        }
+                    }
+                }
                 m_Part.TriggerOnUpdate(0);
             }
         }
