@@ -1026,43 +1026,6 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        [PacketHandler(MessageType.ObjectSelect)]
-        public void HandleObjectSelect(Message m)
-        {
-            var req = (ObjectSelect)m;
-            if (req.CircuitSessionID != req.SessionID ||
-                req.CircuitAgentID != req.AgentID)
-            {
-                return;
-            }
-            IAgent agent;
-            if (!Agents.TryGetValue(req.AgentID, out agent))
-            {
-                return;
-            }
-
-            ObjectPart part;
-            var selectedObjects = agent.SelectedObjects(ID);
-
-            foreach (uint primLocalID in req.ObjectData)
-            {
-#if DEBUG
-                m_Log.DebugFormat("ObjectSelect localid={0}", primLocalID);
-#endif
-
-                if (!Primitives.TryGetValue(primLocalID, out part))
-                {
-                    continue;
-                }
-
-                if (!selectedObjects.Contains(part.ID))
-                {
-                    selectedObjects.Add(part.ID);
-                    agent.ScheduleUpdate(part.UpdateInfo, ID);
-                }
-            }
-        }
-
         [PacketHandler(MessageType.ObjectDrop)]
         public void HandleObjectDrop(Message m)
         {
@@ -1162,6 +1125,49 @@ namespace SilverSim.Scene.Types.Scene
                     prim.Description = d.Description;
                     propHandler.Send(prim);
                 }
+            }
+        }
+
+        [PacketHandler(MessageType.ObjectSelect)]
+        public void HandleObjectSelect(Message m)
+        {
+            var req = (ObjectSelect)m;
+            if (req.CircuitSessionID != req.SessionID ||
+                req.CircuitAgentID != req.AgentID)
+            {
+                return;
+            }
+            IAgent agent;
+            if (!Agents.TryGetValue(req.AgentID, out agent))
+            {
+                return;
+            }
+
+            ObjectPart part;
+            var selectedObjects = agent.SelectedObjects(ID);
+
+            foreach (uint primLocalID in req.ObjectData)
+            {
+#if DEBUG
+                m_Log.DebugFormat("ObjectSelect localid={0}", primLocalID);
+#endif
+
+                if (!Primitives.TryGetValue(primLocalID, out part))
+                {
+                    continue;
+                }
+
+                if (!selectedObjects.Contains(part.ID))
+                {
+                    selectedObjects.Add(part.ID);
+                    agent.ScheduleUpdate(part.UpdateInfo, ID);
+                }
+#if DEBUG
+                else
+                {
+                    m_Log.DebugFormat("Already selected localid={0}", primLocalID);
+                }
+#endif
             }
         }
 

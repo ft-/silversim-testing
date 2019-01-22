@@ -124,6 +124,7 @@ namespace SilverSim.Viewer.Core
                     byte[] propUpdate = part.GetPropertiesUpdateData(agent.CurrentCulture);
                     if (propUpdate == null)
                     {
+                        m_Log.DebugFormat("Invalid object properties (ID {0})", part.ID);
                         return;
                     }
 
@@ -793,10 +794,15 @@ namespace SilverSim.Viewer.Core
                         }
                         else
                         {
-                            var dofull = ui.IsAlwaysFull;
-                            var mustBeNonPhys = false;
-                            var objknown = false;
-                            if(LastObjSerialNo.Contains(ui.LocalID))
+                            bool dofull = ui.IsAlwaysFull;
+                            bool mustBeNonPhys = false;
+                            bool objknown = false;
+                            bool isSelected = false;
+                            bool wasSelected = false;
+                            ObjectUpdateInfo oui = null;
+                            AgentUpdateInfo aui = null;
+
+                            if (LastObjSerialNo.Contains(ui.LocalID))
                             {
                                 int serialno = LastObjSerialNo[ui.LocalID];
                                 dofull |= ui.IsPhysics;// serialno != ui.SerialNumber;
@@ -810,47 +816,18 @@ namespace SilverSim.Viewer.Core
                             byte[] propUpdate = ui.GetPropertiesUpdate(Agent.CurrentCulture);
                             if (propUpdate != null)
                             {
-                                var oui = ui as ObjectUpdateInfo;
+                                oui = ui as ObjectUpdateInfo;
                                 if (oui != null)
                                 {
-                                    var isSelected = SelectedObjects.Contains(ui.ID);
-                                    var wasSelected = SendSelectedObjects.Contains(ui.ID);
-                                    dofull |= (wasSelected && !isSelected) || (isSelected && !wasSelected);
-                                    if (wasSelected && !isSelected)
-                                    {
-                                        SendSelectedObjects.Remove(ui.ID);
-                                    }
-                                    else if (isSelected && !wasSelected)
-                                    {
-                                        mustBeNonPhys = true;
-                                        SendSelectedObjects.Add(ui.ID);
-                                        if (full_packet_objprop == null)
-                                        {
-                                            full_packet_objprop = new ObjectPropertiesTriggerMessage(this);
-                                        }
-                                        full_packet_objprop.ObjectParts.Add(oui.Part);
-                                    }
-                                    else if(!objknown && (oui.Part.ExtendedMesh.Flags & ExtendedMeshParams.MeshFlags.AnimatedMeshEnabled) != 0 && m_EnableObjectAnimation)
-                                    {
-                                        mustBeNonPhys = true;
-                                        if (full_packet_objanim == null)
-                                        {
-                                            full_packet_objanim = new ObjectAnimationTriggerMessage(this);
-                                        }
-                                        full_packet_objanim.ObjectParts.Add(oui.Part);
-                                    }
+                                    isSelected = SelectedObjects.Contains(ui.ID);
+                                    wasSelected = SendSelectedObjects.Contains(ui.ID);
                                 }
                                 else
                                 {
-                                    var aui = ui as AgentUpdateInfo;
+                                    aui = ui as AgentUpdateInfo;
                                     if(aui != null && !objknown)
                                     {
                                         mustBeNonPhys = true;
-                                        if (full_packet_agentanim == null)
-                                        {
-                                            full_packet_agentanim = new AvatarAnimationTriggerMessage(this);
-                                        }
-                                        full_packet_agentanim.Agents.Add(aui.Agent);
                                     }
                                 }
                             }
@@ -925,6 +902,7 @@ send_nonphys_packet:
                                             {
                                                 break;
                                             }
+                                            foundobject = true;
                                             full_packet.IsReliable = true;
 
                                             ChainMessage chain = null;
@@ -983,6 +961,40 @@ send_nonphys_packet:
 
                                         nonphys_full_packet_data.Add(new KeyValuePair<IObjUpdateInfo, byte[]>(ui, fullUpdate));
                                         nonphys_full_packet_data_length += fullUpdate.Length;
+
+                                        if (oui != null)
+                                        {
+                                            if (wasSelected && !isSelected)
+                                            {
+                                                SendSelectedObjects.Remove(ui.ID);
+                                            }
+                                            else if (isSelected && !wasSelected)
+                                            {
+                                                SendSelectedObjects.Add(ui.ID);
+                                                if (full_packet_objprop == null)
+                                                {
+                                                    full_packet_objprop = new ObjectPropertiesTriggerMessage(this);
+                                                }
+                                                full_packet_objprop.ObjectParts.Add(oui.Part);
+                                            }
+                                            else if (!objknown && (oui.Part.ExtendedMesh.Flags & ExtendedMeshParams.MeshFlags.AnimatedMeshEnabled) != 0 && m_EnableObjectAnimation)
+                                            {
+                                                mustBeNonPhys = true;
+                                                if (full_packet_objanim == null)
+                                                {
+                                                    full_packet_objanim = new ObjectAnimationTriggerMessage(this);
+                                                }
+                                                full_packet_objanim.ObjectParts.Add(oui.Part);
+                                            }
+                                        }
+                                        else if (aui != null && !objknown)
+                                        {
+                                            if (full_packet_agentanim == null)
+                                            {
+                                                full_packet_agentanim = new AvatarAnimationTriggerMessage(this);
+                                            }
+                                            full_packet_agentanim.Agents.Add(aui.Agent);
+                                        }
                                     }
                                 }
                             }
@@ -1001,6 +1013,7 @@ send_nonphys_packet:
                                             {
                                                 break;
                                             }
+                                            foundobject = false;
                                             compressed_packet.IsReliable = true;
                                             compressed_packet.AckMessage = phys_compressed_object_release;
                                             phys_compressed_object_release = null;
@@ -1042,6 +1055,7 @@ send_nonphys_packet:
                                         {
                                             break;
                                         }
+                                        foundobject = false;
                                         compressed_packet.IsReliable = true;
 
                                         ChainMessage chain = null;
@@ -1100,6 +1114,32 @@ send_nonphys_packet:
 
                                     nonphys_compressed_packet_data.Add(new KeyValuePair<IObjUpdateInfo, byte[]>(ui, compressedUpdate));
                                     nonphys_compressed_packet_data_length += compressedUpdate.Length;
+
+                                    if (oui != null)
+                                    {
+                                        if (wasSelected && !isSelected)
+                                        {
+                                            SendSelectedObjects.Remove(ui.ID);
+                                        }
+                                        else if (isSelected && !wasSelected)
+                                        {
+                                            SendSelectedObjects.Add(ui.ID);
+                                            if (compressed_packet_objprop == null)
+                                            {
+                                                compressed_packet_objprop = new ObjectPropertiesTriggerMessage(this);
+                                            }
+                                            compressed_packet_objprop.ObjectParts.Add(oui.Part);
+                                        }
+                                        else if (!objknown && (oui.Part.ExtendedMesh.Flags & ExtendedMeshParams.MeshFlags.AnimatedMeshEnabled) != 0 && m_EnableObjectAnimation)
+                                        {
+                                            mustBeNonPhys = true;
+                                            if (compressed_packet_objanim == null)
+                                            {
+                                                compressed_packet_objanim = new ObjectAnimationTriggerMessage(this);
+                                            }
+                                            compressed_packet_objanim.ObjectParts.Add(oui.Part);
+                                        }
+                                    }
                                 }
                             }
                         }
