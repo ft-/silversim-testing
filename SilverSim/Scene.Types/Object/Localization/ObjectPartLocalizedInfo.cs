@@ -559,7 +559,7 @@ namespace SilverSim.Scene.Types.Object.Localization
                         {
                             if (!localization.HasName)
                             {
-                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.Properties);
+                                localization.UpdateData(UpdateDataFlags.Properties);
                             }
                         }
                     }
@@ -602,7 +602,7 @@ namespace SilverSim.Scene.Types.Object.Localization
                         {
                             if (!localization.HasDescription)
                             {
-                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.Properties);
+                                localization.UpdateData(UpdateDataFlags.Properties);
                             }
                         }
                     }
@@ -634,7 +634,7 @@ namespace SilverSim.Scene.Types.Object.Localization
                         {
                             if (!localization.HasSitText)
                             {
-                                localization.UpdateData(ObjectPartLocalizedInfo.UpdateDataFlags.Properties);
+                                localization.UpdateData(UpdateDataFlags.Properties);
                             }
                         }
                     }

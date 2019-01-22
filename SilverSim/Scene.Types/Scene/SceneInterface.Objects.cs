@@ -1185,6 +1185,9 @@ namespace SilverSim.Scene.Types.Scene
 
             foreach (uint primLocalID in req.ObjectData)
             {
+#if DEBUG
+                m_Log.DebugFormat("ObjectDeselect localid={0}", primLocalID);
+#endif
                 if (!Primitives.TryGetValue(primLocalID, out part))
                 {
                     continue;
