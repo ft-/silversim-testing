@@ -203,6 +203,7 @@ namespace SilverSim.Scene.Types.Object.Localization
             m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.Material] = (byte)PrimitiveMaterial.Wood;
             m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PCode] = (byte)PrimitiveCode.Prim;
             m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ObjectDataLength] = 60;
+            part.ID.ToBytes(m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.ObjectID);
 
             m_Part = part;
             m_ParentInfo = parentInfo;
@@ -236,6 +237,7 @@ namespace SilverSim.Scene.Types.Object.Localization
             m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.Material] = (byte)PrimitiveMaterial.Wood;
             m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PCode] = (byte)PrimitiveCode.Prim;
             m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ObjectDataLength] = 60;
+            part.ID.ToBytes(m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.ObjectID);
 
             m_Part = part;
             m_ParentInfo = parentInfo;
@@ -247,6 +249,7 @@ namespace SilverSim.Scene.Types.Object.Localization
             m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.Material] = (byte)PrimitiveMaterial.Wood;
             m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PCode] = (byte)PrimitiveCode.Prim;
             m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ObjectDataLength] = 60;
+            part.ID.ToBytes(m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.ObjectID);
 
             m_Projection = new ProjectionParam();
             m_Sound = new SoundParam();
@@ -271,6 +274,7 @@ namespace SilverSim.Scene.Types.Object.Localization
         {
             LocalizationName = string.Empty;
             m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ObjectDataLength] = 60;
+            part.ID.ToBytes(m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.ObjectID);
 
             m_Part = part;
             m_TextureEntry = src.TextureEntry;
@@ -387,6 +391,24 @@ namespace SilverSim.Scene.Types.Object.Localization
                 m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.LocalID + 1] = (byte)((localid >> 8) & 0xFF);
                 m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.LocalID + 2] = (byte)((localid >> 16) & 0xFF);
                 m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.LocalID + 3] = (byte)((localid >> 24) & 0xFF);
+
+                byte[] data = m_CompressedUpdateData;
+                if (data != null)
+                {
+                    data[(int)CompressedUpdateFixedOffset.LocalID] = (byte)(localid & 0xFF);
+                    data[(int)CompressedUpdateFixedOffset.LocalID + 1] = (byte)((localid >> 8) & 0xFF);
+                    data[(int)CompressedUpdateFixedOffset.LocalID + 2] = (byte)((localid >> 16) & 0xFF);
+                    data[(int)CompressedUpdateFixedOffset.LocalID + 3] = (byte)((localid >> 24) & 0xFF);
+                }
+
+                data = m_CompressedUpdateDataLimited;
+                if (data != null)
+                {
+                    data[(int)CompressedUpdateFixedOffset.LocalID] = (byte)(localid & 0xFF);
+                    data[(int)CompressedUpdateFixedOffset.LocalID + 1] = (byte)((localid >> 8) & 0xFF);
+                    data[(int)CompressedUpdateFixedOffset.LocalID + 2] = (byte)((localid >> 16) & 0xFF);
+                    data[(int)CompressedUpdateFixedOffset.LocalID + 3] = (byte)((localid >> 24) & 0xFF);
+                }
             }
         }
 
