@@ -39,7 +39,7 @@ namespace SilverSim.Viewer.Messages.Agent
         public Vector3 CameraUpAxis;
         public double Far;
         public ControlFlags ControlFlags;
-        public byte Flags;
+        public AgentUpdateFlags Flags;
 
         public static Message Decode(UDPPacket p) => new AgentUpdate
         {
@@ -54,7 +54,7 @@ namespace SilverSim.Viewer.Messages.Agent
             CameraUpAxis = p.ReadVector3f(),
             Far = p.ReadFloat(),
             ControlFlags = (ControlFlags)p.ReadUInt32(),
-            Flags = p.ReadUInt8()
+            Flags = (AgentUpdateFlags)p.ReadUInt8()
         };
 
         public override void Serialize(UDPPacket p)
@@ -70,7 +70,7 @@ namespace SilverSim.Viewer.Messages.Agent
             p.WriteVector3f(CameraUpAxis);
             p.WriteFloat((float)Far);
             p.WriteUInt32((uint)ControlFlags);
-            p.WriteUInt8(Flags);
+            p.WriteUInt8((byte)Flags);
         }
     }
 }
