@@ -200,12 +200,14 @@ namespace SilverSim.Viewer.Core
 
         private void ProcessAgentControls()
         {
-            var agentControlFlags = m_ActiveAgentControlFlags & (~IgnoredControls);
+            var agentControlFlags = m_ActiveAgentControlFlags;
             var agentMovementDirection = Vector3.Zero;
 
-            m_IsFlying = agentControlFlags.HasFly() && SittingOnObject == null;
             m_IsAway = agentControlFlags.HasAway();
+            m_IsInMouselook = agentControlFlags.HasMouselook();
 
+            agentControlFlags &= (~IgnoredControls);
+            m_IsFlying = agentControlFlags.HasFly() && SittingOnObject == null;
             if (SittingOnObject != null)
             {
                 /* agent is sitting on object */
