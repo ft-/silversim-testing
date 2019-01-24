@@ -206,7 +206,7 @@ namespace SilverSim.Viewer.Core
             m_IsAway = agentControlFlags.HasAway();
             m_IsInMouselook = agentControlFlags.HasMouselook();
 
-            agentControlFlags &= (~IgnoredControls);
+            agentControlFlags &= ~IgnoredControls;
             m_IsFlying = agentControlFlags.HasFly() && SittingOnObject == null;
             if (SittingOnObject != null)
             {
