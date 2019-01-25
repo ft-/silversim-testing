@@ -172,7 +172,6 @@ namespace SilverSim.Scripting.Common
                     ThreadPool = this
                 };
                 tc.ScriptThread.Name = "Script Worker: " + m_SceneID.ToString();
-                tc.ScriptThread.IsBackground = true;
                 tc.ScriptThread.Start(tc);
                 m_Threads.Add(tc);
             }
