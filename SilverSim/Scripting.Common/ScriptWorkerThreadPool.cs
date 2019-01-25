@@ -339,14 +339,9 @@ namespace SilverSim.Scripting.Common
                 {
                     lock (m_Threads)
                     {
-                        if (m_Threads.Count > m_MinimumThreads || m_ShutdownThreads)
+                        if (m_Threads.Count > m_MinimumThreads)
                         {
-                            m_Threads.Remove(tc);
-                            if (m_ShutdownThreads && m_Threads.Count == 0)
-                            {
-                                m_WaitShutdownEvent.Set();
-                            }
-                            return;
+                            break;
                         }
                     }
                     continue;
@@ -475,7 +470,7 @@ namespace SilverSim.Scripting.Common
             lock (m_Threads)
             {
                 m_Threads.Remove(tc);
-                if (m_Threads.Count == 0)
+                if (m_ShutdownThreads && m_Threads.Count == 0)
                 {
                     m_WaitShutdownEvent.Set();
                 }
