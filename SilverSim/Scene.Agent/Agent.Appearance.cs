@@ -316,7 +316,6 @@ namespace SilverSim.Scene.Agent
             catch(Exception e)
             {
                 m_Log.Error("Rebake appearance failed for " + Owner.ToString(), e);
-                return;
             }
         }
 
