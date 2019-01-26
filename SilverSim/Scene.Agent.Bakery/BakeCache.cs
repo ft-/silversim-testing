@@ -296,12 +296,64 @@ namespace SilverSim.Scene.Agent.Bakery
                 AvatarTextures[(int)AvatarTextureIndex.SkirtBaked] = AppearanceInfo.AvatarTextureData.DefaultAvatarTextureID;
             }
 
-            var info = new AppearanceInfo();
-            info.Serial = AppearanceSerial;
-            info.VisualParams = bakes.VisualParams;
+            if(bakes.LeftArmBake != null)
+            {
+                destService.Store(bakes.LeftArmBake);
+                AvatarTextures[(int)AvatarTextureIndex.LeftArmBaked] = bakes.LeftArmBake.ID;
+            }
+            else
+            {
+                AvatarTextures[(int)AvatarTextureIndex.LeftArmBaked] = AppearanceInfo.AvatarTextureData.DefaultAvatarTextureID;
+            }
+
+            if (bakes.LeftLegBake != null)
+            {
+                destService.Store(bakes.LeftLegBake);
+                AvatarTextures[(int)AvatarTextureIndex.LeftLegBaked] = bakes.LeftLegBake.ID;
+            }
+            else
+            {
+                AvatarTextures[(int)AvatarTextureIndex.LeftLegBaked] = AppearanceInfo.AvatarTextureData.DefaultAvatarTextureID;
+            }
+
+            if (bakes.Aux1Bake != null)
+            {
+                destService.Store(bakes.Aux1Bake);
+                AvatarTextures[(int)AvatarTextureIndex.Aux1Baked] = bakes.Aux1Bake.ID;
+            }
+            else
+            {
+                AvatarTextures[(int)AvatarTextureIndex.Aux1Baked] = AppearanceInfo.AvatarTextureData.DefaultAvatarTextureID;
+            }
+
+            if (bakes.Aux2Bake != null)
+            {
+                destService.Store(bakes.Aux2Bake);
+                AvatarTextures[(int)AvatarTextureIndex.Aux2Baked] = bakes.Aux2Bake.ID;
+            }
+            else
+            {
+                AvatarTextures[(int)AvatarTextureIndex.Aux2Baked] = AppearanceInfo.AvatarTextureData.DefaultAvatarTextureID;
+            }
+
+            if (bakes.Aux3Bake != null)
+            {
+                destService.Store(bakes.Aux3Bake);
+                AvatarTextures[(int)AvatarTextureIndex.Aux3Baked] = bakes.Aux3Bake.ID;
+            }
+            else
+            {
+                AvatarTextures[(int)AvatarTextureIndex.Aux3Baked] = AppearanceInfo.AvatarTextureData.DefaultAvatarTextureID;
+            }
+
+            var info = new AppearanceInfo
+            {
+                Serial = AppearanceSerial,
+                VisualParams = bakes.VisualParams,
+                AvatarHeight = bakes.AvatarHeight
+            };
             info.AvatarTextures.All = AvatarTextures;
             info.Wearables.All = AvatarWearables;
-            info.AvatarHeight = bakes.AvatarHeight;
             return info;
         }
     }

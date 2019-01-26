@@ -68,6 +68,8 @@ namespace SilverSim.Scene.Agent.Bakery
                     return new SkirtSubBaker(wearable);
                 case WearableType.Gloves:
                     return new GlovesSubBaker(wearable);
+                case WearableType.Universal:
+                    return new UniversalSubBaker(wearable);
 
                 default:
                     return null; /* intentionally returning null here */

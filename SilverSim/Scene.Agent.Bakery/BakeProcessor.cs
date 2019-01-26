@@ -64,6 +64,11 @@ namespace SilverSim.Scene.Agent.Bakery
                 Rectangles.Add(BakeTarget.Head, new Rectangle(0, 0, 512, 512));
                 Rectangles.Add(BakeTarget.LowerBody, new Rectangle(0, 0, 512, 512));
                 Rectangles.Add(BakeTarget.UpperBody, new Rectangle(0, 0, 512, 512));
+                Rectangles.Add(BakeTarget.LeftArm, new Rectangle(0, 0, 512, 512));
+                Rectangles.Add(BakeTarget.LeftLeg, new Rectangle(0, 0, 512, 512));
+                Rectangles.Add(BakeTarget.Aux1, new Rectangle(0, 0, 512, 512));
+                Rectangles.Add(BakeTarget.Aux2, new Rectangle(0, 0, 512, 512));
+                Rectangles.Add(BakeTarget.Aux3, new Rectangle(0, 0, 512, 512));
             }
         }
 
@@ -307,6 +312,8 @@ namespace SilverSim.Scene.Agent.Bakery
                 logOutput?.Invoke("Processing R,G,B and bump parts");
                 DrawSubBakers(Tgt, SourceBakers[WearableType.Skin], SkinIndices);
 
+                DrawSubBakers(Tgt, SourceBakers[WearableType.Universal].OrderBy(item => item.Ordinal), UniversalIndices);
+
                 DrawSubBakers(Tgt, SourceBakers[WearableType.Tattoo].OrderBy(item => item.Ordinal), SkinIndices);
 
                 DrawSubBakers(Tgt, SourceBakers[WearableType.Hair], new BakeTarget[] { BakeTarget.Hair });
@@ -479,6 +486,71 @@ namespace SilverSim.Scene.Agent.Bakery
                         Name = "Bake Texture Skirt"
                     };
                 }
+
+                Bitmap finalLeftArm;
+                if (Tgt.Images.TryGetValue(BakeTarget.LeftArm, out finalLeftArm))
+                {
+                    output.LeftArmBake = new AssetData
+                    {
+                        ID = UUID.RandomFixedFirst(0xffffffff),
+                        Type = AssetType.Texture,
+                        Temporary = true,
+                        Data = J2cEncoder.Encode(finalLeftArm, true),
+                        Name = "Bake Texture LeftArm"
+                    };
+                }
+
+                Bitmap finalLeftLeg;
+                if (Tgt.Images.TryGetValue(BakeTarget.LeftLeg, out finalLeftLeg))
+                {
+                    output.LeftLegBake = new AssetData
+                    {
+                        ID = UUID.RandomFixedFirst(0xffffffff),
+                        Type = AssetType.Texture,
+                        Temporary = true,
+                        Data = J2cEncoder.Encode(finalLeftLeg, true),
+                        Name = "Bake Texture LeftLeg"
+                    };
+                }
+
+                Bitmap finalAux1;
+                if (Tgt.Images.TryGetValue(BakeTarget.Aux1, out finalAux1))
+                {
+                    output.Aux1Bake = new AssetData
+                    {
+                        ID = UUID.RandomFixedFirst(0xffffffff),
+                        Type = AssetType.Texture,
+                        Temporary = true,
+                        Data = J2cEncoder.Encode(finalAux1, true),
+                        Name = "Bake Texture Aux1"
+                    };
+                }
+
+                Bitmap finalAux2;
+                if (Tgt.Images.TryGetValue(BakeTarget.Aux1, out finalAux2))
+                {
+                    output.Aux2Bake = new AssetData
+                    {
+                        ID = UUID.RandomFixedFirst(0xffffffff),
+                        Type = AssetType.Texture,
+                        Temporary = true,
+                        Data = J2cEncoder.Encode(finalAux2, true),
+                        Name = "Bake Texture Aux2"
+                    };
+                }
+
+                Bitmap finalAux3;
+                if (Tgt.Images.TryGetValue(BakeTarget.Aux1, out finalAux3))
+                {
+                    output.Aux3Bake = new AssetData
+                    {
+                        ID = UUID.RandomFixedFirst(0xffffffff),
+                        Type = AssetType.Texture,
+                        Temporary = true,
+                        Data = J2cEncoder.Encode(finalAux3, true),
+                        Name = "Bake Texture Aux3"
+                    };
+                }
             }
             finally
             {
@@ -587,6 +659,21 @@ namespace SilverSim.Scene.Agent.Bakery
             BakeTarget.LowerBody,
             BakeTarget.UpperBody,
             BakeTarget.Skirt
+        };
+
+        private static readonly BakeTarget[] UniversalIndices =
+        {
+            BakeTarget.Hair,
+            BakeTarget.Eyes,
+            BakeTarget.Head,
+            BakeTarget.LowerBody,
+            BakeTarget.UpperBody,
+            BakeTarget.Skirt,
+            BakeTarget.LeftArm,
+            BakeTarget.LeftLeg,
+            BakeTarget.Aux1,
+            BakeTarget.Aux2,
+            BakeTarget.Aux3
         };
     }
 }

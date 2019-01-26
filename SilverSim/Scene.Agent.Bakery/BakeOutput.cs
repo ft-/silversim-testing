@@ -31,6 +31,11 @@ namespace SilverSim.Scene.Agent.Bakery
         public AssetData LowerBake;
         public AssetData EyeBake;
         public AssetData SkirtBake;
+        public AssetData LeftLegBake;
+        public AssetData LeftArmBake;
+        public AssetData Aux1Bake;
+        public AssetData Aux2Bake;
+        public AssetData Aux3Bake;
         public byte[] VisualParams;
         public double AvatarHeight;
     }
