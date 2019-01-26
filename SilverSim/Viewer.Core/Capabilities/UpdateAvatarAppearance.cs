@@ -35,7 +35,7 @@ namespace SilverSim.Viewer.Core.Capabilities
         private readonly ViewerAgent m_Agent;
         private readonly string m_RemoteIP;
 
-        public string CapabilityName => "EstateChangeInfo";
+        public string CapabilityName => "UpdateAvatarAppearance";
 
         public UpdateAvatarAppearance(ViewerAgent agent, SceneInterface scene, string remoteip)
         {
@@ -87,10 +87,12 @@ namespace SilverSim.Viewer.Core.Capabilities
                 reason = e.Message;
             }
 
-            Map resmap = new Map();
-            resmap.Add("success", success);
-            resmap.Add("error", reason);
-            resmap.Add("agent_id", m_Agent.ID);
+            Map resmap = new Map
+            {
+                { "success", success },
+                { "error", reason },
+                { "agent_id", m_Agent.ID }
+            };
 
             using (var httpres = httpreq.BeginResponse())
             {
