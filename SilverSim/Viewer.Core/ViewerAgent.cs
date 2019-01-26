@@ -734,6 +734,7 @@ namespace SilverSim.Viewer.Core
 
         ~ViewerAgent()
         {
+            OnAppearanceUpdate -= HandleAppearanceUpdate;
             OnPositionChange -= ChildUpdateOnPositionChange;
             lock (m_DataLock)
             {
