@@ -318,7 +318,6 @@ namespace SilverSim.Scene.Agent
                 m_Log.Error("Rebake appearance failed for " + Owner.ToString(), e);
                 return;
             }
-            InvokeOnAppearanceUpdate();
         }
 
         private void ToUInt16Bytes(double value, double min, double max, byte[] buf, int pos)
