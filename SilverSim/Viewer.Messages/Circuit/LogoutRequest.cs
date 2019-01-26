@@ -33,14 +33,14 @@ namespace SilverSim.Viewer.Messages.Circuit
 
         public static Message Decode(UDPPacket p) => new LogoutRequest
         {
-            SessionID = p.ReadUUID(),
-            AgentID = p.ReadUUID()
+            AgentID = p.ReadUUID(),
+            SessionID = p.ReadUUID()
         };
 
         public override void Serialize(UDPPacket p)
         {
-            p.WriteUUID(SessionID);
             p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
         }
     }
 }
