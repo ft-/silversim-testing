@@ -25,6 +25,7 @@ using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Purge;
 using SilverSim.Types;
+using SilverSim.Types.Agent;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -51,7 +52,7 @@ namespace SilverSim.AssetPurger
                 {
                     foreach(UUID id in agent.Appearance.AvatarTextures.All)
                     {
-                        if(id != UUID.Zero && !refs.Contains(id))
+                        if(id != UUID.Zero && id != AppearanceInfo.AvatarTextureData.DefaultAvatarTextureID && !refs.Contains(id))
                         {
                             refs.Add(id);
                         }
