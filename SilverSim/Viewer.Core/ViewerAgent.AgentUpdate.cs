@@ -213,9 +213,19 @@ namespace SilverSim.Viewer.Core
 
             agentControlFlags &= ~IgnoredControls;
             m_IsFlying = agentControlFlags.HasFly() && SittingOnObject == null;
+
+            if (agentControlFlags.HasSitOnGround())
+            {
+
+            }
+
             if (SittingOnObject != null)
             {
                 /* agent is sitting on object */
+                if (agentControlFlags.HasStandUp() && AllowUnsit)
+                {
+                    UnSit();
+                }
             }
             else if (agentControlFlags.HasStop())
             {
@@ -346,23 +356,13 @@ namespace SilverSim.Viewer.Core
             m_ActiveAgentControlFlags = au.ControlFlags;
             m_DrawDistance = au.Far;
 
-            if (m_ActiveAgentControlFlags.HasStandUp() &&
-                SittingOnObject != null && AllowUnsit)
-            {
-                UnSit();
-            }
-
-            if (m_ActiveAgentControlFlags.HasSitOnGround())
-            {
-
-            }
-
             HeadRotation = au.HeadRotation;
             BodyRotation = au.BodyRotation;
             CameraPosition = au.CameraCenter;
             CameraAtAxis = au.CameraAtAxis;
             CameraLeftAxis = au.CameraLeftAxis;
             CameraUpAxis = au.CameraUpAxis;
+
             ProcessAgentControls();
 
             Vector4 camCollisionPlane;
@@ -381,6 +381,7 @@ namespace SilverSim.Viewer.Core
                 {
                     var ce = new ControlEvent
                     {
+                        AgentID = ID,
                         Level = m_ActiveAgentControlFlags & kvp.Value.Taken,
                         Edge = edge & kvp.Value.Taken
                     };
