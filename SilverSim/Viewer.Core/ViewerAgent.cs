@@ -24,6 +24,7 @@
 
 using log4net;
 using SilverSim.Main.Common;
+using SilverSim.Scene.Agent;
 using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Neighbor;
@@ -39,7 +40,6 @@ using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.IM;
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.ServiceInterfaces.MuteList;
-using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.ServiceInterfaces.UserSession;
@@ -73,7 +73,7 @@ using System.Threading;
 
 namespace SilverSim.Viewer.Core
 {
-    public partial class ViewerAgent : SilverSim.Scene.Agent.Agent, ILocalIDAccessor
+    public partial class ViewerAgent : Agent, ILocalIDAccessor
     {
         private static readonly ILog m_Log = LogManager.GetLogger("VIEWER AGENT");
         private readonly SceneList m_Scenes;
