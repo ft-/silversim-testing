@@ -117,9 +117,16 @@ namespace SilverSim.Scene.Types.Physics
             /* intentionally left empty */
         }
 
+        private ControlFlags m_ControlFlags;
+
         public void SetControlFlags(ControlFlags flags)
         {
-            /* intentionally left empty */
+            m_ControlFlags = flags;
+        }
+
+        public ControlFlags GetControlFlags()
+        {
+            return m_ControlFlags;
         }
 
         public void SetControlDirectionalInput(Vector3 value)

@@ -96,6 +96,14 @@ namespace SilverSim.Scene.Physics.Common
             }
         }
 
+        public ControlFlags GetControlFlags()
+        {
+            lock(m_Lock)
+            {
+                return m_ControlFlags;
+            }
+        }
+
         private Vector3 m_ControlDirectionalInput = Vector3.Zero;
         public void SetControlDirectionalInput(Vector3 value)
         {

@@ -30,6 +30,7 @@ namespace SilverSim.Scene.Types.Physics
         void SetControlDirectionalInput(Vector3 value);
         void SetControlAngularInput(Vector3 value);
         void SetControlFlags(ControlFlags flags);
+        ControlFlags GetControlFlags();
         double SpeedFactor { get; set; }
     }
 }
