@@ -1163,7 +1163,7 @@ namespace SilverSim.Scene.Agent
             }
         }
 
-        public AgentState State { get; set; }
+        public AgentStateFlags StateFlags { get; set; }
 
         public virtual void SetAssetUploadAsCompletionAction(UUID transactionID, UUID sceneID, Action<UUID> action)
         {

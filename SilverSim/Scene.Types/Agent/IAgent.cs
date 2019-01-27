@@ -237,7 +237,7 @@ namespace SilverSim.Scene.Types.Agent
 
         Quaternion HeadRotation { get; set; }
 
-        AgentState State { get; set; }
+        AgentStateFlags StateFlags { get; set; }
 
         List<AgentControlData> ActiveControls { get; }
 

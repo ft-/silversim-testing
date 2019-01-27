@@ -24,7 +24,7 @@ using System;
 namespace SilverSim.Scene.Types.Agent
 {
     [Flags]
-    public enum AgentState : byte
+    public enum AgentStateFlags : byte
     {
         None = 0,
         Typing = 4,
