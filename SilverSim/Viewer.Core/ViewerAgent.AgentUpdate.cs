@@ -29,6 +29,7 @@ using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Agent;
 using SilverSim.Viewer.Messages.Camera;
 using SilverSim.Viewer.Messages.Script;
+using System;
 using System.Collections.Generic;
 
 namespace SilverSim.Viewer.Core
@@ -40,6 +41,7 @@ namespace SilverSim.Viewer.Core
         private ControlFlags m_ActiveAgentControlFlags;
         private bool m_IsRunning;
         private bool m_IsAway;
+        private const double MaxTurnSpeed = 10.0 / 180.0 * Math.PI;
 
         public override bool IsAway => m_IsAway;
 
@@ -202,6 +204,7 @@ namespace SilverSim.Viewer.Core
         {
             var agentControlFlags = m_ActiveAgentControlFlags;
             var agentMovementDirection = Vector3.Zero;
+            var agentAngularDirection = Vector3.Zero;
 
             m_IsAway = agentControlFlags.HasAway();
             m_IsInMouselook = agentControlFlags.HasMouselook();
@@ -265,10 +268,17 @@ namespace SilverSim.Viewer.Core
                 {
                     agentMovementDirection -= Vector3.UnitY * 0.5;
                 }
+                if(agentControlFlags.HasTurnLeft())
+                {
+                    agentAngularDirection += Vector3.UnitZ * 10 / 180.0 * Math.PI;
+                }
+                if (agentControlFlags.HasTurnRight())
+                {
+                    agentAngularDirection -= Vector3.UnitZ * 10 / 180.0 * Math.PI;
+                }
             }
 
-            agentMovementDirection *= BodyRotation; /* adjust directional vector */
-            if(IsFlying)
+            if (IsFlying)
             {
                 agentMovementDirection *= 5f;
             }
@@ -281,6 +291,7 @@ namespace SilverSim.Viewer.Core
                 agentMovementDirection = Vector3.Zero;
             }
             ((IAgentPhysicsObject)PhysicsActor).SetControlDirectionalInput(agentMovementDirection);
+            ((IAgentPhysicsObject)PhysicsActor).SetControlAngularInput(agentAngularDirection);
             ((IAgentPhysicsObject)PhysicsActor).SetControlFlags(agentControlFlags);
         }
 

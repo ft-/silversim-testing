@@ -31,6 +31,7 @@ namespace SilverSim.Scene.Types.Physics
         private readonly Timer m_UfoTimer;
         private readonly IAgent m_Agent;
         private Vector3 m_ControlTargetVelocity = Vector3.Zero;
+        private Vector3 m_ControlTargetAngularVelocity = Vector3.Zero;
         private readonly PhysicsStateData m_StateData;
         private readonly object m_Lock = new object();
 
@@ -76,18 +77,21 @@ namespace SilverSim.Scene.Types.Physics
         private void UfoTimerFunction(object sender, ElapsedEventArgs e)
         {
             Vector3 controlTarget;
+            Vector3 controlAngularTarget;
             if (m_Agent.SittingOnObject != null || m_Agent.SceneID == m_StateData.SceneID)
             {
                 lock (m_Lock)
                 {
                     controlTarget = m_ControlTargetVelocity;
+                    controlAngularTarget = m_ControlTargetAngularVelocity;
                 }
                 m_StateData.Position += controlTarget / 10f;
                 m_StateData.Velocity = controlTarget;
+                m_StateData.Rotation *= Quaternion.CreateFromEulers(controlAngularTarget / 10f);
+                m_StateData.AngularVelocity = controlAngularTarget;
                 var agent = m_Agent;
                 if (agent != null)
                 {
-                    m_StateData.Rotation = agent.BodyRotation;
                     agent.PhysicsUpdate(m_StateData);
                 }
             }
@@ -123,6 +127,14 @@ namespace SilverSim.Scene.Types.Physics
             lock (m_Lock)
             {
                 m_ControlTargetVelocity = value;
+            }
+        }
+
+        public void SetControlAngularInput(Vector3 value)
+        {
+            lock (m_Lock)
+            {
+                m_ControlTargetAngularVelocity = value;
             }
         }
 

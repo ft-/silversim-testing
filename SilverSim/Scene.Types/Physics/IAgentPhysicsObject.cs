@@ -28,6 +28,7 @@ namespace SilverSim.Scene.Types.Physics
     {
         bool IsAgentCollisionActive { get; set; }
         void SetControlDirectionalInput(Vector3 value);
+        void SetControlAngularInput(Vector3 value);
         void SetControlFlags(ControlFlags flags);
         double SpeedFactor { get; set; }
     }

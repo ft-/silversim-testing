@@ -77,6 +77,11 @@ namespace SilverSim.Scene.Types.Physics
             /* intentionally left empty */
         }
 
+        public void SetControlAngularInput(Vector3 value)
+        {
+            /* intentionally left empty */
+        }
+
         public void SetControlFlags(ControlFlags flags)
         {
             /* intentionally left empty */

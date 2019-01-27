@@ -105,6 +105,15 @@ namespace SilverSim.Scene.Physics.Common
             }
         }
 
+        private Vector3 m_ControlAngularInput = Vector3.Zero;
+        public void SetControlAngularInput(Vector3 value)
+        {
+            lock (m_Lock)
+            {
+                m_ControlAngularInput = value;
+            }
+        }
+
         private Vector3 ControlLinearInput
         {
             get
@@ -112,6 +121,17 @@ namespace SilverSim.Scene.Physics.Common
                 lock(m_Lock)
                 {
                     return m_ControlDirectionalInput;
+                }
+            }
+        }
+
+        private Vector3 ControlAngularInput
+        {
+            get
+            {
+                lock(m_Lock)
+                {
+                    return m_ControlAngularInput;
                 }
             }
         }
@@ -260,7 +280,7 @@ namespace SilverSim.Scene.Physics.Common
                 bool iscrouching = m_ControlFlags.HasDown();
                 AnimationState oldState = Agent.GetDefaultAnimation();
 
-                Vector3 bodyRotDiff = Agent.BodyRotation.GetEulerAngles() - m_LastKnownBodyRotation.GetEulerAngles();
+                //Vector3 bodyRotDiff = Agent.BodyRotation.GetEulerAngles() - m_LastKnownBodyRotation.GetEulerAngles();
 
                 if (isfalling && 
                     oldState != AnimationState.Running && 
@@ -305,7 +325,7 @@ namespace SilverSim.Scene.Physics.Common
                 forces.Add(GravityMotor(this, Agent, Vector3.Zero));
             }
             forces.Add(HoverMotor(this, Agent, Vector3.Zero));
-            forces.Add(new PositionalForce("ControlInput", ControlLinearInput * ControlLinearInputFactor * SpeedFactor, Vector3.Zero));
+            forces.Add(new PositionalForce("ControlInput", ControlLinearInput * ControlLinearInputFactor * SpeedFactor * Agent.GlobalRotation, Vector3.Zero));
             Vector3 restitutionForce = -Agent.Velocity * RestitutionInputFactor;
             if(!Agent.IsFlying)
             {
@@ -335,6 +355,7 @@ namespace SilverSim.Scene.Physics.Common
 
             forces.Add(MoveToTargetMotor(Agent));
             agentTorque += LookAtMotor(Agent);
+            agentTorque += (ControlAngularInput - Agent.AngularVelocity) * dt;
 
             return forces;
         }
