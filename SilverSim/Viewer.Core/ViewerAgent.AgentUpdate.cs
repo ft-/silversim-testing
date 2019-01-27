@@ -69,7 +69,7 @@ namespace SilverSim.Viewer.Core
             this[instance] = new ScriptControlData
             {
                 Taken = accept != 0 ? (ControlFlags)controls : ControlFlags.None,
-                Ignored = pass_on != 0 ? (ControlFlags)controls : ControlFlags.None
+                Ignored = pass_on == 0 ? (ControlFlags)controls : ControlFlags.None
             };
         }
 
@@ -127,13 +127,15 @@ namespace SilverSim.Viewer.Core
                     {
                         m_ScriptControls.Remove(instance);
                     }
-                    TakenControls = ControlFlags.None;
-                    IgnoredControls = ControlFlags.None;
+                    ControlFlags takenControls = ControlFlags.None;
+                    ControlFlags ignoredControls = ControlFlags.None;
                     foreach(var sc in m_ScriptControls.Values)
                     {
-                        TakenControls |= sc.Taken;
-                        IgnoredControls |= sc.Ignored;
+                        takenControls |= sc.Taken;
+                        ignoredControls |= sc.Ignored;
                     }
+                    TakenControls = takenControls;
+                    IgnoredControls = ignoredControls;
                 }
                 ControlFlags taken = TakenControls;
                 ControlFlags ignored = IgnoredControls;
@@ -143,7 +145,7 @@ namespace SilverSim.Viewer.Core
                 {
                     msg.Data.Add(new ScriptControlChange.DataEntry
                     {
-                        Controls = taken,
+                        Controls = taken & ~ignored,
                         PassToAgent = true,
                         TakeControls = true
                     });
@@ -159,7 +161,7 @@ namespace SilverSim.Viewer.Core
                     msg.Data.Add(new ScriptControlChange.DataEntry
                     {
                         Controls = taken,
-                        PassToAgent = true,
+                        PassToAgent = ignored == ControlFlags.None,
                         TakeControls = true
                     });
                 }
