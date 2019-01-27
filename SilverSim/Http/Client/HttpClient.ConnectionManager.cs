@@ -140,8 +140,14 @@ namespace SilverSim.Http.Client
         static HttpClient()
         {
             m_Timer = new Timer(1000);
+            AppDomain.CurrentDomain.ProcessExit += TimerStop;
             m_Timer.Elapsed += CleanUpTimer;
             m_Timer.Start();
+        }
+
+        private static void TimerStop(object sender, EventArgs e)
+        {
+            m_Timer.Stop();
         }
 
         #region Connect Handling

@@ -38,8 +38,14 @@ namespace SilverSim.Threading
         static DnsNameCache()
         {
             m_Timer = new Timer(1000);
+            AppDomain.CurrentDomain.ProcessExit += TimerStop;
             m_Timer.Elapsed += CleanUpTimer;
             m_Timer.Start();
+        }
+
+        private static void TimerStop(object sender, EventArgs e)
+        {
+            m_Timer.Stop();
         }
 
         private static void CleanUpTimer(object sender, ElapsedEventArgs e)
