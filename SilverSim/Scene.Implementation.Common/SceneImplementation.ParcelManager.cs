@@ -59,6 +59,7 @@ namespace SilverSim.Scene.Implementation.Common
 
             ~ParcelAccessManager()
             {
+                m_Timer.Stop();
                 m_Timer.Elapsed -= CheckAccessTimer;
             }
 
