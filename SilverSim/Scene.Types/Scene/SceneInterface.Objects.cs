@@ -105,12 +105,12 @@ namespace SilverSim.Scene.Types.Scene
             ObjectPart part;
             if(Primitives.TryGetValue(req.ObjectID, out part))
             {
+                Object.ObjectGroup grp = part.ObjectGroup;
                 var rep = new PayPriceReply
                 {
-                    ObjectID = req.ObjectID
+                    ObjectID = req.ObjectID,
+                    DefaultPayPrice = grp.PayPrice0
                 };
-                Object.ObjectGroup grp = part.ObjectGroup;
-                rep.ButtonData.Add(grp.PayPrice0);
                 rep.ButtonData.Add(grp.PayPrice1);
                 rep.ButtonData.Add(grp.PayPrice2);
                 rep.ButtonData.Add(grp.PayPrice3);
