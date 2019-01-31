@@ -72,16 +72,33 @@ namespace SilverSim.Threading
 
         public T Dequeue(int timeout)
         {
-            lock(m_Lock)
+            bool lockGranted = true;
+            try
             {
+                Monitor.Enter(m_Lock);
                 while (base.Count == 0)
                 {
-                    if (!Monitor.Wait(m_Lock, timeout))
+                    lockGranted = Monitor.Wait(m_Lock, timeout);
+                    if(!lockGranted)
                     {
                         throw new TimeoutException();
                     }
                 }
                 return base.Dequeue();
+            }
+            finally
+            {
+                if (lockGranted)
+                {
+                    try
+                    {
+                        Monitor.Exit(m_Lock);
+                    }
+                    catch(SynchronizationLockException)
+                    {
+                        /* this can happen */
+                    }
+                }
             }
         }
 
