@@ -57,9 +57,18 @@ namespace SilverSim.Types
         {
             get
             {
-                return (HomeURI == null) ?
-                    string.Format("{0}", GroupName) :
-                    string.Format("{0} @{1}", GroupName.Replace(' ', '.'), HomeURI.ToString());
+                if (HomeURI == null)
+                {
+                    return string.Format("{0}", GroupName);
+                }
+                else
+                {
+                    string hostName = HomeURI.IsDefaultPort ?
+                        HomeURI.Host :
+                        HomeURI.Host + ":" + HomeURI.Port.ToString();
+
+                    return string.Format("{0} @{1}", GroupName.Replace(' ', '.'), hostName);
+                }
             }
             set
             {
