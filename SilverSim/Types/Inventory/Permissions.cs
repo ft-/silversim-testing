@@ -94,7 +94,7 @@ namespace SilverSim.Types.Inventory
             }
             set
             {
-                m_Base = value;
+                m_Base = value | InventoryPermissionsMask.Move;
             }
         }
 
@@ -106,7 +106,7 @@ namespace SilverSim.Types.Inventory
             }
             set
             {
-                m_Current = value;
+                m_Current = value & m_Base;
             }
         }
 
@@ -142,7 +142,7 @@ namespace SilverSim.Types.Inventory
             }
             set
             {
-                m_NextOwner = value;
+                m_NextOwner = value | InventoryPermissionsMask.Move;
             }
         }
 

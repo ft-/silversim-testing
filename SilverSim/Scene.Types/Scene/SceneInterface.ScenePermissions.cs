@@ -427,7 +427,7 @@ namespace SilverSim.Scene.Types.Scene
 
 #warning Add Friends Rights to CanMove
 
-            if(group.RootPart.CheckPermissions(agentOwner, agent.Group, InventoryPermissionsMask.Modify))
+            if(group.RootPart.CheckPermissions(agentOwner, agent.Group, InventoryPermissionsMask.Move))
             {
                 return true;
             }

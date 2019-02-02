@@ -561,7 +561,7 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region Permissions
-        public bool IsLocked => (m_Permissions.Current & InventoryPermissionsMask.Modify) == 0;
+        public bool IsLocked => (m_Permissions.Current & InventoryPermissionsMask.Move) == 0;
 
         public bool CheckPermissions(UGUI accessor, UGI accessorgroup, InventoryPermissionsMask wanted) => (ObjectGroup.IsGroupOwned) ?
                 m_Permissions.CheckGroupPermissions(Creator, ObjectGroup.Group, accessor, accessorgroup, wanted) :
@@ -812,10 +812,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 value = (m_Permissions.Base | setflags) & ~clrflags;
                 m_Permissions.Base = value;
-                InventoryPermissionsMask ownerMask = m_Permissions.Base & InventoryPermissionsMask.ObjectPermissionsChangeable;
-
-                const InventoryPermissionsMask lockBits = InventoryPermissionsMask.Move | InventoryPermissionsMask.Modify;
-                m_Permissions.Current = (m_Permissions.Current & lockBits) | (ownerMask & ~lockBits);
+                m_Permissions.Current = (m_Permissions.Current & InventoryPermissionsMask.Move) | (value & ~InventoryPermissionsMask.Move);
                 foreach (ObjectPartLocalizedInfo l in Localizations)
                 {
                     l.SetBaseMask(value);
@@ -836,10 +833,7 @@ namespace SilverSim.Scene.Types.Object
                 lock (m_DataLock)
                 {
                     m_Permissions.Base = value;
-                    InventoryPermissionsMask ownerMask = value & InventoryPermissionsMask.ObjectPermissionsChangeable;
-
-                    const InventoryPermissionsMask lockBits = InventoryPermissionsMask.Move | InventoryPermissionsMask.Modify;
-                    m_Permissions.Current = (m_Permissions.Current & lockBits) | (ownerMask & ~lockBits);
+                    m_Permissions.Current = (m_Permissions.Current & InventoryPermissionsMask.Move) | (value & ~InventoryPermissionsMask.Move);
                     foreach (ObjectPartLocalizedInfo l in Localizations)
                     {
                         l.SetBaseMask(value);
@@ -856,6 +850,7 @@ namespace SilverSim.Scene.Types.Object
             lock (m_DataLock)
             {
                 value = (m_Permissions.Current | setflags) & ~clrflags;
+                value &= m_Permissions.Base;
                 m_Permissions.Current = value;
                 foreach (ObjectPartLocalizedInfo l in Localizations)
                 {
@@ -873,12 +868,14 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
+                InventoryPermissionsMask newMask;
                 lock (m_DataLock)
                 {
-                    m_Permissions.Current = value;
+                    newMask = value & m_Permissions.Base;
+                    m_Permissions.Current = newMask;
                     foreach (ObjectPartLocalizedInfo l in Localizations)
                     {
-                        l.SetOwnerMask(value);
+                        l.SetOwnerMask(newMask);
                     }
                 }
                 TriggerOnUpdate(0);
@@ -986,6 +983,8 @@ namespace SilverSim.Scene.Types.Object
             lock (m_DataLock)
             {
                 value = (m_Permissions.NextOwner | setflags) & ~clrflags;
+                value &= m_Permissions.Base;
+                value |= InventoryPermissionsMask.Move;
                 m_Permissions.NextOwner = value;
                 foreach(ObjectPartLocalizedInfo l in Localizations)
                 {
@@ -1025,12 +1024,15 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
+                InventoryPermissionsMask newMask;
                 lock (m_DataLock)
                 {
-                    m_Permissions.NextOwner = value;
+                    newMask = value & m_Permissions.Base;
+                    newMask |= InventoryPermissionsMask.Move;
+                    m_Permissions.NextOwner = newMask;
                     foreach (ObjectPartLocalizedInfo l in Localizations)
                     {
-                        l.SetNextOwnerMask(value);
+                        l.SetNextOwnerMask(newMask);
                     }
                 }
                 TriggerOnUpdate(0);
