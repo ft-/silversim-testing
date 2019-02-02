@@ -29,17 +29,57 @@ namespace SilverSim.Types.Inventory
     public enum InventoryFlags : uint
     {
         None = 0,
+
+        #region inventorytype landmark
         LandmarkVisited = 1,
+        #endregion
+
+        #region inventorytype gesture
         GestureActive = 1,
+        #endregion
+
+        #region inventorytype object
+        /** <summary>When set, apply next owner permissions instead of base permissions.</summary> 
+         * <remarks>Reset when assetid is updated.</remarks>
+         */
         ObjectSlamPerm = 1 << 8,
+
+        /** <summary>When set the sale information has been changed</summary> 
+         * <remarks>Reset when assetid is updated.</remarks>
+         */
         ObjectSlamSale = 1 << 12,
+
+        /** <summary>When set, the inventory base permissions are used on rez. When not set, the asset base permissions are used on rez.</summary> 
+         * <remarks>Reset when assetid is updated.</remarks>
+         */
         ObjectPermOverwriteBase = 1 << 16,
+
+        /** <summary>When set, the inventory owner permissions are used on rez. When not set, the asset owner permissions are used on rez.</summary> 
+         * <remarks>Reset when assetid is updated.</remarks>
+         */
         ObjectPermOverwriteOwner = 1 << 17,
+
+        /** <summary>When set, the inventory group permissions are used on rez. When not set, the asset group permissions are used on rez.</summary> 
+         * <remarks>Reset when assetid is updated.</remarks>
+         */
         ObjectPermOverwriteGroup = 1 << 18,
+
+        /** <summary>When set, the inventory everyone permissions are used on rez. When not set, the asset everyone permissions are used on rez.</summary> 
+         * <remarks>Reset when assetid is updated.</remarks>
+         */
         ObjectPermOverwriteEveryOne = 1 << 19,
+
+        /** <summary>When set, the inventory nextowner permissions are used on rez. When not set, the asset nextowner permissions are used on rez.</summary>
+         * <remarks>Reset when assetid is updated.</remarks>
+         */
         ObjectPermOverwriteNextOwner = 1 << 20,
+
+        /** <summary>When set, the inventory item is composed of multiple items</summary> */
         ObjectHasMultipleItems = 1 << 21,
 
+        #endregion
+
+        #region inventorytype wearable
         WearablesTypeMask = 0xFF,
 
         WearableType_Shape = 0,
@@ -59,12 +99,15 @@ namespace SilverSim.Types.Inventory
         WearableType_Tattoo = 14,
         WearableType_Physics = 15,
         WearableType_Universal = 16,
+        #endregion
 
+        #region inventorytype settings
         SettingsType_Mask = 0xFF,
 
         SettingsType_Sky = 0,
         SettingsType_Water = 1,
         SettingsType_Daycycle = 2,
+        #endregion
 
         SharedSingleReference = 1 << 30,
         PermOverwriteMask = ObjectPermOverwriteBase | ObjectPermOverwriteOwner | ObjectPermOverwriteGroup | ObjectPermOverwriteEveryOne | ObjectPermOverwriteNextOwner
