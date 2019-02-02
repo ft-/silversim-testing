@@ -118,7 +118,14 @@ namespace SilverSim.Types.Inventory
             }
             set
             {
-                m_EveryOne = value;
+                if ((m_Base & InventoryPermissionsMask.Export) != 0)
+                {
+                    m_EveryOne = value;
+                }
+                else
+                {
+                    m_EveryOne = value & ~InventoryPermissionsMask.Export;
+                }
             }
         }
 
@@ -142,14 +149,17 @@ namespace SilverSim.Types.Inventory
             }
             set
             {
-                m_NextOwner = value | InventoryPermissionsMask.Move;
+                m_NextOwner = (value & m_Base) | InventoryPermissionsMask.Move;
             }
         }
 
         public void AdjustToNextOwner()
         {
-            Base = (Base & NextOwner) | InventoryPermissionsMask.Move;
-            Current = Base;
+            InventoryPermissionsMask nextOwner = NextOwner;
+            Base = nextOwner;
+            Current = nextOwner;
+            EveryOne = nextOwner & InventoryPermissionsMask.Export;
+            Group = InventoryPermissionsMask.None;
         }
 
         public bool CheckAgentPermissions(UGUI creator, UGUI owner, UGUI accessor, InventoryPermissionsMask wanted)
