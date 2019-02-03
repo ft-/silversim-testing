@@ -24,6 +24,7 @@
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Threading;
 using SilverSim.Types;
+using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using System.Collections.Generic;
 using System.Threading;
@@ -116,7 +117,13 @@ namespace SilverSim.Database.Memory.Inventory
             if(m_Items.TryGetValue(item.Owner.ID, out itemSet) &&
                 itemSet.TryGetValue(item.ID, out storedItem))
             {
+                InventoryFlags keepFlags = item.Flags & InventoryFlags.PermOverwriteMask;
+                if(storedItem.AssetID != item.AssetID || storedItem.AssetType != AssetType.Object)
+                {
+                    keepFlags = InventoryFlags.None;
+                }
                 storedItem.AssetID = item.AssetID;
+                storedItem.Flags = item.Flags | keepFlags;
                 storedItem.Name = item.Name;
                 storedItem.Description = item.Description;
                 storedItem.Permissions.Base = item.Permissions.Base;
@@ -126,7 +133,6 @@ namespace SilverSim.Database.Memory.Inventory
                 storedItem.Permissions.Group = item.Permissions.Group;
                 storedItem.SaleInfo.Price = item.SaleInfo.Price;
                 storedItem.SaleInfo.Type = item.SaleInfo.Type;
-                storedItem.Flags = item.Flags;
                 IncrementVersion(item.Owner.ID, item.ParentFolderID);
             }
         }
