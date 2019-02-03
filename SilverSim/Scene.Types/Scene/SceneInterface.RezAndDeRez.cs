@@ -198,22 +198,9 @@ namespace SilverSim.Scene.Types.Scene
                 }
                 foreach (ObjectPart part in group.ValuesByKey1)
                 {
-                    InventoryPermissionsMask baseMask = sourceItem.Permissions.Base;
-
-                    if ((invFlags & InventoryFlags.ObjectPermOverwriteNextOwner) != 0)
-                    {
-                        part.NextOwnerMask = sourceItem.Permissions.NextOwner;
-                    }
-
-                    if ((invFlags & InventoryFlags.ObjectSlamPerm) != 0)
-                    {
-                        part.AdjustToNextOwner();
-                        baseMask = sourceItem.Permissions.NextOwner;
-                    }
-
                     if ((invFlags & InventoryFlags.ObjectPermOverwriteBase) != 0)
                     {
-                        part.BaseMask = baseMask;
+                        part.BaseMask = sourceItem.Permissions.Base;
                     }
 
                     if ((invFlags & InventoryFlags.ObjectPermOverwriteOwner) != 0)
@@ -229,6 +216,16 @@ namespace SilverSim.Scene.Types.Scene
                     if ((invFlags & InventoryFlags.ObjectPermOverwriteEveryOne) != 0)
                     {
                         part.EveryoneMask = sourceItem.Permissions.EveryOne;
+                    }
+
+                    if ((invFlags & InventoryFlags.ObjectPermOverwriteNextOwner) != 0)
+                    {
+                        part.NextOwnerMask = sourceItem.Permissions.NextOwner;
+                    }
+
+                    if ((invFlags & InventoryFlags.ObjectSlamPerm) != 0)
+                    {
+                        part.AdjustToNextOwner();
                     }
 
                     foreach (ObjectPartInventoryItem item in part.Inventory.ValuesByKey1)
