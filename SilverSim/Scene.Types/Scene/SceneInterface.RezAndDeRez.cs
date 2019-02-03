@@ -245,6 +245,9 @@ namespace SilverSim.Scene.Types.Scene
         public uint RezObject(ObjectGroup group, UGUI rezzingAgent, int startparameter = 0)
             => RezObject(group, rezzingAgent, startparameter, UUID.Zero);
 
+        public uint RezObject(ObjectGroup group, UGUI rezzingAgent, InventoryItem sourceItem)
+            => RezObject(group, rezzingAgent, 0, UUID.Zero, sourceItem);
+
         public uint RezObject(ObjectGroup group, UGUI rezzingAgent, int startparameter, UUID rezzingObjectID, InventoryItem sourceItem = null)
         {
             if (!group.Owner.EqualsGrid(rezzingAgent))

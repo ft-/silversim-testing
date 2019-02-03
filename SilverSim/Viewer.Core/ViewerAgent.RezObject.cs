@@ -37,21 +37,21 @@ namespace SilverSim.Viewer.Core
     {
         private sealed class AgentRezObjectHandler  : RezObjectHandler
         {
-            public AgentRezObjectHandler(SceneInterface scene, Vector3 targetpos, UUID assetid, AssetServiceInterface source, UGUI rezzingagent, SceneInterface.RezObjectParams rezparams, InventoryPermissionsMask itemOwnerPermissions = InventoryPermissionsMask.Every)
-                : base(scene, targetpos, assetid, source, rezzingagent, rezparams, itemOwnerPermissions)
+            public AgentRezObjectHandler(SceneInterface scene, Vector3 targetpos, UUID assetid, AssetServiceInterface source, UGUI rezzingagent, SceneInterface.RezObjectParams rezparams)
+                : base(scene, targetpos, assetid, source, rezzingagent, rezparams)
             {
             }
 
-            public AgentRezObjectHandler(SceneInterface scene, Vector3 targetpos, List<UUID> assetids, AssetServiceInterface source, UGUI rezzingagent, SceneInterface.RezObjectParams rezparams, InventoryPermissionsMask itemOwnerPermissions = InventoryPermissionsMask.Every)
-                : base(scene, targetpos, assetids, source, rezzingagent, rezparams, itemOwnerPermissions)
+            public AgentRezObjectHandler(SceneInterface scene, Vector3 targetpos, List<UUID> assetids, AssetServiceInterface source, UGUI rezzingagent, SceneInterface.RezObjectParams rezparams)
+                : base(scene, targetpos, assetids, source, rezzingagent, rezparams)
             {
             }
         }
 
         private sealed class AgentRezRestoreObjectHandler : RezRestoreObjectHandler
         {
-            public AgentRezRestoreObjectHandler(SceneInterface scene, UUID assetid, AssetServiceInterface source, UGUI rezzingagent, UGI rezzinggroup, InventoryPermissionsMask itemOwnerPermissions = InventoryPermissionsMask.Every)
-                : base(scene, assetid, source, rezzingagent, rezzinggroup, itemOwnerPermissions)
+            public AgentRezRestoreObjectHandler(SceneInterface scene, UUID assetid, AssetServiceInterface source, UGUI rezzingagent, UGI rezzinggroup, InventoryItem sourceItem)
+                : base(scene, assetid, source, rezzingagent, rezzinggroup, sourceItem)
             {
             }
         }
@@ -105,7 +105,8 @@ namespace SilverSim.Viewer.Core
                 item.AssetID,
                 AssetService,
                 Owner,
-                restoreGroup);
+                restoreGroup,
+                item);
 
             ThreadPool.UnsafeQueueUserWorkItem(HandleAssetTransferWorkItem, rezHandler);
         }
@@ -159,7 +160,8 @@ namespace SilverSim.Viewer.Core
                 ItemFlags = req.RezData.ItemFlags,
                 GroupMask = req.RezData.GroupMask,
                 EveryoneMask = req.RezData.EveryoneMask,
-                NextOwnerMask = req.RezData.NextOwnerMask
+                NextOwnerMask = req.RezData.NextOwnerMask,
+                SourceItem = item
             };
             var rezHandler = new AgentRezObjectHandler(
                 Circuits[m.CircuitSceneID].Scene,

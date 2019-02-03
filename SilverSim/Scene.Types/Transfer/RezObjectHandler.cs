@@ -38,30 +38,27 @@ namespace SilverSim.Scene.Types.Transfer
         private readonly SceneInterface m_Scene;
         private readonly Vector3 m_TargetPos;
         private readonly UGUI m_RezzingAgent;
-        private readonly InventoryPermissionsMask m_ItemOwnerPermissions;
         private readonly SceneInterface.RezObjectParams m_RezParams;
         private readonly List<UUID> m_ItemAssetIDs;
 
-        protected RezObjectHandler(SceneInterface scene, Vector3 targetpos, UUID assetid, AssetServiceInterface source, UGUI rezzingagent, SceneInterface.RezObjectParams rezparams, InventoryPermissionsMask itemOwnerPermissions = InventoryPermissionsMask.Every)
+        protected RezObjectHandler(SceneInterface scene, Vector3 targetpos, UUID assetid, AssetServiceInterface source, UGUI rezzingagent, SceneInterface.RezObjectParams rezparams)
             : base(scene.AssetService, source, assetid, ReferenceSource.Destination)
         {
             m_ItemAssetIDs = new List<UUID> { assetid };
             m_Scene = scene;
             m_TargetPos = targetpos;
             m_RezzingAgent = rezzingagent;
-            m_ItemOwnerPermissions = itemOwnerPermissions;
             m_RezParams = rezparams;
             m_RezParams.RezzingAgent = m_RezzingAgent;
         }
 
-        protected RezObjectHandler(SceneInterface scene, Vector3 targetpos, List<UUID> assetids, AssetServiceInterface source, UGUI rezzingagent, SceneInterface.RezObjectParams rezparams, InventoryPermissionsMask itemOwnerPermissions = InventoryPermissionsMask.Every)
+        protected RezObjectHandler(SceneInterface scene, Vector3 targetpos, List<UUID> assetids, AssetServiceInterface source, UGUI rezzingagent, SceneInterface.RezObjectParams rezparams)
             : base(scene.AssetService, source, assetids, ReferenceSource.Destination)
         {
             m_ItemAssetIDs = assetids;
             m_Scene = scene;
             m_TargetPos = targetpos;
             m_RezzingAgent = rezzingagent;
-            m_ItemOwnerPermissions = itemOwnerPermissions;
             m_RezParams = rezparams;
             m_RezParams.RezzingAgent = m_RezzingAgent;
         }
@@ -134,15 +131,15 @@ namespace SilverSim.Scene.Types.Transfer
         private readonly SceneInterface m_Scene;
         private readonly UGUI m_RezzingAgent;
         private readonly UGI m_RezzingGroup;
-        private readonly InventoryPermissionsMask m_ItemOwnerPermissions;
+        private readonly InventoryItem m_SourceItem;
 
-        protected RezRestoreObjectHandler(SceneInterface scene, UUID assetid, AssetServiceInterface source, UGUI rezzingagent, UGI rezzinggroup, InventoryPermissionsMask itemOwnerPermissions = InventoryPermissionsMask.Every)
+        protected RezRestoreObjectHandler(SceneInterface scene, UUID assetid, AssetServiceInterface source, UGUI rezzingagent, UGI rezzinggroup, InventoryItem sourceItem)
             : base(scene.AssetService, source, assetid, ReferenceSource.Destination)
         {
             m_Scene = scene;
             m_RezzingAgent = rezzingagent;
             m_RezzingGroup = rezzinggroup;
-            m_ItemOwnerPermissions = itemOwnerPermissions;
+            m_SourceItem = sourceItem;
         }
 
         protected void SendAlertMessage(string msg)
@@ -190,7 +187,7 @@ namespace SilverSim.Scene.Types.Transfer
                         {
                             grp.Group = m_RezzingGroup;
                         }
-                        m_Scene.RezObject(grp, m_RezzingAgent);
+                        m_Scene.RezObject(grp, m_RezzingAgent, m_SourceItem);
                     }
                 }
             }
