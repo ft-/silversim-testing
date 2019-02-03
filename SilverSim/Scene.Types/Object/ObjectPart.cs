@@ -1016,6 +1016,15 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        public void AdjustToNextOwner()
+        {
+            InventoryPermissionsMask nextOwner = NextOwnerMask;
+            BaseMask = nextOwner;
+            OwnerMask &= nextOwner;
+            EveryoneMask = nextOwner & InventoryPermissionsMask.Export;
+            GroupMask = InventoryPermissionsMask.None;
+        }
+
         public InventoryPermissionsMask NextOwnerMask
         {
             get

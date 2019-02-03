@@ -313,19 +313,25 @@ namespace SilverSim.Scene.Types.Scene
                                 {
                                     continue;
                                 }
-                                var objectItem = new InventoryItem();
-                                objectItem.Permissions.Base = agent.Owner.EqualsGrid(grp.Owner) ? grp.RootPart.NextOwnerMask : grp.RootPart.BaseMask;
+                                var objectItem = new InventoryItem
+                                {
+                                    Name = grp.Name,
+                                    Description = grp.Description,
+                                    LastOwner = grp.Owner,
+                                    Owner = agent.Owner,
+                                    AssetID = assetID,
+                                    AssetType = AssetType.Object,
+                                    InventoryType = InventoryType.Object
+                                };
+                                objectItem.Permissions.Base = grp.RootPart.BaseMask;
                                 objectItem.Permissions.EveryOne = grp.RootPart.EveryoneMask;
                                 objectItem.Permissions.Group = InventoryPermissionsMask.None;
                                 objectItem.Permissions.NextOwner = grp.RootPart.NextOwnerMask;
                                 objectItem.Permissions.Current = objectItem.Permissions.Base;
-                                objectItem.Name = grp.Name;
-                                objectItem.Description = grp.Description;
-                                objectItem.LastOwner = grp.Owner;
-                                objectItem.Owner = agent.Owner;
-                                objectItem.AssetID = assetID;
-                                objectItem.AssetType = AssetType.Object;
-                                objectItem.InventoryType = InventoryType.Object;
+                                if (!agent.Owner.EqualsGrid(grp.Owner))
+                                {
+                                    objectItem.AdjustToNextOwner();
+                                }
                                 items.Add(objectItem);
                                 break;
 
@@ -357,11 +363,8 @@ namespace SilverSim.Scene.Types.Scene
                                     if(!item.Owner.EqualsGrid(agent.Owner))
                                     {
                                         newItem.AssetID = item.NextOwnerAssetID;
-                                        newItem.LastOwner = item.Owner;
-                                        newItem.Owner = agent.Owner;
-                                        newItem.Permissions.Base = newItem.Permissions.NextOwner;
+                                        newItem.AdjustToNextOwner();
                                     }
-                                    newItem.Permissions.Group = InventoryPermissionsMask.None;
                                     assetids.Add(newItem.AssetID);
 
                                     items.Add(newItem);

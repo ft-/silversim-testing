@@ -72,6 +72,15 @@ namespace SilverSim.Types.Inventory
         public bool CheckPermissions(UGUI accessor, UGI accessorgroup, InventoryPermissionsMask wanted) => (IsGroupOwned) ?
                 Permissions.CheckGroupPermissions(Creator, Group, accessor, accessorgroup, wanted) :
                 Permissions.CheckAgentPermissions(Creator, Owner, accessor, wanted);
+
+        public void AdjustToNextOwner()
+        {
+            Permissions.AdjustToNextOwner();
+            if (AssetType == AssetType.Object)
+            {
+                Flags |= InventoryFlags.ObjectSlamPerm | InventoryFlags.ObjectPermOverwriteBase | InventoryFlags.ObjectPermOverwriteEveryOne | InventoryFlags.ObjectPermOverwriteGroup | InventoryFlags.ObjectPermOverwriteOwner;
+            }
+        }
         #endregion
 
         #region SaleInfo

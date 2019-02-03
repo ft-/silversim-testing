@@ -157,7 +157,7 @@ namespace SilverSim.Types.Inventory
         {
             InventoryPermissionsMask nextOwner = NextOwner;
             Base = nextOwner;
-            Current = nextOwner;
+            Current &= nextOwner;
             EveryOne = nextOwner & InventoryPermissionsMask.Export;
             Group = InventoryPermissionsMask.None;
         }

@@ -54,6 +54,10 @@ namespace SilverSim.Scene.Types.Scene
             public InventoryPermissionsMask EveryoneMask;
             public InventoryPermissionsMask NextOwnerMask;
             public UGUI RezzingAgent;
+
+            #region overwrite perms
+            public InventoryItem SourceItem;
+            #endregion
         }
 
         private Vector3 CalculateTargetedRezLocation(
@@ -172,7 +176,7 @@ namespace SilverSim.Scene.Types.Scene
                 try
                 {
                     grp.GlobalPosition = basePosition + grp.CoalescedRestoreOffset;
-                    result.Add(RezObject(grp, rezparams.RezzingAgent));
+                    result.Add(RezObject(grp, rezparams));
                 }
                 catch(Exception e)
                 {
@@ -183,18 +187,65 @@ namespace SilverSim.Scene.Types.Scene
             return result;
         }
 
+        private void HandleRezOverwritePerms(ObjectGroup group, InventoryItem sourceItem)
+        {
+            if ((sourceItem.Flags & InventoryFlags.PermOverwriteMask) != 0)
+            {
+                foreach (ObjectPart part in group.ValuesByKey1)
+                {
+                    InventoryPermissionsMask baseMask = sourceItem.Permissions.Base;
+                    if ((sourceItem.Flags & InventoryFlags.ObjectSlamPerm) != 0)
+                    {
+                        part.AdjustToNextOwner();
+                        baseMask = sourceItem.Permissions.NextOwner;
+                    }
+                    if ((sourceItem.Flags & InventoryFlags.ObjectPermOverwriteBase) != 0)
+                    {
+                        part.BaseMask = baseMask;
+                    }
+                    if ((sourceItem.Flags & InventoryFlags.ObjectPermOverwriteOwner) != 0)
+                    {
+                        part.OwnerMask = sourceItem.Permissions.Current;
+                    }
+                    if ((sourceItem.Flags & InventoryFlags.ObjectPermOverwriteGroup) != 0)
+                    {
+                        part.GroupMask = sourceItem.Permissions.Group;
+                    }
+                    if ((sourceItem.Flags & InventoryFlags.ObjectPermOverwriteEveryOne) != 0)
+                    {
+                        part.EveryoneMask = sourceItem.Permissions.EveryOne;
+                    }
+                    if ((sourceItem.Flags & InventoryFlags.ObjectPermOverwriteNextOwner) != 0)
+                    {
+                        part.NextOwnerMask = sourceItem.Permissions.NextOwner;
+                    }
+                    foreach (ObjectPartInventoryItem item in part.Inventory.ValuesByKey1)
+                    {
+                        if ((sourceItem.Flags & InventoryFlags.ObjectSlamPerm) != 0)
+                        {
+                            item.AdjustToNextOwner();
+                        }
+                    }
+                }
+            }
+        }
+
         public uint RezObject(ObjectGroup group, RezObjectParams rezparams)
         {
             group.GlobalPosition = CalculateRezLocation(
                 rezparams,
                 group.Size);
+            if (rezparams.SourceItem != null)
+            {
+                HandleRezOverwritePerms(group, rezparams.SourceItem);
+            }
             return RezObject(group, rezparams.RezzingAgent);
         }
 
         public uint RezObject(ObjectGroup group, UGUI rezzingAgent, int startparameter = 0)
             => RezObject(group, rezzingAgent, startparameter, UUID.Zero);
 
-        public uint RezObject(ObjectGroup group, UGUI rezzingAgent, int startparameter, UUID rezzingObjectID)
+        public uint RezObject(ObjectGroup group, UGUI rezzingAgent, int startparameter, UUID rezzingObjectID, InventoryItem sourceItem = null)
         {
             if (!group.Owner.EqualsGrid(rezzingAgent))
             {
@@ -211,6 +262,10 @@ namespace SilverSim.Scene.Types.Scene
                         item.LastOwner = item.Owner;
                         item.Owner = rezzingAgent;
                     }
+                }
+                if (sourceItem != null)
+                {
+                    HandleRezOverwritePerms(group, sourceItem);
                 }
             }
             group.Owner = rezzingAgent;
