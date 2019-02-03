@@ -565,7 +565,7 @@ namespace SilverSim.Scene.Types.Object
 
         public bool CheckPermissions(UGUI accessor, UGI accessorgroup, InventoryPermissionsMask wanted) => (ObjectGroup.IsGroupOwned) ?
                 m_Permissions.CheckGroupPermissions(Creator, ObjectGroup.Group, accessor, accessorgroup, wanted) :
-                m_Permissions.CheckAgentPermissions(Creator, Owner, accessor, wanted);
+                m_Permissions.CheckAgentPermissions(Creator, Owner, ObjectGroup.Group, accessor, accessorgroup, wanted);
         #endregion
 
         public void GetBoundingBox(out BoundingBox box)

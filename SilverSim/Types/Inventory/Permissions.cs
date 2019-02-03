@@ -61,6 +61,7 @@ namespace SilverSim.Types.Inventory
         Unused30 = 1 << 30,
         Unused31 = (uint)1 << 31,
         All = Transfer | Modify | Copy | Move,
+        FullPerm = Transfer | Modify | Copy,
         ObjectPermissionsChangeable = 0xFFFFFFF8,
         Every = 0x7FFFFFFF
     }
@@ -162,7 +163,7 @@ namespace SilverSim.Types.Inventory
             Group = InventoryPermissionsMask.None;
         }
 
-        public bool CheckAgentPermissions(UGUI creator, UGUI owner, UGUI accessor, InventoryPermissionsMask wanted)
+        public bool CheckAgentPermissions(UGUI creator, UGUI owner, UGI ownergroup, UGUI accessor, UGI accessorgroup, InventoryPermissionsMask wanted)
         {
             if(accessor.EqualsGrid(creator))
             {
@@ -171,6 +172,10 @@ namespace SilverSim.Types.Inventory
             else if (wanted == InventoryPermissionsMask.None)
             {
                 return false;
+            }
+            else if(accessorgroup.EqualsGrid(ownergroup) && (wanted & Group) == wanted && (Base & Current & InventoryPermissionsMask.FullPerm) == InventoryPermissionsMask.FullPerm)
+            {
+                return true;
             }
             else if (accessor.EqualsGrid(owner))
             {
