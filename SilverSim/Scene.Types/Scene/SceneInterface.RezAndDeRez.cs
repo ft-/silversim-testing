@@ -266,10 +266,10 @@ namespace SilverSim.Scene.Types.Scene
                         item.Owner = rezzingAgent;
                     }
                 }
-                if (sourceItem != null)
-                {
-                    HandleRezOverwritePerms(group, sourceItem);
-                }
+            }
+            if (sourceItem != null)
+            {
+                HandleRezOverwritePerms(group, sourceItem);
             }
             group.Owner = rezzingAgent;
             group.RezzingObjectID = rezzingObjectID;
