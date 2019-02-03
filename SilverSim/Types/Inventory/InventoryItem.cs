@@ -78,7 +78,7 @@ namespace SilverSim.Types.Inventory
             Permissions.AdjustToNextOwner();
             if (AssetType == AssetType.Object)
             {
-                Flags |= InventoryFlags.ObjectSlamPerm | InventoryFlags.ObjectPermOverwriteBase | InventoryFlags.ObjectPermOverwriteEveryOne | InventoryFlags.ObjectPermOverwriteGroup | InventoryFlags.ObjectPermOverwriteOwner;
+                Flags |= InventoryFlags.ObjectSlamPerm | InventoryFlags.ObjectSlamSale | InventoryFlags.ObjectPermOverwriteBase | InventoryFlags.ObjectPermOverwriteEveryOne | InventoryFlags.ObjectPermOverwriteGroup | InventoryFlags.ObjectPermOverwriteOwner;
             }
         }
         #endregion

@@ -189,41 +189,60 @@ namespace SilverSim.Scene.Types.Scene
 
         private void HandleRezOverwritePerms(ObjectGroup group, InventoryItem sourceItem)
         {
-            if ((sourceItem.Flags & InventoryFlags.PermOverwriteMask) != 0)
+            InventoryFlags invFlags = sourceItem.Flags;
+            if ((invFlags & InventoryFlags.PermOverwriteMask) != 0)
             {
+                if ((invFlags & InventoryFlags.ObjectSlamSale) != 0)
+                {
+                    group.SaleType = InventoryItem.SaleInfoData.SaleType.NoSale;
+                }
                 foreach (ObjectPart part in group.ValuesByKey1)
                 {
                     InventoryPermissionsMask baseMask = sourceItem.Permissions.Base;
-                    if ((sourceItem.Flags & InventoryFlags.ObjectSlamPerm) != 0)
+
+                    if ((invFlags & InventoryFlags.ObjectSlamPerm) != 0)
                     {
                         part.AdjustToNextOwner();
                         baseMask = sourceItem.Permissions.NextOwner;
                     }
-                    if ((sourceItem.Flags & InventoryFlags.ObjectPermOverwriteBase) != 0)
+
+                    if ((invFlags & InventoryFlags.ObjectPermOverwriteBase) != 0)
                     {
                         part.BaseMask = baseMask;
                     }
-                    if ((sourceItem.Flags & InventoryFlags.ObjectPermOverwriteOwner) != 0)
+
+                    if ((invFlags & InventoryFlags.ObjectPermOverwriteOwner) != 0)
                     {
                         part.OwnerMask = sourceItem.Permissions.Current;
                     }
-                    if ((sourceItem.Flags & InventoryFlags.ObjectPermOverwriteGroup) != 0)
+
+                    if ((invFlags & InventoryFlags.ObjectPermOverwriteGroup) != 0)
                     {
                         part.GroupMask = sourceItem.Permissions.Group;
                     }
-                    if ((sourceItem.Flags & InventoryFlags.ObjectPermOverwriteEveryOne) != 0)
+
+                    if ((invFlags & InventoryFlags.ObjectPermOverwriteEveryOne) != 0)
                     {
                         part.EveryoneMask = sourceItem.Permissions.EveryOne;
                     }
-                    if ((sourceItem.Flags & InventoryFlags.ObjectPermOverwriteNextOwner) != 0)
+
+                    if ((invFlags & InventoryFlags.ObjectPermOverwriteNextOwner) != 0)
                     {
                         part.NextOwnerMask = sourceItem.Permissions.NextOwner;
                     }
+
                     foreach (ObjectPartInventoryItem item in part.Inventory.ValuesByKey1)
                     {
-                        if ((sourceItem.Flags & InventoryFlags.ObjectSlamPerm) != 0)
+                        if ((invFlags & InventoryFlags.ObjectSlamPerm) != 0)
                         {
                             item.AdjustToNextOwner();
+                            part.Inventory.TriggerItemUpdated(item.ID);
+                        }
+                        else if((invFlags & InventoryFlags.ObjectSlamSale) != 0 &&
+                            sourceItem.AssetType == AssetType.Object)
+                        {
+                            item.Flags |= InventoryFlags.ObjectSlamSale;
+                            part.Inventory.TriggerItemUpdated(item.ID);
                         }
                     }
                 }

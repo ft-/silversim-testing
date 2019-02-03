@@ -361,6 +361,17 @@ namespace SilverSim.Scene.Types.Object
             return renamed;
         }
 
+        /** <summary>Used only within perm change logic</summary> */
+        public void TriggerItemUpdated(UUID id)
+        {
+            ObjectPartInventoryItem item;
+            if (TryGetValue(id, out item))
+            {
+                Interlocked.Increment(ref InventorySerial);
+                OnInventoryUpdate?.Invoke(item.UpdateInfo);
+            }
+        }
+
         public void Replace(string name, ObjectPartInventoryItem newItem, bool onlyIfExists = false)
         {
             ObjectPartInventoryItem oldItem;
