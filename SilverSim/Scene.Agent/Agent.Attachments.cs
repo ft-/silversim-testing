@@ -262,26 +262,26 @@ namespace SilverSim.Scene.Agent
         protected class RezAttachmentHandler : AssetTransferWorkItem
         {
             private readonly SceneInterface m_Scene;
-            private readonly UUID m_ItemID;
             private readonly UGUI m_RezzingAgent;
             private readonly AttachmentPoint m_AttachPoint;
             private readonly AgentAttachments m_AttachmentsList;
+            private readonly InventoryItem m_SourceItem;
 
             public RezAttachmentHandler(
                 SceneInterface scene,
-                UUID itemid,
                 UUID assetid,
                 AssetServiceInterface source,
                 UGUI rezzingagent,
                 AttachmentPoint attachPoint,
-                AgentAttachments attachmentsList)
+                AgentAttachments attachmentsList,
+                InventoryItem sourceItem)
                 : base(scene.AssetService, source, assetid, ReferenceSource.Destination)
             {
                 m_Scene = scene;
                 m_RezzingAgent = rezzingagent;
-                m_ItemID = itemid;
                 m_AttachPoint = attachPoint;
                 m_AttachmentsList = attachmentsList;
+                m_SourceItem = sourceItem;
             }
 
             private void SendAlertMessage(string msg)
@@ -365,7 +365,7 @@ namespace SilverSim.Scene.Agent
                 }
 
                 grp.Owner = m_RezzingAgent;
-                grp.FromItemID = m_ItemID;
+                grp.FromItemID = m_SourceItem.ID;
                 grp.IsAttached = true;
                 grp.Position = grp.AttachedPos;
                 grp.Rotation = grp.AttachedRot;
@@ -381,7 +381,7 @@ namespace SilverSim.Scene.Agent
 #endif
                 try
                 {
-                    m_Scene.Add(grp);
+                    m_Scene.RezObject(grp, m_RezzingAgent, m_SourceItem);
                     m_AttachmentsList.Add(grp.AttachPoint, grp);
                 }
                 catch
@@ -389,8 +389,6 @@ namespace SilverSim.Scene.Agent
                     SendAlertMessage("ALERT: RezAttemptFailed");
                     return;
                 }
-                m_Scene.RezScriptsForObject(grp);
-                grp.PostEvent(new OnRezEvent());
                 grp.PostEvent(new AttachEvent { ObjectID = grp.Owner.ID });
             }
 

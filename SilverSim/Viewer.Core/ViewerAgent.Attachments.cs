@@ -161,12 +161,12 @@ namespace SilverSim.Viewer.Core
 
             new RezAttachmentHandler(
                 Circuits[SceneID].Scene,
-                itemID,
                 item.AssetID,
                 AssetService,
                 Owner,
                 attachpointFlagged,
-                Attachments).QueueWorkItem();
+                Attachments,
+                item).QueueWorkItem();
         }
 
         protected override void DetachAttachment(DetachEntry entry)
@@ -218,6 +218,8 @@ namespace SilverSim.Viewer.Core
                     else
                     {
                         item.AssetID = newAssetID;
+                        /* we stored the new perm flags in asset, so no need for overwrite anymore */
+                        item.Flags &= ~InventoryFlags.PermOverwriteMask;
                         InventoryService.Item.Update(item);
                     }
                 }
