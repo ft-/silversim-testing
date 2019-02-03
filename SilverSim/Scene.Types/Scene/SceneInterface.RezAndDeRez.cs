@@ -230,15 +230,22 @@ namespace SilverSim.Scene.Types.Scene
 
                     foreach (ObjectPartInventoryItem item in part.Inventory.ValuesByKey1)
                     {
+                        bool isUpdated = false;
                         if ((invFlags & InventoryFlags.ObjectSlamPerm) != 0)
                         {
                             item.AdjustToNextOwner();
-                            part.Inventory.TriggerItemUpdated(item.ID);
+                            isUpdated = true;
                         }
-                        else if((invFlags & InventoryFlags.ObjectSlamSale) != 0 &&
+
+                        if ((invFlags & InventoryFlags.ObjectSlamSale) != 0 &&
                             sourceItem.AssetType == AssetType.Object)
                         {
                             item.Flags |= InventoryFlags.ObjectSlamSale;
+                            isUpdated = true;
+                        }
+
+                        if(isUpdated)
+                        {
                             part.Inventory.TriggerItemUpdated(item.ID);
                         }
                     }
