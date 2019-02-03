@@ -471,6 +471,21 @@ namespace SilverSim.Scene.Types.Object
         {
             throw new NotSupportedException("ObjectPartInventory.Remove(UUID, string)");
         }
+
+        public InventoryPermissionsMask CheckAffectablePerms()
+        {
+            InventoryPermissionsMask transferPerm = InventoryPermissionsMask.Transfer;
+            InventoryPermissionsMask copyPerm = InventoryPermissionsMask.Copy;
+            foreach (ObjectPartInventoryItem checkItem in ValuesByKey1)
+            {
+                transferPerm &= checkItem.Permissions.Base;
+                if (checkItem.AssetType.IsNoCopyAffectingContainingObject())
+                {
+                    copyPerm &= checkItem.Permissions.Base;
+                }
+            }
+            return transferPerm | copyPerm;
+        }
         #endregion
 
         #region XML Deserialization

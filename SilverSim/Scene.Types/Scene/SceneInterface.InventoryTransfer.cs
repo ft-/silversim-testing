@@ -59,6 +59,16 @@ namespace SilverSim.Scene.Types.Scene
 
             public override void AssetTransferComplete()
             {
+                if ((m_Item.Permissions.Base & InventoryPermissionsMask.Transfer) == 0)
+                {
+                    m_Part.OwnerMask &= ~InventoryPermissionsMask.Transfer;
+                }
+
+                if (m_Item.AssetType.IsNoCopyAffectingContainingObject() && (m_Item.Permissions.Base & InventoryPermissionsMask.Copy) == 0)
+                {
+                    m_Part.OwnerMask &= ~InventoryPermissionsMask.Copy;
+                }
+
                 m_Part.Inventory.Add(m_Item);
             }
 

@@ -67,6 +67,23 @@ namespace SilverSim.Types.Asset
 
     public static class AssetTypeExtensionMethods
     {
+        public static bool IsNoCopyAffectingContainingObject(this AssetType v)
+        {
+            bool affecting = false;
+            switch(v)
+            {
+                case AssetType.Object:
+                case AssetType.Gesture:
+                case AssetType.Clothing:
+                case AssetType.Bodypart:
+                case AssetType.Settings:
+                    affecting = true;
+                    break;
+            }
+
+            return affecting;
+        }
+
         public static string AssetTypeToString(this AssetType v)
         {
             switch (v)

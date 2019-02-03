@@ -213,6 +213,16 @@ namespace SilverSim.Scene.Types.Scene
                 {
                     /* no need for an assettransferer here */
 
+                    if((item.Permissions.Base & InventoryPermissionsMask.Transfer) == 0)
+                    {
+                        part.OwnerMask &= ~InventoryPermissionsMask.Transfer;
+                    }
+
+                    if(item.AssetType.IsNoCopyAffectingContainingObject() && (item.Permissions.Base & InventoryPermissionsMask.Copy) == 0)
+                    {
+                        part.OwnerMask &= ~InventoryPermissionsMask.Copy;
+                    }
+
                     part.Inventory.Add(item);
 
                     part.SendObjectUpdate();
@@ -403,6 +413,8 @@ namespace SilverSim.Scene.Types.Scene
                 UGUI owner = item.Owner;
                 var deletedItem = new InventoryItem(item);
                 part.Inventory.Remove(req.ItemID);
+                part.SetClrOwnerMask(part.BaseMask & part.Inventory.CheckAffectablePerms(), InventoryPermissionsMask.None);
+
                 InventoryServiceInterface inventoryService;
                 AssetServiceInterface assetService;
                 if(deletedItem.AssetType == AssetType.LSLText && DoNotAddScriptsToTrashFolder)
