@@ -23,7 +23,6 @@
 #pragma warning disable RCS1029
 
 using SilverSim.Scene.Types.Object;
-using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Asset;
