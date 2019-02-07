@@ -35,6 +35,7 @@ namespace SilverSim.Types.Asset
         Object = 6,
         Notecard = 7,
         RootFolder = 8,
+        Folder = 8,
         LSLText = 10,
         LSLBytecode = 11,
         TextureTGA = 12,

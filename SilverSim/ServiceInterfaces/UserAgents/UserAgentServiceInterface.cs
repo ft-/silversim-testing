@@ -22,6 +22,7 @@
 using SilverSim.Types;
 using SilverSim.Types.Account;
 using SilverSim.Types.Agent;
+using SilverSim.Types.Asset;
 using SilverSim.Types.Grid;
 using SilverSim.Types.ServerURIs;
 using System;
@@ -63,6 +64,13 @@ namespace SilverSim.ServiceInterfaces.UserAgents
         }
 
         public abstract bool IsOnline(UGUI user);
+
+        public virtual bool SupportsInitiateInventoryTransfer => false;
+
+        public virtual void InitiateInventoryTransfer(UGUI dstAgent, UGUI fromAgent, AssetType assetType, UUID inventoryID)
+        {
+            throw new NotSupportedException();
+        }
 
         public virtual void Reauth()
         {
