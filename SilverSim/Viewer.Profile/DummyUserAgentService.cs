@@ -50,6 +50,8 @@ namespace SilverSim.Viewer.Profile
             return false;
         }
 
+        public override bool RequiresInventoryIDAsIMSessionID => false;
+
         public override DestinationInfo GetHomeRegion(UGUI user)
         {
             throw new NotSupportedException();

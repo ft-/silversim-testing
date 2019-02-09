@@ -65,9 +65,21 @@ namespace SilverSim.ServiceInterfaces.UserAgents
 
         public abstract bool IsOnline(UGUI user);
 
-        public virtual bool SupportsInitiateInventoryTransfer => false;
+        public virtual bool SupportsInventoryTransfer => false;
 
-        public virtual void InitiateInventoryTransfer(UGUI dstAgent, UGUI fromAgent, AssetType assetType, UUID inventoryID)
+        public abstract bool RequiresInventoryIDAsIMSessionID { get; }
+
+        public virtual void InitiateInventoryTransfer(UGUI dstAgent, UGUI fromAgent, AssetType assetType, UUID inventoryID, UUID srcTransactionID)
+        {
+            throw new NotSupportedException();
+        }
+
+        public virtual void AcceptInventoryTransfer(UUID agentid, UUID ownTransactionID)
+        {
+            throw new NotSupportedException();
+        }
+
+        public virtual void DeclineInventoryTransfer(UUID agentid, UUID ownTransactionID)
         {
             throw new NotSupportedException();
         }

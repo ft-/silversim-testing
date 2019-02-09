@@ -69,10 +69,115 @@ namespace SilverSim.Viewer.InventoryTransfer
             m_IMService = loader.GetService<IMServiceInterface>(m_IMServiceName);
         }
 
+        [IMMessageHandler(GridInstantMessageDialog.InventoryAccepted)]
+        public void HandleInventoryAccepted(ViewerAgent dstAgent, AgentCircuit circuit, Message m)
+        {
+            var im = (ImprovedInstantMessage)m;
+
+            UserAgentServiceInterface userAgentService = dstAgent.UserAgentService;
+            if(userAgentService == null)
+            {
+                return;
+            }
+
+            if(userAgentService.SupportsInventoryTransfer)
+            {
+                userAgentService.AcceptInventoryTransfer(im.ID);
+            }
+            else
+            {
+                SceneInterface scene = circuit.Scene;
+                if (scene == null)
+                {
+                    return;
+                }
+
+                UGUI toAgent;
+                if (!scene.AvatarNameService.TryGetValue(im.ToAgentID, out toAgent))
+                {
+                    /* pass the unresolved here */
+                    toAgent = new UGUI(im.ToAgentID);
+                }
+
+                var gim = new GridInstantMessage
+                {
+                    ToAgent = toAgent,
+                    FromAgent = dstAgent.NamedOwner,
+                    Message = string.Empty,
+                    IMSessionID = im.ID,
+                    Dialog = GridInstantMessageDialog.InventoryAccepted,
+                    RegionID = im.RegionID,
+                    Position = im.Position,
+                    ParentEstateID = im.ParentEstateID
+                };
+                m_IMService.Send(gim);
+            }
+        }
+
+        [IMMessageHandler(GridInstantMessageDialog.InventoryDeclined)]
+        public void HandleInventoryDeclined(ViewerAgent dstAgent, AgentCircuit circuit, Message m)
+        {
+            var im = (ImprovedInstantMessage)m;
+
+            UserAgentServiceInterface userAgentService = dstAgent.UserAgentService;
+            InventoryServiceInterface inventorySerice = dstAgent.InventoryService;
+            if (userAgentService == null)
+            {
+                return;
+            }
+
+            if (userAgentService.SupportsInventoryTransfer)
+            {
+                userAgentService.DeclineInventoryTransfer(im.ID);
+            }
+            else
+            {
+                SceneInterface scene = circuit.Scene;
+                if (scene == null)
+                {
+                    return;
+                }
+
+                UGUI toAgent;
+                if (!scene.AvatarNameService.TryGetValue(im.ToAgentID, out toAgent))
+                {
+                    /* pass the unresolved here */
+                    toAgent = new UGUI(im.ToAgentID);
+                }
+
+                InventoryFolder trashFolder;
+                if (userAgentService.RequiresInventoryIDAsIMSessionID &&
+                    inventorySerice != null &&
+                    inventorySerice.Folder.TryGetValue(dstAgent.ID, AssetType.TrashFolder, out trashFolder))
+                {
+                    if(inventorySerice.Item.ContainsKey(dstAgent.ID, im.ID))
+                    {
+                        inventorySerice.Item.Move(dstAgent.ID, im.ID, trashFolder.ID);
+                    }
+                    else
+                    {
+                        inventorySerice.Folder.Move(dstAgent.ID, im.ID, trashFolder.ID);
+                    }
+                }
+
+                var gim = new GridInstantMessage
+                {
+                    ToAgent = toAgent,
+                    FromAgent = dstAgent.NamedOwner,
+                    Message = string.Empty,
+                    IMSessionID = im.ID,
+                    Dialog = GridInstantMessageDialog.InventoryDeclined,
+                    RegionID = im.RegionID,
+                    Position = im.Position,
+                    ParentEstateID = im.ParentEstateID
+                };
+                m_IMService.Send(gim);
+            }
+        }
+
         [IMMessageHandler(GridInstantMessageDialog.InventoryOffered)]
         public void HandleInventoryOffered(ViewerAgent srcAgent, AgentCircuit circuit, Message m)
         {
-            /* first UUID is the relevant */
             var im = (ImprovedInstantMessage)m;
 
             UGUI dstAgent;
@@ -82,7 +187,6 @@ namespace SilverSim.Viewer.InventoryTransfer
                 return;
             }
 
-
             if (im.BinaryBucket.Length < 17)
             {
                 return;
@@ -91,7 +195,7 @@ namespace SilverSim.Viewer.InventoryTransfer
             AssetType type = (AssetType)im.BinaryBucket[0];
             UUID inventoryId = new UUID(im.BinaryBucket, 1);
 
-            if(srcAgent.UserAgentService.SupportsInitiateInventoryTransfer)
+            if(srcAgent.UserAgentService.SupportsInventoryTransfer)
             {
                 if (!scene.AvatarNameService.TryGetValue(im.ToAgentID, out dstAgent))
                 {
@@ -99,7 +203,7 @@ namespace SilverSim.Viewer.InventoryTransfer
                     dstAgent = new UGUI(im.ToAgentID);
                 }
 
-                srcAgent.UserAgentService.InitiateInventoryTransfer(dstAgent, srcAgent.Owner, type, inventoryId);
+                srcAgent.UserAgentService.InitiateInventoryTransfer(dstAgent, srcAgent.Owner, type, inventoryId, im.ID);
                 return;
             }
 
@@ -415,7 +519,7 @@ namespace SilverSim.Viewer.InventoryTransfer
                     ToAgent = m_DestinationAgent,
                     FromAgent = m_SrcAgent,
                     Message = givenName,
-                    IMSessionID = m_TransactionID,
+                    IMSessionID = m_DstUserAgentService.RequiresInventoryIDAsIMSessionID ? givenID : m_TransactionID,
                     Dialog = GridInstantMessageDialog.InventoryOffered,
                     BinaryBucket = binbuck,
                     RegionID = m_RegionID,
