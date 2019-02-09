@@ -35,6 +35,33 @@ namespace SilverSim.ServiceInterfaces.Inventory.Transferer
 {
     public static class InventoryTransferer
     {
+        public static bool StartTransferLocal(
+            UUID transactionID,
+            UGUI dstAgent,
+            IReadOnlyList<IUserAgentServicePlugin> userAgentServicePlugins,
+            IReadOnlyList<IInventoryServicePlugin> inventoryServicePlugins,
+            IReadOnlyList<IAssetServicePlugin> assetServicePlugins,
+            UGUIWithName srcAgent,
+            InventoryServiceInterface srcInventoryService,
+            AssetServiceInterface srcAssetService,
+            AssetType givenAssetType,
+            UUID givenInventoryID,
+            IMServiceInterface imService,
+            Action<UUID> inventoryCreate = null) => StartTransfer(
+                transactionID,
+                dstAgent,
+                userAgentServicePlugins,
+                inventoryServicePlugins,
+                assetServicePlugins,
+                srcAgent,
+                null,
+                srcInventoryService,
+                srcAssetService,
+                givenAssetType,
+                givenInventoryID,
+                imService,
+                inventoryCreate);
+
         public static bool StartTransfer(
             UUID transactionID,
             UGUI dstAgent,
@@ -47,7 +74,8 @@ namespace SilverSim.ServiceInterfaces.Inventory.Transferer
             AssetServiceInterface srcAssetService,
             AssetType givenAssetType,
             UUID givenInventoryID,
-            IMServiceInterface imService)
+            IMServiceInterface imService,
+            Action<UUID> inventoryCreate = null)
         {
             InventoryServiceInterface dstInventoryService = null;
             AssetServiceInterface dstAssetService = null;
@@ -109,9 +137,37 @@ namespace SilverSim.ServiceInterfaces.Inventory.Transferer
                 srcAssetService,
                 givenAssetType,
                 givenInventoryID,
-                imService);
+                imService,
+                inventoryCreate);
             return true;
         }
+
+        public static void StartTransferLocal(
+            UUID transactionID,
+            UGUI dstAgent,
+            UserAgentServiceInterface dstUserAgentService,
+            InventoryServiceInterface dstInventoryService,
+            AssetServiceInterface dstAssetService,
+            UGUIWithName srcAgent,
+            InventoryServiceInterface srcInventoryService,
+            AssetServiceInterface srcAssetService,
+            AssetType givenAssetType,
+            UUID givenInventoryID,
+            IMServiceInterface imService,
+            Action<UUID> inventoryCreate = null) => StartTransfer(
+                transactionID,
+                dstAgent,
+                dstUserAgentService,
+                dstInventoryService,
+                dstAssetService,
+                srcAgent,
+                null,
+                srcInventoryService,
+                srcAssetService,
+                givenAssetType,
+                givenInventoryID,
+                imService,
+                inventoryCreate);
 
         public static void StartTransfer(
             UUID transactionID,
@@ -125,7 +181,8 @@ namespace SilverSim.ServiceInterfaces.Inventory.Transferer
             AssetServiceInterface srcAssetService,
             AssetType givenAssetType,
             UUID givenInventoryID,
-            IMServiceInterface imService)
+            IMServiceInterface imService,
+            Action<UUID> inventoryCreate = null)
         {
             if(dstUserAgentService == null)
             {
@@ -140,11 +197,6 @@ namespace SilverSim.ServiceInterfaces.Inventory.Transferer
             if (dstAssetService == null)
             {
                 throw new ArgumentNullException(nameof(dstAssetService));
-            }
-
-            if (srcUserAgentService == null)
-            {
-                throw new ArgumentNullException(nameof(srcUserAgentService));
             }
 
             if (srcInventoryService == null)
@@ -162,7 +214,7 @@ namespace SilverSim.ServiceInterfaces.Inventory.Transferer
                 throw new ArgumentNullException(nameof(imService));
             }
 
-            if (srcUserAgentService.SupportsInventoryTransfer)
+            if (srcUserAgentService != null && srcUserAgentService.SupportsInventoryTransfer)
             {
                 srcUserAgentService.InitiateInventoryTransfer(dstAgent, srcAgent, givenAssetType, givenInventoryID, transactionID);
                 return;
@@ -189,7 +241,8 @@ namespace SilverSim.ServiceInterfaces.Inventory.Transferer
                             srcAssetService,
                             assetids,
                             transferFolder,
-                            imService).QueueWorkItem();
+                            imService,
+                            inventoryCreate).QueueWorkItem();
                     }
                 }
             }
@@ -212,7 +265,8 @@ namespace SilverSim.ServiceInterfaces.Inventory.Transferer
                         dstAssetService,
                         item.AssetID,
                         item,
-                        imService).QueueWorkItem();
+                        imService,
+                        inventoryCreate).QueueWorkItem();
                 }
             }
         }
@@ -280,6 +334,7 @@ namespace SilverSim.ServiceInterfaces.Inventory.Transferer
             private readonly InventoryItem m_Item;
             private readonly UUID m_TransactionID;
             private readonly IMServiceInterface m_IMService;
+            private readonly Action<UUID> m_InventoryCreate;
 
             public InventoryTransferWorkItem(
                 UUID transactionID,
@@ -292,7 +347,8 @@ namespace SilverSim.ServiceInterfaces.Inventory.Transferer
                 AssetServiceInterface srcAssetService,
                 List<UUID> assetids,
                 TransferInventoryFolder inventoryTree,
-                IMServiceInterface imService)
+                IMServiceInterface imService,
+                Action<UUID> inventoryCreate)
                 : base(dstAssetService, srcAssetService, assetids, ReferenceSource.Source)
             {
                 m_TransactionID = transactionID;
@@ -303,6 +359,7 @@ namespace SilverSim.ServiceInterfaces.Inventory.Transferer
                 m_InventoryTree = inventoryTree;
                 m_SrcAgent = srcAgent;
                 m_IMService = imService;
+                m_InventoryCreate = inventoryCreate;
             }
 
             public InventoryTransferWorkItem(
@@ -316,7 +373,8 @@ namespace SilverSim.ServiceInterfaces.Inventory.Transferer
                 AssetServiceInterface srcAssetService,
                 UUID assetid,
                 InventoryItem item,
-                IMServiceInterface imService)
+                IMServiceInterface imService,
+                Action<UUID> inventoryCreate)
                 : base(dstAssetService, srcAssetService, assetid, ReferenceSource.Source)
             {
                 m_TransactionID = transactionID;
@@ -327,6 +385,7 @@ namespace SilverSim.ServiceInterfaces.Inventory.Transferer
                 m_Item = item;
                 m_SrcAgent = srcAgent;
                 m_IMService = imService;
+                m_InventoryCreate = inventoryCreate;
             }
 
             public override void AssetTransferComplete()
@@ -409,6 +468,8 @@ namespace SilverSim.ServiceInterfaces.Inventory.Transferer
                 var binbuck = new byte[17];
                 binbuck[0] = (byte)assetType;
                 givenID.ToBytes(binbuck, 1);
+
+                m_InventoryCreate?.Invoke(givenID);
 
                 var im = new GridInstantMessage
                 {
