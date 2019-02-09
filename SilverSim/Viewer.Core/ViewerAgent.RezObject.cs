@@ -23,6 +23,7 @@ using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Transfer;
 using SilverSim.ServiceInterfaces.Asset;
+using SilverSim.ServiceInterfaces.Asset.Transferer;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Asset.Format;

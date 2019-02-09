@@ -21,8 +21,8 @@
 
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
-using SilverSim.Scene.Types.Transfer;
 using SilverSim.ServiceInterfaces.Asset;
+using SilverSim.ServiceInterfaces.Asset.Transferer;
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
