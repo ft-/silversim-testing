@@ -25,7 +25,7 @@ namespace SilverSim.Types.Inventory
 {
     public sealed class InventoryTransferInfo
     {
-        public UGUIWithName SrcAgent;
+        public UGUI SrcAgent;
         public UGUI DstAgent;
         public UUID SrcTransactionID;
         public UUID DstTransactionID;
@@ -39,7 +39,7 @@ namespace SilverSim.Types.Inventory
 
         public InventoryTransferInfo(InventoryTransferInfo src)
         {
-            SrcAgent = new UGUIWithName(src.SrcAgent);
+            SrcAgent = new UGUI(src.SrcAgent);
             DstAgent = new UGUI(src.DstAgent);
             SrcTransactionID = src.SrcTransactionID;
             DstTransactionID = src.DstTransactionID;
