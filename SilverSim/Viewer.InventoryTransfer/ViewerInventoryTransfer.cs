@@ -82,7 +82,7 @@ namespace SilverSim.Viewer.InventoryTransfer
 
             if(userAgentService.SupportsInventoryTransfer)
             {
-                userAgentService.AcceptInventoryTransfer(im.ID);
+                userAgentService.AcceptInventoryTransfer(dstAgent.ID, im.ID);
             }
             else
             {
@@ -128,7 +128,7 @@ namespace SilverSim.Viewer.InventoryTransfer
 
             if (userAgentService.SupportsInventoryTransfer)
             {
-                userAgentService.DeclineInventoryTransfer(im.ID);
+                userAgentService.DeclineInventoryTransfer(dstAgent.ID, im.ID);
             }
             else
             {
