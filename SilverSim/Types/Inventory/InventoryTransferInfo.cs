@@ -31,5 +31,20 @@ namespace SilverSim.Types.Inventory
         public UUID DstTransactionID;
         public AssetType AssetType;
         public UUID InventoryID;
+
+        public InventoryTransferInfo()
+        {
+
+        }
+
+        public InventoryTransferInfo(InventoryTransferInfo src)
+        {
+            SrcAgent = new UGUIWithName(src.SrcAgent);
+            DstAgent = new UGUI(src.DstAgent);
+            SrcTransactionID = src.SrcTransactionID;
+            DstTransactionID = src.DstTransactionID;
+            AssetType = src.AssetType;
+            InventoryID = src.InventoryID;
+        }
     }
 }
