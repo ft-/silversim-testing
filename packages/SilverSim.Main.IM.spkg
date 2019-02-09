@@ -7,6 +7,8 @@
 		<use-if-started-as>simulator</use-if-started-as>
 		<use-if-started-as>standalone</use-if-started-as>
 		<use-if-started-as>grid</use-if-started-as>
+		<use-if-started-as>userserver</use-if-started-as>
+		<use-if-started-as>mapserver</use-if-started-as>
 	</default-configuration>
 	<files>
 		<file name="bin/plugins/SilverSim.Main.IM.dll" is-version-src="true"/>
