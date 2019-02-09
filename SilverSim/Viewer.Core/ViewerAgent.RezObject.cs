@@ -278,7 +278,6 @@ namespace SilverSim.Viewer.Core
                     return;
                 }
 
-
                 if (!scene.AssetService.TryGetValue(item.AssetID, out data))
                 {
                     return;

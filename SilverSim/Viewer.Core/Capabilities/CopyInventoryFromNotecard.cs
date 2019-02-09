@@ -120,7 +120,7 @@ namespace SilverSim.Viewer.Core.Capabilities
             AssetData data;
             AssetServiceInterface sourceAssetService = null;
 
-            if (objectID != null)
+            if (objectID != UUID.Zero)
             {
                 ObjectPart part;
                 ObjectPartInventoryItem item;
@@ -130,7 +130,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 if (m_Scene.Primitives.TryGetValue(objectID, out part) &&
                     part.Inventory.TryGetValue(itemID, out item) &&
                     item.InventoryType == InventoryType.Notecard &&
-                    (destinationFolderID == UUID.Zero || m_Agent.InventoryService.Folder.TryGetValue(destinationFolderID, out destinationFolder)) &&
+                    (destinationFolderID == UUID.Zero || m_Agent.InventoryService.Folder.TryGetValue(m_Agent.ID, destinationFolderID, out destinationFolder)) &&
                     m_Scene.AssetService.TryGetValue(item.AssetID, out data))
                 {
                     nc = new Notecard(data);
@@ -144,7 +144,7 @@ namespace SilverSim.Viewer.Core.Capabilities
 
                 if (m_Agent.InventoryService.Item.TryGetValue(m_Agent.ID, itemID, out item) &&
                     item.InventoryType == InventoryType.Notecard &&
-                    (destinationFolderID == UUID.Zero || m_Agent.InventoryService.Folder.TryGetValue(destinationFolderID, out destinationFolder)) &&
+                    (destinationFolderID == UUID.Zero || m_Agent.InventoryService.Folder.TryGetValue(m_Agent.ID, destinationFolderID, out destinationFolder)) &&
                     m_Agent.AssetService.TryGetValue(item.AssetID, out data))
                 {
                     nc = new Notecard(data);
