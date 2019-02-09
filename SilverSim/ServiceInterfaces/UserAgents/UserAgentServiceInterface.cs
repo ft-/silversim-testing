@@ -69,7 +69,7 @@ namespace SilverSim.ServiceInterfaces.UserAgents
 
         public abstract bool RequiresInventoryIDAsIMSessionID { get; }
 
-        public virtual void InitiateInventoryTransfer(UGUI dstAgent, UGUI fromAgent, AssetType assetType, UUID inventoryID, UUID srcTransactionID)
+        public virtual bool InitiateInventoryTransfer(UGUI dstAgent, UGUI fromAgent, AssetType assetType, UUID inventoryID, UUID srcTransactionID)
         {
             throw new NotSupportedException();
         }
