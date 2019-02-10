@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using log4net;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Asset.Transferer;
 using SilverSim.ServiceInterfaces.IM;
@@ -35,6 +36,8 @@ namespace SilverSim.ServiceInterfaces.Inventory.Transferer
 {
     public static class InventoryTransferer
     {
+        private static readonly ILog m_Log = LogManager.GetLogger("INVENTORY TRANSFERER");
+
         public static bool StartTransferLocal(
             UUID transactionID,
             UGUI dstAgent,
@@ -83,6 +86,7 @@ namespace SilverSim.ServiceInterfaces.Inventory.Transferer
 
             if(dstAgent.HomeURI == null)
             {
+                m_Log.ErrorFormat("No route to agent id {0}", dstAgent.ID);
                 return false;
             }
 
@@ -98,6 +102,7 @@ namespace SilverSim.ServiceInterfaces.Inventory.Transferer
 
             if (dstUserAgentService == null)
             {
+                m_Log.ErrorFormat("No user agent service found to agent id {0}", dstAgent.ID);
                 return false;
             }
 
@@ -113,6 +118,7 @@ namespace SilverSim.ServiceInterfaces.Inventory.Transferer
             }
             if (dstAssetService == null)
             {
+                m_Log.ErrorFormat("No asset service found to agent id {0}", dstAgent.ID);
                 return false;
             }
 
@@ -127,6 +133,7 @@ namespace SilverSim.ServiceInterfaces.Inventory.Transferer
 
             if (dstInventoryService == null)
             {
+                m_Log.ErrorFormat("No inventory service found to agent id {0}", dstAgent.ID);
                 return false;
             }
 
