@@ -1373,6 +1373,14 @@ namespace SilverSim.Scene.Types.Object
                     paramList.Add(Size);
                     break;
 
+                case PrimitiveParamsType.Velocity:
+                    paramList.Add(Velocity);
+                    break;
+
+                case PrimitiveParamsType.Acceleration:
+                    paramList.Add(Acceleration);
+                    break;
+
                 case PrimitiveParamsType.AlphaMode:
                     localization.GetTexPrimitiveParams(enumerator, paramtype, paramList, "PRIM_ALPHAMODE");
                     break;
@@ -1767,6 +1775,14 @@ namespace SilverSim.Scene.Types.Object
 
                 case PrimitiveParamsType.Size:
                     Size = ParamsHelper.GetVector(enumerator, "PRIM_SIZE");
+                    break;
+
+                case PrimitiveParamsType.Velocity:
+                    Velocity = ParamsHelper.GetVector(enumerator, "PRIM_VELOCITY");
+                    break;
+
+                case PrimitiveParamsType.Acceleration:
+                    Acceleration = ParamsHelper.GetVector(enumerator, "PRIM_ACCELERATION");
                     break;
 
                 case PrimitiveParamsType.AlphaMode:

@@ -135,7 +135,9 @@ namespace SilverSim.Types.Primitive
         SitText = 12011,
         TouchText = 12012,
         TextureAnim = 12013,
-        CollisionSound = 12014
+        CollisionSound = 12014,
+        Velocity = 12015,
+        Acceleration = 12016
     }
 
     public static class PrimitiveParamsToLslMethodsExtension
