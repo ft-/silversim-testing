@@ -235,6 +235,9 @@ namespace SilverSim.ServiceInterfaces.Inventory.Transferer
             if (givenAssetType == AssetType.Folder)
             {
                 InventoryFolder folder;
+#if DEBUG
+                m_Log.DebugFormat("Sending folder {0} from {1} to {2}", givenInventoryID, srcAgent, dstAgent);
+#endif
                 if (srcInventoryService.Folder.TryGetValue(srcAgent.ID, givenInventoryID, out folder))
                 {
                     /* this has a whole bunch of such entries, but later only the first 17 bytes are kept and adjusted */
@@ -257,9 +260,18 @@ namespace SilverSim.ServiceInterfaces.Inventory.Transferer
                             inventoryCreate).QueueWorkItem();
                     }
                 }
+                else
+                {
+#if DEBUG
+                    m_Log.DebugFormat("Sending folder {0} from {1} to {2}: Not found", givenInventoryID, srcAgent, dstAgent);
+#endif
+                }
             }
             else
             {
+#if DEBUG
+                m_Log.DebugFormat("Sending item {0} from {1} to {2}", givenInventoryID, srcAgent, dstAgent);
+#endif
                 /* just some item */
                 InventoryItem item;
                 if (srcInventoryService.Item.TryGetValue(srcAgent.ID, givenInventoryID, out item) && 
@@ -279,6 +291,12 @@ namespace SilverSim.ServiceInterfaces.Inventory.Transferer
                         item,
                         imService,
                         inventoryCreate).QueueWorkItem();
+                }
+                else
+                {
+#if DEBUG
+                    m_Log.DebugFormat("Sending item {0} from {1} to {2}: Not found", givenInventoryID, srcAgent, dstAgent);
+#endif
                 }
             }
         }
@@ -402,6 +420,9 @@ namespace SilverSim.ServiceInterfaces.Inventory.Transferer
 
             public override void AssetTransferComplete()
             {
+#if DEBUG
+                m_Log.DebugFormat("Finished transfer {0} to {1}", m_SrcAgent, m_DestinationAgent);
+#endif
                 AssetType assetType = AssetType.Folder;
                 UUID givenID;
                 string givenName;
@@ -458,6 +479,9 @@ namespace SilverSim.ServiceInterfaces.Inventory.Transferer
                     if (!m_DstInventoryService.Folder.TryGetValue(m_DestinationAgent.ID, m_Item.AssetType, out folder) &&
                         !m_DstInventoryService.Folder.TryGetValue(m_DestinationAgent.ID, AssetType.RootFolder, out folder))
                     {
+#if DEBUG
+                        m_Log.DebugFormat("Folder not found for {0} of {1}", m_Item.AssetType, m_DestinationAgent);
+#endif
                         return;
                     }
                     UUID oldItemID = m_Item.ID;
