@@ -198,6 +198,10 @@ namespace SilverSim.Types.Primitive
                 case PrimitiveParamsType.UnSitTarget: return "PRIM_UNSIT_TARGET";
                 case PrimitiveParamsType.SitText: return "PRIM_SIT_TEXT";
                 case PrimitiveParamsType.TouchText: return "PRIM_TOUCH_TEXT";
+                case PrimitiveParamsType.TextureAnim: return "PRIM_TEXTURE_ANIM";
+                case PrimitiveParamsType.CollisionSound: return "PRIM_COLLISION_SOUND";
+                case PrimitiveParamsType.Velocity: return "PRIM_VELOCITY";
+                case PrimitiveParamsType.Acceleration: return "PRIM_ACCELERATION";
             }
             return string.Format("PRIM_{0}", (int)paramtype);
         }
