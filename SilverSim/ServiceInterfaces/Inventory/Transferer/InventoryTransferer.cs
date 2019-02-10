@@ -81,6 +81,11 @@ namespace SilverSim.ServiceInterfaces.Inventory.Transferer
             AssetServiceInterface dstAssetService = null;
             UserAgentServiceInterface dstUserAgentService = null;
 
+            if(dstAgent.HomeURI == null)
+            {
+                return false;
+            }
+
             var homeUri = dstAgent.HomeURI.ToString();
             var heloheaders = ServicePluginHelo.HeloRequest(homeUri);
             foreach (IUserAgentServicePlugin userAgentPlugin in userAgentServicePlugins)
