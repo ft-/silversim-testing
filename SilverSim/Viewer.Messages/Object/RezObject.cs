@@ -38,7 +38,7 @@ namespace SilverSim.Viewer.Messages.Object
         public struct RezDataS
         {
             public UUID FromTaskID;
-            public byte BypassRaycast;
+            public bool BypassRaycast;
             public Vector3 RayStart;
             public Vector3 RayEnd;
             public UUID RayTargetID;
@@ -89,7 +89,7 @@ namespace SilverSim.Viewer.Messages.Object
                 GroupID = p.ReadUUID()
             };
             m.RezData.FromTaskID = p.ReadUUID();
-            m.RezData.BypassRaycast = p.ReadUInt8();
+            m.RezData.BypassRaycast = p.ReadBoolean();
             m.RezData.RayStart = p.ReadVector3f();
             m.RezData.RayEnd = p.ReadVector3f();
             m.RezData.RayTargetID = p.ReadUUID();
@@ -131,7 +131,7 @@ namespace SilverSim.Viewer.Messages.Object
             p.WriteUUID(SessionID);
             p.WriteUUID(GroupID);
             p.WriteUUID(RezData.FromTaskID);
-            p.WriteUInt8(RezData.BypassRaycast);
+            p.WriteBoolean(RezData.BypassRaycast);
             p.WriteVector3f(RezData.RayStart);
             p.WriteVector3f(RezData.RayEnd);
             p.WriteUUID(RezData.RayTargetID);
