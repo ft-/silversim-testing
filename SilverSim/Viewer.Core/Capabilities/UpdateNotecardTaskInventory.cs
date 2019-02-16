@@ -106,6 +106,7 @@ namespace SilverSim.Viewer.Core.Capabilities
 
                 try
                 {
+                    item.Flags &= ~(InventoryFlags.NotecardSlamPerm | InventoryFlags.NotecardSlamSale);
                     part.Inventory.SetAssetID(item.ID, data.ID);
                 }
                 catch

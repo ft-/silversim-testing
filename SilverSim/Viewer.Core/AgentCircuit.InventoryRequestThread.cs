@@ -198,6 +198,7 @@ namespace SilverSim.Viewer.Core
             UUID assetID;
             bool denySpecificAssetsViaDirectAssetId = false;
             var req = (TransferRequest)m;
+            InventoryItem requestedItem = null;
             if (req.SourceType == SourceType.SimInventoryItem)
             {
                 var taskID = new UUID(req.Params, 48);
@@ -216,6 +217,8 @@ namespace SilverSim.Viewer.Core
                         SendAssetNotFound(req);
                         return;
                     }
+
+                    requestedItem = item;
 
                     if (item.AssetType == AssetType.LSLText)
                     {
@@ -248,7 +251,9 @@ namespace SilverSim.Viewer.Core
                         return;
                     }
 
-                    switch(item.AssetType)
+                    requestedItem = item;
+
+                    switch (item.AssetType)
                     {
                         case AssetType.LSLText:
                             if(!item.CheckPermissions(Agent.Owner, Agent.Group, InventoryPermissionsMask.Modify))
@@ -340,6 +345,23 @@ namespace SilverSim.Viewer.Core
                         SendAssetInsufficientPermissions(req);
                         return;
                 }
+            }
+
+            if (asset.Type == AssetType.Notecard && requestedItem != null && (requestedItem.Flags & (InventoryFlags.NotecardSlamPerm | InventoryFlags.NotecardSlamSale)) != 0)
+            {
+                Notecard nc = new Notecard(asset);
+                foreach (NotecardInventoryItem ncitem in nc.Inventory.Values)
+                {
+                    if ((requestedItem.Flags & InventoryFlags.NotecardSlamPerm) != 0)
+                    {
+                        ncitem.AdjustToNextOwner();
+                    }
+                    if((requestedItem.Flags & InventoryFlags.NotecardSlamSale) != 0)
+                    {
+                        ncitem.SaleInfo.Type = InventoryItem.SaleInfoData.SaleType.NoSale;
+                    }
+                }
+                asset.Data = nc.Asset().Data;
             }
 
             var ti = new TransferInfo

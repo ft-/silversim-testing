@@ -99,6 +99,7 @@ namespace SilverSim.Viewer.Core.Capabilities
 
                 try
                 {
+                    item.Flags &= ~(InventoryFlags.NotecardSlamPerm | InventoryFlags.NotecardSlamSale);
                     m_InventoryService.Item.Update(item);
                 }
                 catch
