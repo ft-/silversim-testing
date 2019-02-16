@@ -258,26 +258,17 @@ namespace SilverSim.Viewer.Core.Capabilities
 
         private UUID CreateInventoryItemFromNotecard(InventoryFolder destinationFolder, NotecardInventoryItem ncitem, uint callbackID)
         {
-            var item = new InventoryItem
+            var item = new InventoryItem(ncitem)
             {
-                InventoryType = ncitem.InventoryType,
-                AssetType = ncitem.AssetType,
-                Description = ncitem.Description,
-                Name = ncitem.Name
+                ParentFolderID = destinationFolder.ID
             };
-            item.LastOwner = item.Owner;
-            item.Owner = m_Agent.Owner;
-            item.Creator = ncitem.Creator;
-            item.SaleInfo.Type = InventoryItem.SaleInfoData.SaleType.NoSale;
-            item.SaleInfo.Price = 0;
-            item.SaleInfo.PermMask = InventoryPermissionsMask.All;
-            item.ParentFolderID = destinationFolder.ID;
+            item.SetNewID(UUID.Random);
 
-            item.Permissions.Base = ncitem.Permissions.Base & ncitem.Permissions.NextOwner;
-            item.Permissions.Current = ncitem.Permissions.NextOwner;
-            item.Permissions.Group = InventoryPermissionsMask.None;
-            item.Permissions.EveryOne = InventoryPermissionsMask.None;
-            item.Permissions.NextOwner = ncitem.Permissions.NextOwner;
+            if(item.Owner.EqualsGrid(m_Agent.Owner))
+            {
+                item.LastOwner = item.Owner;
+                item.Owner = m_Agent.Owner;
+            }
 
             m_Agent.InventoryService.Item.Add(item);
             m_Agent.SendMessageAlways(new Messages.Inventory.UpdateCreateInventoryItem(m_Agent.ID, true, UUID.Zero, item, callbackID), m_Scene.ID);
