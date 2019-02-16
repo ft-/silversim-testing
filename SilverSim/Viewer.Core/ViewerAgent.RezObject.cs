@@ -101,15 +101,13 @@ namespace SilverSim.Viewer.Core
                 restoreGroup = UGI.Unknown;
             }
 
-            var rezHandler = new AgentRezRestoreObjectHandler(
+            new AgentRezRestoreObjectHandler(
                 Circuits[m.CircuitSceneID].Scene,
                 item.AssetID,
                 AssetService,
                 Owner,
                 restoreGroup,
-                item);
-
-            ThreadPool.UnsafeQueueUserWorkItem(HandleAssetTransferWorkItem, rezHandler);
+                item).QueueWorkItem();
         }
 
         [PacketHandler(MessageType.RezObject)]
@@ -164,21 +162,13 @@ namespace SilverSim.Viewer.Core
                 NextOwnerMask = req.RezData.NextOwnerMask,
                 SourceItem = item
             };
-            var rezHandler = new AgentRezObjectHandler(
+            new AgentRezObjectHandler(
                 Circuits[m.CircuitSceneID].Scene,
                 rezparams.RayEnd,
                 item.AssetID,
                 AssetService,
                 Owner,
-                rezparams);
-
-            ThreadPool.UnsafeQueueUserWorkItem(HandleAssetTransferWorkItem, rezHandler);
-        }
-
-        private void HandleAssetTransferWorkItem(object o)
-        {
-            var wi = (AssetTransferWorkItem)o;
-            wi.ProcessAssetTransfer();
+                rezparams).QueueWorkItem();
         }
 
         [PacketHandler(MessageType.ObjectDuplicateOnRay)]
@@ -323,15 +313,13 @@ namespace SilverSim.Viewer.Core
                 EveryoneMask = req.RezData.EveryoneMask,
                 NextOwnerMask = req.RezData.NextOwnerMask
             };
-            var rezHandler = new AgentRezObjectHandler(
+            new AgentRezObjectHandler(
                 Circuits[m.CircuitSceneID].Scene,
                 rezparams.RayEnd,
                 assetids,
                 AssetService,
                 Owner,
-                rezparams);
-
-            ThreadPool.UnsafeQueueUserWorkItem(HandleAssetTransferWorkItem, rezHandler);
+                rezparams).QueueWorkItem();
         }
     }
 }
