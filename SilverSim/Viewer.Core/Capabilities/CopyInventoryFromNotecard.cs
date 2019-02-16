@@ -37,7 +37,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using System.Threading;
 
 namespace SilverSim.Viewer.Core.Capabilities
 {
@@ -185,8 +184,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                     }
                 }
 
-                var transferItem = new NotecardAssetTransfer(m_Agent.AssetService, sourceAssetService, transferItems);
-                ThreadPool.UnsafeQueueUserWorkItem(HandleAssetTransferWorkItem, transferItem);
+                new NotecardAssetTransfer(m_Agent.AssetService, sourceAssetService, transferItems).QueueWorkItem();
             }
 
             using (HttpResponse httpres = httpreq.BeginResponse())
@@ -197,12 +195,6 @@ namespace SilverSim.Viewer.Core.Capabilities
                     LlsdXml.Serialize(new Map(), outStream);
                 }
             }
-        }
-
-        private void HandleAssetTransferWorkItem(object o)
-        {
-            var wi = (AssetTransferWorkItem)o;
-            wi.ProcessAssetTransfer();
         }
 
         private UUID CreateInventoryItemFromNotecard(InventoryFolder destinationFolder, NotecardInventoryItem ncitem, uint callbackID)
