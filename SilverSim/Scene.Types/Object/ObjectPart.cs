@@ -848,7 +848,7 @@ namespace SilverSim.Scene.Types.Object
                     m_Permissions.Group &= newBase;
                     foreach (ObjectPartLocalizedInfo l in Localizations)
                     {
-                        l.SetBaseMask(value);
+                        l.SetBaseMask(newBase);
                         l.SetOwnerMask(m_Permissions.Current);
                         l.SetEveryoneMask(m_Permissions.EveryOne);
                         l.SetNextOwnerMask(m_Permissions.NextOwner);
@@ -858,6 +858,27 @@ namespace SilverSim.Scene.Types.Object
 
                 TriggerOnUpdate(0);
             }
+        }
+
+        public void AdjustToNextOwner()
+        {
+            lock (m_DataLock)
+            {
+                InventoryPermissionsMask newBase = m_Permissions.NextOwner | InventoryPermissionsMask.Move;
+                m_Permissions.Base = newBase;
+                m_Permissions.Current = newBase;
+                m_Permissions.EveryOne = newBase & InventoryPermissionsMask.Export;
+                m_Permissions.Group = InventoryPermissionsMask.None;
+                foreach (ObjectPartLocalizedInfo l in Localizations)
+                {
+                    l.SetBaseMask(newBase);
+                    l.SetOwnerMask(m_Permissions.Current);
+                    l.SetEveryoneMask(m_Permissions.EveryOne);
+                    l.SetGroupMask(m_Permissions.Group);
+                }
+            }
+
+            TriggerOnUpdate(0);
         }
 
         public void SetClrOwnerMask(InventoryPermissionsMask setflags, InventoryPermissionsMask clrflags)
@@ -1030,15 +1051,6 @@ namespace SilverSim.Scene.Types.Object
                 m_AllowUnsit = value;
                 TriggerOnUpdate(0);
             }
-        }
-
-        public void AdjustToNextOwner()
-        {
-            InventoryPermissionsMask nextOwner = NextOwnerMask;
-            BaseMask = nextOwner;
-            OwnerMask &= nextOwner;
-            EveryoneMask = nextOwner & InventoryPermissionsMask.Export;
-            GroupMask = InventoryPermissionsMask.None;
         }
 
         public InventoryPermissionsMask NextOwnerMask
