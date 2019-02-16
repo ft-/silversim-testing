@@ -80,6 +80,10 @@ namespace SilverSim.Types.Inventory
             {
                 Flags |= InventoryFlags.ObjectSlamPerm | InventoryFlags.ObjectSlamSale | InventoryFlags.ObjectPermOverwriteBase | InventoryFlags.ObjectPermOverwriteEveryOne | InventoryFlags.ObjectPermOverwriteGroup | InventoryFlags.ObjectPermOverwriteOwner;
             }
+            else if(AssetType == AssetType.Notecard)
+            {
+                Flags |= InventoryFlags.NotecardSlamPerm | InventoryFlags.NotecardSlamSale;
+            }
         }
         #endregion
 

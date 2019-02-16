@@ -476,8 +476,7 @@ namespace SilverSim.ServiceInterfaces.Inventory.Transferer
                 else
                 {
                     InventoryFolder folder;
-                    if (!m_DstInventoryService.Folder.TryGetValue(m_DestinationAgent.ID, m_Item.AssetType, out folder) &&
-                        !m_DstInventoryService.Folder.TryGetValue(m_DestinationAgent.ID, AssetType.RootFolder, out folder))
+                    if (!m_DstInventoryService.Folder.TryGetDefaultFolderOrFallback(m_DestinationAgent.ID, m_Item.AssetType, out folder))
                     {
 #if DEBUG
                         m_Log.DebugFormat("Folder not found for {0} of {1}", m_Item.AssetType, m_DestinationAgent);

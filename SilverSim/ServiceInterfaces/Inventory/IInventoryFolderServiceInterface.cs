@@ -68,4 +68,24 @@ namespace SilverSim.ServiceInterfaces.Inventory
         List<UUID> Delete(UUID principalID, List<UUID> folderIDs);
         #endregion
     }
+
+    public static class ExtensionFolderMethods
+    {
+        public static bool TryGetDefaultFolderOrFallback(
+            this IInventoryFolderServiceInterface folderServiceInterface, 
+            UUID principalID, 
+            AssetType type, 
+            out InventoryFolder folder) =>
+            folderServiceInterface.TryGetValue(principalID, type, out folder) ||
+            folderServiceInterface.TryGetValue(principalID, AssetType.Object, out folder);
+
+        public static bool TryGetSpecificOrDefaultFolderOrFallback(
+            this IInventoryFolderServiceInterface folderServiceInterface,
+            UUID principalID,
+            UUID specificFolder,
+            AssetType type,
+            out InventoryFolder folder) =>
+            folderServiceInterface.TryGetValue(principalID, specificFolder, out folder) || 
+            folderServiceInterface.TryGetDefaultFolderOrFallback(principalID, type, out folder);
+    }
 }

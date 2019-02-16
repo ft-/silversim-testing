@@ -28,6 +28,7 @@ using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Asset.Transferer;
+using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Asset.Format;
@@ -103,11 +104,6 @@ namespace SilverSim.Viewer.Core.Capabilities
                 return;
             }
 
-            if (!m_Agent.IsInScene(m_Scene))
-            {
-                return;
-            }
-
             var notecardID = reqmap["notecard-id"].AsUUID;
             var objectID = reqmap["object-id"].AsUUID;
             var itemID = reqmap["item-id"].AsUUID;
@@ -118,33 +114,37 @@ namespace SilverSim.Viewer.Core.Capabilities
             InventoryFolder destinationFolder = null;
             AssetData data;
             AssetServiceInterface sourceAssetService = null;
+            InventoryItem notecarditem;
 
             if (objectID != UUID.Zero)
             {
                 ObjectPart part;
-                ObjectPartInventoryItem item;
 
                 sourceAssetService = m_Scene.AssetService;
 
-                if (m_Scene.Primitives.TryGetValue(objectID, out part) &&
-                    part.Inventory.TryGetValue(itemID, out item) &&
-                    item.InventoryType == InventoryType.Notecard &&
-                    (destinationFolderID == UUID.Zero || m_Agent.InventoryService.Folder.TryGetValue(m_Agent.ID, destinationFolderID, out destinationFolder)) &&
-                    m_Scene.AssetService.TryGetValue(item.AssetID, out data))
+                if (!m_Scene.Primitives.TryGetValue(objectID, out part))
+                {
+                    httpreq.ErrorResponse(HttpStatusCode.NotFound);
+                    return;
+                }
+
+                ObjectPartInventoryItem objitem;
+
+                if (part.Inventory.TryGetValue(notecardID, out objitem) &&
+                    objitem.InventoryType == InventoryType.Notecard &&
+                    m_Scene.AssetService.TryGetValue(objitem.AssetID, out data))
                 {
                     nc = new Notecard(data);
                 }
+                notecarditem = objitem;
             }
             else
             {
-                InventoryItem item;
-
                 sourceAssetService = m_Agent.AssetService;
 
-                if (m_Agent.InventoryService.Item.TryGetValue(m_Agent.ID, itemID, out item) &&
-                    item.InventoryType == InventoryType.Notecard &&
-                    (destinationFolderID == UUID.Zero || m_Agent.InventoryService.Folder.TryGetValue(m_Agent.ID, destinationFolderID, out destinationFolder)) &&
-                    m_Agent.AssetService.TryGetValue(item.AssetID, out data))
+                if (m_Agent.InventoryService.Item.TryGetValue(m_Agent.ID, notecardID, out notecarditem) &&
+                    notecarditem.InventoryType == InventoryType.Notecard &&
+                    m_Agent.AssetService.TryGetValue(notecarditem.AssetID, out data))
                 {
                     nc = new Notecard(data);
                 }
@@ -152,26 +152,79 @@ namespace SilverSim.Viewer.Core.Capabilities
 
             var transferItems = new List<UUID>();
             var destFolder = new Dictionary<AssetType, InventoryFolder>();
+            InventoryFolder selectedDestFolder = null;
             if(nc != null)
             {
-                foreach (var ncitem in nc.Inventory.Values)
+                var invlist = new List<NotecardInventoryItem>();
+                if(itemID != UUID.Zero)
                 {
+                    NotecardInventoryItem ncitem;
+                    if(!nc.Inventory.TryGetValue(itemID, out ncitem))
+                    {
+                        httpreq.ErrorResponse(HttpStatusCode.NotFound);
+                        return;
+                    }
+                    else
+                    {
+                        invlist.Add(ncitem);
+                    }
+                }
+                else
+                {
+                    invlist.AddRange(nc.Inventory.Values);
+                }
+
+                foreach (var ncitem in invlist)
+                {
+                    ncitem.LastOwner = notecarditem.LastOwner;
+                    ncitem.Owner = m_Agent.Owner;
+                    if ((notecarditem.Flags & InventoryFlags.NotecardSlamPerm) != 0)
+                    {
+                        ncitem.AdjustToNextOwner();
+                    }
+
+                    if ((notecarditem.Flags & InventoryFlags.NotecardSlamSale) != 0)
+                    {
+                        if (notecarditem.AssetType == AssetType.Object)
+                        {
+                            ncitem.Flags |= InventoryFlags.ObjectSlamSale;
+                        }
+                        if (notecarditem.AssetType == AssetType.Notecard)
+                        {
+                            ncitem.Flags |= InventoryFlags.NotecardSlamSale;
+                        }
+                        ncitem.SaleInfo.Type = InventoryItem.SaleInfoData.SaleType.NoSale;
+                    }
+
                     try
                     {
-                        if(destinationFolderID == UUID.Zero &&
-                            !destFolder.ContainsKey(ncitem.AssetType))
+                        if(destinationFolderID == UUID.Zero)
                         {
-                            if(!m_Agent.InventoryService.Folder.TryGetValue(m_Agent.ID, ncitem.AssetType, out destinationFolder) &&
-                                !m_Agent.InventoryService.Folder.TryGetValue(m_Agent.ID, AssetType.Object, out destinationFolder))
+                            if (!destFolder.ContainsKey(ncitem.AssetType))
                             {
-                                m_Log.WarnFormat("Failed to copy notecard inventory {0} to agent {1} ({2}): No Folder found for {3}", ncitem.Name, m_Agent.NamedOwner.FullName, m_Agent.ID, ncitem.AssetType.ToString());
-                                continue;
+                                if (!m_Agent.InventoryService.Folder.TryGetDefaultFolderOrFallback(m_Agent.ID, ncitem.AssetType, out destinationFolder))
+                                {
+                                    m_Log.WarnFormat("Failed to copy notecard inventory {0} to agent {1} ({2}): No Folder found for {3}", ncitem.Name, m_Agent.NamedOwner.FullName, m_Agent.ID, ncitem.AssetType.ToString());
+                                    continue;
+                                }
+                                else
+                                {
+                                    destFolder.Add(ncitem.AssetType, destinationFolder);
+                                }
                             }
-                            else
-                            {
-                                destFolder.Add(ncitem.AssetType, destinationFolder);
-                            }
+                            ncitem.ParentFolderID = destinationFolder.ID;
                         }
+                        else if(selectedDestFolder != null ||
+                            m_Agent.InventoryService.Folder.TryGetSpecificOrDefaultFolderOrFallback(m_Agent.ID, destinationFolderID, ncitem.AssetType, out selectedDestFolder))
+                        {
+                            ncitem.ParentFolderID = selectedDestFolder.ID;
+                        }
+                        else
+                        {
+                            m_Log.WarnFormat("Failed to copy notecard inventory {0} to agent {1} ({2}): No Folder found for {3}", ncitem.Name, m_Agent.NamedOwner.FullName, m_Agent.ID, ncitem.AssetType.ToString());
+                            continue;
+                        }
+
                         var assetID = CreateInventoryItemFromNotecard(destinationFolder, ncitem, callbackID);
                         if (!transferItems.Contains(assetID))
                         {
@@ -184,7 +237,13 @@ namespace SilverSim.Viewer.Core.Capabilities
                     }
                 }
 
-                new NotecardAssetTransfer(m_Agent.AssetService, sourceAssetService, transferItems).QueueWorkItem();
+                if (objectID != UUID.Zero)
+                {
+                    /* no need to wait for its completion since for the sim processing it the assets are either available through sim assets or user assets 
+                     * only transfer assets if it is from prim inventory notecard to user inventory.
+                     */
+                    new NotecardAssetTransfer(m_Agent.AssetService, sourceAssetService, transferItems).QueueWorkItem();
+                }
             }
 
             using (HttpResponse httpres = httpreq.BeginResponse())

@@ -79,6 +79,19 @@ namespace SilverSim.Types.Inventory
 
         #endregion
 
+        #region inventorytype_notecard
+
+        /** <summary>When set, apply next owner permissions instead of base permissions. Triggers setting ObjectSlamPerm.</summary> 
+         * <remarks>Reset when assetid is updated.</remarks>
+         */
+        NotecardSlamPerm = 1 << 8,
+
+        /** <summary>When set the sale information has been changed. Triggers setting ObjectSlamSale.</summary> 
+         * <remarks>Reset when assetid is updated.</remarks>
+         */
+        NotecardSlamSale = 1 << 12,
+        #endregion
+
         #region inventorytype wearable
         WearablesTypeMask = 0xFF,
 
