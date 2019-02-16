@@ -103,6 +103,11 @@ namespace SilverSim.Scene.Types.Transfer
                 }
             }
 
+            if (objgroups.Count == 1 && m_RezParams.SourceItem != null)
+            {
+                objgroups[0].Name = m_RezParams.SourceItem.Name;
+            }
+
             try
             {
                 m_Scene.RezObjects(objgroups, m_RezParams);
@@ -111,7 +116,6 @@ namespace SilverSim.Scene.Types.Transfer
             {
                 m_Log.Error(string.Format("Failed to rez object in scene {0} ({1})", m_Scene.Name, m_Scene.ID), e);
                 SendAlertMessage("ALERT: RezAttemptFailed");
-                return;
             }
         }
 
@@ -176,6 +180,11 @@ namespace SilverSim.Scene.Types.Transfer
                 m_Log.Error(string.Format("Unable to decode asset {0} to rez", data.ID), e);
                 SendAlertMessage("ALERT: RezAttemptFailed");
                 return;
+            }
+
+            if(objgroups.Count == 1 && m_SourceItem != null)
+            {
+                objgroups[0].Name = m_SourceItem.Name;
             }
 
             try
