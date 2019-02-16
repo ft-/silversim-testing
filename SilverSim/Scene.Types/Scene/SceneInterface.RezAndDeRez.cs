@@ -189,50 +189,42 @@ namespace SilverSim.Scene.Types.Scene
 
         private void HandleRezOverwritePerms(ObjectGroup group, InventoryItem sourceItem)
         {
-            m_Log.DebugFormat("Checking if rez overwrite perms apply for {0}", sourceItem.Name);
             InventoryFlags invFlags = sourceItem.Flags;
             if ((invFlags & InventoryFlags.PermOverwriteMask) != 0)
             {
                 if ((invFlags & InventoryFlags.ObjectSlamSale) != 0)
                 {
-                    m_Log.DebugFormat("Apply slam sale {0}", sourceItem.Name);
                     group.SaleType = InventoryItem.SaleInfoData.SaleType.NoSale;
                 }
                 foreach (ObjectPart part in group.ValuesByKey1)
                 {
                     if ((invFlags & InventoryFlags.ObjectPermOverwriteBase) != 0)
                     {
-                        m_Log.DebugFormat("Apply perm overwrite base perms of {0}: {1}", sourceItem.Name, sourceItem.Permissions.Base);
                         part.BaseMask = sourceItem.Permissions.Base;
                     }
 
                     if ((invFlags & InventoryFlags.ObjectPermOverwriteOwner) != 0)
                     {
-                        m_Log.DebugFormat("Apply perm overwrite current perms of {0}: {1}", sourceItem.Name, sourceItem.Permissions.Current);
                         part.OwnerMask = sourceItem.Permissions.Current;
                     }
 
                     if ((invFlags & InventoryFlags.ObjectPermOverwriteGroup) != 0)
                     {
-                        m_Log.DebugFormat("Apply perm overwrite group perms of {0}: {1}", sourceItem.Name, sourceItem.Permissions.Group);
                         part.GroupMask = sourceItem.Permissions.Group;
                     }
 
                     if ((invFlags & InventoryFlags.ObjectPermOverwriteEveryOne) != 0)
                     {
-                        m_Log.DebugFormat("Apply perm overwrite everyone perms of {0}: {1}", sourceItem.Name, sourceItem.Permissions.EveryOne);
                         part.EveryoneMask = sourceItem.Permissions.EveryOne;
                     }
 
                     if ((invFlags & InventoryFlags.ObjectPermOverwriteNextOwner) != 0)
                     {
-                        m_Log.DebugFormat("Apply perm overwrite nextowner perms of {0}: {1}", sourceItem.Name, sourceItem.Permissions.EveryOne);
                         part.NextOwnerMask = sourceItem.Permissions.NextOwner;
                     }
 
                     if ((invFlags & InventoryFlags.ObjectSlamPerm) != 0)
                     {
-                        m_Log.DebugFormat("Apply slam perm {0}", sourceItem.Name);
                         part.AdjustToNextOwner();
                     }
 
