@@ -811,11 +811,19 @@ namespace SilverSim.Scene.Types.Object
             lock (m_DataLock)
             {
                 value = (m_Permissions.Base | setflags) & ~clrflags;
+                value |= InventoryPermissionsMask.Move;
                 m_Permissions.Base = value;
-                m_Permissions.Current = (m_Permissions.Current & InventoryPermissionsMask.Move) | (value & ~InventoryPermissionsMask.Move);
+                m_Permissions.Current &= value;
+                m_Permissions.EveryOne &= value;
+                m_Permissions.NextOwner &= value;
+                m_Permissions.Group &= value;
                 foreach (ObjectPartLocalizedInfo l in Localizations)
                 {
                     l.SetBaseMask(value);
+                    l.SetOwnerMask(m_Permissions.Current);
+                    l.SetEveryoneMask(m_Permissions.EveryOne);
+                    l.SetNextOwnerMask(m_Permissions.NextOwner);
+                    l.SetGroupMask(m_Permissions.Group);
                 }
             }
 
@@ -832,11 +840,19 @@ namespace SilverSim.Scene.Types.Object
             {
                 lock (m_DataLock)
                 {
-                    m_Permissions.Base = value;
-                    m_Permissions.Current = (m_Permissions.Current & InventoryPermissionsMask.Move) | (value & ~InventoryPermissionsMask.Move);
+                    InventoryPermissionsMask newBase = value | InventoryPermissionsMask.Move;
+                    m_Permissions.Base = newBase;
+                    m_Permissions.Current &= newBase;
+                    m_Permissions.EveryOne &= newBase;
+                    m_Permissions.NextOwner &= newBase;
+                    m_Permissions.Group &= newBase;
                     foreach (ObjectPartLocalizedInfo l in Localizations)
                     {
                         l.SetBaseMask(value);
+                        l.SetOwnerMask(m_Permissions.Current);
+                        l.SetEveryoneMask(m_Permissions.EveryOne);
+                        l.SetNextOwnerMask(m_Permissions.NextOwner);
+                        l.SetGroupMask(m_Permissions.Group);
                     }
                 }
 
@@ -888,7 +904,7 @@ namespace SilverSim.Scene.Types.Object
             lock (m_DataLock)
             {
                 value = (m_Permissions.Group | setflags) & ~clrflags;
-                m_Permissions.Group = value;
+                m_Permissions.Group = value & m_Permissions.Base;
                 foreach (ObjectPartLocalizedInfo l in Localizations)
                 {
                     l.SetGroupMask(value);
@@ -932,7 +948,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 lock (m_DataLock)
                 {
-                    m_Permissions.Group = value;
+                    m_Permissions.Group = value & m_Permissions.Base;
                     foreach(ObjectPartLocalizedInfo l in Localizations)
                     {
                         l.SetGroupMask(value);
@@ -948,7 +964,7 @@ namespace SilverSim.Scene.Types.Object
             lock (m_DataLock)
             {
                 value = (m_Permissions.EveryOne | setflags) & ~clrflags;
-                m_Permissions.EveryOne = value;
+                m_Permissions.EveryOne = value & m_Permissions.Base;
                 foreach(ObjectPartLocalizedInfo l in Localizations)
                 {
                     l.SetEveryoneMask(value);
@@ -967,7 +983,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 lock (m_DataLock)
                 {
-                    m_Permissions.EveryOne = value;
+                    m_Permissions.EveryOne = value & m_Permissions.Base;
                     foreach (ObjectPartLocalizedInfo l in Localizations)
                     {
                         l.SetEveryoneMask(value);
