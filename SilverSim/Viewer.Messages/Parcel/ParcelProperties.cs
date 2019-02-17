@@ -92,6 +92,7 @@ namespace SilverSim.Viewer.Messages.Parcel
         public bool RegionDenyIdentified;
         public bool RegionDenyTransacted;
         public bool RegionDenyAgeUnverified;
+        public bool RegionAllowAccessOverride;
 
         public bool Privacy;
         public bool SeeAVs;
@@ -116,7 +117,7 @@ namespace SilverSim.Viewer.Messages.Parcel
             {
                 Array.Reverse(parcelFlags);
             }
-            var parcelArray = new AnArray
+            m.Add("ParcelData", new AnArray
             {
                 new MapType
                 {
@@ -174,10 +175,8 @@ namespace SilverSim.Viewer.Messages.Parcel
                     { "AnyAVSounds", AnyAVSounds },
                     { "GroupAVSounds", GroupAVSounds }
                 }
-            };
-            m.Add("ParcelData", parcelArray);
-
-            var mediaArray = new AnArray
+            });
+            m.Add("MediaData", new AnArray
             {
                 new MapType
                 {
@@ -189,17 +188,22 @@ namespace SilverSim.Viewer.Messages.Parcel
                     { "ObscureMedia", ObscureMedia },
                     { "ObscureMusic", ObscureMusic }
                 }
-            };
-            m.Add("MediaData", mediaArray);
-
-            var ageArray = new AnArray
+            });
+            m.Add("AgeVerificationBlock", new AnArray
             {
                 new MapType
                 {
                     { "RegionDenyAgeUnverified", RegionDenyAgeUnverified }
                 }
-            };
-            m.Add("AgeVerificationBlock", ageArray);
+            });
+            m.Add("RegionAllowAccessBlock", new AnArray
+            {
+                new MapType
+                {
+                    { "RegionAllowAccessOverride", RegionAllowAccessOverride }
+                }
+            });
+
             return m;
         }
 
@@ -209,6 +213,12 @@ namespace SilverSim.Viewer.Messages.Parcel
             var parcelData = (MapType)((AnArray)m["ParcelData"])[0];
             var mediaData = (MapType)((AnArray)m["MediaData"])[0];
             var ageData = (MapType)((AnArray)m["AgeVerificationBlock"])[0];
+            AnArray allowAccess;
+            bool regionAllowAccessOverride = false;
+            if(m.TryGetValue("RegionAllowAccessBlock", out allowAccess))
+            {
+                regionAllowAccessOverride = ((MapType)allowAccess[0])["RegionAllowAccessOverride"].AsBoolean;
+            }
             byte[] parcelflagsdata = (BinaryData)parcelData["ParcelFlags"];
             if(BitConverter.IsLittleEndian)
             {
@@ -251,6 +261,7 @@ namespace SilverSim.Viewer.Messages.Parcel
                 RegionDenyAnonymous = parcelData["RegionDenyAnonymous"].AsBoolean,
                 RegionDenyIdentified = parcelData["RegionDenyIdentified"].AsBoolean,
                 RegionPushOverride = parcelData["RegionPushOverride"].AsBoolean,
+                RegionAllowAccessOverride = regionAllowAccessOverride,
                 RentPrice = parcelData["RentPrice"].AsInt,
                 RequestResult = (RequestResultType)parcelData["RequestResult"].AsInt,
                 SalePrice = parcelData["SalePrice"].AsInt,
