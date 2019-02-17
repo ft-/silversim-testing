@@ -45,7 +45,7 @@ namespace SilverSim.Viewer.Core
                         { "display_name_next_update", new Date() },
                         { "legacy_first_name", Agent.FirstName },
                         { "mesh_upload_status", "valid" },
-                        { "display_name", Agent.FirstName + " " + Agent.LastName },
+                        { "display_name", Agent.DisplayName },
                         { "legacy_last_name", Agent.LastName },
                         { "id", Agent.ID },
                         { "is_display_name_default", false }
