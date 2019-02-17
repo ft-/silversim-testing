@@ -25,6 +25,7 @@
 
 using log4net;
 using SilverSim.Main.Common;
+using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Groups;
@@ -33,6 +34,7 @@ using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Profile;
+using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Viewer.Core;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Generic;
@@ -42,6 +44,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.IO;
+using System.Net;
 using System.Text;
 using System.Threading;
 using System.Timers;
@@ -877,6 +881,98 @@ namespace SilverSim.Viewer.Profile
                 IMViaEmail = prefs.IMviaEmail
             };
             agent.SendMessageAlways(reply, scene.ID);
+        }
+
+        [CapabilityHandler("UserInfo")]
+        public void HandleUserInfoRequest(ViewerAgent agent, AgentCircuit circuit, HttpRequest req)
+        {
+            if (req.CallerIP != circuit.RemoteIP)
+            {
+                req.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
+                return;
+            }
+            if (req.Method == "GET")
+            {
+                ProfilePreferences prefs;
+                Map resmap;
+                try
+                {
+                    prefs = agent.ProfileService.Preferences[agent.Owner];
+                    resmap = new Map
+                    {
+                        { "success", true },
+                        { "im_via_email", prefs.IMviaEmail },
+                        { "is_verified", false },
+                        { "email", string.Empty },
+                        { "directory_visibility", prefs.Visible }
+                    };
+                }
+                catch /* yes, we are catching a NullReferenceException here too */
+                {
+                    resmap = new Map
+                    {
+                        { "success", false }
+                    };
+                }
+
+
+                using (HttpResponse res = req.BeginResponse("application/llsd+xml"))
+                using (Stream s = res.GetOutputStream())
+                {
+                    LlsdXml.Serialize(resmap, s);
+                }
+            }
+            else if(req.Method == "POST")
+            {
+                Map reqmap;
+                try
+                {
+                    reqmap = LlsdXml.Deserialize(req.Body) as Map;
+                }
+                catch
+                {
+                    req.ErrorResponse(HttpStatusCode.BadRequest, "Bad request");
+                    return;
+                }
+
+                if (reqmap == null)
+                {
+                    req.ErrorResponse(HttpStatusCode.BadRequest, "Bad request");
+                    return;
+                }
+
+                if (agent.ProfileService == null)
+                {
+                    return;
+                }
+
+                var prefs = new ProfilePreferences
+                {
+                    User = agent.Owner,
+                    IMviaEmail = reqmap["im_via_email"].AsBoolean,
+                    Visible = reqmap["dir_visibility"].ToString() != "hidden"
+                };
+                Map resmap;
+                try
+                {
+                    agent.ProfileService.Preferences[agent.Owner] = prefs;
+                    resmap = new Map { { "success", true } };
+                }
+                catch
+                {
+                    agent.SendAlertMessage("Error updating preferences", circuit.Scene?.ID ?? UUID.Zero);
+                    resmap = new Map { { "success", false } };
+                }
+                using (HttpResponse res = req.BeginResponse("application/llsd+xml"))
+                using (Stream s = res.GetOutputStream())
+                {
+                    LlsdXml.Serialize(resmap, s);
+                }
+            }
+            else
+            {
+                req.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
+            }
         }
 
         private void HandleUpdateUserInfo(ViewerAgent agent, SceneInterface scene, Message m)
