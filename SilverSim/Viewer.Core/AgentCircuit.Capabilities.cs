@@ -354,6 +354,7 @@ namespace SilverSim.Viewer.Core
 
             AddDefCapabilityFactory("SimulatorFeatures", regionSeedID, (agent) => new SimulatorFeatures(agent, Server.Scene, RemoteIP), capConfig);
             AddDefCapability("UpdateAgentLanguage", regionSeedID, Cap_UpdateAgentLanguage, capConfig);
+            AddDefCapability("UntrustedSimulatorMessage", regionSeedID, Cap_UntrustedSimulatorMessage, capConfig);
             AddDefCapability("EnvironmentSettings", regionSeedID, Cap_EnvironmentSettings, capConfig);
             AddDefCapability("RenderMaterials", regionSeedID, Cap_RenderMaterials, capConfig);
             AddDefCapability("SimConsoleAsync", regionSeedID, Cap_SimConsoleAsyncCap, capConfig);

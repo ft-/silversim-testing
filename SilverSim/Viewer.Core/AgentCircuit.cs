@@ -1134,74 +1134,82 @@ namespace SilverSim.Viewer.Core
                         /* we keep the circuit relatively dumb so that we have no other logic than how to send and receive messages to the viewer.
                             * It merely collects delegates to other objects as well to call specific functions.
                             */
-                        Action<Message> mdel;
-                        if (m_MessageRouting.TryGetValue(m.Number, out mdel))
-                        {
-                            mdel(m);
-                        }
-                        else if(m.Number == MessageType.ImprovedInstantMessage)
-                        {
-                            var im = (ImprovedInstantMessage)m;
-                            if(im.CircuitAgentID != im.AgentID ||
-                                im.CircuitSessionID != im.SessionID)
-                            {
-                                break;
-                            }
-                            if(m_IMMessageRouting.TryGetValue(im.Dialog, out mdel))
-                            {
-                                mdel(m);
-                            }
-                            else
-                            {
-                                m_Log.DebugFormat("Unhandled im message {0} received", im.Dialog.ToString());
-                            }
-                        }
-                        else if (m.Number == MessageType.GenericMessage)
-                        {
-                            var genMsg = (GenericMessage)m;
-                            if (m_GenericMessageRouting.TryGetValue(genMsg.Method, out mdel))
-                            {
-                                mdel(m);
-                            }
-                            else
-                            {
-                                m_Log.DebugFormat("Unhandled generic message {0} received", genMsg.Method);
-                            }
-                        }
-                        else if(m.Number == MessageType.LargeGenericMessage)
-                        {
-                            var genMsg = (LargeGenericMessage)m;
-                            if(m_LargeGenericMessageRouting.TryGetValue(genMsg.Method, out mdel))
-                            {
-                                mdel(m);
-                            }
-                            else
-                            {
-                                m_Log.DebugFormat("Unhandled large generic message {0} received", genMsg.Method);
-                            }
-                        }
-                        else if (m.Number == MessageType.GodlikeMessage)
-                        {
-                            var genMsg = (GodlikeMessage)m;
-                            if (m_GodlikeMessageRouting.TryGetValue(genMsg.Method, out mdel))
-                            {
-                                mdel(m);
-                            }
-                            else
-                            {
-                                m_Log.DebugFormat("Unhandled godlike message {0} received", genMsg.Method);
-                            }
-                        }
-                        else
-                        {
-                            m_Log.DebugFormat("Unhandled message type {0} received", m.Number.ToString());
-                        }
+                        HandleUntrustedSimulatorMessage(m);
                     }
                     else
                     {
                         /* Ignore we have no decoder for that */
                     }
                     break;
+            }
+        }
+
+        internal void HandleUntrustedSimulatorMessage(Message m)
+        {
+            /* we keep the circuit relatively dumb so that we have no other logic than how to send and receive messages to the viewer.
+                * It merely collects delegates to other objects as well to call specific functions.
+                */
+            Action<Message> mdel;
+            if (m_MessageRouting.TryGetValue(m.Number, out mdel))
+            {
+                mdel(m);
+            }
+            else if (m.Number == MessageType.ImprovedInstantMessage)
+            {
+                var im = (ImprovedInstantMessage)m;
+                if (im.CircuitAgentID != im.AgentID ||
+                    im.CircuitSessionID != im.SessionID)
+                {
+                    return;
+                }
+                if (m_IMMessageRouting.TryGetValue(im.Dialog, out mdel))
+                {
+                    mdel(m);
+                }
+                else
+                {
+                    m_Log.DebugFormat("Unhandled im message {0} received", im.Dialog.ToString());
+                }
+            }
+            else if (m.Number == MessageType.GenericMessage)
+            {
+                var genMsg = (GenericMessage)m;
+                if (m_GenericMessageRouting.TryGetValue(genMsg.Method, out mdel))
+                {
+                    mdel(m);
+                }
+                else
+                {
+                    m_Log.DebugFormat("Unhandled generic message {0} received", genMsg.Method);
+                }
+            }
+            else if (m.Number == MessageType.LargeGenericMessage)
+            {
+                var genMsg = (LargeGenericMessage)m;
+                if (m_LargeGenericMessageRouting.TryGetValue(genMsg.Method, out mdel))
+                {
+                    mdel(m);
+                }
+                else
+                {
+                    m_Log.DebugFormat("Unhandled large generic message {0} received", genMsg.Method);
+                }
+            }
+            else if (m.Number == MessageType.GodlikeMessage)
+            {
+                var genMsg = (GodlikeMessage)m;
+                if (m_GodlikeMessageRouting.TryGetValue(genMsg.Method, out mdel))
+                {
+                    mdel(m);
+                }
+                else
+                {
+                    m_Log.DebugFormat("Unhandled godlike message {0} received", genMsg.Method);
+                }
+            }
+            else
+            {
+                m_Log.DebugFormat("Unhandled message type {0} received", m.Number.ToString());
             }
         }
 
