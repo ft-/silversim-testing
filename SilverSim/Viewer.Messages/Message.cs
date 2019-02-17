@@ -93,6 +93,16 @@ namespace SilverSim.Viewer.Messages
     }
 
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Field, Inherited = false, AllowMultiple = true)]
+    public sealed class LargeGenericMessageHandlerAttribute : Attribute
+    {
+        public string Method { get; }
+        public LargeGenericMessageHandlerAttribute(string method)
+        {
+            Method = method;
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Field, Inherited = false, AllowMultiple = true)]
     public sealed class GodlikeMessageHandlerAttribute : Attribute
     {
         public string Method { get; }

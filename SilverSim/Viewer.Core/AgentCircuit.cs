@@ -68,6 +68,7 @@ namespace SilverSim.Viewer.Core
         private readonly Dictionary<MessageType, Action<Message>> m_MessageRouting = new Dictionary<MessageType, Action<Message>>();
         private readonly Dictionary<string, Action<Message>> m_GenericMessageRouting = new Dictionary<string, Action<Message>>();
         private readonly Dictionary<string, Action<Message>> m_GodlikeMessageRouting = new Dictionary<string, Action<Message>>();
+        private readonly Dictionary<string, Action<Message>> m_LargeGenericMessageRouting = new Dictionary<string, Action<Message>>();
         private readonly Dictionary<GridInstantMessageDialog, Action<Message>> m_IMMessageRouting = new Dictionary<GridInstantMessageDialog, Action<Message>>();
 
         private Thread m_TextureDownloadThread;
@@ -478,6 +479,7 @@ namespace SilverSim.Viewer.Core
 
             var messageRegisteredHere = new List<MessageType>();
             var genericMsgRegisteredHere = new List<string>();
+            var largeGenericMsgRegisteredHere = new List<string>();
             var godlikeMsgRegisteredHere = new List<string>();
             var imTypeRegisteredHere = new List<GridInstantMessageDialog>();
 
@@ -531,6 +533,29 @@ namespace SilverSim.Viewer.Core
                             catch
                             {
                                 m_Log.WarnFormat("Tried duplicate registration of generic message {0}", gm.Method);
+                            }
+                        }
+                    }
+
+                    foreach (var gm in (LargeGenericMessageHandlerAttribute[])Attribute.GetCustomAttributes(fi, typeof(LargeGenericMessageHandlerAttribute)))
+                    {
+                        if (m_LargeGenericMessageRouting.ContainsKey(gm.Method))
+                        {
+                            if (!largeGenericMsgRegisteredHere.Contains(gm.Method))
+                            {
+                                m_Log.FatalFormat("Field {0} of {1} registered duplicate large generic {2}", fi.Name, t.GetType(), gm.Method);
+                            }
+                        }
+                        else
+                        {
+                            try
+                            {
+                                m_LargeGenericMessageRouting.Add(gm.Method, DeriveActionDelegateFromFieldInfo(fi, t, o, "largegeneric " + gm.Method));
+                                largeGenericMsgRegisteredHere.Add(gm.Method);
+                            }
+                            catch
+                            {
+                                m_Log.WarnFormat("Tried duplicate registration of large generic message {0}", gm.Method);
                             }
                         }
                     }
@@ -878,6 +903,7 @@ namespace SilverSim.Viewer.Core
                     mtype == MessageType.CompletePingCheck || 
                     mtype == MessageType.StartPingCheck ||
                     mtype == MessageType.GenericMessage ||
+                    mtype == MessageType.LargeGenericMessage ||
                     mtype == MessageType.ImprovedInstantMessage ||
                     mtype == MessageType.GodlikeMessage ||
                     mtype == MessageType.EstateOwnerMessage ||
@@ -1140,6 +1166,18 @@ namespace SilverSim.Viewer.Core
                             else
                             {
                                 m_Log.DebugFormat("Unhandled generic message {0} received", genMsg.Method);
+                            }
+                        }
+                        else if(m.Number == MessageType.LargeGenericMessage)
+                        {
+                            var genMsg = (LargeGenericMessage)m;
+                            if(m_LargeGenericMessageRouting.TryGetValue(genMsg.Method, out mdel))
+                            {
+                                mdel(m);
+                            }
+                            else
+                            {
+                                m_Log.DebugFormat("Unhandled large generic message {0} received", genMsg.Method);
                             }
                         }
                         else if (m.Number == MessageType.GodlikeMessage)

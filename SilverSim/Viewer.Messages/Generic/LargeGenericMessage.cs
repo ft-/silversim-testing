@@ -20,7 +20,6 @@
 // exception statement from your version.
 
 using SilverSim.Types;
-using System.Collections.Generic;
 using System.Linq;
 using MapType = SilverSim.Types.Map;
 
@@ -28,24 +27,16 @@ namespace SilverSim.Viewer.Messages.Generic
 {
     [EventQueueGet("LargeGenericMessage")]
     [NotTrusted]
-    public sealed class LargeGenericMessage : Message
+    public sealed class LargeGenericMessage : GenericMessageFormat
     {
-        public UUID AgentID = UUID.Zero;
-        public UUID SessionID = UUID.Zero;
-        public UUID TransactionID = UUID.Random;
-        public string Method = string.Empty;
-        public UUID Invoice = UUID.Zero;
-
-        public List<string> ParamList = new List<string>();
-
         public override MessageType Number => MessageType.LargeGenericMessage;
 
         public override IValue SerializeEQG()
         {
             var paramList = new AnArray();
-            foreach(string p in ParamList)
+            foreach(byte[] p in ParamList)
             {
-                paramList.Add(new MapType { { "Parameter", p } });
+                paramList.Add(new MapType { { "Parameter", p.FromUTF8Bytes() } });
             }
 
             return new MapType
@@ -92,7 +83,7 @@ namespace SilverSim.Viewer.Messages.Generic
 
             foreach(var p in paramList.OfType<MapType>())
             {
-                res.ParamList.Add(p["Parameter"].ToString());
+                res.ParamList.Add(p["Parameter"].ToString().ToUTF8Bytes());
             }
             return res;
         }
