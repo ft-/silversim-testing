@@ -507,6 +507,7 @@ namespace SilverSim.Viewer.Messages
         LinkInventoryItem = Low | 426,
         RetrieveIMsExtended = Low | 427,
         JoinGroupRequestExtended = Low | 428,
-        CreateGroupRequestExtended = Low | 429
+        CreateGroupRequestExtended = Low | 429,
+        LargeGenericMessage = Low | 430
     }
 }
