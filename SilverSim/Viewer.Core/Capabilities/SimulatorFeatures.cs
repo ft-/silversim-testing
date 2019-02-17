@@ -89,7 +89,7 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
 
             /* known OpenSimExtras
-             * GrickName:string
+             * GridName:string
              * GridURL:string
              * ExportSupported:bool
              * map-server-url:string
