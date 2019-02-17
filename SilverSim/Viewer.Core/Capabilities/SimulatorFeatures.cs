@@ -60,7 +60,8 @@ namespace SilverSim.Viewer.Core.Capabilities
             });
             Features.Add("AnimatedObjects", new Map
             {
-                { "AnimatedObjectMaxTris", 20000 }
+                { "AnimatedObjectMaxTris", 20000 },
+                { "MaxAgentAnimatedObjectAttachments", 2 }
             });
             var extrasMap = new Map();
             if (!string.IsNullOrEmpty(scene.GatekeeperURI))
