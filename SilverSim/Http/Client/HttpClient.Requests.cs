@@ -21,6 +21,7 @@
 
 using SilverSim.Types;
 using SilverSim.Types.StructuredData.Json;
+using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -37,21 +38,38 @@ namespace SilverSim.Http.Client
         public interface IRequestBodyType
         {
             string ContentType { get; }
-            byte[] RequestBody { get; }
+            void WriteRequestBody(Stream s);
         }
 
         public sealed class JsonRequest : IRequestBodyType
         {
             public string ContentType => "application/json";
-            public byte[] RequestBody { get; }
+            private readonly IValue m_Data;
+
+            public void WriteRequestBody(Stream s)
+            {
+                Json.Serialize(m_Data, s);
+            }
 
             public JsonRequest(IValue iv)
             {
-                using (var s = new MemoryStream())
-                {
-                    Json.Serialize(iv, s);
-                    RequestBody = s.ToArray();
-                }
+                m_Data = iv;
+            }
+        }
+
+        public sealed class LlsdXmlRequest : IRequestBodyType
+        {
+            public string ContentType => "application/llsd+xml";
+            private readonly IValue m_Data;
+
+            public void WriteRequestBody(Stream s)
+            {
+                LlsdXml.Serialize(m_Data, s);
+            }
+
+            public LlsdXmlRequest(IValue iv)
+            {
+                m_Data = iv;
             }
         }
 
@@ -158,7 +176,8 @@ namespace SilverSim.Http.Client
             public Post(string url, IRequestBodyType typeddata)
                 : base(url)
             {
-                RequestBody = typeddata.RequestBody;
+                UseChunkedEncoding = true;
+                RequestBodyDelegate = typeddata.WriteRequestBody;
                 RequestContentType = typeddata.ContentType;
                 Method = DefaultMethod;
             }
