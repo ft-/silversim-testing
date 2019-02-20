@@ -156,8 +156,12 @@ namespace SilverSim.Scene.Types.Agent
         [Description("Health in %")]
         double Health { get; set; }
 
+        [Description("Heal Rate in %/0.1s")]
+        double HealRate { get; set; }
+
         void IncreaseHealth(double v);
         void DecreaseHealth(double v);
+        void ProcessHealing(double dt);
 
         void SetDefaultAnimation(AgentAnimationController.AnimationState anim_state);
 

@@ -149,6 +149,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         private int m_LastSunUpdateTickCount;
         private int m_LastTidalModelUpdateTickCount;
         private int m_CountedTicks;
+        private int m_LastHealTickCount;
         private double m_EnvironmentFps;
 
         public double EnvironmentFps
@@ -177,6 +178,18 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                 m_CountedTicks = 0;
             }
 
+
+            { /* Heal Rate processor */
+                int timeDiff = newTickCount - m_LastHealTickCount;
+                m_LastHealTickCount = newTickCount;
+                double healdt = timeDiff / 1000.0;
+                foreach (IAgent agent in m_Scene.RootAgents)
+                {
+                    agent.ProcessHealing(healdt);
+                }
+            }
+
+            /* Sun phase processor */
             if (newTickCount - m_LastSunUpdateTickCount >= m_SunUpdateEveryMsecs || m_ImmediateSunUpdate)
             {
                 bool immedSendSimTime;
@@ -194,6 +207,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                 }
             }
 
+            /* Wind model processor */
             int lastwinddt = newTickCount - m_LastWindModelUpdateTickCount;
             if (lastwinddt >= m_UpdateWindModelEveryMsecs)
             {
@@ -201,8 +215,11 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                 Wind?.UpdateModel(m_SunData, lastwinddt / 1000.0);
             }
 
+            /* Moon phase processor */
             UpdateMoonPhase();
 
+
+            /* Tidal phase processor */
             if (newTickCount - m_LastTidalModelUpdateTickCount >= m_UpdateTidalModelEveryMsecs)
             {
                 m_LastTidalModelUpdateTickCount = newTickCount;

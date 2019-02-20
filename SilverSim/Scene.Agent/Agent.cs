@@ -67,6 +67,7 @@ namespace SilverSim.Scene.Agent
 
         #region Agent fields
         private double m_Health = 100f;
+        private double m_HealRate = 0.5;
         #endregion
 
         public string DisplayName { get; set; }
@@ -955,17 +956,56 @@ namespace SilverSim.Scene.Agent
             set
             {
                 bool agentDies;
+                double healthvalue = value.Clamp(0, 100);
+                bool sendUpdate;
                 lock (m_DataLock)
                 {
-                    m_Health = value.Clamp(0, 100);
-                    agentDies = m_Health < 0.0001;
+                    sendUpdate = m_Health != healthvalue;
+                    m_Health = healthvalue;
+                    agentDies = m_Health < 0.0001 && sendUpdate;
                 }
 
-                if(agentDies)
+                if (sendUpdate)
+                {
+                    SendMessageAlways(new HealthMessage
+                    {
+                        Health = healthvalue
+                    }, SceneID);
+                }
+
+                if (agentDies)
                 {
                     DieAgent();
                 }
             }
+        }
+
+        public double HealRate
+        {
+            get
+            {
+                lock(m_DataLock)
+                {
+                    return m_HealRate;
+                }
+            }
+            set
+            {
+                lock(m_DataLock)
+                {
+                    m_HealRate = value.Clamp(0, 100);
+                }
+            }
+        }
+
+        public void ProcessHealing(double dt)
+        {
+            double inchealth;
+            lock(m_DataLock)
+            {
+                inchealth = m_HealRate * dt * 10.0;
+            }
+            IncreaseHealth(inchealth);
         }
 
         public abstract RwLockedDictionary<UUID, AgentChildInfo> ActiveChilds { get; }
@@ -997,12 +1037,24 @@ namespace SilverSim.Scene.Agent
 
         public void IncreaseHealth(double v)
         {
+            bool sendUpdate = false;
+            double healthvalue = 100;
             lock (m_DataLock)
             {
                 if (v >= 0)
                 {
-                    m_Health = (m_Health + v).Clamp(0, 100);
+                    healthvalue = (m_Health + v).Clamp(0, 100);
+                    sendUpdate = m_Health != healthvalue;
+                    m_Health = healthvalue;
                 }
+            }
+
+            if (sendUpdate)
+            {
+                SendMessageAlways(new HealthMessage
+                {
+                    Health = healthvalue
+                }, SceneID);
             }
         }
 
@@ -1011,15 +1063,29 @@ namespace SilverSim.Scene.Agent
         public void DecreaseHealth(double v)
         {
             bool agentDies = false;
+            bool sendUpdate = false;
+            double healthvalue = 0;
             lock (m_DataLock)
             {
                 if (v >= 0)
                 {
-                    m_Health = (m_Health - v).Clamp(0, 100);
-                    agentDies = m_Health < 0.0001;
+                    healthvalue = (m_Health - v).Clamp(0, 100);
+                    sendUpdate = healthvalue != m_Health;
+                    m_Health = healthvalue;
+                    agentDies = m_Health < 0.0001 && sendUpdate;
                 }
             }
-            if(agentDies)
+
+
+            if (sendUpdate)
+            {
+                SendMessageAlways(new HealthMessage
+                {
+                    Health = healthvalue
+                }, SceneID);
+            }
+
+            if (agentDies)
             {
                 DieAgent();
             }
