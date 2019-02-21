@@ -91,6 +91,7 @@ namespace SilverSim.Http.Client
             public bool Expect100Continue;
             public bool UseChunkedEncoding;
             public int Expect100ContinueMinSize = 8192;
+            public bool EnableIPv6;
 
             public X509CertificateCollection ClientCertificates;
             public SslProtocols EnabledSslProtocols = SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12;

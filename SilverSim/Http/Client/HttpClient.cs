@@ -233,6 +233,8 @@ namespace SilverSim.Http.Client
             return s;
         }
 
+        private static bool OSSupportsIPv6 = Socket.OSSupportsIPv6;
+
         public static Stream ExecuteStreamRequest(
             this Request request)
         {
@@ -408,7 +410,7 @@ namespace SilverSim.Http.Client
 
             int retrycnt = 1;
             retry:
-            AbstractHttpStream s = OpenStream(uri.Scheme, uri.Host, uri.Port, request.ClientCertificates, request.EnabledSslProtocols, request.CheckCertificateRevocation, request.ConnectionMode, request.RemoteCertificateValidationCallback);
+            AbstractHttpStream s = OpenStream(uri.Scheme, uri.Host, uri.Port, request.ClientCertificates, request.EnabledSslProtocols, request.CheckCertificateRevocation, request.ConnectionMode, request.RemoteCertificateValidationCallback, request.EnableIPv6 && OSSupportsIPv6);
             string finalreqdata = reqdata.ToString();
             if (!s.IsReusable)
             {
@@ -901,7 +903,7 @@ redoafter401:
 
             int retrycnt = 1;
             retry:
-            Http2Connection.Http2Stream s = reuseStream ?? OpenHttp2Stream(uri.Scheme, uri.Host, uri.Port, request.ClientCertificates, request.EnabledSslProtocols, request.CheckCertificateRevocation, request.RemoteCertificateValidationCallback);
+            Http2Connection.Http2Stream s = reuseStream ?? OpenHttp2Stream(uri.Scheme, uri.Host, uri.Port, request.ClientCertificates, request.EnabledSslProtocols, request.CheckCertificateRevocation, request.RemoteCertificateValidationCallback, request.EnableIPv6 && OSSupportsIPv6);
             headers.Clear();
             try
             {

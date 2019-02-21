@@ -153,15 +153,15 @@ namespace SilverSim.Http.Client
         #region Connect Handling
         /* yes, we need our own DNS cache. Mono bypasses anything that caches on Linux */
 
-        private static Socket ConnectToTcp(string host, int port)
+        private static Socket ConnectToTcp(string host, int port, bool enableIPv6)
         {
-            IPAddress[] addresses = DnsNameCache.GetHostAddresses(host);
+            IPAddress[] addresses = DnsNameCache.GetHostAddresses(host, !enableIPv6);
 
             if (addresses.Length == 0)
             {
                 throw new SocketException((int)SocketError.HostNotFound);
             }
-            var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            var socket = new Socket(enableIPv6 ? AddressFamily.InterNetworkV6 : AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             socket.Connect(addresses, port);
             return socket;
         }
@@ -174,7 +174,8 @@ namespace SilverSim.Http.Client
             SslProtocols enabledSslProtocols,
             bool checkCertificateRevocation,
             ConnectionModeEnum reuseMode,
-            RemoteCertificateValidationCallback remoteCertificateValidationCallback)
+            RemoteCertificateValidationCallback remoteCertificateValidationCallback,
+            bool enableIPv6)
         {
             if(reuseMode == ConnectionModeEnum.UpgradeHttp2 && scheme != Uri.UriSchemeHttp)
             {
@@ -215,11 +216,11 @@ namespace SilverSim.Http.Client
 
             if (scheme == Uri.UriSchemeHttp)
             {
-                return new HttpStream(ConnectToTcp(host, port)) { IsReusable = reuseMode == ConnectionModeEnum.Keepalive };
+                return new HttpStream(ConnectToTcp(host, port, enableIPv6)) { IsReusable = reuseMode == ConnectionModeEnum.Keepalive };
             }
             else if (scheme == Uri.UriSchemeHttps)
             {
-                return ConnectToSslServer(host, port, clientCertificates, enabledSslProtocols, checkCertificateRevocation, reuseMode == ConnectionModeEnum.Keepalive, remoteCertificateValidationCallback);
+                return ConnectToSslServer(host, port, clientCertificates, enabledSslProtocols, checkCertificateRevocation, reuseMode == ConnectionModeEnum.Keepalive, remoteCertificateValidationCallback, enableIPv6);
             }
             else
             {
@@ -234,9 +235,10 @@ namespace SilverSim.Http.Client
             SslProtocols enabledSslProtocols,
             bool checkCertificateRevocation,
             bool enableReuseConnection,
-            RemoteCertificateValidationCallback remoteCertificateValidationCallback)
+            RemoteCertificateValidationCallback remoteCertificateValidationCallback,
+            bool enableIPv6)
         {
-            var sslstream = new SslStream(new NetworkStream(ConnectToTcp(host, port), true), false, remoteCertificateValidationCallback);
+            var sslstream = new SslStream(new NetworkStream(ConnectToTcp(host, port, enableIPv6), true), false, remoteCertificateValidationCallback);
             sslstream.AuthenticateAsClient(host, clientCertificates, enabledSslProtocols, checkCertificateRevocation);
             if (!sslstream.IsEncrypted)
             {
@@ -311,7 +313,8 @@ namespace SilverSim.Http.Client
             X509CertificateCollection clientCertificates,
             SslProtocols enabledSslProtocols,
             bool checkCertificateRevocation,
-            RemoteCertificateValidationCallback remoteCertificateValidationCallback)
+            RemoteCertificateValidationCallback remoteCertificateValidationCallback,
+            bool enableIPv6)
         {
             Http2Connection.Http2Stream h2stream = TryReuseStream(scheme, host, port);
             if(h2stream != null)
@@ -322,11 +325,11 @@ namespace SilverSim.Http.Client
             Stream s;
             if (scheme == Uri.UriSchemeHttp)
             {
-                s = new HttpStream(ConnectToTcp(host, port)) { IsReusable = false };
+                s = new HttpStream(ConnectToTcp(host, port, enableIPv6)) { IsReusable = false };
             }
             else if (scheme == Uri.UriSchemeHttps)
             {
-                s = ConnectToSslServer(host, port, clientCertificates, enabledSslProtocols, checkCertificateRevocation, false, remoteCertificateValidationCallback);
+                s = ConnectToSslServer(host, port, clientCertificates, enabledSslProtocols, checkCertificateRevocation, false, remoteCertificateValidationCallback, enableIPv6);
             }
             else
             {
