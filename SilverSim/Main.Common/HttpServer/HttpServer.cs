@@ -155,6 +155,10 @@ namespace SilverSim.Main.Common.HttpServer
             foreach(IPortControlServiceInterface iface in m_PortControlServices)
             {
                 iface.EnablePort(new AddressFamily[] { AddressFamily.InterNetwork }, ProtocolType.Tcp, (int)Port);
+                if(m_ListenerSocket.DualMode)
+                {
+                    iface.EnablePort(new AddressFamily[] { AddressFamily.InterNetworkV6 }, ProtocolType.Tcp, (int)Port);
+                }
             }
 
             m_ListenerThread = ThreadManager.CreateThread(AcceptThread);
@@ -292,6 +296,17 @@ namespace SilverSim.Main.Common.HttpServer
                 catch (Exception e)
                 {
                     m_Log.DebugFormat("Failed to disable port {0}: {1}: {2}", Port, e.GetType().FullName, e.Message);
+                }
+                if (m_ListenerSocket.DualMode)
+                {
+                    try
+                    {
+                        iface.DisablePort(new AddressFamily[] { AddressFamily.InterNetworkV6 }, ProtocolType.Tcp, (int)Port);
+                    }
+                    catch (Exception e)
+                    {
+                        m_Log.DebugFormat("Failed to disable port {0}: {1}: {2}", Port, e.GetType().FullName, e.Message);
+                    }
                 }
             }
         }
