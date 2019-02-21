@@ -112,7 +112,17 @@ namespace SilverSim.Main.Common.HttpServer
                 Scheme = Uri.UriSchemeHttp;
             }
 
-            m_ListenerSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            if (httpConfig.GetBoolean("AllowDualMode", true) && Socket.OSSupportsIPv6)
+            {
+                m_ListenerSocket = new Socket(AddressFamily.InterNetworkV6, SocketType.Stream, ProtocolType.Tcp)
+                {
+                    DualMode = true
+                };
+            }
+            else
+            {
+                m_ListenerSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            }
 
             try
             {
@@ -138,7 +148,7 @@ namespace SilverSim.Main.Common.HttpServer
                 /* however, mono does not have an idea about what this is all about, so we catch that here */
             }
 
-            var ep = new IPEndPoint(IPAddress.Any, (int)Port);
+            var ep = new IPEndPoint(m_ListenerSocket.DualMode ? IPAddress.IPv6Any : IPAddress.Any, (int)Port);
             m_ListenerSocket.Bind(ep);
             m_ListenerSocket.Listen(128);
 
@@ -162,11 +172,11 @@ namespace SilverSim.Main.Common.HttpServer
                     m_SslProtocols |= SslProtocols.Tls11;
                     loader.KnownConfigurationIssues.Add("Please set EnableTls1.0 in [HTTPS] to false. TLS V1.1 is susceptible to POODLE attack. Only enable if explicitly needed for certain old applications.");
                 }
-                m_Log.InfoFormat("Adding HTTPS Server at port {0}", Port);
+                m_Log.InfoFormat("Adding HTTPS Server at port {0} (DualMode={1})", Port, m_ListenerSocket.DualMode);
             }
             else
             {
-                m_Log.InfoFormat("Adding HTTP Server at port {0}", Port);
+                m_Log.InfoFormat("Adding HTTP Server at port {0} (DualMode={1})", Port, m_ListenerSocket.DualMode);
             }
         }
 
