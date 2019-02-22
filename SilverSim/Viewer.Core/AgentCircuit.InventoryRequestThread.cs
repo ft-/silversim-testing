@@ -21,6 +21,9 @@
 
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.ServiceInterfaces.Asset;
+using SilverSim.ServiceInterfaces.Asset.Transferer;
+using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Asset.Format;
@@ -41,6 +44,24 @@ namespace SilverSim.Viewer.Core
         #region Fetch Inventory Thread
         private const int MAX_FOLDERS_PER_PACKET = 6;
         private const int MAX_ITEMS_PER_PACKET = 5;
+
+        public class NotecardAssetTransfer : AssetTransferWorkItem
+        {
+            public NotecardAssetTransfer(AssetServiceInterface dest, AssetServiceInterface src, List<UUID> assetids)
+                : base(dest, src, assetids, ReferenceSource.Source)
+            {
+            }
+
+            public override void AssetTransferComplete()
+            {
+                /* nothing to do */
+            }
+
+            public override void AssetTransferFailed(Exception e)
+            {
+                /* nothing to do for now */
+            }
+        }
 
         private void SendAssetNotFound(TransferRequest req) => SendMessage(new TransferInfo
         {
@@ -158,6 +179,10 @@ namespace SilverSim.Viewer.Core
                             FetchInventoryThread_DeactivateGestures(m);
                             break;
 
+                        case MessageType.CopyInventoryFromNotecard:
+                            FetchInventoryThread_CopyInventoryFromNotecard(m);
+                            break;
+
                         default:
                             break;
                     }
@@ -167,6 +192,162 @@ namespace SilverSim.Viewer.Core
                     m_Log.ErrorFormat("Encountered exception in inventory handling: {0}: {1}\n{2}", e.GetType().FullName, e.Message, e.StackTrace);
                 }
             }
+        }
+
+        private void FetchInventoryThread_CopyInventoryFromNotecard(Message m)
+        {
+            var req = (CopyInventoryFromNotecard)m;
+            if (req.SessionID != SessionID || req.AgentID != AgentID)
+            {
+                return;
+            }
+
+            Notecard nc = null;
+            InventoryFolder destinationFolder = null;
+            AssetData data;
+            AssetServiceInterface sourceAssetService = null;
+            InventoryItem notecarditem;
+
+            if (req.ObjectID != UUID.Zero)
+            {
+                ObjectPart part;
+
+                sourceAssetService = m_Scene.AssetService;
+
+                if (!m_Scene.Primitives.TryGetValue(req.ObjectID, out part))
+                {
+                    return;
+                }
+
+                ObjectPartInventoryItem objitem;
+
+                if (part.Inventory.TryGetValue(req.NotecardItemID, out objitem) &&
+                    objitem.InventoryType == InventoryType.Notecard &&
+                    m_Scene.AssetService.TryGetValue(objitem.AssetID, out data))
+                {
+                    nc = new Notecard(data);
+                }
+                notecarditem = objitem;
+            }
+            else
+            {
+                sourceAssetService = Agent.AssetService;
+
+                if (Agent.InventoryService.Item.TryGetValue(Agent.ID, req.NotecardItemID, out notecarditem) &&
+                    notecarditem.InventoryType == InventoryType.Notecard &&
+                    Agent.AssetService.TryGetValue(notecarditem.AssetID, out data))
+                {
+                    nc = new Notecard(data);
+                }
+            }
+
+            var transferItems = new List<UUID>();
+            var destFolder = new Dictionary<AssetType, InventoryFolder>();
+            InventoryFolder selectedDestFolder = null;
+            if (nc != null)
+            {
+                var invlist = new List<NotecardInventoryItem>();
+                foreach(CopyInventoryFromNotecard.InventoryDataEntry d in req.InventoryData)
+                {
+                    NotecardInventoryItem ncitem;
+                    if (!nc.Inventory.TryGetValue(d.ItemID, out ncitem))
+                    {
+                        return;
+                    }
+                    ncitem.ParentFolderID = d.FolderID;
+                    invlist.Add(ncitem);
+                }
+
+                foreach (var ncitem in invlist)
+                {
+                    ncitem.LastOwner = notecarditem.LastOwner;
+                    ncitem.Owner = Agent.Owner;
+                    if ((notecarditem.Flags & InventoryFlags.NotecardSlamPerm) != 0)
+                    {
+                        ncitem.AdjustToNextOwner();
+                    }
+
+                    if ((notecarditem.Flags & InventoryFlags.NotecardSlamSale) != 0)
+                    {
+                        if (notecarditem.AssetType == AssetType.Object)
+                        {
+                            ncitem.Flags |= InventoryFlags.ObjectSlamSale;
+                        }
+                        if (notecarditem.AssetType == AssetType.Notecard)
+                        {
+                            ncitem.Flags |= InventoryFlags.NotecardSlamSale;
+                        }
+                        ncitem.SaleInfo.Type = InventoryItem.SaleInfoData.SaleType.NoSale;
+                    }
+
+                    try
+                    {
+                        if (ncitem.ParentFolderID == UUID.Zero)
+                        {
+                            if (!destFolder.ContainsKey(ncitem.AssetType))
+                            {
+                                if (!Agent.InventoryService.Folder.TryGetDefaultFolderOrFallback(Agent.ID, ncitem.AssetType, out destinationFolder))
+                                {
+                                    m_Log.WarnFormat("Failed to copy notecard inventory {0} to agent {1} ({2}): No Folder found for {3}", ncitem.Name, Agent.NamedOwner.FullName, Agent.ID, ncitem.AssetType.ToString());
+                                    continue;
+                                }
+                                else
+                                {
+                                    destFolder.Add(ncitem.AssetType, destinationFolder);
+                                }
+                            }
+                            ncitem.ParentFolderID = destinationFolder.ID;
+                        }
+                        else if (selectedDestFolder != null ||
+                            Agent.InventoryService.Folder.TryGetSpecificOrDefaultFolderOrFallback(Agent.ID, ncitem.ParentFolderID, ncitem.AssetType, out selectedDestFolder))
+                        {
+                            ncitem.ParentFolderID = selectedDestFolder.ID;
+                        }
+                        else
+                        {
+                            m_Log.WarnFormat("Failed to copy notecard inventory {0} to agent {1} ({2}): No Folder found for {3}", ncitem.Name, Agent.NamedOwner.FullName, Agent.ID, ncitem.AssetType.ToString());
+                            continue;
+                        }
+
+                        var assetID = CreateInventoryItemFromNotecard(destinationFolder, ncitem);
+                        if (!transferItems.Contains(assetID))
+                        {
+                            transferItems.Add(assetID);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        m_Log.WarnFormat("Failed to copy notecard inventory {0} to agent {1} ({2}): {3}: {4}\n{5}", ncitem.Name, Agent.NamedOwner.FullName, Agent.ID, e.GetType().FullName, e.Message, e.StackTrace);
+                    }
+                }
+
+                if (req.ObjectID != UUID.Zero)
+                {
+                    /* no need to wait for its completion since for the sim processing it the assets are either available through sim assets or user assets 
+                     * only transfer assets if it is from prim inventory notecard to user inventory.
+                     */
+                    new NotecardAssetTransfer(Agent.AssetService, sourceAssetService, transferItems).QueueWorkItem();
+                }
+            }
+        }
+
+        private UUID CreateInventoryItemFromNotecard(InventoryFolder destinationFolder, NotecardInventoryItem ncitem)
+        {
+            var item = new InventoryItem(ncitem)
+            {
+                ParentFolderID = destinationFolder.ID
+            };
+            item.SetNewID(UUID.Random);
+
+            if (item.Owner.EqualsGrid(Agent.Owner))
+            {
+                item.LastOwner = item.Owner;
+                item.Owner = Agent.Owner;
+            }
+
+            Agent.InventoryService.Item.Add(item);
+            SendMessage(new UpdateCreateInventoryItem(Agent.ID, true, UUID.Zero, item, 0));
+            return item.AssetID;
         }
 
         private void FetchInventoryThread_ChangeInventoryItemFlags(Message m)
