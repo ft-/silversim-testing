@@ -42,7 +42,7 @@ namespace SilverSim.Scene.Types.Object
             NextOwnerAssetID
         }
 
-        public event Action<ChangeAction /* change */, UUID /* primID */, UUID /* itemID */> OnChange;
+        public event Action<ChangeAction /* change */, UUID /* primID */, UUID /* itemID */, string /* itemName */> OnChange;
         public event Action<ObjectInventoryUpdateInfo> OnInventoryUpdate;
 
         public int InventorySerial = 1;
@@ -293,7 +293,7 @@ namespace SilverSim.Scene.Types.Object
             Interlocked.Increment(ref InventorySerial);
 
             OnInventoryUpdate?.Invoke(item.UpdateInfo);
-            OnChange?.Invoke(ChangeAction.Add, PartID, item.ID);
+            OnChange?.Invoke(ChangeAction.Add, PartID, item.ID, item.Name);
         }
 
         public void SetAssetID(UUID key1, UUID assetID)
@@ -305,7 +305,7 @@ namespace SilverSim.Scene.Types.Object
                 Interlocked.Increment(ref InventorySerial);
 
                 OnInventoryUpdate?.Invoke(item.UpdateInfo);
-                OnChange?.Invoke(ChangeAction.Change, PartID, item.ID);
+                OnChange?.Invoke(ChangeAction.Change, PartID, item.ID, item.Name);
             }
         }
 
@@ -318,7 +318,7 @@ namespace SilverSim.Scene.Types.Object
                 Interlocked.Increment(ref InventorySerial);
 
                 OnInventoryUpdate?.Invoke(item.UpdateInfo);
-                OnChange?.Invoke(ChangeAction.NextOwnerAssetID, PartID, item.ID);
+                OnChange?.Invoke(ChangeAction.NextOwnerAssetID, PartID, item.ID, item.Name);
             }
         }
 
@@ -334,7 +334,7 @@ namespace SilverSim.Scene.Types.Object
             Interlocked.Increment(ref InventorySerial);
 
             OnInventoryUpdate?.Invoke(item.UpdateInfo);
-            OnChange?.Invoke(ChangeAction.Change, PartID, item.ID);
+            OnChange?.Invoke(ChangeAction.Change, PartID, item.ID, item.Name);
         }
 
         public bool Rename(string newKey, UUID itemid)
@@ -356,7 +356,7 @@ namespace SilverSim.Scene.Types.Object
                 Interlocked.Increment(ref InventorySerial);
 
                 OnInventoryUpdate?.Invoke(item.UpdateInfo);
-                OnChange?.Invoke(ChangeAction.Change, PartID, item.ID);
+                OnChange?.Invoke(ChangeAction.Change, PartID, item.ID, item.Name);
             }
             return renamed;
         }
@@ -402,7 +402,7 @@ namespace SilverSim.Scene.Types.Object
                 OnInventoryUpdate?.Invoke(oldItem.UpdateInfo);
             }
             OnInventoryUpdate?.Invoke(newItem.UpdateInfo);
-            OnChange?.Invoke(ChangeAction.Add, PartID, newItem.ID);
+            OnChange?.Invoke(ChangeAction.Add, PartID, newItem.ID, newItem.Name);
         }
 
         public new bool Remove(UUID key1)
@@ -415,7 +415,7 @@ namespace SilverSim.Scene.Types.Object
                 Interlocked.Increment(ref InventorySerial);
                 item.UpdateInfo.SetRemovedItem();
                 OnInventoryUpdate?.Invoke(item.UpdateInfo);
-                OnChange?.Invoke(ChangeAction.Remove, PartID, key1);
+                OnChange?.Invoke(ChangeAction.Remove, PartID, key1, item.Name);
                 return true;
             }
             return false;
@@ -431,7 +431,7 @@ namespace SilverSim.Scene.Types.Object
                 Interlocked.Increment(ref InventorySerial);
                 item.UpdateInfo.SetRemovedItem();
                 OnInventoryUpdate?.Invoke(item.UpdateInfo);
-                OnChange?.Invoke(ChangeAction.Remove, PartID, item.ID);
+                OnChange?.Invoke(ChangeAction.Remove, PartID, item.ID, item.Name);
                 return true;
             }
             return false;
@@ -446,7 +446,7 @@ namespace SilverSim.Scene.Types.Object
                 Interlocked.Increment(ref InventorySerial);
                 item.UpdateInfo.SetRemovedItem();
                 OnInventoryUpdate?.Invoke(item.UpdateInfo);
-                OnChange?.Invoke(ChangeAction.Remove, PartID, item.ID);
+                OnChange?.Invoke(ChangeAction.Remove, PartID, item.ID, item.Name);
                 return true;
             }
             return false;
@@ -461,7 +461,7 @@ namespace SilverSim.Scene.Types.Object
                 Interlocked.Increment(ref InventorySerial);
                 item.UpdateInfo.SetRemovedItem();
                 OnInventoryUpdate?.Invoke(item.UpdateInfo);
-                OnChange?.Invoke(ChangeAction.Remove, PartID, item.ID);
+                OnChange?.Invoke(ChangeAction.Remove, PartID, item.ID, item.Name);
                 return true;
             }
             return false;

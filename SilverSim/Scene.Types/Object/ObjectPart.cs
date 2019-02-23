@@ -610,7 +610,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        private void OnInventoryChange(ObjectPartInventory.ChangeAction action, UUID primID, UUID itemID)
+        private void OnInventoryChange(ObjectPartInventory.ChangeAction action, UUID primID, UUID itemID, string itemName)
         {
             if (action == ObjectPartInventory.ChangeAction.NextOwnerAssetID)
             {
@@ -636,6 +636,20 @@ namespace SilverSim.Scene.Types.Object
                     }
                 }
                 TriggerOnUpdate(UpdateChangedFlags.Inventory);
+                switch(action)
+                {
+                    case ObjectPartInventory.ChangeAction.Add:
+                        PostEvent(new InventoryChangedEvent(InventoryChangedEvent.ChangeType.Added, itemName));
+                        break;
+
+                    case ObjectPartInventory.ChangeAction.Change:
+                        PostEvent(new InventoryChangedEvent(InventoryChangedEvent.ChangeType.Changed, itemName));
+                        break;
+
+                    case ObjectPartInventory.ChangeAction.Remove:
+                        PostEvent(new InventoryChangedEvent(InventoryChangedEvent.ChangeType.Removed, itemName));
+                        break;
+                }
             }
         }
 
