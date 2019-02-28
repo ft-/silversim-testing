@@ -333,7 +333,7 @@ namespace SilverSim.Scene.Types.Scene
             return estateInfo;
         }
 
-        public void DetermineInitialAgentLocation(IAgent agent, TeleportFlags teleportFlags, Vector3 destinationLocation, Vector3 destinationLookAt)
+        public void DetermineInitialAgentLocation(IAgent agent, TeleportFlags teleportFlags, Vector3 destinationLocation, Vector3 destinationLookAt, bool sameParcelOverride = false)
         {
             UGUI agentOwner = agent.Owner;
             if (destinationLocation.X < 0 || destinationLocation.X >= SizeX)
@@ -359,7 +359,8 @@ namespace SilverSim.Scene.Types.Scene
             if ((!p.Owner.EqualsGrid(agentOwner) &&
                 !IsEstateManager(agentOwner) &&
                 !Owner.EqualsGrid(agentOwner) &&
-                !IsPossibleGod(agentOwner)) ||
+                !IsPossibleGod(agentOwner) &&
+                !sameParcelOverride) ||
                 !EnableLandingOverride)
             {
                 bool foundTelehub = false;

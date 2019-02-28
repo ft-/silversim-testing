@@ -597,11 +597,18 @@ namespace SilverSim.Viewer.Core
             m_Log.DebugFormat("Local Teleport Service for {0}", NamedOwner.FullName);
 #endif
 
+            ParcelInfo oldParcel;
+            ParcelInfo newParcel;
+            sceneInterface.Parcels.TryGetValue(GlobalPosition, out oldParcel);
+            sceneInterface.Parcels.TryGetValue(position, out newParcel);
             if (SittingOnObject != null)
             {
                 UnSit();
             }
-            sceneInterface.DetermineInitialAgentLocation(this, flags, position, lookAt);
+
+            bool sameParcelOverride = oldParcel != null && newParcel != null && oldParcel.ID == newParcel.ID;
+
+            sceneInterface.DetermineInitialAgentLocation(this, flags, position, lookAt, sameParcelOverride);
             SendMessageAlways(new TeleportStart(), sceneInterface.ID);
             SendMessageAlways(new TeleportLocal
             {
