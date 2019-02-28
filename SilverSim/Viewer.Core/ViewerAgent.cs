@@ -64,6 +64,7 @@ using SilverSim.Viewer.Messages.God;
 using SilverSim.Viewer.Messages.Inventory;
 using SilverSim.Viewer.Messages.Parcel;
 using SilverSim.Viewer.Messages.Script;
+using SilverSim.Viewer.Messages.Teleport;
 using SilverSim.Viewer.Messages.User;
 using System;
 using System.Collections.Generic;
@@ -590,8 +591,36 @@ namespace SilverSim.Viewer.Core
             }
         }
 
+        private bool TeleportToLocal(SceneInterface sceneInterface, Vector3 position, Vector3 lookAt, TeleportFlags flags)
+        {
+#if DEBUG
+            m_Log.DebugFormat("Local Teleport Service for {0}", NamedOwner.FullName);
+#endif
+
+            if (SittingOnObject != null)
+            {
+                UnSit();
+            }
+            sceneInterface.DetermineInitialAgentLocation(this, flags, position, lookAt);
+            SendMessageAlways(new TeleportStart(), sceneInterface.ID);
+            SendMessageAlways(new TeleportLocal
+            {
+                AgentID = ID,
+                Position = GlobalPosition,
+                LookAt = LookAt,
+                TeleportFlags = flags,
+                LocationID = 2
+            }, sceneInterface.ID);
+            return true;
+        }
+
         public override bool TeleportTo(SceneInterface sceneInterface, string regionName, Vector3 position, Vector3 lookAt, TeleportFlags flags)
         {
+            if(sceneInterface.Name == regionName)
+            {
+                return TeleportToLocal(sceneInterface, position, lookAt, flags);
+            }
+
             foreach(var service in m_TeleportServices)
             {
 #if DEBUG
@@ -608,6 +637,11 @@ namespace SilverSim.Viewer.Core
 
         public override bool TeleportTo(SceneInterface sceneInterface, GridVector location, Vector3 position, Vector3 lookAt, TeleportFlags flags)
         {
+            if (sceneInterface.GridPosition == location)
+            {
+                return TeleportToLocal(sceneInterface, position, lookAt, flags);
+            }
+
             foreach (var service in m_TeleportServices)
             {
 #if DEBUG
@@ -623,6 +657,11 @@ namespace SilverSim.Viewer.Core
 
         public override bool TeleportTo(SceneInterface sceneInterface, string gatekeeperURI, GridVector location, Vector3 position, Vector3 lookAt, TeleportFlags flags)
         {
+            if (sceneInterface.GatekeeperURI == gatekeeperURI && sceneInterface.GridPosition == location)
+            {
+                return TeleportToLocal(sceneInterface, position, lookAt, flags);
+            }
+
             foreach (var service in m_TeleportServices)
             {
 #if DEBUG
@@ -638,6 +677,11 @@ namespace SilverSim.Viewer.Core
 
         public override bool TeleportTo(SceneInterface sceneInterface, UUID regionID, Vector3 position, Vector3 lookAt, TeleportFlags flags)
         {
+            if (sceneInterface.ID == regionID)
+            {
+                return TeleportToLocal(sceneInterface, position, lookAt, flags);
+            }
+
             foreach (var service in m_TeleportServices)
             {
 #if DEBUG
@@ -653,6 +697,11 @@ namespace SilverSim.Viewer.Core
 
         public override bool TeleportTo(SceneInterface sceneInterface, string gatekeeperURI, UUID regionID, Vector3 position, Vector3 lookAt, TeleportFlags flags)
         {
+            if (sceneInterface.ID == regionID && sceneInterface.GatekeeperURI == gatekeeperURI)
+            {
+                return TeleportToLocal(sceneInterface, position, lookAt, flags);
+            }
+
             foreach (var service in m_TeleportServices)
             {
 #if DEBUG
