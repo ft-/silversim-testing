@@ -494,6 +494,7 @@ namespace SilverSim.Viewer.Core
             AddDefCapabilityFactory("ViewerStats", regionSeedID, (agent) => ViewerStats = new ViewerStats(agent, Server.Scene, RemoteIP), capConfig);
             AddDefCapabilityFactory("ViewerMetrics", regionSeedID, (agent) => ViewerMetrics = new ViewerMetrics(agent, Server.Scene, RemoteIP), capConfig);
             AddDefCapabilityFactory("GetObjectCost", regionSeedID, (agent) => new GetObjectCost(agent, Server.Scene, RemoteIP), capConfig);
+            AddDefCapabilityFactory("EstateAccess", regionSeedID, (agent) => new EstateAccess(agent, Server.Scene, RemoteIP), capConfig);
         }
 
         /** <summary>Contains ViewerMetrics capability handler or null if not requested</summary> */
