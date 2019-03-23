@@ -45,13 +45,19 @@ namespace SilverSim.Viewer.Messages.Object
             ScratchPad = 0x0001,
             Tree = 0x0002,
             HasText = 0x0004,
+            /** <summary>86 byte particle system</summary> */
             HasParticles = 0x0008,
             HasSound = 0x0010,
             HasParent = 0x0020,
             TextureAnimation = 0x0040,
             HasAngularVelocity = 0x0080,
             HasNameValues = 0x0100,
-            MediaURL = 0x0200
+            MediaURL = 0x0200,
+            /** <summary>particles new flag signal</summary>
+             * When set and HasParticles is not set (particle system is not 86 bytes in that case),
+             * it notifies the viewer not to remove the particle system when ObjectUpdateCompressed is received.
+             */
+            HasParticlesNew = 0x0400 
         }
 
         public List<ObjData> ObjectData = new List<ObjData>();
