@@ -57,7 +57,7 @@ namespace SilverSim.Viewer.Messages.Object
              * When set and HasParticles is not set (particle system is not 86 bytes in that case),
              * it notifies the viewer not to remove the particle system when ObjectUpdateCompressed is received.
              */
-            HasParticlesNew = 0x0400 
+            HasParticlesNew = 0x0400
         }
 
         public List<ObjData> ObjectData = new List<ObjData>();

@@ -19,6 +19,8 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using System;
+
 namespace SilverSim.Types.IM
 {
     public enum GridInstantMessageDialog : sbyte
@@ -37,19 +39,21 @@ namespace SilverSim.Types.IM
         SessionAdd = 13,
         SessionOfflineAdd = 14,
         SessionGroupStart = 15,
-        SessionCardlessStart = 16,
+        SessionConferenceStart = 16,
         SessionSend = 17,
-        SessionDrop = 18,
+        SessionLeave = 18,
         MessageFromObject = 19,
         BusyAutoResponse = 20,
         ConsoleAndChatHistory = 21,
-        RequestTeleport = 22,
-        AcceptTeleport = 23,
-        DenyTeleport = 24,
-        GodLikeRequestTeleport = 25,
-        RequestLure = 26,
+        LureUser = 22,
+        LureAccepted = 23,
+        LureDeclined = 24,
+        GodlikeLureUser = 25,
+        TeleportRequest = 26,
         GotoUrl = 28,
+        [Obsolete]
         Session911Start = 29,
+        [Obsolete]
         Lure911 = 30,
         FromTaskAsAlert = 31,
         GroupNotice = 32,

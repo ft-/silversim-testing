@@ -53,7 +53,7 @@ namespace SilverSim.Viewer.GroupChat
         [IMMessageHandler(GridInstantMessageDialog.GroupNoticeInventoryAccepted)]
         [IMMessageHandler(GridInstantMessageDialog.SessionGroupStart)]
         [IMMessageHandler(GridInstantMessageDialog.SessionSend)]
-        [IMMessageHandler(GridInstantMessageDialog.SessionDrop)]
+        [IMMessageHandler(GridInstantMessageDialog.SessionLeave)]
         [IMMessageHandler(GridInstantMessageDialog.SessionAdd)]
         private readonly BlockingQueue<KeyValuePair<AgentCircuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
 
@@ -174,8 +174,8 @@ namespace SilverSim.Viewer.GroupChat
                                         HandleSessionSend(req.Key.Agent, scene, im);
                                         break;
 
-                                    case GridInstantMessageDialog.SessionDrop:
-                                        HandleSessionDrop(req.Key.Agent, scene, im);
+                                    case GridInstantMessageDialog.SessionLeave:
+                                        HandleSessionLeave(req.Key.Agent, scene, im);
                                         break;
 
                                     case GridInstantMessageDialog.SessionAdd:
@@ -208,7 +208,7 @@ namespace SilverSim.Viewer.GroupChat
         {
         }
 
-        private void HandleSessionDrop(ViewerAgent agent, SceneInterface scene, ImprovedInstantMessage m)
+        private void HandleSessionLeave(ViewerAgent agent, SceneInterface scene, ImprovedInstantMessage m)
         {
 
         }
