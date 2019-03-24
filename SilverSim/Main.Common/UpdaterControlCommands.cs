@@ -224,7 +224,7 @@ namespace SilverSim.Main.Common
             }
             else if (args.Count < 2 || args[0] == "help")
             {
-                io.Write("uninstall <package> - Installs a package");
+                io.Write("uninstall <package> - Uninstalls a package");
             }
             else if(!CoreUpdater.Instance.InstalledPackages.ContainsKey(args[1]))
             {
