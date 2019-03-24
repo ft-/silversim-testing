@@ -48,7 +48,7 @@ namespace SilverSim.Scene.Types.Scene
             public RegionInfo RemoteRegionData;
         }
 
-        public readonly Dictionary<UUID, NeighborEntry> Neighbors = new Dictionary<UUID, NeighborEntry>();
+        public readonly RwLockedDictionary<UUID, NeighborEntry> Neighbors = new RwLockedDictionary<UUID, NeighborEntry>();
 
         public delegate bool TryGetSceneDelegate(UUID id, out SceneInterface scene);
         public TryGetSceneDelegate TryGetScene;
