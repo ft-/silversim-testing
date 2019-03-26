@@ -26,7 +26,6 @@ using SilverSim.ServiceInterfaces.Neighbor;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Grid;
-using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace SilverSim.Grid.Standalone
@@ -52,8 +51,7 @@ namespace SilverSim.Grid.Standalone
                 if ((fromRegion.Flags & RegionFlags.RegionOnline) != 0)
                 {
                     m_NeighborLists.AddIfNotExists(fromRegion.ID, () => new NeighborList());
-                    List<RegionInfo> neighbors = NeighborRequester.GetNeighbors(fromScene.GridService, fromRegion);
-                    foreach (RegionInfo neighbor in neighbors)
+                    foreach (RegionInfo neighbor in NeighborRequester.GetNeighbors(fromScene.GridService, fromRegion))
                     {
                         SceneInterface scene;
                         if (m_Scenes.TryGetValue(neighbor.ID, out scene))
