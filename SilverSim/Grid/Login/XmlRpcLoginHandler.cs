@@ -728,7 +728,16 @@ namespace SilverSim.Grid.Login
                         else if(m_GridService == null || m_LocalLoginConnectorService == null)
                         {
 #if DEBUG
-                            m_Log.DebugFormat("Last for agent {0} not usable", loginData.Account.Principal);
+                            var missingList = new List<string>();
+                            if (m_GridService == null)
+                            {
+                                missingList.Add("GridService");
+                            }
+                            if (m_LocalLoginConnectorService == null)
+                            {
+                                missingList.Add("LocalLoginConnector");
+                            }
+                            m_Log.DebugFormat("Last for agent {0} is not usable: Missing {1}", loginData.Account.Principal, string.Join(",", missingList));
 #endif
                         }
                         else
@@ -803,7 +812,16 @@ namespace SilverSim.Grid.Login
                         {
                             /* insufficient services */
 #if DEBUG
-                            m_Log.DebugFormat("URI for agent {0} is not usable", loginData.Account.Principal);
+                            var missingList = new List<string>();
+                            if(m_GridService == null)
+                            {
+                                missingList.Add("GridService");
+                            }
+                            if(m_LocalLoginConnectorService == null)
+                            {
+                                missingList.Add("LocalLoginConnector");
+                            }
+                            m_Log.DebugFormat("URI for agent {0} is not usable: Missing {1}", loginData.Account.Principal, string.Join(",", missingList));
 #endif
                         }
                         else if (m_GridService.TryGetValue(uriMatch.Groups[1].Value, out ri))
