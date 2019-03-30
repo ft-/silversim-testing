@@ -113,15 +113,15 @@ namespace SilverSim.Types.StructuredData.TLV
         {
             if (m_Stream != null)
             {
-                if(m_Outer != null)
-                {
-                    byte[] array = ((MemoryStream)m_Stream).ToArray();
-                    m_Outer.Write_Header(m_OuterId, EntryType.TLV, array.Length);
-                    m_Outer.m_Stream.Write(array, 0, array.Length);
-                    m_Outer = null;
-                }
                 if (!m_ReadOuter)
                 {
+                    if (m_Outer != null)
+                    {
+                        byte[] array = ((MemoryStream)m_Stream).ToArray();
+                        m_Outer.Write_Header(m_OuterId, EntryType.TLV, array.Length);
+                        m_Outer.m_Stream.Write(array, 0, array.Length);
+                        m_Outer = null;
+                    }
                     m_Stream.Dispose();
                 }
                 else
@@ -334,7 +334,8 @@ namespace SilverSim.Types.StructuredData.TLV
             {
                 if(targetType.IsEnum && targetType.GetEnumUnderlyingType() == sourceType)
                 {
-                    data = (T)Convert.ChangeType(d, targetType);
+                    data = (T)Convert.ChangeType(d, sourceType);
+                    return true;
                 }
                 return false;
             }
@@ -383,7 +384,7 @@ namespace SilverSim.Types.StructuredData.TLV
 
             header.ID = (ushort)((headerbytes[1] << 8) | headerbytes[0]);
             header.Type = (EntryType)((headerbytes[3] << 8) | headerbytes[2]);
-            header.Length = (headerbytes[7] << 24) | (headerbytes[6] << 16) | (headerbytes[5] << 8) | (headerbytes[4] << 8);
+            header.Length = (headerbytes[7] << 24) | (headerbytes[6] << 16) | (headerbytes[5] << 8) | headerbytes[4];
             return true;
         }
 
