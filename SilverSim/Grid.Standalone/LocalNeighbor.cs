@@ -50,7 +50,7 @@ namespace SilverSim.Grid.Standalone
             {
                 if ((fromRegion.Flags & RegionFlags.RegionOnline) != 0)
                 {
-                    m_NeighborLists.AddIfNotExists(fromRegion.ID, () => new NeighborList());
+                    m_NeighborLists.GetOrAddIfNotExists(fromRegion.ID, () => new NeighborList());
                     foreach (RegionInfo neighbor in NeighborRequester.GetNeighbors(fromScene.GridService, fromRegion))
                     {
                         SceneInterface scene;
