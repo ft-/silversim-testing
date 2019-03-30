@@ -202,7 +202,7 @@ namespace SilverSim.Scene.Agent.Bakery
                     }
                 }
 
-                var actualItems = inventoryService.Item[principal.ID, itemlinks];
+                var actualItems = itemlinks.Count != 0 ? inventoryService.Item[principal.ID, itemlinks] : new List<InventoryItem>();
                 var actualItemsInDict = new Dictionary<UUID, InventoryItem>();
                 foreach (var item in actualItems)
                 {
