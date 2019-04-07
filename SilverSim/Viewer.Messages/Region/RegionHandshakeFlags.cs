@@ -19,31 +19,16 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using SilverSim.Types;
+using System;
 
 namespace SilverSim.Viewer.Messages.Region
 {
-    [UDPMessage(MessageType.RegionHandshakeReply)]
-    [Reliable]
-    [NotTrusted]
-    public class RegionHandshakeReply : Message
+    [Flags]
+    public enum RegionHandshakeFlags
     {
-        public UUID AgentID = UUID.Zero;
-        public UUID SessionID = UUID.Zero;
-        public RegionHandshakeFlags Flags;
-
-        public static Message Decode(UDPPacket p) => new RegionHandshakeReply
-        {
-            AgentID = p.ReadUUID(),
-            SessionID = p.ReadUUID(),
-            Flags = (RegionHandshakeFlags)p.ReadUInt32()
-        };
-
-        public override void Serialize(UDPPacket p)
-        {
-            p.WriteUUID(AgentID);
-            p.WriteUUID(SessionID);
-            p.WriteUInt32((uint)Flags);
-        }
-    }
+		None = 0,
+        ViewerObjectCacheCullingEnabled = 1 << 0,
+        ViewerObjectCacheIsEmpty = 1 << 1,
+        SupportsSelfAppearance = 1 << 2
+	}
 }

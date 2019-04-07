@@ -380,7 +380,7 @@ namespace SilverSim.Viewer.Core
                                             rh.RegionExtData.Add(new RegionHandshake.RegionExtDataEntry
                                             {
                                                 RegionFlagsExtended = (ulong)regionFlags,
-                                                RegionProtocols = 1 /* 0 => no SSB, 1 => SSB */
+                                                RegionProtocols = RegionProtocolFlags.AgentAppearanceService
                                             });
 
                                             /* Immediate Ack */

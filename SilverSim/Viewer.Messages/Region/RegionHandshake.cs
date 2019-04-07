@@ -68,7 +68,7 @@ namespace SilverSim.Viewer.Messages.Region
         public struct RegionExtDataEntry
         {
             public UInt64 RegionFlagsExtended;
-            public UInt64 RegionProtocols;
+            public RegionProtocolFlags RegionProtocols;
         }
 
         public readonly List<RegionExtDataEntry> RegionExtData = new List<RegionExtDataEntry>();
@@ -109,7 +109,7 @@ namespace SilverSim.Viewer.Messages.Region
             foreach(var e in RegionExtData)
             {
                 p.WriteUInt64(e.RegionFlagsExtended);
-                p.WriteUInt64(e.RegionProtocols);
+                p.WriteUInt64((ulong)e.RegionProtocols);
             }
         }
 
@@ -154,7 +154,7 @@ namespace SilverSim.Viewer.Messages.Region
                 m.RegionExtData.Add(new RegionExtDataEntry
                 {
                     RegionFlagsExtended = p.ReadUInt64(),
-                    RegionProtocols = p.ReadUInt64()
+                    RegionProtocols = (RegionProtocolFlags)p.ReadUInt64()
                 });
             }
             return m;
