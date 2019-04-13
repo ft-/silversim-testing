@@ -55,6 +55,7 @@ namespace SilverSim.Main.Common.HttpServer
 
         public string ServerURI => $"{Scheme}://{ExternalHostName}:{Port}/";
         public string Scheme { get; }
+        private bool m_IsSsl;
 
         private readonly bool m_IsBehindProxy;
         private bool m_StoppingListeners;
@@ -70,6 +71,8 @@ namespace SilverSim.Main.Common.HttpServer
 
         private int m_AcceptedConnectionsCount;
         public int AcceptedConnectionsCount => m_AcceptedConnectionsCount;
+        private ICertificateObtainService m_CertificateObtainService;
+        private readonly string m_CertificateObtainServiceName;
 
         private readonly List<Thread> m_Threads = new List<Thread>();
 
@@ -94,6 +97,7 @@ namespace SilverSim.Main.Common.HttpServer
             m_PortControlServices = loader.GetServicesByValue<IPortControlServiceInterface>();
             Port = (uint)httpConfig.GetInt("Port", useSsl ? 9001 : 9000);
             m_IsBehindProxy = httpConfig.GetBoolean("HasProxy", false);
+            m_CertificateObtainServiceName = httpConfig.GetString("CertificateObtainService", string.Empty);
             /* prevent Mono from lazy loading SslStream at shutdown */
             m_SslStreamPreload = typeof(SslStream);
 
@@ -101,11 +105,13 @@ namespace SilverSim.Main.Common.HttpServer
             {
                 m_CertificateFileName = httpConfig.GetString("ServerCertificate");
                 Scheme = Uri.UriSchemeHttps;
+                m_IsSsl = true;
             }
             else if(useSsl)
             {
                 m_CertificateFileName = "../data/server-cert.p12";
                 Scheme = Uri.UriSchemeHttps;
+                m_IsSsl = true;
             }
             else
             {
@@ -189,22 +195,43 @@ namespace SilverSim.Main.Common.HttpServer
             m_AsyncListenerEvent.Dispose();
         }
 
+        private class SelfSignedObtainService : ICertificateObtainService
+        {
+            public void ObtainCertificate(string filename, ExternalHostNameServiceInterface externalHostNameService)
+            {
+                if (!File.Exists(filename))
+                {
+                    m_Log.Warn("Generating self-signed cert");
+                    try
+                    {
+                        SslSelfSignCertUtil.GenerateSelfSignedServiceCertificate(filename, externalHostNameService.ExternalHostName);
+                    }
+                    catch (Exception e)
+                    {
+                        m_Log.Error("Creating self-signed cert failed", e);
+                        throw new ConfigurationLoader.ConfigurationErrorException("Creating self-signed cert failed");
+                    }
+                }
+            }
+        }
+
         public void Startup(ConfigurationLoader loader)
         {
             m_ExternalHostNameService = loader.ExternalHostNameService;
-            if(!File.Exists(m_CertificateFileName) && Scheme == Uri.UriSchemeHttps)
+            if(Scheme == Uri.UriSchemeHttps)
             {
-                m_Log.Warn("Generating self-signed cert");
-                try
+                if (string.IsNullOrEmpty(m_CertificateObtainServiceName))
                 {
-                    SslSelfSignCertUtil.GenerateSelfSignedServiceCertificate(m_CertificateFileName, m_ExternalHostNameService.ExternalHostName);
+                    m_CertificateObtainService = new SelfSignedObtainService();
                 }
-                catch(Exception e)
+                else
                 {
-                    m_Log.Error("Creating self-signed cert failed", e);
-                    throw new ConfigurationLoader.ConfigurationErrorException("Creating self-signed cert failed");
+                    loader.GetService(m_CertificateObtainServiceName, out m_CertificateObtainService);
                 }
             }
+
+            m_CertificateObtainService?.ObtainCertificate(m_CertificateFileName, m_ExternalHostNameService);
+
             if (Scheme == Uri.UriSchemeHttps)
             {
                 try
@@ -345,7 +372,7 @@ namespace SilverSim.Main.Common.HttpServer
                     else if (args.AcceptSocket.Connected && !m_StoppingListeners)
                     {
                         Interlocked.Increment(ref m_ActiveThreadCount);
-                        Thread t = m_ServerCertificate != null ?
+                        Thread t = m_IsSsl ?
                             ThreadManager.CreateThread(AcceptedConnectionSsl) :
                             ThreadManager.CreateThread(AcceptedConnectionPlain);
                         t.Start(args.AcceptSocket);
@@ -453,6 +480,10 @@ namespace SilverSim.Main.Common.HttpServer
                 var socket = (Socket)socko;
                 try
                 {
+                    if (m_ServerCertificate == null)
+                    {
+                        return;
+                    }
                     var ep = (IPEndPoint)socket.RemoteEndPoint;
                     foreach (IPortControlServiceInterface service in m_PortControlServices)
                     {
