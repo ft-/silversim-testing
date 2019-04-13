@@ -394,6 +394,7 @@ namespace SilverSim.Main.Common
             FeaturesTable[typeof(IServerParamListener)] = "Server Params";
             FeaturesTable[typeof(IPortControlServiceInterface)] = "Port Control";
             FeaturesTable[typeof(IScriptWorkerThreadPoolFactory)] = "Script Worker Thread Pool Factory";
+            FeaturesTable[typeof(ICertificateObtainService)] = "Certificate Obtainer";
 
             AppDomain.CurrentDomain.AssemblyResolve += ArchSpecificResolveEventHandler;
         }
