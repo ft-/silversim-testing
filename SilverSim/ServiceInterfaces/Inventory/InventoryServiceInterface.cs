@@ -61,9 +61,9 @@ namespace SilverSim.ServiceInterfaces.Inventory
             get
             {
                 InventoryItem item;
-#pragma warning disable CS0618 // Typ oder Element ist veraltet
+#pragma warning disable CS0618
                 if (Item.TryGetValue(key, out item))
-#pragma warning restore CS0618 // Typ oder Element ist veraltet
+#pragma warning restore CS0618
                 {
                     return item;
                 }
@@ -102,9 +102,9 @@ namespace SilverSim.ServiceInterfaces.Inventory
             get
             {
                 InventoryFolder folder;
-#pragma warning disable CS0618 // Typ oder Element ist veraltet
+#pragma warning disable CS0618
                 if (Folder.TryGetValue(key, out folder))
-#pragma warning restore CS0618 // Typ oder Element ist veraltet
+#pragma warning restore CS0618
                 {
                     return folder;
                 }
@@ -213,6 +213,7 @@ namespace SilverSim.ServiceInterfaces.Inventory
             VerifyInventoryFolder(principalID, rootFolder.ID, "Objects", AssetType.Object);
             VerifyInventoryFolder(principalID, rootFolder.ID, "Photo Album", AssetType.SnapshotFolder);
             VerifyInventoryFolder(principalID, rootFolder.ID, "Scripts", AssetType.LSLText);
+            VerifyInventoryFolder(principalID, rootFolder.ID, "Settings", AssetType.Settings);
             VerifyInventoryFolder(principalID, rootFolder.ID, "Sounds", AssetType.Sound);
             VerifyInventoryFolder(principalID, rootFolder.ID, "Textures", AssetType.Texture);
             VerifyInventoryFolder(principalID, rootFolder.ID, "Trash", AssetType.TrashFolder);
