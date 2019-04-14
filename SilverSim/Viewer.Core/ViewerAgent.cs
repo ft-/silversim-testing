@@ -198,7 +198,7 @@ namespace SilverSim.Viewer.Core
 
         /* Circuits: UUID is SceneID */
         public readonly RwLockedDictionary<UUID, AgentCircuit> Circuits = new RwLockedDictionary<UUID, AgentCircuit>();
-        public readonly RwLockedDictionary<GridVector, string> KnownChildAgentURIs = new RwLockedDictionary<GridVector, string>();
+        public readonly RwLockedDictionary<GridVector, IChildAgentConnection> KnownChildAgentConnections = new RwLockedDictionary<GridVector, IChildAgentConnection>();
 
         public override RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>> TransmittedTerrainSerials { get; } = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>>(() => new RwLockedDictionary<uint, uint>());
 
@@ -1093,6 +1093,13 @@ namespace SilverSim.Viewer.Core
                     Timestamp = (uint)Date.GetUnixTime()
                 };
 
+                amc.OnSendCompletion += (bool success) =>
+                {
+                    if(success)
+                    {
+                        HandleChildAgentChanges(circuit);
+                    }
+                };
                 circuit.SendMessage(amc);
 
                 SendAgentDataUpdate(circuit);
@@ -1122,6 +1129,97 @@ namespace SilverSim.Viewer.Core
                     action.TriggerOnRootAgent(ID, scene);
                 }
             }
+        }
+
+        private void HandleChildAgentChanges(AgentCircuit circuit)
+        {
+            SceneInterface scene = circuit.Scene;
+            if(scene == null)
+            {
+                return;
+            }
+
+            Dictionary<GridVector, IChildAgentConnection> disconnects = new Dictionary<GridVector, IChildAgentConnection>();
+            foreach (KeyValuePair<GridVector, IChildAgentConnection> kvp in KnownChildAgentConnections)
+            {
+                UUID childSceneID = kvp.Value.SceneID;
+                if (childSceneID == scene.ID)
+                {
+                    continue;
+                }
+
+                disconnects.Add(kvp.Key, kvp.Value);
+            }
+
+            /* remove all that stay active */
+            foreach (KeyValuePair<UUID, SceneInterface.NeighborEntry> kvp in scene.Neighbors)
+            {
+                disconnects.Remove(kvp.Value.RemoteRegionData.Location);
+            }
+
+            /* connect new child agents */
+            foreach(KeyValuePair<UUID, SceneInterface.NeighborEntry> kvp in scene.Neighbors)
+            {
+                if(!KnownChildAgentConnections.ContainsKey(kvp.Value.RemoteRegionData.Location))
+                {
+                    SceneInterface childScene;
+                    if(m_Scenes.TryGetValue(kvp.Key, out childScene))
+                    {
+                        /* local connect */
+#if DEBUG
+                        m_Log.DebugFormat("Connect agent {0} to scene {1} as child locally", NamedOwner.FullName, childScene.ID);
+#endif
+
+                        UUID seedId;
+                        string seedCapsUri = NewCapsURL(childScene, out seedId);
+                        var udpServer = (UDPCircuitsManager)childScene.UDPServer;
+                        AgentCircuit childCircuit = circuit.CreateChild(udpServer, seedId);
+                        DestinationInfo connectInfo = new DestinationInfo(kvp.Value.RemoteRegionData)
+                        {
+                            TeleportFlags = TeleportFlags.None
+                        };
+                        Circuits.Add(childScene.ID, childCircuit);
+                        try
+                        {
+                            childScene.Add(this);
+                            try
+                            {
+                                udpServer.AddCircuit(childCircuit);
+                            }
+                            catch
+                            {
+                                childScene.Remove(this);
+                                continue;
+                            }
+                        }
+                        catch
+                        {
+                            Circuits.Remove(childScene.ID);
+                            continue;
+                        }
+                        EnableSimulator(scene.ID, circuit.CircuitCode, seedCapsUri, connectInfo);
+                    }
+                    else
+                    {
+
+                    }
+                }
+            }
+
+            /* disconnect unneeded child agents */
+            foreach(IChildAgentConnection conn in disconnects.Values)
+            {
+#if DEBUG
+                m_Log.DebugFormat("Disconnect agent {0} from scene {1}", NamedOwner.FullName, conn.SceneID);
+#endif
+                conn.Disable();
+            }
+        }
+
+        private string NewCapsURL(SceneInterface scene, out UUID id)
+        {
+            id = UUID.Random;
+            return scene.ServerURI + "CAPS/" + id + "0000/";
         }
 
         public void DisableCircuit(UUID sceneid)

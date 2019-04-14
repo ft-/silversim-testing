@@ -813,6 +813,20 @@ namespace SilverSim.Viewer.Core
             Scene.ScheduleUpdate(UpdateInfo);
         }
 
+        public AgentCircuit CreateChild(UDPCircuitsManager server, UUID regionSeedID) => new AgentCircuit(
+                m_Commands,
+                Agent,
+                server,
+                CircuitCode,
+                m_CapsRedirector,
+                regionSeedID,
+                m_ServiceURLCapabilities,
+                GatekeeperURI,
+                m_Extenders,
+                RemoteEndPoint);
+
+        private readonly List<IProtocolExtender> m_Extenders;
+
         public AgentCircuit(
             CommandRegistry commands,
             ViewerAgent agent,
@@ -828,6 +842,7 @@ namespace SilverSim.Viewer.Core
         {
             RemoteEndPoint = remoteEndPoint;
             m_Commands = commands;
+            m_Extenders = extenders;
             InitSimStats();
 
             Agent = agent;
