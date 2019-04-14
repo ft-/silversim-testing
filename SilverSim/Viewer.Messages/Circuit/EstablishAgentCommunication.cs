@@ -20,6 +20,7 @@
 // exception statement from your version.
 
 using SilverSim.Types;
+using System;
 using System.Net;
 
 namespace SilverSim.Viewer.Messages.Circuit
@@ -39,7 +40,7 @@ namespace SilverSim.Viewer.Messages.Circuit
             { "agent-id", AgentID },
             { "sim-ip-and-port", SimIpAndPort.ToString() },
             { "seed-capability", SeedCapability },
-            { "region-handle", GridPosition.RegionHandle.ToString() },
+            { "region-handle", new BinaryData(GridPosition.AsBytes) },
             { "region-size-x", RegionSize.X },
             { "region-size-y", RegionSize.Y }
         };
@@ -47,15 +48,19 @@ namespace SilverSim.Viewer.Messages.Circuit
         public static Message DeserializeIQG(IValue value)
         {
             var map = (Types.Map)value;
-            var msg = new EstablishAgentCommunication
+            byte[] reghandle = (BinaryData)map["Handle"];
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(reghandle);
+            }
+            return new EstablishAgentCommunication
             {
                 AgentID = map["agent-id"].AsUUID,
                 SimIpAndPort = IPEndPointHelpers.CreateIPEndPoint(map["sim-ip-and-port"].ToString()),
                 SeedCapability = map["seed-capability"].ToString(),
-                RegionSize = new GridVector(map["region-size-x"].AsUInt, map["region-size-y"].AsUInt)
+                RegionSize = new GridVector(map["region-size-x"].AsUInt, map["region-size-y"].AsUInt),
+                GridPosition = new GridVector(BitConverter.ToUInt64(reghandle, 0))
             };
-            msg.GridPosition.RegionHandle = ulong.Parse(map["region-handle"].ToString());
-            return msg;
         }
     }
 }
