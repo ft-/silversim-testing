@@ -31,6 +31,7 @@ using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Object;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading;
 
 namespace SilverSim.Viewer.Core
@@ -168,12 +169,74 @@ namespace SilverSim.Viewer.Core
             m_TxObjectQueue.Enqueue(info);
         }
 
+        private class ScheduleFirstUpdateInfo : IObjUpdateInfo
+        {
+            public uint LocalID => 0;
+            public uint ParentID => 0;
+
+            public UUID ID => UUID.Zero;
+
+            public UGUI Owner => UGUI.Unknown;
+
+            public bool IsAlwaysFull => false;
+
+            public bool IsKilled => true;
+
+            public bool IsTemporary => true;
+
+            public bool IsAttached => false;
+
+            public bool IsMoving => false;
+
+            public bool IsAttachedToPrivate => true;
+
+            public bool IsPhysics => false;
+
+            public int SerialNumber => 0;
+
+            public byte[] GetCompressedUpdate(CultureInfo cultureInfo)
+            {
+                throw new NotSupportedException();
+            }
+
+            public byte[] GetCompressedUpdateLimited(CultureInfo cultureInfo)
+            {
+                throw new NotSupportedException();
+            }
+
+            public byte[] GetFullUpdate(CultureInfo cultureInfo)
+            {
+                throw new NotSupportedException();
+            }
+
+            public byte[] GetFullUpdateLimited(CultureInfo cultureInfo)
+            {
+                throw new NotSupportedException();
+            }
+
+            public byte[] GetPropertiesUpdate(CultureInfo cultureInfo)
+            {
+                throw new NotSupportedException();
+            }
+
+            public byte[] GetTerseUpdate(CultureInfo cultureInfo)
+            {
+                throw new NotSupportedException();
+            }
+
+            public byte[] GetTerseUpdateLimited(CultureInfo cultureInfo)
+            {
+                throw new NotSupportedException();
+            }
+        }
+
+        private static readonly ScheduleFirstUpdateInfo m_ScheduleFirstUpdateTrigger = new ScheduleFirstUpdateInfo();
+
         public void ScheduleFirstUpdate()
         {
             m_EnableObjectUpdates = true;
             EnablePhysicalOutQueue = true;
-            m_TriggerFirstUpdate = true;
-            m_TxObjectQueue.Enqueue(null);
+            m_TxObjectQueue.Enqueue(m_ScheduleFirstUpdateTrigger);
         }
 
         private void SendObjectUpdateMsg(UDPPacket p)
@@ -673,10 +736,15 @@ namespace SilverSim.Viewer.Core
                 int qcount = m_TxObjectQueue.Count;
                 while (objinfo != null)
                 {
+                    Type objInfoType = objinfo.GetType();
                     /* better use a compare here than the "is" */
-                    if(objinfo.GetType() == typeof(AgentUpdateInfo))
+                    if(objInfoType == typeof(AgentUpdateInfo))
                     {
                         /* agents pass */
+                    }
+                    else if(objInfoType == typeof(ScheduleFirstUpdateInfo))
+                    {
+                        m_TriggerFirstUpdate = true;
                     }
                     else if (!m_EnableObjectUpdates)
                     {
