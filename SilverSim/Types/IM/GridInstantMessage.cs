@@ -37,6 +37,7 @@ namespace SilverSim.Types.IM
         public byte[] BinaryBucket = new byte[0];
         public uint ParentEstateID;
         public UUID RegionID = UUID.Zero;
+        public string GatekeeperURI = string.Empty;
         public Date Timestamp = new Date();
 
         public Action<GridInstantMessage, bool /* success */> OnResult;
