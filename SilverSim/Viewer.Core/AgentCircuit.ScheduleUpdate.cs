@@ -170,9 +170,9 @@ namespace SilverSim.Viewer.Core
 
         public void ScheduleFirstUpdate()
         {
-            m_TriggerFirstUpdate = true;
             m_EnableObjectUpdates = true;
             EnablePhysicalOutQueue = true;
+            m_TriggerFirstUpdate = true;
             m_TxObjectQueue.Enqueue(null);
         }
 
