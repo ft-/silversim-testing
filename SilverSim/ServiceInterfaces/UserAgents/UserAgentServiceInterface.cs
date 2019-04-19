@@ -19,6 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.ServiceInterfaces.IM;
 using SilverSim.Types;
 using SilverSim.Types.Account;
 using SilverSim.Types.Agent;
@@ -83,6 +84,8 @@ namespace SilverSim.ServiceInterfaces.UserAgents
         {
             throw new NotSupportedException();
         }
+
+        public abstract IMServiceInterface GetIMService(UUID agentid);
 
         public virtual void Reauth()
         {

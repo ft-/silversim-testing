@@ -19,10 +19,12 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.ServiceInterfaces.IM;
 using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Grid;
+using SilverSim.Types.IM;
 using SilverSim.Types.ServerURIs;
 using System;
 using System.Collections.Generic;
@@ -95,6 +97,19 @@ namespace SilverSim.Viewer.Profile
         bool IDisplayNameAccessor.ContainsKey(UGUI agent)
         {
             return false;
+        }
+
+        private sealed class DummyIMService : IMServiceInterface
+        {
+            public override void Send(GridInstantMessage im)
+            {
+                /* intentionally left empty */
+            }
+        }
+
+        public override IMServiceInterface GetIMService(UUID agentid)
+        {
+            return new DummyIMService();
         }
     }
 }
