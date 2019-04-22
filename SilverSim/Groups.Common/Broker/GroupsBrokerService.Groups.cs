@@ -37,7 +37,7 @@ namespace SilverSim.Groups.Common.Broker
 
         bool IGroupsInterface.ContainsKey(UGUI requestingAgent, UGI groupID)
         {
-            GroupsServiceInterface groupsService;
+            GroupsBrokerEntry groupsService;
             return TryGetGroupsService(groupID, out groupsService) && groupsService.Groups.ContainsKey(requestingAgent, groupID);
         }
 
@@ -69,7 +69,7 @@ namespace SilverSim.Groups.Common.Broker
 
         bool IGroupsInterface.TryGetValue(UGUI requestingAgent, UGI groupID, out GroupInfo groupInfo)
         {
-            GroupsServiceInterface groupsService;
+            GroupsBrokerEntry groupsService;
             groupInfo = default(GroupInfo);
             return TryGetGroupsService(groupID, out groupsService) && groupsService.Groups.TryGetValue(requestingAgent, groupID, out groupInfo);
         }

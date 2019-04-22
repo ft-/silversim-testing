@@ -19,15 +19,22 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.Types;
 using SilverSim.Types.Groups;
 
-namespace SilverSim.ServiceInterfaces.Groups
+namespace SilverSim.Groups.Common.Broker
 {
-    public interface IGroupsChatServiceInterface
+    internal sealed partial class GroupsBrokerEntry : IGroupsChatServiceInterface
     {
-        /* only connectors and group IM router implement these */
-        void Send(GroupInstantMessage im);
-        void Leave(UGI group, UUID sessionid, UGUI agent);
+        public void Leave(UGI group, UUID sessionid, UGUI agent)
+        {
+            InnerGroupsChatService?.Leave(group, sessionid, agent);
+        }
+
+        public void Send(GroupInstantMessage im)
+        {
+            InnerGroupsChatService?.Send(im);
+        }
     }
 }

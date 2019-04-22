@@ -30,6 +30,8 @@ namespace SilverSim.Groups.Common.Broker
 
         private GroupsServiceInterface InnerGroupsService { get; }
 
+        private IGroupsChatServiceInterface InnerGroupsChatService { get; }
+
         public override IGroupsInterface Groups => InnerGroupsService.Groups;
 
         public override IGroupRolesInterface Roles => this;
@@ -50,9 +52,10 @@ namespace SilverSim.Groups.Common.Broker
 
         public long ExpiryTickCount;
 
-        public GroupsBrokerEntry(GroupsServiceInterface innerGroupsService, long expiryTickCount)
+        public GroupsBrokerEntry(GroupsServiceInterface innerGroupsService, IGroupsChatServiceInterface innerGroupsChatService, long expiryTickCount)
         {
             InnerGroupsService = innerGroupsService;
+            InnerGroupsChatService = innerGroupsChatService;
             ExpiryTickCount = expiryTickCount;
         }
 

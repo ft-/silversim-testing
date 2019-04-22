@@ -32,4 +32,13 @@ namespace SilverSim.ServiceInterfaces.Groups
         bool IsProtocolSupported(string url);
         bool IsProtocolSupported(string url, Dictionary<string, string> cachedheaders);
     }
+
+    public interface IGroupsChatServicePlugin
+    {
+        IGroupsChatServiceInterface Instantiate(string url);
+        IGroupsChatServiceInterface Instantiate(UGI ugi);
+        string Name { get; }
+        bool IsProtocolSupported(string url);
+        bool IsProtocolSupported(string url, Dictionary<string, string> cachedheaders);
+    }
 }

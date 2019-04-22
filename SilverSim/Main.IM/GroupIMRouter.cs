@@ -35,7 +35,7 @@ namespace SilverSim.Main.IM
 {
     [Description("IM Router")]
     [PluginName("GroupIMRouter")]
-    public sealed class GroupIMRouter : IGroupChatInterface
+    public sealed class GroupIMRouter : IGroupsChatServiceInterface
     {
         private BlockingQueue<GroupInstantMessage> m_Queue = new BlockingQueue<GroupInstantMessage>();
         private RwLockedList<Thread> m_Threads = new RwLockedList<Thread>();
@@ -86,10 +86,10 @@ namespace SilverSim.Main.IM
         }
         #endregion
 
-        public void Leave(UUID sessionid, UGUI agent)
+        public void Leave(UGI group, UUID sessionid, UGUI agent)
         {
             GroupSession session;
-            if(m_ActiveSessions.TryGetValue(sessionid, out session))
+            if(m_ActiveSessions.TryGetValue(sessionid, out session) && group.EqualsGrid(session.Group))
             {
                 session.Participants.Remove(agent);
                 m_ActiveChats.RemoveIf(session.Group.ID, (r) => r.Participants.Count == 0);

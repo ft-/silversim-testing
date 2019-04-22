@@ -33,14 +33,14 @@ namespace SilverSim.Groups.Common.Broker
 
         bool IGroupMembershipsInterface.ContainsKey(UGUI requestingAgent, UGI group, UGUI principal)
         {
-            GroupsServiceInterface groupsService;
+            GroupsBrokerEntry groupsService;
             return TryGetGroupsService(group, out groupsService) && groupsService.Memberships.ContainsKey(requestingAgent, group, principal);
         }
 
         bool IGroupMembershipsInterface.TryGetValue(UGUI requestingAgent, UGI group, UGUI principal, out GroupMembership gmem)
         {
             gmem = default(GroupMembership);
-            GroupsServiceInterface groupsService;
+            GroupsBrokerEntry groupsService;
             return TryGetGroupsService(group, out groupsService) && groupsService.Memberships.TryGetValue(requestingAgent, group, principal, out gmem);
         }
     }

@@ -28,7 +28,6 @@ using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.Threading;
 using SilverSim.Types;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Timers;
@@ -66,11 +65,14 @@ namespace SilverSim.Groups.Common.Broker
 
         private GroupsServiceInterface m_GroupsService;
         private readonly string m_GroupsServiceName;
+        private IGroupsChatServiceInterface m_GroupIMRouter;
+        private readonly string m_GroupIMRouterName;
         private string m_GroupsHomeURI;
         private SceneList m_Scenes;
 
         private List<IGroupsServicePlugin> m_GroupsServicePlugins;
         private List<IUserAgentServicePlugin> m_UserAgentServicePlugins;
+        private List<IGroupsChatServicePlugin> m_GroupsChatServicePlugins;
 
         private readonly RwLockedDictionary<UUID, GroupsBrokerEntry> m_NameCache = new RwLockedDictionary<UUID, GroupsBrokerEntry>();
 
@@ -96,7 +98,17 @@ namespace SilverSim.Groups.Common.Broker
 
         private GroupsServiceInterface GetGroupsService(UGI group)
         {
-            GroupsServiceInterface groupsService;
+            GroupsBrokerEntry groupsService;
+            if (!TryGetGroupsService(group, out groupsService))
+            {
+                throw new GroupsServiceNotFoundException();
+            }
+            return groupsService;
+        }
+
+        private IGroupsChatServiceInterface GetGroupsChatService(UGI group)
+        {
+            GroupsBrokerEntry groupsService;
             if (!TryGetGroupsService(group, out groupsService))
             {
                 throw new GroupsServiceNotFoundException();
@@ -140,12 +152,14 @@ namespace SilverSim.Groups.Common.Broker
                 groupsService = default(GroupsServiceInterface);
                 return false;
             }
-            return TryGetGroupsService(group, out groupsService);
+            bool result = TryGetGroupsService(group, out entry);
+            groupsService = entry;
+            return result;
         }
 
-        private bool TryGetGroupsService(UGI ugi, out GroupsServiceInterface groupsService)
+        private bool TryGetGroupsService(UGI ugi, out GroupsBrokerEntry groupsService)
         {
-            groupsService = default(GroupsServiceInterface);
+            groupsService = default(GroupsBrokerEntry);
             Dictionary<string, string> cachedheaders;
             GroupsBrokerEntry entry;
             if(ugi.HomeURI == null)
@@ -171,19 +185,35 @@ namespace SilverSim.Groups.Common.Broker
 
             if (m_GroupsService != null && m_GroupsHomeURI == groupsServerURI)
             {
-                entry = new GroupsBrokerEntry(m_GroupsService, m_ClockSource.TickCount);
+                entry = new GroupsBrokerEntry(m_GroupsService, m_GroupIMRouter, m_ClockSource.TickCount);
                 m_NameCache[ugi.ID] = entry;
                 groupsService = entry;
                 return true;
             }
 
             cachedheaders = ServicePluginHelo.HeloRequest(groupsServerURI);
-            foreach(IGroupsServicePlugin plugin in m_GroupsServicePlugins)
+
+            foreach (IGroupsServicePlugin plugin in m_GroupsServicePlugins)
             {
                 if(plugin.IsProtocolSupported(groupsServerURI, cachedheaders))
                 {
                     GroupsServiceInterface service = plugin.Instantiate(ugi);
-                    entry = new GroupsBrokerEntry(service, m_ClockSource.TickCount);
+
+                    IGroupsChatServiceInterface chatService = service as IGroupsChatServiceInterface;
+                    if (chatService == null)
+                    {
+                        /* do not search for it if the groups connector has it integrated */
+                        foreach (IGroupsChatServicePlugin chatplugin in m_GroupsChatServicePlugins)
+                        {
+                            if (chatplugin.IsProtocolSupported(groupsServerURI, cachedheaders))
+                            {
+                                chatService = chatplugin.Instantiate(ugi);
+                                break;
+                            }
+                        }
+                    }
+
+                    entry = new GroupsBrokerEntry(service, chatService, m_ClockSource.TickCount);
                     m_NameCache[ugi.ID] = entry;
                     groupsService = entry;
                     return true;
@@ -208,6 +238,7 @@ namespace SilverSim.Groups.Common.Broker
             m_GroupsServiceName = config.GetString("GroupsService", string.Empty);
             m_ClockSource = TimeProvider.StopWatch;
             m_GroupsNameServiceName = config.GetString("GroupsNameService", "GroupsNameStorage");
+            m_GroupIMRouterName = config.GetString("GroupIMRouter", string.Empty);
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -215,10 +246,15 @@ namespace SilverSim.Groups.Common.Broker
             m_Scenes = loader.Scenes;
             m_GroupsServicePlugins = loader.GetServicesByValue<IGroupsServicePlugin>();
             m_UserAgentServicePlugins = loader.GetServicesByValue<IUserAgentServicePlugin>();
+            m_GroupsChatServicePlugins = loader.GetServicesByValue<IGroupsChatServicePlugin>();
             loader.GetService(m_GroupsNameServiceName, out m_GroupsNameService);
             if(!string.IsNullOrEmpty(m_GroupsServiceName))
             {
                 loader.GetService(m_GroupsServiceName, out m_GroupsService);
+            }
+            if(!string.IsNullOrEmpty(m_GroupIMRouterName))
+            {
+                loader.GetService(m_GroupIMRouterName, out m_GroupIMRouter);
             }
             m_GroupsHomeURI = loader.HomeURI;
             m_Timer.Elapsed += ExpireHandler;
