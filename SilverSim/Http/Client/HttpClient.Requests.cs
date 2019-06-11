@@ -24,17 +24,82 @@ using SilverSim.Types.StructuredData.Json;
 using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Net.Security;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Xml;
 
 namespace SilverSim.Http.Client
 {
     public static partial class HttpClient
     {
+        public static class Rfc8187
+        {
+            public static string Encode(string val)
+            {
+                byte[] str = val.ToUTF8Bytes();
+                var sb = new StringBuilder();
+                bool isUtf8 = false;
+                foreach(byte b in str)
+                {
+                    char c = (char)b;
+                    if(b > 0x20 && b <= 0x7F && c != '?' && c != '=')
+                    {
+                        sb.Append(c);
+                    }
+                    else
+                    {
+                        isUtf8 = true;
+                        sb.AppendFormat("%{0:X2}", b);
+                    }
+                }
+
+                return isUtf8 ? ("utf-8''" + sb.ToString()) : sb.ToString();
+            }
+
+            public static string Decode(string encoded)
+            {
+                int n = encoded.Length;
+                int i;
+                if(!encoded.StartsWith("utf-8'", true, CultureInfo.InvariantCulture))
+                {
+                    return encoded;
+                }
+
+                i = encoded.IndexOf("'", 6);
+                if(i < 0)
+                {
+                    throw new InvalidDataException();
+                }
+
+                ++i;
+                StringBuilder sb = new StringBuilder();
+
+                while (i < n)
+                {
+                    char c = encoded[i++];
+                    if(c == '%')
+                    {
+                        if(i + 2 > n)
+                        {
+                            break;
+                        }
+                        sb.Append(Convert.ToByte(encoded.Substring(i + 1, 2), 16));
+                    }
+                    else
+                    {
+                        sb.Append(c);
+                    }
+                }
+
+                return sb.ToString();
+            }
+        }
+
         public interface IRequestBodyType
         {
             string ContentType { get; }
