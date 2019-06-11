@@ -89,6 +89,7 @@ namespace SilverSim.Http.Client
                             break;
                         }
                         sb.Append(Convert.ToByte(encoded.Substring(i + 1, 2), 16));
+                        i += 2;
                     }
                     else
                     {
